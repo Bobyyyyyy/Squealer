@@ -17,6 +17,8 @@ app.set('view engine', 'ejs');
 
 //il sito inizia dando il controllo al router della frontpage
 app.use('/', require('./routes/frontpage'));
+app.use('/register', require('./routes/register'));
+app.use('/homepage',require('./routes/App.js'))
 
 // avvio di node
 app.listen(8000,function() {
