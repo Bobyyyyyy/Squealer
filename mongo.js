@@ -1,13 +1,14 @@
 const mongoose = require('mongoose');
 const UserdbName = "userdb";  
-import User from "./models/User.js";
+const User = require("./models/User.js");
 
 //in qualche modo si deve collegare all'index, magari facendo routing?
 
 //connessione
 exports.createUserDB = async (credentials) => {
     try{
-        const mongoDBuri = `mongodb://${credentials.user}:${credentials.pwd}@${credentials.site}/${dbname}`;
+       //const mongoDBuri = `mongodb://${credentials.user}:${credentials.pwd}@${credentials.site}/${dbname}`;
+       const mongoDBuri = `mongodb://localhost:27017/${UserdbName}`;
         await mongoose.connect(mongoDBuri,{
             useUnifiedTopology: true, 
             useNewUrlParser: true 
