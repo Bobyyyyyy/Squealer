@@ -1,10 +1,13 @@
+const mongoose = require('mongoose');
+const mongojs = require('./mongo');
+
 global.rootDir = __dirname; //Salviamo la directory locale
 global.startDate = null;
 
 const express = require('express');
 const cors = require('cors');
 
-
+mongojs.createUserDB(null);
 let app = express();
 //https://dev.to/alisinayousofi/why-we-use-appuseexpressjson-in-our-express-web-app-384
 app.use(express.urlencoded({ extended: true })); 
@@ -25,3 +28,4 @@ app.listen(8000,function() {
     global.startDate = new Date();
     console.log('App listenting on port 8000 started' + ' ' + global.startDate.toLocaleString());
 });
+
