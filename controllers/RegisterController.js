@@ -11,7 +11,7 @@ const registerDB = async (req,res) => {
         body: req.body
     });
     let result = await response.json();
-    res.render('/homepage',{result});
+    res.render('/homepage',{data: result});
 }
 
 module.exports = {

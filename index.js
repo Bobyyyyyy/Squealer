@@ -7,7 +7,6 @@ global.startDate = null;
 const express = require('express');
 const cors = require('cors');
 
-mongojs.createUserDB(null);
 let app = express();
 //https://dev.to/alisinayousofi/why-we-use-appuseexpressjson-in-our-express-web-app-384
 app.use(express.urlencoded({ extended: true })); 
@@ -21,7 +20,7 @@ app.set('view engine', 'ejs');
 //il sito inizia dando il controllo al router della frontpage
 app.use('/', require('./routes/frontpage'));
 app.use('/register', require('./routes/register'));
-app.use('/homepage',require('./routes/App.js'))
+app.use('/homepage',require('./routes/App'))
 app.use('/db',require('./routes/MongoDB'));
 
 
