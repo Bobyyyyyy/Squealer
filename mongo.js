@@ -23,47 +23,53 @@ Dunque funzione di creazione del DB non ha senso.
 
 //POST
 exports.addUser = async (body,credentials) => {
+
     try{
-        const mongouri = `mongodb://${credentials.user}:${credentials.pwd}@${credentials.site}/${dbname}`;
-        //const mongouri = `mongodb://localhost:27017/${dbname}`;
-        const db = await mongoose.connect(mongouri, {       //https://stackoverflow.com/questions/74218532/possible-to-have-mongoose-return-a-connection
+        //const mongouri = `mongodb://${credentials.user}:${credentials.pwd}@${credentials.site}/${dbname}`;
+        const mongouri = `mongodb://localhost:27017/${dbname}`;
+        await mongoose.connect(mongouri, {       //https://stackoverflow.com/questions/74218532/possible-to-have-mongoose-return-a-connection
             useUnifiedTopology: true,
             useNewUrlParser: true
-        })
-
-        if (await db.User.findOne({ email: body.email })) {
-            let err = new Error("Utente già registrato! Inserire una nuova mail");
-            err.statusCode = 400;
-            return err;
-        }
+        });
 
         const newUser = new User({
-            username: body.username,
+            username: body.name,
             email: body.email,
             password: body.password,
         })
 
-        await db.collection('User').insertOne(newUser);
+        if (await User.find({email: body.email})) {
+            let err = new Error("Utente già registrato! Inserire una nuova mail");
+            err.statusCode = 400;
+            console.log(err);
+            return err;
+        }
+
+        await newUser.save();
+
+        //debug console.log(newUser)
 
         await mongoose.connection.close();
 
-        //gestire i vari casi in base al valore di ritorno della risposta
     }
     catch(err){
+        console.log(err);
         return err;
     }
 }
 
 exports.getUserByEmail = async (query,credentials) =>{
-    const mongouri = `mongodb://${credentials.user}:${credentials.pwd}@${credentials.site}/${dbname}`;
-    //const mongouri = `mongodb://localhost:27017/${dbname}/Users`;
+    //const mongouri = `mongodb://${credentials.user}:${credentials.pwd}@${credentials.site}/${dbname}`;
+    const mongouri = `mongodb://localhost:27017/${dbname}/Users`;
     try {
-        const db = await mongoose.connect(mongouri,{
+        await mongoose.connect(mongouri,{
             useUnifiedTopology: true,
             useNewUrlParser: true
         })
 
-        const user = await db.collection('User').find(query).lean();    //lean restituisce un oggetto JS
+        const user = await User.find(query).lean();    //lean restituisce un oggetto JS
+
+        console.log(user);
 
         await mongoose.connection.close();
 
