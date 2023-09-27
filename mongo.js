@@ -11,47 +11,68 @@ usare la funzione insert_one per inserire
 Dunque funzione di creazione del DB non ha senso.
  */
 
-//connessione
-exports.createUserDB = async (credentials) => {
-    try{
-       //const mongoDBuri = `mongodb://${credentials.user}:${credentials.pwd}@${credentials.site}/${dbname}`;
-       const mongoDBuri = `mongodb://localhost:27017/${UserdbName}`;
-        await mongoose.connect(mongoDBuri,{
-            useUnifiedTopology: true, 
-            useNewUrlParser: true 
-        })
-        //debug
-        console.log("DB connected");
-
-
-    }
-    catch(err){
-        console.log(err);
-    }
-}
+/*
+##########
+#  USER  #
+##########
+*/
 
 //va qui?
 //https://stackoverflow.com/questions/70229333/creating-an-instance-in-mongoose
-exports.addUser = async(req,res) => {
+//da capire come gestire le credenziali
+
+//POST
+exports.addUser = async (body,credentials) => {
     try{
-        //const mongouri = `mongodb://${credentials.user}:${credentials.pwd}@${credentials.site}/${dbname}`;
-        const mongouri = `mongodb://localhost:27017/${dbname}/Users`;
-        await mongoose.connect(mongouri,{       //https://stackoverflow.com/questions/74218532/possible-to-have-mongoose-return-a-connection
+        const mongouri = `mongodb://${credentials.user}:${credentials.pwd}@${credentials.site}/${dbname}`;
+        //const mongouri = `mongodb://localhost:27017/${dbname}`;
+        const db = await mongoose.connect(mongouri, {       //https://stackoverflow.com/questions/74218532/possible-to-have-mongoose-return-a-connection
             useUnifiedTopology: true,
             useNewUrlParser: true
         })
+
+        if (await db.User.findOne({ email: body.email })) {
+            let err = new Error("Utente già registrato! Inserire una nuova mail");
+            err.statusCode = 400;
+            return err;
+        }
+
         const newUser = new User({
-            username: req.body.username,
-            email: req.body.email,
-            password: req.body.password,
+            username: body.username,
+            email: body.email,
+            password: body.password,
         })
 
-        await newUser.save();
+        await db.collection('User').insertOne(newUser);
 
         await mongoose.connection.close();
+
         //gestire i vari casi in base al valore di ritorno della risposta
     }
     catch(err){
-        console.log(err);
+        return err;
     }
 }
+
+exports.getUserByEmail = async (query,credentials) =>{
+    const mongouri = `mongodb://${credentials.user}:${credentials.pwd}@${credentials.site}/${dbname}`;
+    //const mongouri = `mongodb://localhost:27017/${dbname}/Users`;
+    try {
+        const db = await mongoose.connect(mongouri,{
+            useUnifiedTopology: true,
+            useNewUrlParser: true
+        })
+
+        const user = await db.collection('User').find(query).lean();    //lean restituisce un oggetto JS
+
+        await mongoose.connection.close();
+
+        return user;
+    }
+    catch (err){
+        return err;
+    }
+}
+
+
+//https://stackoverflow.com/questions/74242292/how-to-return-documents-in-mongoose-and-express-js-which-are-associated-with-onl
