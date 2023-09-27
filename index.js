@@ -22,6 +22,8 @@ app.set('view engine', 'ejs');
 app.use('/', require('./routes/frontpage'));
 app.use('/register', require('./routes/register'));
 app.use('/homepage',require('./routes/App.js'))
+app.use('/db',require('./routes/MongoDB'));
+
 
 // avvio di node
 app.listen(8000,function() {
