@@ -5,27 +5,16 @@ const registerView = (req, res) => {
     });
 }
 
-const registerDB = (req,res) => {
-    //Funzione che viene chiamata quando dobbiamo registrare l'utente nel DB (POST)
-
-    console.log("Sto usando registerDB");
-
-    /*if(persona nel database) {
-        riportiamo alla home con un messaggio di account già esistente
-    
-    }
-    else {
-        devo passare i dati del mio user all'home page cosi' carichera tutti i dati realtivi all'user
-        https://stackoverflow.com/questions/26746730/express-js-is-it-possible-to-pass-an-object-to-a-redirect-like-it-is-with-res-r
-    }
-    */
-
-    res.redirect("/homepage");
+const registerDB = async (req,res) => {
+    let response = await fetch ('db/create',{
+        method:'POST',
+        body: req.body
+    });
+    let result = await response.json();
+    res.render('/homepage',{result});
 }
 
-
-
-module.exports =  {
+module.exports = {
     registerDB,
     registerView
 };
