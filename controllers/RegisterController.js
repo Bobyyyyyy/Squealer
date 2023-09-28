@@ -11,10 +11,22 @@ const registerDB = async (req,res) => {
         body: req.body
     });
     let result = await response.json();
-    res.render('/homepage',{data: result});
+    res.render('App/homepage',{result});
 }
+
+
+const esempio = async (req,res) => {
+        const user = {
+            name: 'Alessandro',
+            surname: 'Tomaiuolo',
+            age: '21'
+        };
+        res.render('App/homepage', {user});
+}
+
 
 module.exports = {
     registerDB,
-    registerView
+    registerView,
+    esempio
 };
