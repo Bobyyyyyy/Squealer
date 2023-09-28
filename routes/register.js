@@ -1,7 +1,8 @@
 const express = require('express');
-const {registerView,registerDB, esempio} = require('../controllers/RegisterController');
+const {registerView} = require('../controllers/RegisterController');
+const {createUser} = require("../controllers/MongoController");
+
 const router = express.Router();
 router.get('/',registerView);
-router.post('/registerUser',registerDB);
-router.get('/test',esempio);
+router.post('/registerUser',createUser);
 module.exports = router;

@@ -10,5 +10,4 @@ const registerView = (req, res) => {
 
 module.exports = {
     registerView,
-    esempio
 };
