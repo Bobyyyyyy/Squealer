@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const dbname = "db";
-const User = require("./models/User.js");
+const User = require("./models/User");
+const Post = require("./models/Post");
+const {ObjectId} = require("mongodb");
 
 /*
 Non ha senso creare un DB. Mongo funziona così:
@@ -17,13 +19,11 @@ Dunque funzione di creazione del DB non ha senso.
 ##########
 */
 
-//va qui?
-//https://stackoverflow.com/questions/70229333/creating-an-instance-in-mongoose
 //da capire come gestire le credenziali
 
-//POST
-exports.addUser = async (body,credentials) => {
 
+
+exports.addUser = async (body,credentials) => {
     try{
         //const mongouri = `mongodb://${credentials.user}:${credentials.pwd}@${credentials.site}/${dbname}`;
         const mongouri = `mongodb://localhost:27017/${dbname}`;
@@ -36,21 +36,22 @@ exports.addUser = async (body,credentials) => {
             username: body.name,
             email: body.email,
             password: body.password,
-        })
+        });
 
-        if (await User.find({email: body.email})) {
+        let findResult =  await User.find({email: body.email}).lean();
+
+        if (findResult.length !== 0) {
             let err = new Error("Utente già registrato! Inserire una nuova mail");
             err.statusCode = 400;
             console.log(err);
+            await mongoose.connection.close();
             return err;
         }
-
         await newUser.save();
-
-        //debug console.log(newUser)
 
         await mongoose.connection.close();
 
+        return newUser;
     }
     catch(err){
         console.log(err);
@@ -60,7 +61,7 @@ exports.addUser = async (body,credentials) => {
 
 exports.getUserByEmail = async (query,credentials) =>{
     //const mongouri = `mongodb://${credentials.user}:${credentials.pwd}@${credentials.site}/${dbname}`;
-    const mongouri = `mongodb://localhost:27017/${dbname}/Users`;
+    const mongouri = `mongodb://localhost:27017/${dbname}`;
     try {
         await mongoose.connect(mongouri,{
             useUnifiedTopology: true,
@@ -79,6 +80,41 @@ exports.getUserByEmail = async (query,credentials) =>{
         return err;
     }
 }
-
-
 //https://stackoverflow.com/questions/74242292/how-to-return-documents-in-mongoose-and-express-js-which-are-associated-with-onl
+
+
+/*
+##########
+#  POST  #
+##########
+*/
+
+exports.addPost = async (user,body,credentials) => {
+    try{
+        //const mongouri = `mongodb://${credentials.user}:${credentials.pwd}@${credentials.site}/${dbname}`;
+        const mongouri = `mongodb://localhost:27017/${dbname}`;
+        await mongoose.connect(mongouri, {       //https://stackoverflow.com/questions/74218532/possible-to-have-mongoose-return-a-connection
+            useUnifiedTopology: true,
+            useNewUrlParser: true
+        });
+
+        //User.find()
+
+        const newPost = new Post({
+            ownerId: user, //user._id,      capire il concetto di sessione per capire come prendere l'id di chi scrive il post
+            views: body.views,
+            dateOfCreation: new Date().getTime(),
+            comments: [],
+            content: "pippo",       //body.content,
+            contentType: "pippo",   //body.contentType,
+        });
+
+        await newPost.save();
+
+        await mongoose.connection.close();
+    }
+    catch(err){
+        console.log(err);
+        return err;
+    }
+}

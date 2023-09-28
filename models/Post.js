@@ -3,7 +3,16 @@ const {ObjectId} = require("mongodb");
 
 const PostSchema = new mongoose.Schema({
     ownerId: {
-        type: mongoose.Schema.ObjectId,
+        //type: mongoose.Schema.ObjectId,
+        type: Number,
+        required: true,
+    },
+    contentType:{
+        type: String,       //geolocalizzazione, immagine o testo
+        required: true,
+    },
+    content:{
+        type: String,       // ?
         required: true,
     },
     reactions:{
@@ -48,3 +57,7 @@ const PostSchema = new mongoose.Schema({
         }
         ]
 })
+
+const Post = mongoose.model("Post", PostSchema);
+
+module.exports = Post;
