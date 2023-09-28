@@ -1,0 +1,20 @@
+Note per capire fasi e struttura:
+
+Utilizziamo un modello MVC (Model-View-Controller)
+
+Database:
+
+Non ha senso creare un DB. Mongo funziona così:
+- un dataBase esiste solo se c'è qualcosa dentro. Dunque al primo inserimento viene creato
+- un DB contiene molteplici collezioni (canali, post, utenti)
+- ogni collezione contiene molteplici Documenti (che sono le istanze della collezione)
+usare la funzione insert_one per inserire
+Dunque funzione di creazione del DB non ha senso.
+
+
+
+TODO:
+- tutto frontend
+- definire per bene tutti i modelli
+- capire come fare la sessione (cookies)
+- hash della password (bcrypt.js, a livello server)

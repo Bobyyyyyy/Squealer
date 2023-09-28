@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const mongojs = require('./mongo');
 
 global.rootDir = __dirname; //Salviamo la directory locale
 global.startDate = null;

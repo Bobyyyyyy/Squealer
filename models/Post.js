@@ -40,6 +40,9 @@ const PostSchema = new mongoose.Schema({
     views: {
         type: Number,
     },
+    tag: {
+        type: String,
+    },
     comments: [
         {
             body:{

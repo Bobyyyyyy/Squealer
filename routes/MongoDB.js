@@ -4,7 +4,6 @@ const {homeView} = require("../controllers/AppController");
 
 const router = express.Router();
 router.post('/create',createUser);
-router.get('/search',search);
 router.post('/addPost',createPost);
 
 module.exports = router;
