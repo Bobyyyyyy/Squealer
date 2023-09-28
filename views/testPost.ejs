@@ -1,0 +1,42 @@
+<%- include('layout.ejs'); %>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h2>NODE.JS MVC</h2>
+            <div class="card">
+                <div class="card-header">Register</div>
+                <div class="card-body">
+
+                    <form class="form-horizontal" method="post" action="/db/addPost">
+
+                        <div class="form-group">
+                            <label for="name" class="cols-sm-2 control-label">Data di creazione</label>
+                            <div class="cols-sm-10">
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="fa fa-user fa" aria-hidden="true"></i></span>
+                                    <input type="date" class="form-control" name="date" id="date" placeholder="Enter your date" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="email" class="cols-sm-2 control-label">Views</label>
+                            <div class="cols-sm-10">
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="fa fa-envelope fa" aria-hidden="true"></i></span>
+                                    <input type="number" class="form-control" name="views" id="views" placeholder="Inserisci le views" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group ">
+                            <button type="submit" class="btn btn-primary btn-lg btn-block login-button">Register</button>
+                        </div>
+                        <div class="login-register">
+                            <a href="/">Go back</a>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
