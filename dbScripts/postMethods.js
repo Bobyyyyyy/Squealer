@@ -1,15 +1,10 @@
 const mongoose = require('mongoose');
 const Post = require("../models/Post");
+const {connectdb} = require("mongoose");
 
 const addPost = async (user,body,credentials) => {
     try{
-        //const mongouri = `mongodb://${credentials.user}:${credentials.pwd}@${credentials.site}/${dbname}`;
-        const mongouri = `mongodb://localhost:27017/${dbname}`;
-        await mongoose.connect(mongouri, {       //https://stackoverflow.com/questions/74218532/possible-to-have-mongoose-return-a-connection
-            useUnifiedTopology: true,
-            useNewUrlParser: true
-        });
-
+        await connectdb(credentials);
         const newPost = new Post({
             ownerId: user, //user._id,      capire il concetto di sessione per capire come prendere l'id di chi scrive il post
             views: body.views,

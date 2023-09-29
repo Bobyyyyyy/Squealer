@@ -1,16 +1,12 @@
 const mongoose = require('mongoose');
-const dbname = "db";
 const User = require("../models/User");
+const {connectdb} = require("./utils");
+
 
 //POST
 const addUser = async (body,credentials) => {
     try{
-        //const mongouri = `mongodb://${credentials.user}:${credentials.pwd}@${credentials.site}/${dbname}`;
-        const mongouri = `mongodb://localhost:27017/${dbname}`;
-        await mongoose.connect(mongouri, {       //https://stackoverflow.com/questions/74218532/possible-to-have-mongoose-return-a-connection
-            useUnifiedTopology: true,
-            useNewUrlParser: true
-        });
+        await connectdb(credentials);
 
         const newUser = new User({
             username: body.name,
@@ -42,11 +38,8 @@ const addUser = async (body,credentials) => {
 //GET
 const searchByUsername = async (query, credentials) =>{
     try {
-        const mongouri = `mongodb://localhost:27017/${dbname}`;
-        await mongoose.connect(mongouri, {
-            useUnifiedTopology: true,
-            useNewUrlParser: true
-        });
+
+        await connectdb(credentials);
 
         let result = await User.find(query).lean();
         if (result.length === 0) {
@@ -66,7 +59,35 @@ const searchByUsername = async (query, credentials) =>{
     }
 }
 
+//PUT
+const changePswd = async(body,credentials) =>{
+    try{
+        await connectdb(credentials);
+        let user = await User.find({email: body.email});    //query o body??
+
+        if (user.length === 0) {
+            let err = new Error("Mail inesistente");
+            err.statusCode = 400;
+            console.log(err);
+            await mongoose.connection.close();
+            return err;
+        }
+        user.password = body.password;
+
+        await user.save();
+
+        await mongoose.connection.close()
+    }
+    catch (err) {
+        console.log(err);
+        return err;
+    }
+}
+
+//manca un delete per provare le principali API
+
 module.exports = {
     addUser,
     searchByUsername,
+    changePswd,
 }
