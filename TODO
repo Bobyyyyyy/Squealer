@@ -17,8 +17,12 @@ TODO:
 - tutto frontend
 - definire per bene tutti i modelli
 - capire come fare la sessione (cookies)
-- hash della password (bcrypt.js, a livello server)
 
 
 n.b.:
 con ejs si possono fare soltanto richieste POST e GET, per fare le altre richieste è necessario fetchare.
+
+
+FATTO:
+- hash della password (bcrypt.js, a livello server)
+    AGGIUNTO nella salvataggio nel database, da fare nel login
