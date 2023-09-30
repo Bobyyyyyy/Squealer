@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
-const session = require('express-session');
-const MongoStore = require('connect-mongo');
+//const session = require('express-session');
+//const MongoStore = require('connect-mongo')(session);
 global.rootDir = __dirname; //Salviamo la directory locale
 global.startDate = null;
 

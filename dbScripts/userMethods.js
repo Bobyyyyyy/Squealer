@@ -9,25 +9,24 @@ const addUser = async (body,credentials) => {
     try{
 
         await connectdb(credentials);
+        //GET user using email and name
+        let findEmail =  await User.find({email: body.email}).lean();
+        let findName = await User.find({username: body.name}).lean();
 
-        const newUser = new User({
-            username: body.name,
-            email: body.email,
-            password: await bcrypt.hash(body.password,saltRounds),
-        });
-
-        let findResult =  await User.find({email: body.email}).lean();
-
-        if (findResult.length !== 0) {
-            let err = new Error("Utente già registrato! Inserire una nuova mail");
+        if (findEmail.length !== 0 || findName.length !== 0) {
+            let err = new Error("Utente già registrato!");
             err.statusCode = 400;
             console.log(err);
             await mongoose.connection.close();
             return err;
         }
 
-        //aggiungere controllo username per non avere utenti con stesso nome
-
+        let newUser = new User({
+            username: body.name,
+            email: body.email,
+            password: await bcrypt.hash(body.password,saltRounds),
+        });
+        //save new user in DB
         await newUser.save();
 
         await mongoose.connection.close();
@@ -45,8 +44,7 @@ const loginUser = async (query,credentials) =>{
         await connectdb(credentials);
         //get user by username
         let user = await User.findOne({username: query.user});
-        console.log(query);
-        console.log(user);
+
         //check if user exists
         if (!user){
             let err = new Error("Nessun utente trovato!");
@@ -58,7 +56,7 @@ const loginUser = async (query,credentials) =>{
 
         //check if passwd is right
         const match = await bcrypt.compare(query.password, user.password);
-        console.log(match);
+
         if (!match){
             let err = new Error("Password Sbagliata!");
             err.statusCode = 400;       // 400 ??
