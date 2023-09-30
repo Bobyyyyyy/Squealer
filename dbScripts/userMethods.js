@@ -25,6 +25,9 @@ const addUser = async (body,credentials) => {
             await mongoose.connection.close();
             return err;
         }
+
+        //aggiungere controllo username per non avere utenti con stesso nome
+
         await newUser.save();
 
         await mongoose.connection.close();
@@ -41,32 +44,34 @@ const loginUser = async (query,credentials) =>{
     try{
         await connectdb(credentials);
         //get user by username
-        let user = User.find({username: query.name});
-
+        let user = await User.findOne({username: query.user});
+        console.log(query);
+        console.log(user);
         //check if user exists
-        if (user.length === 0){
+        if (!user){
             let err = new Error("Nessun utente trovato!");
             err.statusCode = 400;       // 400 ??
             console.log(err);
             await mongoose.connection.close();
-            return err;
+            throw err;
         }
 
-        await mongoose.connection.close();
-
         //check if passwd is right
-        const match = await bcrypt.compare(query.password,user.password);
+        const match = await bcrypt.compare(query.password, user.password);
+        console.log(match);
         if (!match){
             let err = new Error("Password Sbagliata!");
             err.statusCode = 400;       // 400 ??
             console.log(err);
-            return err;
+            await mongoose.connection.close();
+            throw err;
         }
 
+        await mongoose.connection.close();
         return user;
     }
     catch (err){
-        return err;
+        throw err;
     }
 }
 
@@ -95,7 +100,7 @@ const searchByUsername = async (query, credentials) =>{
 }
 
 //PUT
-const changePswd = async(body,credentials) =>{
+const changePwsd = async(body,credentials) =>{
     try{
         await connectdb(credentials);
         let user = await User.find({email: body.email});    //query o body??
@@ -124,5 +129,6 @@ const changePswd = async(body,credentials) =>{
 module.exports = {
     addUser,
     searchByUsername,
-    changePswd,
+    changePwsd,
+    loginUser,
 }

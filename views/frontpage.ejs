@@ -1,12 +1,57 @@
 <!DOCTYPE html>
-<html lang="it">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Homepage</title>
+    <title>Homepage Squealer</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .form-container {
+            text-align: center;
+        }
+
+        .button-container {
+            margin-top: 20px;
+        }
+
+        .button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007BFF;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .input-field {
+            margin: 10px;
+            padding: 10px;
+            width: 300px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+    </style>
 </head>
 <body>
-    <button onclick="window.location.href='/login'">Login</button>
-    <button onclick="window.location.href='/register'">Register</button>
+<div class="form-container">
+    <form method="post" action="/login">
+        <input class="input-field" type="text" placeholder="Utente" name="user" required><br>
+        <input class="input-field" type="password" placeholder="Password" name="password" required><br>
+        <input class="input-field" type="email" placeholder="Email" name="email" required><br>
+        <input type="submit" name="login">
+    </form>
+    <div class="button-container">
+        <button onclick="window.location.href='/register'" class="button">Registrati</button>
+        <button onclick="window.location.href=''" class="button">Sono un SMM</button>
+        <button onclick="window.location.href=''" class="button">Sono un MM</button>
+    </div>
+</div>
 </body>
 </html>

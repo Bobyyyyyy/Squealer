@@ -1,12 +1,9 @@
 
 
 const registerView = (req, res) => {
-    res.render("register", {
+    res.render("App/register", {
     });
 }
-
-
-
 
 module.exports = {
     registerView,
