@@ -1,4 +1,20 @@
-<%- include('../layout.ejs'); %>
-<p><%= response.username %></p>
-<p><%= response.email %></p>
-<p><%= response.password %></p>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Homepage</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+<h1>Questa è la homepage</h1>
+
+<button onclick="window.location.href='homepage/logout'"> Slogga </button>
+</body>
+</html>

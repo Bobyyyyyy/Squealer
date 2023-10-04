@@ -14,7 +14,24 @@ const UserSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true,
-    }
+    },
+
+   /* dailyCh: {
+        type: Number,
+        required: true,
+    },
+
+    weeklyCh: {
+        type: Number,
+        required: true,
+    },
+
+    monthlyCh: {
+        type: Number,
+        required: true,
+    },
+
+    */
 })
 
 const User = mongoose.model("User", UserSchema);

@@ -1,6 +1,13 @@
 const mongoose = require('mongoose');
 const dbname = "db";
 const saltRounds = 10;
+const mongoCredentials = {
+    user:"site222330",
+    pwd: "aiNgaeh5",
+    site:"mongo_site222330"
+}
+
+
 
 const connectdb = async (credentials) => {
     try {
@@ -19,4 +26,5 @@ const connectdb = async (credentials) => {
 module.exports = {
     connectdb,
     saltRounds,
+    mongoCredentials
 }

@@ -18,7 +18,7 @@ const addUser = async (body,credentials) => {
             err.statusCode = 400;
             console.log(err);
             await mongoose.connection.close();
-            return err;
+            throw err;
         }
 
         let newUser = new User({
@@ -35,7 +35,7 @@ const addUser = async (body,credentials) => {
     }
     catch(err){
         console.log(err);
-        return err;
+        throw err;
     }
 }
 

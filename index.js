@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
-//const session = require('express-session');
-//const MongoStore = require('connect-mongo')(session);
+const session = require('express-session');
+const MongoStore = require('connect-mongo');
 global.rootDir = __dirname; //Salviamo la directory locale
 global.startDate = null;
 
@@ -9,17 +9,18 @@ const cors = require('cors');
 
 let app = express();
 
-/*
+
 app.use(session({
     secret: 'sburo',
     resave: false,
-    saveUninitialized: true,
-    store: MongoStore.create({mongoUrl: 'mongodb://localhost:27017',
-    ttl: 60 * 5,
-    autoRemove : 'native'
-    })
+    saveUninitialized: false,
+    store: MongoStore.create({
+        mongoUrl: 'mongodb://localhost:27017',
+        ttl: 1000*4*64,
+        autoRemove: "native",
+    }),
 }));
-*/
+
 
 //https://dev.to/alisinayousofi/why-we-use-appuseexpressjson-in-our-express-web-app-384
 app.use(express.urlencoded({ extended: true })); 
@@ -29,17 +30,26 @@ app.use(cors());
 app.enable('trust proxy');
 app.set('view engine', 'ejs');
 
+const isAuthenticated = (req,res,next) => {
+    if(!req.session.authenticated) {
+        next();
+    }
+
+    else {
+        res.redirect('/');
+    }
+}
 
 //il sito inizia dando il controllo al router della frontpage
 app.use('/', require('./routes/frontpage'));
-app.use('/register', require('./routes/register'));
-app.use('/homepage',require('./routes/App/homepage'))
+app.use('/register',isAuthenticated, require('./routes/register'));
+app.use('/homepage',require('./routes/App/homepage'));
 app.use('/db',require('./routes/MongoDB'));
-
+//app.use('/mod',require('./routes/MM/homepage'));
 
 // avvio di node
 app.listen(8000,function() {
     global.startDate = new Date();
-    console.log('App listenting on port 8000 started' + ' ' + global.startDate.toLocaleString());
+    console.log('App listening on port 8000 started' + ' ' + startDate.toLocaleString());
 });
 
