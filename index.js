@@ -1,4 +1,3 @@
-const mongoose = require('mongoose');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
 global.rootDir = __dirname; //Salviamo la directory locale
@@ -34,20 +33,8 @@ app.use(cors());
 app.enable('trust proxy');
 app.set('view engine', 'ejs');
 
-const isAuthenticated = (req,res,next) => {
-    if(!req.session.authenticated) {
-        next();
-    }
-
-    else {
-        res.redirect('/');
-    }
-}
-
 //il sito inizia dando il controllo al router della frontpage
 app.use('/', require('./routes/frontpage'));
-app.use('/register',isAuthenticated, require('./routes/register'));
-app.use('/homepage',require('./routes/App/homepage'));
 app.use('/db',require('./routes/MongoDB'));
 //app.use('/mod',require('./routes/MM/homepage'));
 

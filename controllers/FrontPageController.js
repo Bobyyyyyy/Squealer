@@ -1,15 +1,15 @@
 const {loginUser} = require("../dbScripts/userMethods");
 const {mongoCredentials} = require("../dbScripts/utils");
 
+const registerView = (req, res) => {
+    res.render("App/register", {
+    });
+}
+
 
 const frontpageView = (req,res) => {
-    if(req.session.authenticated) {
-        res.redirect('/homepage');
-    }
-    else {
         res.render("frontpage",{
     });
-    }
 }
 
 const login  = async (req,res) => {
@@ -28,8 +28,31 @@ const login  = async (req,res) => {
     }
 }
 
+const isAuthenticated = (req,res,next) => {
+    if(req.session.authenticated) {
+        next();
+    }
+    else {
+        res.redirect('/');
+    }
+}
+
+const isSessionActive = (req,res,next) => {
+
+    // bisogna vedere ma con quale account si è autorizzati (USER,MM,SMM)
+    if(!req.session.authenticated) {
+        next();
+    }
+
+    else {
+        res.redirect('/homepage');
+    }
+}
 
 module.exports = {
     frontpageView,
+    registerView,
     login,
+    isAuthenticated,
+    isSessionActive,
 };
