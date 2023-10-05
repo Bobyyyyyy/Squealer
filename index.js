@@ -4,8 +4,11 @@ const MongoStore = require('connect-mongo');
 global.rootDir = __dirname; //Salviamo la directory locale
 global.startDate = null;
 
+
+
 const express = require('express');
 const cors = require('cors');
+const {dbname} = require("./dbScripts/utils");
 
 let app = express();
 
@@ -16,6 +19,7 @@ app.use(session({
     saveUninitialized: false,
     store: MongoStore.create({
         mongoUrl: 'mongodb://localhost:27017',
+        dbName: dbname,
         ttl: 1000*4*64,
         autoRemove: "native",
     }),

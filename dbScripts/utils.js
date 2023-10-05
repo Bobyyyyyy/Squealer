@@ -26,5 +26,6 @@ const connectdb = async (credentials) => {
 module.exports = {
     connectdb,
     saltRounds,
-    mongoCredentials
+    mongoCredentials,
+    dbname
 }
