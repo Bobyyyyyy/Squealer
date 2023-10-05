@@ -22,9 +22,9 @@ app.use(session({
         dbName: dbname,
         ttl: 1000*4*64,
         autoRemove: "native",
+        stringify: false,
     }),
 }));
-
 
 //https://dev.to/alisinayousofi/why-we-use-appuseexpressjson-in-our-express-web-app-384
 app.use(express.urlencoded({ extended: true })); 
