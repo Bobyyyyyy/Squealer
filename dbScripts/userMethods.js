@@ -44,7 +44,7 @@ const loginUser = async (query,credentials) =>{
         await connectdb(credentials);
         //get user by username
         let user = await User.findOne({username: query.user});
-
+        console.log(query);
         //check if user exists
         if (!user){
             let err = new Error("Nessun utente trovato!");

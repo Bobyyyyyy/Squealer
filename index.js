@@ -36,7 +36,6 @@ app.set('view engine', 'ejs');
 //il sito inizia dando il controllo al router della frontpage
 app.use('/', require('./routes/frontpage'));
 app.use('/db',require('./routes/MongoDB'));
-//app.use('/mod',require('./routes/MM/homepage'));
 
 // avvio di node
 app.listen(8000,function() {

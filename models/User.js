@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const userTypes = ['user','pro','mod'];
 
 //Dati di un utente al momento dell'iscrizione
 
@@ -16,22 +17,31 @@ const UserSchema = new mongoose.Schema({
         required: true,
     },
 
-   /* dailyCh: {
-        type: Number,
+    typeUser: {
+        type: String,
+        enum: userTypes,
         required: true,
+    },
+
+    dailyCh: {
+        type: Number,
+        required: function(){
+            return this.typeUser === 'user';
+        },
     },
 
     weeklyCh: {
         type: Number,
-        required: true,
+        required: false,
     },
 
     monthlyCh: {
         type: Number,
-        required: true,
+        required: false,
     },
 
-    */
+
+
 })
 
 const User = mongoose.model("User", UserSchema);

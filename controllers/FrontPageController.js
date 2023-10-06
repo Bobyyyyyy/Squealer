@@ -39,7 +39,7 @@ const isAuthenticated = (req,res,next) => {
 
 const isSessionActive = (req,res,next) => {
 
-    // bisogna vedere ma con quale account si è autorizzati (USER,MM,SMM)
+    // bisogna vedere ma con quale account si è autorizzati (USER,mod,SMM)
     if(!req.session.authenticated) {
         next();
     }

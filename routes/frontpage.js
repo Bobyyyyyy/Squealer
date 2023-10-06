@@ -5,5 +5,5 @@ router.get('/',isSessionActive,frontpageView);
 router.post('/login',login);
 router.get('/register',registerView);
 router.use('/homepage',isAuthenticated,require('./App/homepage'));
-router.use('')
+router.use('/mod',require('./mod/frontpage'))
 module.exports = router;
