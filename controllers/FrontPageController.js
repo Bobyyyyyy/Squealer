@@ -2,7 +2,7 @@ const {loginUser} = require("../dbScripts/userMethods");
 const {mongoCredentials} = require("../dbScripts/utils");
 
 const registerView = (req, res) => {
-    res.render("App/register", {
+    res.render("register", {
     });
 }
 
@@ -12,24 +12,35 @@ const frontpageView = (req,res) => {
     });
 }
 
-const login  = async (req,res) => {
+const login  = async (req,res,next) => {
     try {
-        let response = await loginUser(req.body, mongoCredentials);
-        req.session.regenerate(function () {
-            req.session.authenticated = true;
-            req.session.user = response.username;
-            console.log(response);
-            console.log(req.session);
-            req.session.save();
-            res.redirect('/homepage');
-        });
+        req.response = await loginUser(req.body, mongoCredentials);
+        next();
     } catch (Error) {
         res.redirect('/register');
     }
 }
 
-const isAuthenticated = (req,res,next) => {
-    if(req.session.authenticated) {
+const isUser = (req,res,next) => {
+    if(req.session.authenticated && req.session.type === 'user') {
+        next();
+    }
+    else {
+        res.redirect('/');
+    }
+}
+
+const isMod = (req,res,next) => {
+    if(req.session.authenticated && req.session.type === 'mod') {
+        next();
+    }
+    else {
+        res.redirect('/');
+    }
+}
+
+const isSMM = (req,res,next) => {
+    if(req.session.authenticated && req.session.type === 'pro' ) {
         next();
     }
     else {
@@ -39,20 +50,57 @@ const isAuthenticated = (req,res,next) => {
 
 const isSessionActive = (req,res,next) => {
 
-    // bisogna vedere ma con quale account si è autorizzati (USER,mod,SMM)
     if(!req.session.authenticated) {
         next();
     }
-
     else {
-        res.redirect('/homepage');
+        switch (req.session.type) {
+            case 'user':
+                res.redirect('/homepage');
+                break;
+
+            case 'mod':
+                res.redirect('/mod/homepage');
+                break;
+
+            case 'pro':
+                res.redirect('/SMM/homepage');
+        }
     }
+}
+
+const createSession = async(req,res) => {
+    req.session.regenerate(function () {
+        req.session.authenticated = true;
+        req.session.user = req.response.username;
+        req.session.type = req.response.typeUser;
+        console.log(req.response);
+        console.log(req.session);
+        req.session.save();
+
+        switch (req.response.typeUser) {
+            case 'user':
+                res.redirect('/homepage');
+                break;
+
+            case 'mod':
+                res.redirect('/mod/homepage');
+                break;
+
+            case 'pro':
+                res.redirect('/SMM/homepage');
+        }
+
+    });
 }
 
 module.exports = {
     frontpageView,
     registerView,
     login,
-    isAuthenticated,
+    isUser,
+    isMod,
+    isSMM,
     isSessionActive,
+    createSession
 };

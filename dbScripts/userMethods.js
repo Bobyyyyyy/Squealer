@@ -8,7 +8,7 @@ const {connectdb,saltRounds,quota} = require("./utils");
 //POST
 const addUser = async (body,credentials) => {
     try{
-
+        console.log(body);
         await connectdb(credentials);
         //GET user using email and name
         let findEmail =  await User.find({email: body.email}).lean();
@@ -22,7 +22,7 @@ const addUser = async (body,credentials) => {
             throw err;
         }
 
-        let usertp='pro';   //debug
+        let usertp = body.pro === 'on' ? 'pro' : 'user';
 
         let newUser = new User({
             username: body.name,
