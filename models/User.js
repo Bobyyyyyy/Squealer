@@ -23,24 +23,27 @@ const UserSchema = new mongoose.Schema({
         required: true,
     },
 
-    dailyCh: {
-        type: Number,
-        required: function(){
-            return this.typeUser === 'user';
+    characters: {
+        daily:{
+            type: Number,
+            required: function(){
+                return this.typeUser !== 'mod';
+            },
         },
-    },
+        weekly: {
+            type:Number,
+            required: function(){
+                return this.typeUser !== 'mod';
+            },
+        },
+        monthly:{
+            type:Number,
+            required: function(){
+                return this.typeUser !== 'mod';
+            },
+        },
 
-    weeklyCh: {
-        type: Number,
-        required: false,
-    },
-
-    monthlyCh: {
-        type: Number,
-        required: false,
-    },
-
-
+    }
 
 })
 

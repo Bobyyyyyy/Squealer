@@ -7,6 +7,12 @@ const mongoCredentials = {
     site:"mongo_site222330"
 }
 
+const quota ={
+    daily: 50,
+    weekly: 300,
+    monthly: 8000,
+}
+
 
 
 const connectdb = async (credentials) => {
@@ -27,5 +33,6 @@ module.exports = {
     connectdb,
     saltRounds,
     mongoCredentials,
-    dbname
+    dbname,
+    quota
 }

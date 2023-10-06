@@ -5,16 +5,22 @@ const ChannelSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    nfollowers: {
-        type: Number,
+    public: {
+        type: Boolean,
         required: true,
     },
-    followers: [
-        {
-            type: mongoose.Schema.ObjectId,     //utenti
+    followers: {
+        users : [
+            {
+                type: mongoose.Schema.ObjectId,     //utenti
+                required: true,
+            }
+            ],
+        number: {
+            type: Number,
             required: true,
         }
-    ],
+    },
     posts: [
         {
             type: mongoose.Schema.ObjectId,     //post

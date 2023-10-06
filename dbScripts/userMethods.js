@@ -2,7 +2,8 @@ const mongoose = require('mongoose');
 const bcrypt = require("bcryptjs");
 
 const User = require("../models/User");
-const {connectdb,saltRounds} = require("./utils");
+const {connectdb,saltRounds,quota} = require("./utils");
+
 
 //POST
 const addUser = async (body,credentials) => {
@@ -21,11 +22,16 @@ const addUser = async (body,credentials) => {
             throw err;
         }
 
+        let usertp='pro';   //debug
+
         let newUser = new User({
             username: body.name,
             email: body.email,
             password: await bcrypt.hash(body.password,saltRounds),
+            typeUser: usertp,
+            characters: usertp === 'mod' ? null : quota,
         });
+
         //save new user in DB
         await newUser.save();
 
