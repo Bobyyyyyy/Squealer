@@ -60,7 +60,7 @@ const isSessionActive = (req,res,next) => {
                 break;
 
             case 'mod':
-                res.redirect('/mod/homepage');
+                res.redirect('/mod');
                 break;
 
             case 'pro':
@@ -84,7 +84,7 @@ const createSession = async(req,res) => {
                 break;
 
             case 'mod':
-                res.redirect('/mod/homepage');
+                res.redirect('/mod');
                 break;
 
             case 'pro':
@@ -94,6 +94,13 @@ const createSession = async(req,res) => {
     });
 }
 
+
+const logout = (req,res) => {
+    req.session.destroy();
+    res.redirect('/');
+}
+
+
 module.exports = {
     frontpageView,
     registerView,
@@ -102,5 +109,6 @@ module.exports = {
     isMod,
     isSMM,
     isSessionActive,
-    createSession
+    createSession,
+    logout
 };

@@ -16,9 +16,6 @@ Dunque funzione di creazione del DB non ha senso.
 TODO:
 - tutto frontend
 - definire per bene tutti i modelli
-- bisogna creare la divisione tra i vari tipi di utente (la mia idea è quella di usare un flag nello schema dell'user, se creiamo
-  uno schema diverso per i mod secondo me (ale tom) diventa un po' un casino, con un flag secondo me sarebbe anche piu' facile, anche
-  perchè te lo puoi salvare nella sessione e capire fin da subito di che account si tratta.
 
 
 n.b.:
