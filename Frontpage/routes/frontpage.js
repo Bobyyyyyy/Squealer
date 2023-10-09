@@ -4,7 +4,7 @@ const router = express.Router();
 router.get('/',isSessionActive,frontpageView);
 router.post('/login',isSessionActive,login,createSession);
 router.get('/register',isSessionActive,registerView);
-router.use('/homepage',isUser,require('./App/homepage'));
-router.use('/mod',isMod,require('./mod/homepage'))
+router.use('/homepage',isUser,require('../../AppUser/routes/homepage'));
+router.use('/mod',isMod,require('../../AppMod/routes/homepage'))
 router.get('/logout',logout);
 module.exports = router;

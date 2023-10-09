@@ -1,5 +1,5 @@
-const {loginUser} = require("../dbScripts/userMethods");
-const {mongoCredentials} = require("../dbScripts/utils");
+const {loginUser} = require("../../dbScripts/userMethods");
+const {mongoCredentials} = require("../../dbScripts/utils");
 
 const registerView = (req, res) => {
     res.render("register", {

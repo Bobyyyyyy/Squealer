@@ -32,10 +32,10 @@ app.use(cors());
 // https://stackoverflow.com/questions/40459511/in-express-js-req-protocol-is-not-picking-up-https-for-my-secure-link-it-alwa
 app.enable('trust proxy');
 app.set('view engine', 'ejs');
-
+app.set('views',['Frontpage/views','./AppMod/views','./AppUser/views']);
 //il sito inizia dando il controllo al router della frontpage
-app.use('/', require('./routes/frontpage'));
-app.use('/db',require('./routes/MongoDB'));
+app.use('/', require('./Frontpage/routes/frontpage'));
+app.use('/db',require('./Frontpage/routes/MongoDB'));
 
 // avvio di node
 app.listen(8000,function() {
