@@ -1,0 +1,11 @@
+Fatto:
+
+- Tabella utenti con ricerca e aggiunta di utenti
+- Modifica stato di blocco utente (da fixare quella dei caratteri)
+
+Da fare:
+
+- !!Aggiungere tasto per modificare caratteri e stato
+- Lista canali con post
+- Fare file separati per le funzioni di mongo (solo i mod possono accedere a determinate funzioni)
+- Gestire tutti gli errori
