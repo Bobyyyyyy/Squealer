@@ -1,6 +1,6 @@
 
 const homeView = (req,res) => {
-    res.render('./homepage');
+    res.render('homepage.html');
 }
 
 module.exports = {

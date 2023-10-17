@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 
 const User = require("../models/User");
 const {connectdb,saltRounds,quota} = require("./utils");
+const {json} = require("express");
 
 
 //POST
@@ -22,14 +23,13 @@ const addUser = async (body,credentials) => {
             throw err;
         }
 
-        let usertp = body.pro === 'on' ? 'pro' : 'user';
-
         let newUser = new User({
             username: body.name,
             email: body.email,
             password: await bcrypt.hash(body.password,saltRounds),
-            typeUser: usertp,
-            characters: usertp === 'mod' ? null : quota,
+            typeUser: body.type,
+            characters: quota,
+            blocked: false,
         });
 
         //save new user in DB
@@ -40,6 +40,7 @@ const addUser = async (body,credentials) => {
         return newUser;
     }
     catch(err){
+        await mongoose.connection.close();
         console.log(err);
         throw err;
     }
@@ -50,7 +51,6 @@ const loginUser = async (query,credentials) =>{
         await connectdb(credentials);
         //get user by username
         let user = await User.findOne({username: query.user});
-        console.log(query);
         //check if user exists
         if (!user){
             let err = new Error("Nessun utente trovato!");
@@ -75,6 +75,7 @@ const loginUser = async (query,credentials) =>{
         return user;
     }
     catch (err){
+        await mongoose.connection.close();
         throw err;
     }
 }
@@ -84,22 +85,21 @@ const searchByUsername = async (query, credentials) =>{
     try {
 
         await connectdb(credentials);
-
-        let result = await User.find(query).lean();
-        if (result.length === 0) {
+        console.log(query);
+        let user = await User.findOne({username: query.user});
+        if (user.length === 0) {
             let err = new Error("Nessun utente trovato!");
             err.statusCode = 400;       // 400 ??
             console.log(err);
             await mongoose.connection.close();
-            return err;
+            throw err
         }
-        await mongoose.connection.close();
 
-        return result;
+        return user;
     }
     catch (err){
         console.log(err);
-        return err;
+        throw err;
     }
 }
 
@@ -123,10 +123,52 @@ const changePwsd = async(body,credentials) =>{
         await mongoose.connection.close()
     }
     catch (err) {
+        await mongoose.connection.close();
         console.log(err);
-        return err;
+        throw err;
     }
 }
+
+const getUsers = async (query,credentials) =>{
+    try {
+        await connectdb(credentials);
+        console.log(query);
+        let offset = parseInt(query.offset);
+        let limit = parseInt(query.limit);
+        return await User.find({$or : [{username: {$regex: query.filter , $options: 'i'}},{email: {$regex: query.filter , $options: 'i'}},{typeUser: {$regex: query.filter , $options: 'i'}}, ] } ).skip(offset).limit(limit);
+    }
+    catch (err){
+        throw err;
+    }
+}
+
+const usersLength = async (query,credentials) => {
+    try {
+        await connectdb(credentials);
+        let users = await User.find({$or : [{username: {$regex: query.filter , $options: 'i'}},{email: {$regex: query.filter , $options: 'i'}},{typeUser: {$regex: query.filter , $options: 'i'}},]});
+        return {length: users.length};
+    }
+    catch (Error){
+        throw Error;
+    }
+}
+
+const altUser = async (body,credentials) => {
+    try {
+        console.log(body);
+        await connectdb(credentials);
+        let user = await User.findOneAndUpdate(
+            {username: {$regex: body.filter , $options: 'i'}},
+            {blocked: body.blocked},
+            {new: true});
+        return user;
+    }
+    catch (Error){
+        throw Error;
+    }
+}
+
+
 
 //manca un delete per provare le principali API
 
@@ -135,4 +177,7 @@ module.exports = {
     searchByUsername,
     changePwsd,
     loginUser,
+    getUsers,
+    usersLength,
+    altUser
 }

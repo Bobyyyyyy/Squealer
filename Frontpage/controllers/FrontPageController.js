@@ -2,13 +2,13 @@ const {loginUser} = require("../../dbScripts/userMethods");
 const {mongoCredentials} = require("../../dbScripts/utils");
 
 const registerView = (req, res) => {
-    res.render("register", {
+    res.render("register.html", {
     });
 }
 
 
 const frontpageView = (req,res) => {
-        res.render("frontpage",{
+        res.render("frontpage.html",{
     });
 }
 
@@ -89,6 +89,7 @@ const createSession = async(req,res) => {
 
             case 'pro':
                 res.redirect('/SMM/homepage');
+                break;
         }
 
     });

@@ -67,7 +67,7 @@
 <body>
 <div class="registration-form">
     <h2>Registrazione</h2>
-    <form action="/db/create" method="post">
+    <form action="/register" method="post">
         <div>
             <label for="name">Nome:</label>
             <input type="text" id="name" name="name" required>
@@ -81,8 +81,12 @@
             <input type="email" id="email" name="email" required>
         </div>
         <div>
-            <label for="pro">Sono un social media manager:</label>
-            <input type="checkbox" id="pro" name="pro">
+            <label for="pro">Sono un utente </label>
+            <input type="radio" id="user" name="type" value="user" checked>
+        </div>
+        <div>
+            <label for="pro">Sono un social media manager</label>
+            <input type="radio" id="pro" name="type" value="pro">
         </div>
         <div>
             <input type="submit" value="Registrati">

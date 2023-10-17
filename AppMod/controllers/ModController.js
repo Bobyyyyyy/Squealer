@@ -1,8 +1,9 @@
 
 const dashboard = (req, res) => {
-    res.render('./dashboard');
+    res.render('userDashboard.html');
 }
 
+
 module.exports = {
-    dashboard
+    dashboard,
 }

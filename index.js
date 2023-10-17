@@ -1,6 +1,7 @@
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
 global.rootDir = __dirname; //Salviamo la directory locale
+global.frontViews = __dirname + "/Frontpage/views"
 global.startDate = null;
 
 
@@ -31,11 +32,16 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 // https://stackoverflow.com/questions/40459511/in-express-js-req-protocol-is-not-picking-up-https-for-my-secure-link-it-alwa
 app.enable('trust proxy');
-app.set('view engine', 'ejs');
-app.set('views',['Frontpage/views','./AppMod/views','./AppUser/views']);
+
+app.set('views', [__dirname + '/AppMod/public/html', __dirname+ '/Frontpage/views', __dirname + '/AppUser/views']);
+app.engine('html', require('ejs').renderFile);
+
 //il sito inizia dando il controllo al router della frontpage
 app.use('/', require('./Frontpage/routes/frontpage'));
-app.use('/db',require('./Frontpage/routes/MongoDB'));
+app.use('/db',require('./AppMod/routes/MongoDB'));
+
+app.use('/js',express.static(rootDir + '/AppMod/public/js'));
+app.use('/css',express.static(rootDir + '/AppMod/public/css'));
 
 // avvio di node
 app.listen(8000,function() {

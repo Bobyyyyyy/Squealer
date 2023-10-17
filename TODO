@@ -18,6 +18,4 @@ TODO:
 - definire per bene tutti i modelli
 
 
-n.b.:
-con ejs si possono fare soltanto richieste POST e GET, per fare le altre richieste è necessario fetchare.
 
