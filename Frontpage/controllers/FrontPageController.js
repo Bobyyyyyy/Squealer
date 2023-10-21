@@ -64,7 +64,7 @@ const isSessionActive = (req,res,next) => {
                 break;
 
             case 'pro':
-                res.redirect('/SMM/homepage');
+                res.redirect('/SMM/' + req.session.user);
         }
     }
 }
@@ -88,7 +88,7 @@ const createSession = async(req,res) => {
                 break;
 
             case 'pro':
-                res.redirect('/SMM/homepage');
+                res.redirect('/SMM/' + req.response.username );
                 break;
         }
 

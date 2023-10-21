@@ -1,5 +1,5 @@
 <script setup>
-  import {ref} from "vue";
+import {ref, watch} from "vue";
   import SideBar from "./components/sideBar/SideBar.vue";
 
   let inWel = ref(true);
@@ -8,19 +8,28 @@
     inWel.value= !inWel.value
   }
 
+  function setWel(bool){
+    inWel.value = bool;
+  }
+    //PER LA HISTORY, altrimenti non si aggiorna
+  window.addEventListener("popstate",()=>{
+    if(window.location.pathname.split('/').slice(-1) == 'handlevip') setWel(true);
+  },false)
 
 </script>
 
 <template>
   <SideBar v-if="!inWel"
-           v-on:setInWel="setisWel"
+           @setInWel="setisWel"
+           @setWel="(bool) => setWel(bool)"
   />
   <div v-if="!inWel" class="allPage">
     <router-view  name="SbOn"/>
   </div>
 
   <router-view v-else
-               v-on:setInWel="setisWel"
+               @setInWel="setisWel"
+               @setWel="(bool) => setWel(bool)"
   />
 </template>
 

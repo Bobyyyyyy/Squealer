@@ -1,7 +1,7 @@
 <script setup>
   import Post from "../post/Post.vue";
   import {reactive} from "vue";
-  let srcImg="../../public/profilePicture.png";
+  let srcImg="/img/profilePicture.png";
 
   const props = defineProps({
     username: String,

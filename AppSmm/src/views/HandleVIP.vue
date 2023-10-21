@@ -2,16 +2,11 @@
   import NavBarWel from "../components/NavBarWel.vue";
   import VipCard from "../components/handleVip/VipCard.vue";
   import VipModal from "../components/handleVip/VipModal.vue";
-  import {computed, onMounted, reactive, ref} from "vue";
+  import {onBeforeMount, onBeforeUnmount, onBeforeUpdate, onMounted, reactive, ref} from "vue";
   import {Modal} from 'bootstrap'
-  /*
-  defineProps({
-    SMMname:String,
-  })
+  import {getSMMname, getVIPname} from "../utils";
 
-   */
-
-  let SMMname = "PIPPO"
+  const emit = defineEmits(['setWel'])
 
   //ci andrebbe anche il post
   const vips =[
@@ -37,6 +32,11 @@
     modalState.myModal = new Modal('#choiceModal',{})
   })
 
+  onBeforeUpdate(()=>{
+    console.log("AAAAAAAAJAHSVJDSA")
+    emit('setWel',true)
+  })
+
   function openModal(name) {
     name2Use.value = name;
     modalState.myModal.show()
@@ -55,14 +55,17 @@
   <div class="d-flex flex-row align-items-center flex-wrap justify-content-evenly mt-lg-3">
     <VipCard v-for="(vip,index) in vips"
             :key="index"
-            :followers="vip.fol" :username="vip.name"
+            :followers="vip.fol"
+             :username="vip.name"
             @setModal = " (username) => openModal(username)"
     />
   </div>
   <VipModal
-            :SMMname="SMMname"
+            :SMMname="getSMMname()"
             :VIPname="name2Use"
-            @closeModal="[$emit('setInWel'), closeModal()]"
+            @closeModal = "closeModal()"
+            @changeWel = "this.$emit('setInWel')"
+
   />
 
 </template>

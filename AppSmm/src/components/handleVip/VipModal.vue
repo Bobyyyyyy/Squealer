@@ -2,7 +2,7 @@
 
   import {computed} from "vue";
 
-  const props = defineProps({
+  defineProps({
     SMMname: String,
     VIPname: String,
   })
@@ -25,8 +25,9 @@
           >No, esci</button>
           <button type="button" class="btn btn-primary"
                   @click=
-                      "$emit('closeModal');
-                      this.$router.push('/SMM_App/'+SMMname + '/' + VIPname + '/Profile')">
+                      "this.$router.push('/SMM/' + SMMname + '/' + VIPname +'/Profile');
+                      $emit('closeModal'),
+                      $emit('changeWel')">
           Si, continua</button>
         </div>
       </div>

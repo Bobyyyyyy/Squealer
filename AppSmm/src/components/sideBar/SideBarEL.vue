@@ -6,6 +6,8 @@ import {computed, onBeforeMount, onMounted, onUnmounted, ref} from "vue";
     expanded: Boolean
   })
 
+  const name = props.item.text;
+
   const isActive = ref(false);
 
   function setIsActive(){
@@ -22,6 +24,8 @@ import {computed, onBeforeMount, onMounted, onUnmounted, ref} from "vue";
 
   defineExpose({
     setNotActive,
+    setIsActive,
+    name
   })
 
 
@@ -29,7 +33,7 @@ import {computed, onBeforeMount, onMounted, onUnmounted, ref} from "vue";
 
 <template>
   <li class="nav-item butNav"  >
-      <a href="#"
+      <a
          class="nav-link d-flex flex-row align-items-center reducePad"
          :class= "isActive ? 'active': '',
                   expanded ? 'justify-content-start' : 'justify-content-center'"
