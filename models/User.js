@@ -25,7 +25,7 @@ const UserSchema = new mongoose.Schema({
 
     characters: {
         daily:{
-            type: Number,
+            type:Number,
             required: function(){
                 return this.typeUser !== 'mod';
             },

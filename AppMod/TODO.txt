@@ -5,7 +5,6 @@ Fatto:
 
 Da fare:
 
-- !!Aggiungere tasto per modificare caratteri e stato
 - Lista canali con post
 - Fare file separati per le funzioni di mongo (solo i mod possono accedere a determinate funzioni)
 - Gestire tutti gli errori

@@ -6,6 +6,23 @@ let LastCall = {
 
 }
 
+let modifyParameters = {
+    user: '',
+    daily: 0,
+    weekly: 0,
+    monthly: 0,
+    blocked: false
+}
+
+function updateModifyParameters()  {
+    modifyParameters.user = $('#modUserLabel').html();
+    modifyParameters.daily = $('#daily').val();
+    modifyParameters.weekly = $('#weekly').val();
+    modifyParameters.monthly = $('#monthly').val();
+    modifyParameters.blocked = $('#blocked').is(":checked");
+}
+
+
 function updateLastCall(limit,offset,filter,users) {
     LastCall.limit = limit;
     LastCall.offset = offset;
@@ -37,15 +54,30 @@ function displayUser() {
     })
 }
 
-function modifyUser(filter,characters, blocked) {
+function modifyUser(filter,daily,weekly,monthly,blocked) {
     $.ajax({
         url: '/db/user',
         type: 'put',
-        data: {filter: filter, character: characters, blocked : blocked},
+        data: {filter: filter, characters: {daily,weekly,monthly}, blocked : blocked},
         success: () => {
             location.reload();
         }
     })
+}
+
+
+function showUserModal(user,daily,weekly,monthly,blocked) {
+    $('#modUserLabel').html(user);
+    $('#daily').val(daily);
+    $('#weekly').val(weekly);
+    $('#monthly').val(monthly);
+    if (blocked === 'true') {
+        $('#blocked').attr('checked',true);
+    }
+    else {
+        $('#blocked').attr('checked',false);
+    }
+    $('#modUser').modal("show");
 }
 
 function userTable (limit,offset,filter) {
@@ -69,7 +101,7 @@ function userTable (limit,offset,filter) {
                         </thead>
                         <tbody>
                             ${$.map(data, (user) => `
-                             <tr>
+                             <tr onclick="showUserModal('${user.username}','${user.characters.daily}','${user.characters.weekly}','${user.characters.monthly}','${user.blocked}')">
                                 <td> ${user.username} </td>
                                 <td> ${user.email} </td>
                                 <td> <ul>
@@ -78,7 +110,8 @@ function userTable (limit,offset,filter) {
                                         <li> Monthly: ${user.characters.monthly} </li> </td>
                                 <td> ${user.typeUser} </td>
                                 <td> ${user.blocked} </td> 
-                            </tr>`).join('\n')}
+                            </tr>
+                            `).join('\n')}
                         </tbody>
                     </table>
                     `;
@@ -88,17 +121,17 @@ function userTable (limit,offset,filter) {
             $('#pages').append(previous);
         }
 
-        let page = `<li class="page-item"><a class="page-link">${offset / limit + 1}</a></li>`
+        let page = `<li class="page-item"><a class="page-link">${LastCall.offset / LastCall.limit + 1}</a></li>`
 
         if (offset + limit < LastCall.users) {
             let next = `<li class="page-item"><a class="page-link" onclick="userTable(LastCall.limit,LastCall.limit+LastCall.offset,LastCall.filter)">Next</a></li>`
             page = page + next;
         }
 
+
         $('#table1').empty().html(html);
         $('#pages').append(page);
 },
-
 })
 }
 
@@ -107,9 +140,18 @@ $('#filter').on("keyup", () => {
     userTable(LastCall.limit,LastCall.offset = 0,value);
 });
 
+$('#modifyButton').click(() => {
+    updateModifyParameters();
+    modifyUser(
+        modifyParameters.user,
+        modifyParameters.daily,
+        modifyParameters.weekly,
+        modifyParameters.monthly,
+        modifyParameters.blocked
+    );
+})
+
 $(document).ready(function() {
     displayUser();
     userTable(LastCall.limit,LastCall.offset,LastCall.filter);
 });
-
-

@@ -6,11 +6,13 @@ const mongoCredentials = {
     pwd: "aiNgaeh5",
     site:"mongo_site222330"
 }
+const baseQuota = 50;
+
 
 const quota ={
-    daily: 50,
-    weekly: 300,
-    monthly: 8000,
+    daily: baseQuota,
+    weekly: baseQuota*6,
+    monthly: (baseQuota*6)*4,
 }
 
 

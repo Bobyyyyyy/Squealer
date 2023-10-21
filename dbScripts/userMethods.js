@@ -159,8 +159,12 @@ const altUser = async (body,credentials) => {
         await connectdb(credentials);
         let user = await User.findOneAndUpdate(
             {username: {$regex: body.filter , $options: 'i'}},
-            {blocked: body.blocked},
+            {blocked: body.blocked,
+            'characters.daily':  parseInt(body.characters.daily),
+            'characters.weekly':  parseInt(body.characters.weekly),
+            'characters.monthly':  parseInt(body.characters.monthly)},
             {new: true});
+        console.log(user);
         return user;
     }
     catch (Error){

@@ -12,6 +12,4 @@ router.post('/addPost',createPost);
 router.get('/userid',getSessionUser);
 router.get('/nusers',getUsersNumber);
 router.get('/users',getAllUsers);
-//router.get('/user',getUser);
-
 module.exports = router;
