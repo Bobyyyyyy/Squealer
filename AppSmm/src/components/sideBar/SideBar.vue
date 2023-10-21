@@ -1,0 +1,189 @@
+<script setup>
+  import SideBarEL from "./SideBarEL.vue";
+  import { useRoute } from 'vue-router';
+  import {computed, onMounted, onUnmounted, ref} from "vue";
+  import NavBarWel from "../NavBarWel.vue";
+
+  const windowWidth = ref(window.innerWidth);
+
+  const onWidthChange =  () => windowWidth.value = window.innerWidth
+  onMounted(() => window.addEventListener('resize', onWidthChange))
+  onUnmounted(() => window.removeEventListener('resize', onWidthChange))
+
+  const width = computed(() => windowWidth.value)
+  const expanded = computed(() => width.value > 1450 );
+  const smartPhone = computed(()=> width.value < 768);
+
+  const route= useRoute()
+
+  let sideBarElements = [
+    {
+      class:"bi bi-person",
+      icon:"M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4Zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10Z",
+      text:"Profile"
+    },
+    {
+      icon: "M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4Zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1H2Zm13 2.383-4.708 2.825L15 11.105V5.383Zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741ZM1 11.105l4.708-2.897L1 5.383v5.722Z",
+      text: "Messages",
+      class: "bi bi-envelope",
+    },
+    {
+      class:"bi bi-plus-circle-dotted",
+      icon:"M8 0c-.176 0-.35.006-.523.017l.064.998a7.117 7.117 0 0 1 .918 0l.064-.998A8.113 8.113 0 0 0 8 0zM6.44.152c-.346.069-.684.16-1.012.27l.321.948c.287-.098.582-.177.884-.237L6.44.153zm4.132.271a7.946 7.946 0 0 0-1.011-.27l-.194.98c.302.06.597.14.884.237l.321-.947zm1.873.925a8 8 0 0 0-.906-.524l-.443.896c.275.136.54.29.793.459l.556-.831zM4.46.824c-.314.155-.616.33-.905.524l.556.83a7.07 7.07 0 0 1 .793-.458L4.46.824zM2.725 1.985c-.262.23-.51.478-.74.74l.752.66c.202-.23.418-.446.648-.648l-.66-.752zm11.29.74a8.058 8.058 0 0 0-.74-.74l-.66.752c.23.202.447.418.648.648l.752-.66zm1.161 1.735a7.98 7.98 0 0 0-.524-.905l-.83.556c.169.253.322.518.458.793l.896-.443zM1.348 3.555c-.194.289-.37.591-.524.906l.896.443c.136-.275.29-.54.459-.793l-.831-.556zM.423 5.428a7.945 7.945 0 0 0-.27 1.011l.98.194c.06-.302.14-.597.237-.884l-.947-.321zM15.848 6.44a7.943 7.943 0 0 0-.27-1.012l-.948.321c.098.287.177.582.237.884l.98-.194zM.017 7.477a8.113 8.113 0 0 0 0 1.046l.998-.064a7.117 7.117 0 0 1 0-.918l-.998-.064zM16 8a8.1 8.1 0 0 0-.017-.523l-.998.064a7.11 7.11 0 0 1 0 .918l.998.064A8.1 8.1 0 0 0 16 8zM.152 9.56c.069.346.16.684.27 1.012l.948-.321a6.944 6.944 0 0 1-.237-.884l-.98.194zm15.425 1.012c.112-.328.202-.666.27-1.011l-.98-.194c-.06.302-.14.597-.237.884l.947.321zM.824 11.54a8 8 0 0 0 .524.905l.83-.556a6.999 6.999 0 0 1-.458-.793l-.896.443zm13.828.905c.194-.289.37-.591.524-.906l-.896-.443c-.136.275-.29.54-.459.793l.831.556zm-12.667.83c.23.262.478.51.74.74l.66-.752a7.047 7.047 0 0 1-.648-.648l-.752.66zm11.29.74c.262-.23.51-.478.74-.74l-.752-.66c-.201.23-.418.447-.648.648l.66.752zm-1.735 1.161c.314-.155.616-.33.905-.524l-.556-.83a7.07 7.07 0 0 1-.793.458l.443.896zm-7.985-.524c.289.194.591.37.906.524l.443-.896a6.998 6.998 0 0 1-.793-.459l-.556.831zm1.873.925c.328.112.666.202 1.011.27l.194-.98a6.953 6.953 0 0 1-.884-.237l-.321.947zm4.132.271a7.944 7.944 0 0 0 1.012-.27l-.321-.948a6.954 6.954 0 0 1-.884.237l.194.98zm-2.083.135a8.1 8.1 0 0 0 1.046 0l-.064-.998a7.11 7.11 0 0 1-.918 0l-.064.998zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z",
+      text:"Add Post"
+    },
+    {
+      class:"bi bi-tv",
+      icon:"M2.5 13.5A.5.5 0 0 1 3 13h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zM13.991 3l.024.001a1.46 1.46 0 0 1 .538.143.757.757 0 0 1 .302.254c.067.1.145.277.145.602v5.991l-.001.024a1.464 1.464 0 0 1-.143.538.758.758 0 0 1-.254.302c-.1.067-.277.145-.602.145H2.009l-.024-.001a1.464 1.464 0 0 1-.538-.143.758.758 0 0 1-.302-.254C1.078 10.502 1 10.325 1 10V4.009l.001-.024a1.46 1.46 0 0 1 .143-.538.758.758 0 0 1 .254-.302C1.498 3.078 1.675 3 2 3h11.991zM14 2H2C0 2 0 4 0 4v6c0 2 2 2 2 2h12c2 0 2-2 2-2V4c0-2-2-2-2-2z",
+      text: "Channels",
+    },
+    {
+      class:"bi bi-graph-up",
+      icon:"M0 0h1v15h15v1H0V0Zm14.817 3.113a.5.5 0 0 1 .07.704l-4.5 5.5a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61 4.15-5.073a.5.5 0 0 1 .704-.07Z",
+      text:"Stats"
+    },
+    {
+      class:"bi bi-wallet2",
+      icon:"M12.136.326A1.5 1.5 0 0 1 14 1.78V3h.5A1.5 1.5 0 0 1 16 4.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 13.5v-9a1.5 1.5 0 0 1 1.432-1.499L12.136.326zM5.562 3H13V1.78a.5.5 0 0 0-.621-.484L5.562 3zM1.5 4a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-13z",
+      text:"Buy Quota"
+    }
+  ]
+
+  const logout = {
+    class:"bi bi-wallet2",
+    icon:"M12.136.326A1.5 1.5 0 0 1 14 1.78V3h.5A1.5 1.5 0 0 1 16 4.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 13.5v-9a1.5 1.5 0 0 1 1.432-1.499L12.136.326zM5.562 3H13V1.78a.5.5 0 0 0-.621-.484L5.562 3zM1.5 4a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-13z",
+    text:"Buy Quota"
+  }
+
+  function getUserByURL(){
+    return route.fullPath.split('/')[2];   //DA CAMBIARE
+  }
+
+  function getVIPByURL(){
+    return route.fullPath.split('/')[3];   //DA CAMBIARE
+  }
+
+  function getHandleURL(){
+    return "/SMM_App/"+ getUserByURL() + "/handlevip"
+  }
+
+
+  function getUrlPage(page){
+    return "/SMM_App/"+ getUserByURL() +"/"+getVIPByURL()+"/"+page;
+  }
+
+
+</script>
+
+<template>
+  <div v-if="smartPhone">
+    <!-- AGGIUNGERE NAVBAR NEL CASO SMARTPHONE -->
+    <NavBarWel center-text=''
+               class="setW100"
+
+    />
+  </div>
+
+  <nav id="sideBar"
+      class="d-flex justify-content-between position-fixed flex-shrink-0 border changeDirFlex setW100">
+
+    <div class="d-flex changeDirFlex setW100 setHeight">
+      <div v-if="!smartPhone" class="">
+        <a href="/SMM_App/public" class="d-flex align-items-center mb-3">
+          <span class="fs-4">LOGO</span>
+        </a>
+        <hr>
+      </div>
+
+      <ul class="nav nav-pills mb-auto setW100"
+          :class="smartPhone? 'flex-row justify-content-around flex-shrink-0' :'flex-column' ">
+        <SideBarEL v-for="element in sideBarElements"
+                   :key="element.text"
+                   ref="elementSideBar"
+                   :item="element"
+                   :expanded="expanded"
+                   @deactivateAll = "() => {
+                        this.$refs.elementSideBar.forEach( el => el.setNotActive());
+                   }"
+                   @pushto = "(name) => {
+                     this.$router.push(getUrlPage(name))
+                   }"
+        />
+      </ul>
+    </div>
+    <div v-if="!smartPhone" class="d-flex flex-column">
+      <ul class="nav nav-pills flex-column mb-auto">
+        <li class="nameUser" >
+          {{getUserByURL()}}
+        </li>
+        <li class="nameUser" >
+          {{getVIPByURL()}}
+        </li>
+        <li>
+            <a
+                class="nav-link text-danger d-flex flex-row align-items-center mb-3"
+               :class="expanded ? 'justify-content-start' : 'justify-content-center'"
+               @click="[this.$router.push(getHandleURL()), $emit('setInWel')]">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-left" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M6 12.5a.5.5 0 0 0 .5.5h8a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-8a.5.5 0 0 0-.5.5v2a.5.5 0 0 1-1 0v-2A1.5 1.5 0 0 1 6.5 2h8A1.5 1.5 0 0 1 16 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-8A1.5 1.5 0 0 1 5 12.5v-2a.5.5 0 0 1 1 0v2z"/>
+                <path fill-rule="evenodd" d="M.146 8.354a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L1.707 7.5H10.5a.5.5 0 0 1 0 1H1.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3z"/>
+              </svg>
+              <p v-if="expanded" class="mb-0 ms-2">
+                Choice VIP
+              </p>
+            </a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</template>
+
+<style>
+
+  #sideBar{
+    height: 100vh;
+    padding-bottom: 2vh;
+    padding-left: 1vh;
+    width: 10vw;
+    background-color: white;
+    z-index: 1;
+  }
+  .nameUser{
+    padding-left:16px ;
+  }
+
+  .changeDirFlex{
+    flex-direction: column !important;
+  }
+
+  @media screen and (max-width: 768px){
+    #sideBar{
+      position: fixed;
+      height: auto;
+      display: flex;
+      flex-direction: row !important;
+      justify-content: space-evenly !important;
+      bottom: 0;
+      align-items: end;
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+    .changeDirFlex{
+      flex-direction: row !important;
+    }
+
+    .setW100{
+      width: 100% !important;
+    }
+    .setHeight{
+      height: auto;
+    }
+  }
+  
+ @media screen and (max-width: 1450px) and (min-width: 768px) {
+    #sideBar{
+      width: 7%;
+    }
+ } 
+
+</style>
