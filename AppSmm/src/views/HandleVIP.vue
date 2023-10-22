@@ -14,17 +14,19 @@
   const modalState = reactive({myModal: null,})
 
   const name2Use = ref('')
+  const requestCompleted = ref(false);
 
   onMounted(()=>{
     modalState.myModal = new Modal('#choiceModal',{})
   })
 
-  onBeforeMount(async ()=>{
+  onMounted(async ()=>{
     let res = await fetch(`/db/getVips?SMMname=${getSMMname()}`,{
       method:"GET"
     })
-    vips = res
-    console.log(vips);
+    vips = await res.json()
+    requestCompleted.value=true;
+    console.log(vips)
   })
 
   function openModal(name) {
@@ -42,11 +44,11 @@
 
 <template>
   <NavBarWel center-text="Scegli account da gestire" />
-  <div class="d-flex flex-row align-items-center flex-wrap justify-content-evenly mt-lg-3">
+  <div class="d-flex flex-row align-items-center flex-wrap justify-content-evenly mt-lg-3" v-if="requestCompleted">
     <VipCard v-for="(vip,index) in vips"
             :key="index"
-            :followers="vip.fol"
-             :username="vip.name"
+            :followers="100"
+             :username="vip.username"
             @setModal = " (username) => openModal(username)"
     />
   </div>

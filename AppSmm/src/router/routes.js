@@ -4,6 +4,7 @@ import ChannelList from "../views/ChannelList.vue";
 import VipProfile from "../views/VipProfile.vue";
 import Messages from "../views/Messages.vue";
 import Post from "../components/post/Post.vue";
+import {getSMMname} from "../utils";
 
 const baseDir = window.location.origin;
 
