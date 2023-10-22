@@ -8,21 +8,8 @@
 
   const emit = defineEmits(['setWel'])
 
-  //ci andrebbe anche il post
-  const vips =[
-    {
-      name:"PippoVip",
-      fol: 10,
-    },
-    {
-      name:"FVPro",
-      fol: 190,
-    },
-    {
-      name:"Popi",
-      fol: 200000,
-    }
-]
+
+  let vips = [];
 
   const modalState = reactive({myModal: null,})
 
@@ -32,9 +19,12 @@
     modalState.myModal = new Modal('#choiceModal',{})
   })
 
-  onBeforeUpdate(()=>{
-    console.log("AAAAAAAAJAHSVJDSA")
-    emit('setWel',true)
+  onBeforeMount(async ()=>{
+    let res = await fetch(`/db/getVips?SMMname=${getSMMname()}`,{
+      method:"GET"
+    })
+    vips = res
+    console.log(vips);
   })
 
   function openModal(name) {

@@ -1,5 +1,5 @@
 const {addPost} = require('../../dbScripts/postMethods');
-const {addUser, searchByUsername, changePwsd, getUsers, usersLength, altUser} = require('../../dbScripts/userMethods');
+const {addUser, searchByUsername, changePwsd, getUsers, usersLength, altUser, getHandledVip} = require('../../dbScripts/userMethods');
 const {mongoCredentials} = require('../../dbScripts/utils.js')
 
 const createUser = async (req,res,next) => {
@@ -54,6 +54,15 @@ const getUsersNumber = async (req,res) => {
     }
 }
 
+const getVips = async (req,res) => {
+    try {
+        res.send(await getHandledVip(req.query,mongoCredentials));
+    }
+    catch (error) {
+        res.send(error);
+    }
+}
+
 module.exports = {
     createUser,
     createPost,
@@ -62,5 +71,6 @@ module.exports = {
     getSessionUser,
     getAllUsers,
     getUsersNumber,
-    modifyUser
+    modifyUser,
+    getVips
 }

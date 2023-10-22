@@ -172,6 +172,26 @@ const altUser = async (body,credentials) => {
     }
 }
 
+//GET
+const getHandledVip = async (query,credentials) => {
+    try{
+        await connectdb(credentials);
+        let SMM = await User.findOne({username: query.SMMname})
+        console.log(SMM)
+        const vips = SMM.vipHandled;
+        console.log(vips)
+        let vipsAcc = await Promise.all(vips.map(async (vip)=>{
+            return await User.findById(vip)
+        }))
+
+        console.log(vipsAcc)
+        return vipsAcc
+    }
+    catch (Error){
+        throw Error;
+    }
+}
+
 
 
 //manca un delete per provare le principali API
@@ -183,5 +203,6 @@ module.exports = {
     loginUser,
     getUsers,
     usersLength,
-    altUser
+    altUser,
+    getHandledVip
 }

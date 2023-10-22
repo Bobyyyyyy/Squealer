@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const userTypes = ['user','pro','mod'];
+const userTypes = ['user','pro','smm','vip','mod'];
 
 //Dati di un utente al momento dell'iscrizione
 
@@ -21,6 +21,17 @@ const UserSchema = new mongoose.Schema({
         type: String,
         enum: userTypes,
         required: true,
+    },
+
+    vipHandled: {
+        type: [
+            {
+                type: mongoose.Schema.ObjectId,
+            }
+        ],
+        required: function (){
+            return this.typeUser === 'smm'
+        }
     },
 
     characters: {
