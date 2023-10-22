@@ -1,7 +1,18 @@
 <script setup>
+
   defineProps({
     centerText: String,
   })
+
+
+  //è una get la logout??
+  async function logout(){
+
+    let res = await fetch("/logout");
+    console.log(res);
+    window.location.href= res.url;
+  }
+
 </script>
 
 <template>
@@ -16,7 +27,10 @@
         <h4 class="mb-0">{{centerText}}</h4>
       </div>
       <div class="d-flex">
-        <button type="button" class="btn btn-outline-danger">LOGOUT</button>
+        <button type="button"
+                class="btn btn-outline-danger"
+                @click="logout"
+        >LOGOUT</button>
       </div>
     </div>
   </nav>
