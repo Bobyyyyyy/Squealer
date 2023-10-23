@@ -1,4 +1,8 @@
+<<<<<<< HEAD
  -----------------------------------------------------------------
+=======
+# -----------------------------------------------------------------
+>>>>>>> Fre_newVue
 # .gitignore
 # Bare Minimum Git
 # https://salferrarello.com/starter-gitignore-file/
@@ -50,7 +54,11 @@
 # -----------------------------------------------------------------
 
 # ignore all files starting with . or ~
+<<<<<<< HEAD
 .*
+=======
+.gitignore
+>>>>>>> Fre_newVue
 ~*
 
 # ignore node/grunt dependency directories
