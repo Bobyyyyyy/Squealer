@@ -77,7 +77,6 @@ const createSession = async(req,res) => {
         console.log(req.response);
         console.log(req.session);
         req.session.save();
-        console.log('ciao');
         switch (req.response.typeUser) {
             case 'user':
             case 'vip':
