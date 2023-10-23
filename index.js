@@ -8,7 +8,7 @@ global.startDate = null;
 
 const express = require('express');
 const cors = require('cors');
-const {dbname} = require("./dbScripts/utils");
+const {dbname} = require("./public/utils");
 const {isSMM} = require("./Frontpage/controllers/FrontPageController");
 
 let app = express();
@@ -39,7 +39,7 @@ app.engine('html', require('ejs').renderFile);
 
 //il sito inizia dando il controllo al router della frontpage
 app.use('/', require('./Frontpage/routes/frontpage'));
-app.use('/db',require('./AppMod/routes/MongoDB'));
+app.use('/db',require('./public/routers/MongoDB'));
 app.get('/SMM/*', isSMM, (req,res) => {
     res.sendFile(rootDir + '/AppSmm/index.html');
 })

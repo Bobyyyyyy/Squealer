@@ -1,5 +1,5 @@
-const {loginUser} = require("../../dbScripts/userMethods");
-const {mongoCredentials} = require("../../dbScripts/utils");
+const {loginUser} = require("../../public/userMethods");
+const {mongoCredentials} = require("../../public/utils");
 
 const registerView = (req, res) => {
     res.render("register.html", {
@@ -22,7 +22,7 @@ const login  = async (req,res,next) => {
 }
 
 const isUser = (req,res,next) => {
-    if(req.session.authenticated && req.session.type === 'user') {
+    if(req.session.authenticated && (req.session.type === 'user' || req.session.type === 'vip') ) {
         next();
     }
     else {
@@ -40,7 +40,7 @@ const isMod = (req,res,next) => {
 }
 
 const isSMM = (req,res,next) => {
-    if(req.session.authenticated && req.session.type === 'pro' ) {
+    if(req.session.authenticated && req.session.type === 'smm' ) {
         next();
     }
     else {
@@ -49,13 +49,13 @@ const isSMM = (req,res,next) => {
 }
 
 const isSessionActive = (req,res,next) => {
-
     if(!req.session.authenticated) {
         next();
     }
     else {
         switch (req.session.type) {
             case 'user':
+            case 'vip':
                 res.redirect('/homepage');
                 break;
 
@@ -63,7 +63,7 @@ const isSessionActive = (req,res,next) => {
                 res.redirect('/mod');
                 break;
 
-            case 'pro':
+            case 'smm':
                 res.redirect('/SMM/' + req.session.user);
         }
     }
@@ -77,9 +77,10 @@ const createSession = async(req,res) => {
         console.log(req.response);
         console.log(req.session);
         req.session.save();
-
+        console.log('ciao');
         switch (req.response.typeUser) {
             case 'user':
+            case 'vip':
                 res.redirect('/homepage');
                 break;
 
@@ -87,7 +88,7 @@ const createSession = async(req,res) => {
                 res.redirect('/mod');
                 break;
 
-            case 'pro':
+            case 'smm':
                 res.redirect('/SMM/' + req.response.username );
                 break;
         }
