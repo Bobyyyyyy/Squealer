@@ -1,6 +1,6 @@
 const express = require('express')
 const {frontpageView, login, registerView, isAuthenticated, isSessionActive, createSession, isUser, isMod, logout} = require('../controllers/FrontPageController');
-const {createUser} = require("../../AppMod/controllers/MongoController");
+const {createUser} = require("../../public/controllers/MongoController");
 const router = express.Router();
 
 router.get('/',isSessionActive,frontpageView);
