@@ -1,0 +1,22 @@
+.centralDiv {
+    height: 100vh;
+    margin-left: 10vw !important;
+}
+.marginCD{
+    margin-left: 10%;
+    margin-right: 10%;
+}
+
+@media screen and (max-width: 768px){
+    .allPage{
+        width: 100%;
+        margin-left: 0;
+        margin-bottom: 15%;
+    }
+}
+
+@media screen and (max-width: 1450px) and (min-width:768px) {
+    .allPage{
+        margin-left: 7%;
+    }
+}

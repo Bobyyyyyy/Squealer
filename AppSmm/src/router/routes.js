@@ -48,6 +48,7 @@ const routes =[
             SbOn: ChannelList
         },
     },
+    /*
     {
         path: "/SMM/:user/:vip/Messages",
         name:"Messages",
@@ -80,6 +81,8 @@ const routes =[
             SbOn: VipCard
         },
     }
+
+     */
 ]
 
 

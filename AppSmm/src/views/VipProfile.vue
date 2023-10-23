@@ -44,73 +44,71 @@
 </script>
 
 <template>
-  <div class="page">
-    <div class="d-flex flex-row justify-content-center  profileDim">
-      <div class="aspect-ratio object-fit-fill profileDim">
-        <img :src= "profilePicturePath" alt="pippo" class="img-fluid" />
+  <div class="centralDiv">
+    <div class="marginCD">
+      <div class="d-flex flex-row justify-content-center  profileDim">
+        <div class="aspect-ratio object-fit-fill profileDim">
+          <img :src= "profilePicturePath" alt="pippo" class="img-fluid" />
+        </div>
       </div>
-    </div>
-    <div class="d-flex flex-row w-100 justify-content-between">
-      <div class="d-flex flex-column ">
-        <div>
-          <p class="m-0">{{nFoll}} Followers</p>
+      <div class="d-flex flex-row w-100 justify-content-between">
+        <div class="d-flex flex-column ">
+          <div>
+            <p class="m-0">{{nFoll}} Followers</p>
+          </div>
+          <div>
+            <p class="m-0">{{nPost}} Posts</p>
+          </div>
         </div>
         <div>
-          <p class="m-0">{{nPost}} Posts</p>
+          <p class="m-0 fs-3 text-center">{{username}}</p>
+        </div>
+        <div>
+          <p class="m-0">Quota rimanente:</p>
+          <p>{{quotaRes.daily}}/{{quotaRes.weekly}}/{{quotaRes.monthly}}</p>
         </div>
       </div>
-      <div>
-        <p class="m-0 fs-3 text-center">{{username}}</p>
-      </div>
-      <div>
-        <p class="m-0">Quota rimanente:</p>
-        <p>{{quotaRes.daily}}/{{quotaRes.weekly}}/{{quotaRes.monthly}}</p>
-      </div>
-    </div>
-    <div class="d-flex flex-row justify-content-between">
-      <div class="d-flex flex-row justify-content-around align-items-center setFlexDirection">
-        <div class="dropdown">
-          <a class="btn btn-primary dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">{{textFilter}}</a>
-          <ul class="dropdown-menu">
-            <li v-for="(el,i) in filterValues" :key ="i">
-              <a class="dropdown-item" @click="disableKeyWdFilter(); updateTextFilter(el)">{{ el }}</a>
-            </li>
-            <li><a class="dropdown-item" v-on:click="setKeyWdFilter(); updateTextFilter('Keyword')">Keyword</a></li>
-          </ul>
+      <div class="d-flex flex-row justify-content-between">
+        <div class="d-flex flex-row justify-content-around align-items-center setFlexDirection">
+          <div class="dropdown">
+            <a class="btn btn-primary dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">{{textFilter}}</a>
+            <ul class="dropdown-menu">
+              <li v-for="(el,i) in filterValues" :key ="i">
+                <a class="dropdown-item" @click="disableKeyWdFilter(); updateTextFilter(el)">{{ el }}</a>
+              </li>
+              <li><a class="dropdown-item" v-on:click="setKeyWdFilter(); updateTextFilter('Keyword')">Keyword</a></li>
+            </ul>
+          </div>
+          <div v-if="keyWordFilter" class="ms-1">
+            <input type="text" placeholder="Keyword..." />
+          </div>
         </div>
-        <div v-if="keyWordFilter" class="ms-1">
-          <input type="text" placeholder="Keyword..." />
-        </div>
-      </div>
 
-      <div class="d-flex flex-row justify-content-evenly setFlexDirection">
-        <div class="dropdown buttonDropDown">
-          <a class="btn btn-primary dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">{{typePostFilter}}</a>
-          <ul class="dropdown-menu">
-            <li v-for="(el,i) in postType" :key="i" ><a class="dropdown-item" v-on:click="disableKeyWdFilter();updateTextType(el)">{{ el }}</a></li>
-          </ul>
-        </div>
-        <div class="dropdown ms-1 buttonDropDown">
-          <a class="btn btn-primary dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">{{ sortFilter }}</a>
-          <ul class="dropdown-menu">
-            <li v-for="(el,i) in sortPosts" :key="i" ><a class="dropdown-item" v-on:click="disableKeyWdFilter(); updateSortFilter(el)">{{ el }}</a></li>
-          </ul>
+        <div class="d-flex flex-row justify-content-evenly setFlexDirection">
+          <div class="dropdown buttonDropDown">
+            <a class="btn btn-primary dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">{{typePostFilter}}</a>
+            <ul class="dropdown-menu">
+              <li v-for="(el,i) in postType" :key="i" ><a class="dropdown-item" v-on:click="disableKeyWdFilter();updateTextType(el)">{{ el }}</a></li>
+            </ul>
+          </div>
+          <div class="dropdown ms-1 buttonDropDown">
+            <a class="btn btn-primary dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">{{ sortFilter }}</a>
+            <ul class="dropdown-menu">
+              <li v-for="(el,i) in sortPosts" :key="i" ><a class="dropdown-item" v-on:click="disableKeyWdFilter(); updateSortFilter(el)">{{ el }}</a></li>
+            </ul>
+          </div>
         </div>
       </div>
+      <div class="d-flex flex-row flex-wrap justify-content-around mt-3">
+        <Post v-for="(el,i) in 10" :key="i"
+        />
+      </div>
     </div>
-    <div class="d-flex flex-row flex-wrap justify-content-around mt-3">
-      <Post v-for="(el,i) in 10" :key="i"
-      />
-    </div>
+
   </div>
 </template>
 
 <style>
-
-  .page{
-    margin-left: 4%;
-    margin-right: 4%;
-  }
 
   .profileDim{
     height: 20vh;
