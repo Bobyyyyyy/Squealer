@@ -2,8 +2,12 @@ import {createApp} from 'vue'
 import App from './App.vue'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap'
+import "../../public/style.css"
+
 import routes from './router/routes.js'
 import {createRouter, createWebHistory} from "vue-router";
+
+
 import NavBarWel from "./components/NavBarWel.vue";
 import VipCard from "./components/handleVip/VipCard.vue";
 import VipModal from "./components/handleVip/VipModal.vue";

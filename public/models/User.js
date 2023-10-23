@@ -24,11 +24,13 @@ const UserSchema = new mongoose.Schema({
     },
 
     vipHandled: {
-        type: [
-            {
-                type: mongoose.Schema.ObjectId,
-            }
-        ],
+        type: {
+            users: [
+                {
+                    type: mongoose.Schema.ObjectId,
+                }
+            ]
+        },
         required: function (){
             return this.typeUser === 'smm'
         }

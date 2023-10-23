@@ -30,7 +30,10 @@ const addUser = async (body,credentials) => {
             typeUser: body.type ? body.type : 'user',
             characters: quota,
             blocked: false,
+            vipHandled: body.type==='smm' ? {} : undefined,
         });
+
+
 
         //save new user in DB
         await newUser.save();
@@ -178,8 +181,7 @@ const getHandledVip = async (query,credentials) => {
         await connectdb(credentials);
 
         let SMM = await User.findOne({username: query.SMMname})
-
-        return await Promise.all(SMM.vipHandled.map( (vip) => {
+        return await Promise.all(SMM.vipHandled.users.map( (vip) => {
             return User.findById(vip);
         }))
     }

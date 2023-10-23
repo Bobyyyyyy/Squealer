@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const {ObjectId} = require("mongodb");
+const contentTypes = ['geoloc','text','img']
 
 const PostSchema = new mongoose.Schema({
     ownerId: {
@@ -8,6 +9,7 @@ const PostSchema = new mongoose.Schema({
     },
     contentType:{
         type: String,       //geolocalizzazione, immagine o testo
+        enum: contentTypes,
         required: true,
     },
     content:{
