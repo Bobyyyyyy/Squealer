@@ -39,6 +39,11 @@ function getVIPname(){
     return window.location.pathname.split('/')[3];
 }
 
+function getPage(){
+    return window.location.pathname.split('/')[4];
+}
+
+
 function getHandleVipURL(){
     return "/SMM/"+getSMMname()+"/handlevip";
 }
@@ -47,5 +52,6 @@ export{
     getSMMname,
     getVIPname,
     getHandleVipURL,
+    getPage,
     sideBarElements
 }

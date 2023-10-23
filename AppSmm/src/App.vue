@@ -1,42 +1,19 @@
 <script setup>
-import {ref, watch} from "vue";
-  import SideBar from "./components/sideBar/SideBar.vue";
-
-  let inWel = ref(true);
-
-  function setisWel(){
-    inWel.value= !inWel.value
-  }
-
-  function setWel(bool){
-    inWel.value = bool;
-  }
-    //PER LA HISTORY, altrimenti non si aggiorna
-  window.addEventListener("popstate",()=>{
-    if(window.location.pathname.split('/').slice(-1) == 'handlevip') setWel(true);
-  },false)
 
 </script>
 
 <template>
-  <SideBar v-if="!inWel"
-           @setInWel="setisWel"
-           @setWel="(bool) => setWel(bool)"
-  />
-  <div v-if="!inWel" class="allPage">
-    <router-view  name="SbOn"/>
-  </div>
 
-  <router-view v-else
-               @setInWel="setisWel"
-               @setWel="(bool) => setWel(bool)"
-  />
+  <router-view name="sideBar"/>
+  <router-view name="SbOn" class="allPage"/>
+  <router-view name="welcomingPage"/>
+
 </template>
 
 <style>
   .allPage {
     height: 100vh;
-    margin-left: 10vw;
+    margin-left: 10vw !important;
   }
   @media screen and (max-width: 768px){
     .allPage{

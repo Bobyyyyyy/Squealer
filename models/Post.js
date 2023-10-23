@@ -3,8 +3,7 @@ const {ObjectId} = require("mongodb");
 
 const PostSchema = new mongoose.Schema({
     ownerId: {
-        //type: mongoose.Schema.ObjectId,
-        type: Number,
+        type: mongoose.Schema.ObjectId,
         required: true,
     },
     contentType:{

@@ -92,7 +92,7 @@ const searchByUsername = async (query, credentials) =>{
             err.statusCode = 400;       // 400 ??
             console.log(err);
             await mongoose.connection.close();
-            throw err
+            throw err;
         }
 
         return user;
@@ -176,16 +176,12 @@ const altUser = async (body,credentials) => {
 const getHandledVip = async (query,credentials) => {
     try{
         await connectdb(credentials);
-        let SMM = await User.findOne({username: query.SMMname})
-        console.log(SMM)
-        const vips = SMM.vipHandled;
-        console.log(vips)
-        let vipsAcc = await Promise.all(vips.map(async (vip)=>{
-            return await User.findById(vip)
-        }))
 
-        console.log(vipsAcc)
-        return vipsAcc
+        let SMM = await User.findOne({username: query.SMMname})
+
+        return await Promise.all(SMM.vipHandled.map( (vip) => {
+            return User.findById(vip);
+        }))
     }
     catch (Error){
         throw Error;

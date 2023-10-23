@@ -6,9 +6,6 @@
   import {Modal} from 'bootstrap'
   import {getSMMname, getVIPname} from "../utils";
 
-  const emit = defineEmits(['setWel'])
-
-
   let vips = [];
 
   const modalState = reactive({myModal: null,})
@@ -26,7 +23,6 @@
     })
     vips = await res.json()
     requestCompleted.value=true;
-    console.log(vips)
   })
 
   function openModal(name) {
@@ -56,7 +52,6 @@
             :SMMname="getSMMname()"
             :VIPname="name2Use"
             @closeModal = "closeModal()"
-            @changeWel = "this.$emit('setInWel')"
 
   />
 

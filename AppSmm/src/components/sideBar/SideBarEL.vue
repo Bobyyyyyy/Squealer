@@ -1,10 +1,13 @@
 <script setup>
-import {computed, onBeforeMount, onMounted, onUnmounted, ref} from "vue";
+import {computed, onBeforeMount, onBeforeUpdate, onMounted, onUnmounted, onUpdated, ref} from "vue";
+import {getPage} from "../../utils";
 
   const props = defineProps({
     item: Object,
     expanded: Boolean
   })
+
+  const emit = defineEmits(['deactivateAll','pushto'])
 
   const name = props.item.text;
 
@@ -19,7 +22,7 @@ import {computed, onBeforeMount, onMounted, onUnmounted, ref} from "vue";
   }
 
   onBeforeMount(()=>{
-    if (props.item.text === "Profile"){ setIsActive(); }
+    if (props.item.text === getPage()){ setIsActive(); }
   })
 
   defineExpose({
@@ -27,7 +30,6 @@ import {computed, onBeforeMount, onMounted, onUnmounted, ref} from "vue";
     setIsActive,
     name
   })
-
 
 </script>
 

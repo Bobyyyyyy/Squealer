@@ -26,8 +26,7 @@
           <button type="button" class="btn btn-primary"
                   @click=
                       "this.$router.push('/SMM/' + SMMname + '/' + VIPname +'/Profile');
-                      $emit('closeModal'),
-                      $emit('changeWel')">
+                      $emit('closeModal')">
           Si, continua</button>
         </div>
       </div>

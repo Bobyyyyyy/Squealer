@@ -1,6 +1,6 @@
 <script setup>
-
 import Post from "../components/post/Post.vue";
+
 </script>
 
 <template>

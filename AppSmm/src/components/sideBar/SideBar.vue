@@ -20,7 +20,8 @@
     return "/SMM/"+ getSMMname() +"/"+getVIPname()+"/"+ page.split(' ').join('');
   }
 
-  //HISTORY:
+  //HISTORY:    Forse si può fare utilizzano le lifecycle hooks
+
   window.addEventListener("popstate",()=>{
     elementSideBar.value.forEach((el)=>{
       if (el.name.split(' ').join('') == window.location.pathname.split('/').slice(-1)){
@@ -29,6 +30,7 @@
       }
     })
   },false)
+
 
 </script>
 
