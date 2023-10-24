@@ -65,14 +65,15 @@ const routes =[
             SbOn: ChannelList
         },
     },
+    */
     {
         path: "/SMM/:user/:vip/AddPost",
         name:"Post",
         components: {
             sideBar: SideBar,
-            SbOn: Post
         },
     },
+    /*
     {
         path: "/SMM/:user/:vip/Stats",
         name:"Stats",

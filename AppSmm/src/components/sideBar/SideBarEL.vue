@@ -4,32 +4,18 @@ import {getPage} from "../../utils";
 
   const props = defineProps({
     item: Object,
-    expanded: Boolean
+    expanded: Boolean,
+    active: {
+      default:null
+    }
   })
 
-  const emit = defineEmits(['deactivateAll','pushto'])
+  const emit = defineEmits(['pushTo', 'changeActive'])
 
   const name = props.item.text;
 
-  const isActive = ref(false);
+  const isThisActive = computed(() => props.active === props.item.text);
 
-  function setIsActive(){
-    isActive.value = true;
-  }
-
-  function setNotActive(){
-    isActive.value = false;
-  }
-
-  onBeforeMount(()=>{
-    if (props.item.text === getPage()){ setIsActive(); }
-  })
-
-  defineExpose({
-    setNotActive,
-    setIsActive,
-    name
-  })
 
 </script>
 
@@ -37,9 +23,12 @@ import {getPage} from "../../utils";
   <li class="nav-item butNav"  >
       <a
          class="nav-link d-flex flex-row align-items-center reducePad"
-         :class= "isActive ? 'active': '',
+         :class= "isThisActive ? 'active': '',
                   expanded ? 'justify-content-start' : 'justify-content-center'"
-         @click="$emit('deactivateAll'); $emit('pushto',item.text); setIsActive()" >
+         @click ="$emit('changeActive',item.text);
+                  $emit('pushTo',item.text);"
+      >
+
         <svg xmlns="http://www.w3.org/2000/svg" class="icon"  fill="currentColor" :class="item.class" viewBox="0 0 16 16">
           <path :d= "item.icon" />
         </svg>

@@ -1,19 +1,40 @@
 <script setup>
   import SideBarEL from "./SideBarEL.vue";
-  import {computed, onMounted, onUnmounted, ref} from "vue";
   import NavBarWel from "../NavBarWel.vue";
-  import {getHandleVipURL, getSMMname, getVIPname, sideBarElements} from "../../utils";
+  import AddPostModal from "../../views/AddPostModal.vue";
+  import {Modal} from 'bootstrap'
+  import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
+  import {getHandleVipURL, getPage, getSMMname, getVIPname, sideBarElements} from "../../utils";
 
   const windowWidth = ref(window.innerWidth);
+  const modalState = reactive({Modal: null,})
+  const beforeModalPage = ref('');
 
   const onWidthChange =  () => windowWidth.value = window.innerWidth
   onMounted(() => window.addEventListener('resize', onWidthChange))
+  onMounted(() => { modalState.Modal = new Modal('#AddPostModal',{})})
   onUnmounted(() => window.removeEventListener('resize', onWidthChange))
+
+  const activeBut = ref(getPage());
+
+  function openAppModal() {
+    modalState.Modal.show()
+  }
+  function closeAppModal() {
+    modalState.Modal.hide()
+    activeBut.value = beforeModalPage.value
+  }
+
+  function setUpModal() {
+    openAppModal();
+    beforeModalPage.value = window.location.pathname.split('/').slice(-1)[0];
+    console.log(beforeModalPage.value);
+  }
+
 
   const width = computed(() => windowWidth.value)
   const expanded = computed(() => width.value > 1450 );
   const smartPhone = computed(()=> width.value < 768);
-  const elementSideBar = ref(null);
 
 
   function getUrlPage(page){
@@ -21,15 +42,12 @@
   }
 
   //HISTORY:    Forse si può fare utilizzano le lifecycle hooks
-
   window.addEventListener("popstate",()=>{
-    elementSideBar.value.forEach((el)=>{
-      if (el.name.split(' ').join('') == window.location.pathname.split('/').slice(-1)){
-        elementSideBar.value.forEach(elm=>elm.setNotActive())
-        el.setIsActive();
-      }
-    })
+    activeBut.value = window.location.pathname.split('/').slice(-1).join().split(/(?=[A-Z])/).join(' ');
   },false)
+
+
+
 
 
 </script>
@@ -61,11 +79,14 @@
                    ref="elementSideBar"
                    :item="element"
                    :expanded="expanded"
-                   @deactivateAll = "() => {
-                        this.$refs.elementSideBar.forEach( el => el.setNotActive());
+                   :active = "activeBut"
+                   @changeActive="(name) => {
+                     activeBut = name
                    }"
-                   @pushto = "(name) => {
-                     this.$router.push(getUrlPage(name))
+
+                   @pushTo = "(name) => {
+                     if(name === 'Add Post') setUpModal()
+                     else this.$router.push(getUrlPage(name))
                    }"
         />
       </ul>
@@ -95,6 +116,9 @@
       </ul>
     </div>
   </nav>
+  <AddPostModal
+    @closeAppModal = "closeAppModal"
+  />
 </template>
 
 <style>
