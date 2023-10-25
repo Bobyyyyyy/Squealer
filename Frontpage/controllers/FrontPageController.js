@@ -80,7 +80,7 @@ const createSession = async(req,res) => {
 
          */
         req.session.save();
-
+      
         switch (req.response.typeUser) {
             case 'user':
             case 'vip':

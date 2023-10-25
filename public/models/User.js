@@ -38,7 +38,6 @@ const UserSchema = new mongoose.Schema({
 
     characters: {
         type:{
-
             daily:{
                 type:Number,
             },
@@ -54,12 +53,6 @@ const UserSchema = new mongoose.Schema({
             return this.typeUser !== 'mod';
         },
     },
-
-    blocked: {
-        type: Boolean,
-        required: true,
-    }
-
 })
 
 const User = mongoose.model("User", UserSchema);

@@ -12,19 +12,19 @@
         <div class="navbar-collapse collapse dual-collapse2" style="flex-basis: 100%">
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="#">Utenti</a>
+                    <a class="nav-link active" aria-current="page" href="/mod/users">Utenti</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Posts</a>
+                    <a class="nav-link" href="/mod/posts">Posts</a>
                 </li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         Channels
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#">Private</a></li>
+                        <li><a class="dropdown-item" href="/mod/officialChannels">Official Channels</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="#">Public</a></li>
+                        <li><a class="dropdown-item" href="/mod/privateChannels">Private Channels</a></li>
                     </ul>
                 </li>
             </ul>
@@ -53,8 +53,8 @@
     <div class="p-5 bg-white flex-column" id="div1" style="height: 100%; width: 100%">
         <!-- Modal Button -->
     <div class="d-flex flex-row align-items-center p-3 pe-0">
-        <input class="form-control" id="filter" type="text" style="height: 10%; width: 15%; background-color: lightgray" placeholder="Cerca..">
-        <button type="button" class="btn btn-primary ms-auto " data-bs-toggle="modal" data-bs-target="#addUser">
+        <input class="form-control" id="filter" type="text" style="height: 10%; width: 15%; background-color: lightgray" placeholder="Cerca Utente..">
+        <button type="button" class="btn btn-primary ms-auto " data-bs-toggle="modal" data-bs-target="">
             Add User
         </button>
     </div>
@@ -80,7 +80,7 @@
                 <h1 class="modal-title fs-5" id="addUserLabel">Inserisci Dati Utente</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form method="post" action="db/user">
+            <form method="post" action="/db/user">
             <div class="modal-body">
                 <div>
                     <label for="name" class="form-label w-100"> Nome:
@@ -101,15 +101,21 @@
                     </label>
                 </div>
                 <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="type" id="pro" value="pro">
-                    <label class="form-check-label" for="pro">
-                        Pro
+                    <input class="form-check-input" type="radio" name="type" id="smm" value="smm">
+                    <label class="form-check-label" for="smm">
+                        Social Media Manager
                     </label>
                 </div>
                 <div class="form-check form-check-inline">
                     <input class="form-check-input" type="radio" name="type" id="mod" value="mod">
                     <label class="form-check-label" for="mod">
                         Mod
+                    </label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="type" id="Vip" value="Vip">
+                    <label class="form-check-label" for="Vip">
+                        Vip
                     </label>
                 </div>
             </div>
@@ -144,10 +150,6 @@
                             <label for="monthly" class="form-label w-100"> Mensili:
                                 <input type="number" class="form-control" name="monthly" id="monthly" placeholder="Inserisci caratteri mensili"></label>
                         </div>
-                        <div>
-                            <input type="checkbox" class="form-check-input" name="blocked" id="blocked" value="true">
-                            <label for="blocked" class="form-check-label"> Bloccato </label>
-                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
@@ -159,6 +161,7 @@
     </div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="/js/modHomepage.js"></script>
 <script src="/js/userDashboard.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 </body>

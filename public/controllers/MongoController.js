@@ -1,7 +1,9 @@
 const {addPost} = require('../scripts/postMethods');
 const {addUser, searchByUsername, changePwsd, getUsers, usersLength, altUser, getHandledVip} = require('../scripts/userMethods');
 const {mongoCredentials} = require('../scripts/utils.js')
+const {addOfficialChannel, addFollower, addAdmin, deleteChannel} = require("../scripts/ChannelMethods");
 
+/* User Methods */
 const createUser = async (req,res,next) => {
     try {
         req.response = await addUser(req.body, mongoCredentials);
@@ -10,11 +12,6 @@ const createUser = async (req,res,next) => {
         res.redirect('/register');
     }
 }
-
-const createPost = async (req,res) => {
-    res.send(await addPost(req.body,mongoCredentials));
-}
-
 const searchUser = async (req,res) => {
     res.send(await searchByUsername(req.body,mongoCredentials));
 }
@@ -63,6 +60,49 @@ const getVips = async (req,res) => {
     }
 }
 
+/* Post Methods */
+const createPost = async (req,res) => {
+    res.send(await addPost(req.body,mongoCredentials));
+}
+
+
+/* Channel Methods */
+const createReservedChannel = async (req,res) => {
+    try {
+        res.send(await addOfficialChannel(req.body,mongoCredentials))
+    }
+    catch(error) {
+        res.send(error);
+    }
+}
+
+const addFollowers = async (req,res) => {
+    try {
+        res.send(await addFollower(req.body,mongoCredentials))
+    }
+    catch(error) {
+        res.send(error);
+    }
+}
+
+const addAdmins = async (req,res) => {
+    try {
+        res.send(await addAdmin(req.body,mongoCredentials))
+    }
+    catch(error) {
+        res.send(error);
+    }
+}
+
+const deleteCh = async (req,res) => {
+    try {
+        res.send(await deleteChannel(req.body,mongoCredentials))
+    }
+    catch(error) {
+        res.send(error);
+    }
+}
+
 module.exports = {
     createUser,
     createPost,
@@ -72,5 +112,9 @@ module.exports = {
     getAllUsers,
     getUsersNumber,
     modifyUser,
-    getVips
+    getVips,
+    createReservedChannel,
+    addFollowers,
+    addAdmins,
+    deleteCh,
 }
