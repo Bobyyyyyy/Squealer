@@ -1,12 +1,27 @@
 const mongoose = require('mongoose');
 const {ObjectId} = require("mongodb");
-const contentTypes = ['geoloc','text','img']
+const contentTypes = ['geoloc','text','image']
+const destTypes = ['channel', 'user']
 const reactionTypes = ['love','like','meh','disagreement','hate']
 
 const PostSchema = new mongoose.Schema({
     ownerId: {
-        type: mongoose.Schema.ObjectId,
+        type: String,
         required: true,
+    },
+    destination: {
+        type: {
+            destType: {
+                type: String,
+                enum: destTypes,
+            },
+            receiver: {
+                type: String,
+                required: true,
+            },
+        },
+        required: true,
+
     },
     contentType:{
         type: String,       //geolocalizzazione, immagine o testo

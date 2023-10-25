@@ -13,6 +13,7 @@ const {isSMM} = require("./Frontpage/controllers/FrontPageController");
 
 let app = express();
 
+app.use(express.json());
 
 app.use(session({
     secret: 'sburo',

@@ -1,22 +1,29 @@
 const mongoose = require('mongoose');
 const Post = require("./models/Post");
-const {connectdb} = require("mongoose");
+const User = require("./models/User");
+const {connectdb} = require("./utils");
 
-const addPost = async (user,body,credentials) => {
+
+const addPost = async (body,credentials) => {
     try{
-        await connectdb(credentials);
-        const newPost = new Post({
-            ownerId: user, //user._id,      capire il concetto di sessione per capire come prendere l'id di chi scrive il post
-            views: body.views,
-            dateOfCreation: new Date().getTime(),
-            comments: [],
-            content: "pippo",       //body.content,
-            contentType: "pippo",   //body.contentType,
-        });
+        await connectdb(credentials)
+
+        let newPost = new Post({
+            ownerId: (await User.findOne({username: body.name}))._id.toString(),
+            destination:{
+                destType: 'user',
+                receiver: (await User.findOne({username: body.receiver}))._id.toString(),
+            },
+            contentType: body.contentType,
+            content: body.content,
+            reactions: [],
+            dateOfCreation: body.dateOfCreation,
+        })
 
         await newPost.save();
-
         await mongoose.connection.close();
+
+        return newPost
     }
     catch(err){
         console.log(err);
