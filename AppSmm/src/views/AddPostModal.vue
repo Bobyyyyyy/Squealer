@@ -1,16 +1,55 @@
 <script setup>
 
 import {computed, ref} from "vue";
+import {currentVip} from "../utils";
 
   const postType = ref('Select type')
   const imgUrl = ref('')
   let currentImg = ref('')
   const showImg = ref(false)
 
+  async function createPost() {
+    console.log(currentVip.value)
+    let cnt = postType.value == 'image' ? imgUrl.value : document.getElementById("textPost").value;
+
+    let post = {
+      name: currentVip.value,
+      contentType: postType.value,
+      content: cnt,
+      dateOfCreation: Date.now(),
+      receiver: document.getElementById("destPost").value,
+    }
+
+
+    console.log(JSON.stringify(post))
+    console.log(JSON.parse(JSON.stringify(post)))
+    console.log("INIZIO FETCH")
+
+      const res = await fetch("/db/addPost",{
+        method: "POST",
+        body: JSON.stringify(post),
+        headers: {
+          "Content-Type":"application/json"
+        }
+      })
+
+      const result = await res.json();
+      console.log(result);
+
+  }
+
+  function reset(){
+    postType.value ='Select type'
+    imgUrl.value = ''
+    currentImg.value= ''
+    showImg.value = false
+  }
+
 /*TODO
   fare richiesta e prendere i canali in cui posso scrivere, per far diminuire il numero di errori
   capire come gestire la risposta del server in caso in cui l'utente non esista
  */
+
 </script>
 
 <template>
@@ -21,8 +60,8 @@ import {computed, ref} from "vue";
         <form id="addPostForm">
           <div class="modal-body d-flex flex-row justify-content-between">
             <div>
-              <label for="Destinatario" class="form-label">Destinatario</label>
-              <input type="text" class="form-control" id="validationCustom02" value="Pippo" required>
+              <label for="destPost" class="form-label">Destinatario</label>
+              <input type="text" class="form-control" id="destPost" value="PippoVIP" required>
               <!-- Aggiungere un pazzo validatore -->
             </div>
             <div class="btn-group">
@@ -37,8 +76,8 @@ import {computed, ref} from "vue";
             </div>
           </div>
           <div class="paddingEqual">
-            <textarea rows="6" v-if=" postType == 'text'" class="form-control"></textarea>
-            <div v-if=" postType == 'image'" class="d-flex flex-column">
+            <textarea rows="6" id="textPost" v-if=" postType == 'text'" class="form-control"></textarea>
+            <div v-if="postType == 'image'" class="d-flex flex-column">
               <div class="input-group d-flex flex-row">
                 <input class="w-75" type="text" placeholder="insert URL" id="pathImg" v-model="imgUrl" >
                 <button type="button" class="btn btn-secondary" @click=" currentImg = imgUrl; showImg = true">
@@ -48,7 +87,7 @@ import {computed, ref} from "vue";
                   </svg>
                 </button>
               </div>
-              <div v-if="showImg" id="imgAddPost" class=" d-flex flex-row align-self-center">
+              <div v-if="showImg" id="imgAddPost" class=" d-flex flex-row align-self-center w-75">
                 <img class="img-fluid" :src="currentImg" alt="NON FUNZIONA UN CAZZO">
               </div>
               <!--Aggiungere altri tipi di post-->
@@ -58,7 +97,7 @@ import {computed, ref} from "vue";
             <button type="button" class="btn btn-danger"
                     @click="$emit('closeAppModal')"
             >Indietro</button>
-            <button class="btn btn-primary" type="submit">Crea Post</button>
+            <button class="btn btn-primary" type="button" @click="createPost(); reset()"> Crea Post </button>
           </div>
         </form>
       </div>

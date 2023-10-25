@@ -13,7 +13,7 @@ const createUser = async (req,res,next) => {
 }
 
 const createPost = async (req,res) => {
-    res.send(await addPost(760,req.body,mongoCredentials));
+    res.send(await addPost(req.body,mongoCredentials));
 }
 
 const searchUser = async (req,res) => {

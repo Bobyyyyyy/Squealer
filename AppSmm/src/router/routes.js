@@ -71,6 +71,10 @@ const routes =[
             sideBar: SideBar,
         },
     },
+    {
+        path:"/SMM/*",
+        redirect:  { name: "Home" }
+    },
     /*
     {
         path: "/SMM/:user/:vip/Stats",

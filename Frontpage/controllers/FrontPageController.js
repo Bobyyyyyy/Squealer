@@ -64,7 +64,7 @@ const isSessionActive = (req,res,next) => {
                 break;
 
             case 'smm':
-                res.redirect('/SMM/' + req.session.user);
+                res.redirect('/SMM');
         }
     }
 }
