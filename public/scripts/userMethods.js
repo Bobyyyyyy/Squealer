@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require("bcryptjs");
 
-const User = require("./models/User");
+const User = require("../models/User");
 const {connectdb,saltRounds,quota} = require("./utils");
 const {json} = require("express");
 
@@ -28,9 +28,8 @@ const addUser = async (body,credentials) => {
             email: body.email,
             password: await bcrypt.hash(body.password,saltRounds),
             typeUser: body.type ? body.type : 'user',
-            characters: quota,
-            blocked: false,
-            vipHandled: body.type==='smm' ? {} : undefined,
+            characters: body.type === 'mod' ? {daily: null, weekly: null, monthly: null} : quota,
+            vipHandled: body.type ==='smm' ? {} : undefined,
         });
 
 
@@ -53,7 +52,7 @@ const loginUser = async (query,credentials) =>{
     try{
         await connectdb(credentials);
         //get user by username
-        let user = await User.findOne({username: query.user});
+        let user = await User.findOne({username: query.user}).lean();
         //check if user exists
         if (!user){
             let err = new Error("Nessun utente trovato!");
@@ -88,16 +87,14 @@ const searchByUsername = async (query, credentials) =>{
     try {
 
         await connectdb(credentials);
-        console.log(query);
-        let user = await User.findOne({username: query.user});
-        if (user.length === 0) {
+        let user = await User.findOne({username: query.username}).lean();
+        if (!user) {
             let err = new Error("Nessun utente trovato!");
             err.statusCode = 400;       // 400 ??
             console.log(err);
             await mongoose.connection.close();
             throw err;
         }
-
         return user;
     }
     catch (err){
@@ -138,7 +135,7 @@ const getUsers = async (query,credentials) =>{
         console.log(query);
         let offset = parseInt(query.offset);
         let limit = parseInt(query.limit);
-        return await User.find({$or : [{username: {$regex: query.filter , $options: 'i'}},{email: {$regex: query.filter , $options: 'i'}},{typeUser: {$regex: query.filter , $options: 'i'}}, ] } ).skip(offset).limit(limit);
+        return await User.find({$or : [{username: {$regex: query.filter , $options: 'i'}},{email: {$regex: query.filter , $options: 'i'}},{typeUser: {$regex: query.filter , $options: 'i'}}, ] } ).skip(offset).limit(limit).lean();
     }
     catch (err){
         throw err;
@@ -148,7 +145,7 @@ const getUsers = async (query,credentials) =>{
 const usersLength = async (query,credentials) => {
     try {
         await connectdb(credentials);
-        let users = await User.find({$or : [{username: {$regex: query.filter , $options: 'i'}},{email: {$regex: query.filter , $options: 'i'}},{typeUser: {$regex: query.filter , $options: 'i'}},]});
+        let users = await User.find({$or : [{username: {$regex: query.filter , $options: 'i'}},{email: {$regex: query.filter , $options: 'i'}},{typeUser: {$regex: query.filter , $options: 'i'}},]}).lean();
         return {length: users.length};
     }
     catch (Error){
@@ -166,7 +163,7 @@ const altUser = async (body,credentials) => {
             'characters.daily':  parseInt(body.characters.daily),
             'characters.weekly':  parseInt(body.characters.weekly),
             'characters.monthly':  parseInt(body.characters.monthly)},
-            {new: true});
+            {new: true}).lean();
         console.log(user);
         return user;
     }
@@ -179,7 +176,6 @@ const altUser = async (body,credentials) => {
 const getHandledVip = async (query,credentials) => {
     try{
         await connectdb(credentials);
-
         let SMM = await User.findOne({username: query.SMMname})
         return await Promise.all(SMM.vipHandled.users.map( (vip) => {
             return User.findById(vip);

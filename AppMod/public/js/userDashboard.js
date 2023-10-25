@@ -11,7 +11,6 @@ let modifyParameters = {
     daily: 0,
     weekly: 0,
     monthly: 0,
-    blocked: false
 }
 
 function updateModifyParameters()  {
@@ -19,7 +18,6 @@ function updateModifyParameters()  {
     modifyParameters.daily = $('#daily').val();
     modifyParameters.weekly = $('#weekly').val();
     modifyParameters.monthly = $('#monthly').val();
-    modifyParameters.blocked = $('#blocked').is(":checked");
 }
 
 
@@ -33,7 +31,7 @@ function updateLastCall(limit,offset,filter,users) {
 
 function getUsersNumber(filter) {
     $.ajax({
-        url:'db/nusers',
+        url:'/db/nusers',
         data: {filter: filter},
         async: false,
         type: 'get',
@@ -43,22 +41,11 @@ function getUsersNumber(filter) {
     })
 }
 
-
-function displayUser() {
-    $.ajax({
-        url: 'db/userid',
-        type: 'get',
-        success: (data) => {
-            $('#sessionid').html(`@${data.username}`);
-        }
-    })
-}
-
-function modifyUser(filter,daily,weekly,monthly,blocked) {
+function modifyUser(filter,daily,weekly,monthly) {
     $.ajax({
         url: '/db/user',
         type: 'put',
-        data: {filter: filter, characters: {daily,weekly,monthly}, blocked : blocked},
+        data: {filter: filter, characters: {daily,weekly,monthly}},
         success: () => {
             location.reload();
         }
@@ -66,17 +53,11 @@ function modifyUser(filter,daily,weekly,monthly,blocked) {
 }
 
 
-function showUserModal(user,daily,weekly,monthly,blocked) {
+function showUserModal(user,daily,weekly,monthly) {
     $('#modUserLabel').html(user);
     $('#daily').val(daily);
     $('#weekly').val(weekly);
     $('#monthly').val(monthly);
-    if (blocked === 'true') {
-        $('#blocked').attr('checked',true);
-    }
-    else {
-        $('#blocked').attr('checked',false);
-    }
     $('#modUser').modal("show");
 }
 
@@ -92,24 +73,35 @@ function userTable (limit,offset,filter) {
             $('#pages').empty();
         let html = `
                     <table class="table table-dark table-hover table-bordered table-striped" style="vertical-align: middle; text-align: center">
+                        <!-- Header Tabella -->
                         <thead>
                             <th> Nome </th>
                             <th> Email </th>
                             <th> Caratteri Rimanenti </th>
                             <th> Tipo </th>
-                            <th> Bloccato </th>
                         </thead>
                         <tbody>
                             ${$.map(data, (user) => `
-                             <tr onclick="showUserModal('${user.username}','${user.characters.daily}','${user.characters.weekly}','${user.characters.monthly}','${user.blocked}')">
+                            <!-- Righe Tabella -->
+                            <tr id="${user.username}">
+                                <!-- Nome e Email -->
                                 <td> ${user.username} </td>
-                                <td> ${user.email} </td>
-                                <td> <ul>
+                                <td> ${user.email} </td> 
+                                <script> 
+                                    if('${user.typeUser}' !== 'mod') {
+                                    $('#${user.username}').on('click',() => {showUserModal('${user.username}','${user.characters.daily}','${user.characters.weekly}','${user.characters.monthly}')});
+                                    } 
+                                </script>
+                                <!-- Caratteri e tipo -->
+                                <td>
+                                <span id="placeholder_${user.username}" style="display:none">Not a Field</span>
+                                <ul id="characters_${user.username}">
                                         <li> Daily: ${user.characters.daily} </li>
                                         <li> Weekly: ${user.characters.weekly} </li>
-                                        <li> Monthly: ${user.characters.monthly} </li> </td>
+                                        <li> Monthly: ${user.characters.monthly} </li> 
+                                <script>LoadChars('${user.username}','${user.typeUser}')</script>
+                                </td>
                                 <td> ${user.typeUser} </td>
-                                <td> ${user.blocked} </td> 
                             </tr>
                             `).join('\n')}
                         </tbody>
@@ -135,6 +127,19 @@ function userTable (limit,offset,filter) {
 })
 }
 
+function LoadChars(username,type) {
+    let placeid = '#placeholder_' + username;
+    let charid = '#characters_' + username;
+    if(type === 'mod') {
+        $(placeid).show();
+        $(charid).remove();
+    }
+    else {
+        $(placeid).remove();
+    }
+}
+
+
 $('#filter').on("keyup", () => {
     let value = $('#filter').val();
     userTable(LastCall.limit,LastCall.offset = 0,value);
@@ -147,11 +152,9 @@ $('#modifyButton').click(() => {
         modifyParameters.daily,
         modifyParameters.weekly,
         modifyParameters.monthly,
-        modifyParameters.blocked
     );
 })
 
 $(document).ready(function() {
-    displayUser();
     userTable(LastCall.limit,LastCall.offset,LastCall.filter);
 });

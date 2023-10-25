@@ -1,6 +1,7 @@
-const {addPost} = require('../postMethods');
-const {addUser, searchByUsername, changePwsd, getUsers, usersLength, altUser, getHandledVip} = require('../userMethods');
-const {mongoCredentials} = require('../utils.js')
+const {addPost} = require('../scripts/postMethods');
+const {addUser, searchByUsername, changePwsd, getUsers, usersLength, altUser, getHandledVip} = require('../scripts/userMethods');
+const {mongoCredentials} = require('../scripts/utils.js')
+const {addOfficialChannel, addFollower, addAdmin} = require("../scripts/ChannelMethods");
 
 const createUser = async (req,res,next) => {
     try {
@@ -63,6 +64,34 @@ const getVips = async (req,res) => {
     }
 }
 
+const createReservedChannel = async (req,res) => {
+    try {
+        res.send(await addOfficialChannel(req.body,mongoCredentials))
+    }
+    catch(error) {
+        res.send(error);
+    }
+}
+
+const addFollowers = async (req,res) => {
+    try {
+        res.send(await addFollower(req.body,mongoCredentials))
+    }
+    catch(error) {
+        res.send(error);
+    }
+}
+
+const addAdmins = async (req,res) => {
+    try {
+        res.send(await addAdmin(req.body,mongoCredentials))
+    }
+    catch(error) {
+        res.send(error);
+    }
+}
+
+
 module.exports = {
     createUser,
     createPost,
@@ -72,5 +101,8 @@ module.exports = {
     getAllUsers,
     getUsersNumber,
     modifyUser,
-    getVips
+    getVips,
+    createReservedChannel,
+    addFollowers,
+    addAdmins
 }
