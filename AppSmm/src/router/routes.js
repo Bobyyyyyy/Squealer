@@ -8,32 +8,30 @@ import SideBar from "../components/sideBar/SideBar.vue";
 import VipCard from "../components/handleVip/VipCard.vue";
 
 const routes =[
-
     {
-        path:"/SMM/:user/",
+        path:"/SMM",
         redirect:  { name: "Home" }
     },
     {
-        path:"/SMM/:user/home",
+        path:"/SMM/",
+        redirect:  { name: "Home" }
+    },
+    {
+        path:"/SMM/home",
         name:'Home',
         components: {
             welcomingPage: Home
         },
-        sensitive: true,
     },
     {
-        path:"/SMM/:user/handlevip",
+        path:"/SMM/handlevip",
         name:'HandleVIP',
         components: {
             welcomingPage:HandleVIP
         },
     },
     {
-        path: "/SMM/:user/:vip",
-        redirect: {name:"Profile"}
-    },
-    {
-        path: "/SMM/:user/:vip/Profile",
+        path: "/SMM/Profile",
         name: "Profile",
         components: {
             sideBar: SideBar,
@@ -41,7 +39,7 @@ const routes =[
         },
     },
     {
-        path: "/SMM/:user/:vip/Channels",
+        path: "/SMM/Channels",
         name:"Channels",
         components: {
             sideBar: SideBar,
@@ -65,14 +63,15 @@ const routes =[
             SbOn: ChannelList
         },
     },
+    */
     {
-        path: "/SMM/:user/:vip/AddPost",
+        path: "/SMM/AddPost",
         name:"Post",
         components: {
             sideBar: SideBar,
-            SbOn: Post
         },
     },
+    /*
     {
         path: "/SMM/:user/:vip/Stats",
         name:"Stats",

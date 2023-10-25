@@ -74,9 +74,13 @@ const createSession = async(req,res) => {
         req.session.authenticated = true;
         req.session.user = req.response.username;
         req.session.type = req.response.typeUser;
+        /*
         console.log(req.response);
         console.log(req.session);
+
+         */
         req.session.save();
+      
         switch (req.response.typeUser) {
             case 'user':
             case 'vip':
@@ -88,10 +92,9 @@ const createSession = async(req,res) => {
                 break;
 
             case 'smm':
-                res.redirect('/SMM/' + req.response.username );
+                res.redirect('/SMM/');
                 break;
         }
-
     });
 }
 
@@ -100,7 +103,6 @@ const logout = (req,res) => {
     req.session.destroy();
     res.redirect('/');
 }
-
 
 module.exports = {
     frontpageView,
@@ -111,5 +113,5 @@ module.exports = {
     isSMM,
     isSessionActive,
     createSession,
-    logout
+    logout,
 };

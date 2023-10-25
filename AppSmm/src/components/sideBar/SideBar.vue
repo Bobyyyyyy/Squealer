@@ -1,35 +1,53 @@
 <script setup>
   import SideBarEL from "./SideBarEL.vue";
-  import {computed, onMounted, onUnmounted, ref} from "vue";
   import NavBarWel from "../NavBarWel.vue";
-  import {getHandleVipURL, getSMMname, getVIPname, sideBarElements} from "../../utils";
+  import AddPostModal from "../../views/AddPostModal.vue";
+  import {Modal} from 'bootstrap'
+  import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
+  import {currentVip, getPage, getSMMname, getVIPname, sideBarElements} from "../../utils";
 
   const windowWidth = ref(window.innerWidth);
+  const modalState = reactive({Modal: null,})
+  const beforeModalPage = ref('');
 
   const onWidthChange =  () => windowWidth.value = window.innerWidth
   onMounted(() => window.addEventListener('resize', onWidthChange))
+  onMounted(() => { modalState.Modal = new Modal('#AddPostModal',{})})
   onUnmounted(() => window.removeEventListener('resize', onWidthChange))
+
+  const activeBut = ref(getPage());
+
+  function openAppModal() {
+    modalState.Modal.show()
+  }
+  function closeAppModal() {
+    modalState.Modal.hide()
+    activeBut.value = beforeModalPage.value
+  }
+
+  function setUpModal() {
+    openAppModal();
+    beforeModalPage.value = window.location.pathname.split('/').slice(-1)[0];
+    console.log(beforeModalPage.value);
+  }
+
 
   const width = computed(() => windowWidth.value)
   const expanded = computed(() => width.value > 1450 );
   const smartPhone = computed(()=> width.value < 768);
-  const elementSideBar = ref(null);
 
 
   function getUrlPage(page){
-    return "/SMM/"+ getSMMname() +"/"+getVIPname()+"/"+ page.split(' ').join('');
+    return "/SMM/"+ page.split(' ').join('');
   }
 
   //HISTORY:    Forse si può fare utilizzano le lifecycle hooks
-
   window.addEventListener("popstate",()=>{
-    elementSideBar.value.forEach((el)=>{
-      if (el.name.split(' ').join('') == window.location.pathname.split('/').slice(-1)){
-        elementSideBar.value.forEach(elm=>elm.setNotActive())
-        el.setIsActive();
-      }
-    })
+    activeBut.value = window.location.pathname.split('/').slice(-1).join().split(/(?=[A-Z])/).join(' ');
   },false)
+
+
+
 
 
 </script>
@@ -61,11 +79,14 @@
                    ref="elementSideBar"
                    :item="element"
                    :expanded="expanded"
-                   @deactivateAll = "() => {
-                        this.$refs.elementSideBar.forEach( el => el.setNotActive());
+                   :active = "activeBut"
+                   @changeActive="(name) => {
+                     activeBut = name
                    }"
-                   @pushto = "(name) => {
-                     this.$router.push(getUrlPage(name))
+
+                   @pushTo = "(name) => {
+                     if(name === 'Add Post') setUpModal()
+                     else this.$router.push(getUrlPage(name))
                    }"
         />
       </ul>
@@ -82,7 +103,10 @@
             <a
                 class="nav-link text-danger d-flex flex-row align-items-center mb-3"
                :class="expanded ? 'justify-content-start' : 'justify-content-center'"
-               @click="[this.$router.push(getHandleVipURL()), $emit('setInWel')]">
+               @click="
+                        currentVip = ''
+                        this.$router.push('/SMM/handlevip');
+                        $emit('setInWel')">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-left" viewBox="0 0 16 16">
                 <path fill-rule="evenodd" d="M6 12.5a.5.5 0 0 0 .5.5h8a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-8a.5.5 0 0 0-.5.5v2a.5.5 0 0 1-1 0v-2A1.5 1.5 0 0 1 6.5 2h8A1.5 1.5 0 0 1 16 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-8A1.5 1.5 0 0 1 5 12.5v-2a.5.5 0 0 1 1 0v2z"/>
                 <path fill-rule="evenodd" d="M.146 8.354a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L1.707 7.5H10.5a.5.5 0 0 1 0 1H1.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3z"/>
@@ -95,6 +119,9 @@
       </ul>
     </div>
   </nav>
+  <AddPostModal
+    @closeAppModal = "closeAppModal"
+  />
 </template>
 
 <style>

@@ -1,6 +1,5 @@
 <script setup>
-
-  import {computed} from "vue";
+  import {currentVip} from "../../utils";
 
   defineProps({
     SMMname: String,
@@ -22,11 +21,14 @@
         <div class="modal-footer d-flex flex-row justify-content-around">
           <button type="button" class="btn btn-danger"
                   @click="$emit('closeModal')"
-          >No, esci</button>
+          >No, escinpm reu</button>
           <button type="button" class="btn btn-primary"
                   @click=
-                      "this.$router.push('/SMM/' + SMMname + '/' + VIPname +'/Profile');
-                      $emit('closeModal')">
+                      "
+                      currentVip = VIPname
+                      this.$router.push('/SMM/Profile');
+                      $emit('closeModal')
+                      ">
           Si, continua</button>
         </div>
       </div>

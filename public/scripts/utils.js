@@ -6,7 +6,11 @@ const mongoCredentials = {
     pwd: "aiNgaeh5",
     site:"mongo_site222330"
 }
+
+
+
 const baseQuota = 50;
+
 
 
 const quota ={
@@ -38,5 +42,5 @@ module.exports = {
     saltRounds,
     mongoCredentials,
     dbname,
-    quota
+    quota,
 }
