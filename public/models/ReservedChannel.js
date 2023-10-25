@@ -6,6 +6,11 @@ const ReservedChannelSchema = new mongoose.Schema({
         required: true,
     },
 
+    description: {
+        type: String,
+        required: true
+    },
+
     postList: {
         type: {
             posts: [{

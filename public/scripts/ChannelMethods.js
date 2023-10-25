@@ -2,17 +2,16 @@ const mongoose = require('mongoose');
 const ReservedChannel = require("../models/ReservedChannel");
 const {connectdb} = require("./utils");
 const {searchByUsername} = require("./userMethods");
+const User = require("../models/User");
 
 
 //POST
 const addOfficialChannel = async (body,credentials) => {
     try{
-        console.log(body);
         await connectdb(credentials);
         //check if channel exists already
         let name = '§' + body.name.toUpperCase();
         let findName = await ReservedChannel.findOne({name: name}).lean();
-
         if (findName) {
             let err = new Error("Canale Già esistente");
             err.statusCode = 400;
@@ -20,10 +19,10 @@ const addOfficialChannel = async (body,credentials) => {
             await mongoose.connection.close();
             throw err;
         }
-
         let newChannel = new ReservedChannel({
             name: name,
-            postList: {posts: [] },
+            postList: {posts: []},
+            description: 'Ciao questo è il canale di bologna',
             followers: {users: []},
             administrators: {users: []},
         });
@@ -41,7 +40,7 @@ const addOfficialChannel = async (body,credentials) => {
 
 
 const addFollower = async (body, credentials) => {
-    console.log(body);
+    await connectdb(credentials);
     //controlla se l'utente è presente nel database
     let user = await searchByUsername(body,credentials);
     let id = user._id.toString();
@@ -64,12 +63,13 @@ const addFollower = async (body, credentials) => {
             console.log(err);
             throw err;
         }
+        await mongoose.connection.close();
         return channel
     }
 }
 
 const addAdmin = async (body, credentials) => {
-    console.log(body);
+    await connectdb(credentials);
     //controlla se l'utente è presente nel database
     let user = await searchByUsername(body,credentials);
     let id = user._id.toString();
@@ -90,9 +90,9 @@ const addAdmin = async (body, credentials) => {
             if (!channel) {
                 let err = new Error("Nessun canale trovato!");
                 err.statusCode = 400;       // 400 ??
-                console.log(err);
                 throw err;
             }
+            await mongoose.connection.close();
             return channel
         }
     }
@@ -104,11 +104,46 @@ const addAdmin = async (body, credentials) => {
     }
 }
 
+const deleteChannel = async (body,credentials) => {
+    try{
+        await connectdb(credentials);
+        //check if channel exists already
+        let name = '§' + body.name.toUpperCase();
+        let findName = await ReservedChannel.findOneAndDelete({name: name}).lean();
+        console.log(findName)
+        if (!findName) {
+            let err = new Error("Nessun Canale Con questo nome");
+            err.statusCode = 400;
+            throw err;
+        }
+        await mongoose.connection.close();
+        return findName;
+    }
+    catch(err){
+        console.log(err);
+        throw err;
+    }
+}
+
+const getChannels = async (query,credentials) =>{
+    try {
+        await connectdb(credentials);
+        console.log(query);
+        let offset = parseInt(query.offset);
+        let limit = parseInt(query.limit);
+        return await ReservedChannel.find({$or : [{name: {$regex: query.filter , $options: 'i'}}]}).skip(offset).limit(limit).lean();
+    }
+    catch (err){
+        throw err;
+    }
+}
 
 //manca un delete per provare le principali API
 
 module.exports = {
     addOfficialChannel,
     addFollower,
-    addAdmin
+    addAdmin,
+    deleteChannel,
+    getChannels,
 }

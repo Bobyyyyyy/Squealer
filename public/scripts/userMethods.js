@@ -95,6 +95,7 @@ const searchByUsername = async (query, credentials) =>{
             await mongoose.connection.close();
             throw err;
         }
+        await mongoose.connection.close();
         return user;
     }
     catch (err){
@@ -119,7 +120,6 @@ const changePwsd = async(body,credentials) =>{
         user.password = await bcrypt.hash(body.password,saltRounds);
 
         await user.save();
-
         await mongoose.connection.close()
     }
     catch (err) {
@@ -146,6 +146,7 @@ const usersLength = async (query,credentials) => {
     try {
         await connectdb(credentials);
         let users = await User.find({$or : [{username: {$regex: query.filter , $options: 'i'}},{email: {$regex: query.filter , $options: 'i'}},{typeUser: {$regex: query.filter , $options: 'i'}},]}).lean();
+        await mongoose.connection.close();
         return {length: users.length};
     }
     catch (Error){
@@ -165,6 +166,7 @@ const altUser = async (body,credentials) => {
             'characters.monthly':  parseInt(body.characters.monthly)},
             {new: true}).lean();
         console.log(user);
+        await mongoose.connection.close();
         return user;
     }
     catch (Error){
@@ -174,12 +176,13 @@ const altUser = async (body,credentials) => {
 
 //GET
 const getHandledVip = async (query,credentials) => {
-    try{
+    try {
         await connectdb(credentials);
         let SMM = await User.findOne({username: query.SMMname})
         return await Promise.all(SMM.vipHandled.users.map( (vip) => {
             return User.findById(vip);
         }))
+        await mongoose.connection.close();
     }
     catch (Error){
         throw Error;

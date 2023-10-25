@@ -8,11 +8,8 @@ const mongoCredentials = {
 }
 
 
-
+/* Characters Quota */
 const baseQuota = 50;
-
-
-
 const quota ={
     daily: baseQuota,
     weekly: baseQuota*6,
