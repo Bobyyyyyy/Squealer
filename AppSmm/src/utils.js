@@ -1,3 +1,4 @@
+import {ref} from "vue";
 
 const sideBarElements = [
     {
@@ -31,27 +32,27 @@ const sideBarElements = [
         text:"Buy Quota"
     }
 ]
+
+const smm = ref('');
+const currentVip = ref('')
+
 function getSMMname(){
-    return window.location.pathname.split('/')[2];
+    return smm.value;
 }
 
 function getVIPname(){
-    return window.location.pathname.split('/')[3];
+    return currentVip.value
 }
 
 function getPage(){
-    return window.location.pathname.split('/')[4];
-}
-
-
-function getHandleVipURL(){
-    return "/SMM/"+getSMMname()+"/handlevip";
+    return window.location.pathname.split('/')[2];
 }
 
 export{
     getSMMname,
     getVIPname,
-    getHandleVipURL,
     getPage,
-    sideBarElements
+    sideBarElements,
+    smm,
+    currentVip
 }

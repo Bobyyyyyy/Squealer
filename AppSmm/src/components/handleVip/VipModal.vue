@@ -1,6 +1,5 @@
 <script setup>
-
-  import {computed} from "vue";
+  import {currentVip} from "../../utils";
 
   defineProps({
     SMMname: String,
@@ -25,8 +24,11 @@
           >No, escinpm reu</button>
           <button type="button" class="btn btn-primary"
                   @click=
-                      "this.$router.push('/SMM/' + SMMname + '/' + VIPname +'/Profile');
-                      $emit('closeModal')">
+                      "
+                      currentVip = VIPname
+                      this.$router.push('/SMM/Profile');
+                      $emit('closeModal')
+                      ">
           Si, continua</button>
         </div>
       </div>

@@ -1,6 +1,6 @@
 <script setup>
   import NavBar from "../components/NavBarWel.vue";
-  import {getHandleVipURL, getSMMname} from "../utils";
+  import {smm} from "../utils"
 
 </script>
 
@@ -10,7 +10,7 @@
     <div class="d-flex flex-column align-self-center">
       <div class="d-flex flex-row w-100 justify-content-center">
         <div class="d-flex flex-column">
-          <h1 class="text-center">Benvenuto, {{getSMMname()}} </h1>
+          <h1 class="text-center">Benvenuto, {{smm}} </h1>
           <h1>Scegli come accedere!</h1>
         </div>
       </div>
@@ -21,7 +21,7 @@
         <div class="d-flex align-items-center">
           <button type="button"
                   class="btn btn-primary btn-lg"
-                  @click=" this.$router.push(getHandleVipURL())"
+                  @click=" this.$router.push('/SMM/handlevip')"
                   >SMM</button>
         </div>
       </div>
