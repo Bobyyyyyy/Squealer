@@ -8,7 +8,7 @@ global.startDate = null;
 
 const express = require('express');
 const cors = require('cors');
-const {dbname} = require("./public/utils");
+const {dbname} = require("./public/scripts/utils");
 const {isSMM} = require("./Frontpage/controllers/FrontPageController");
 
 let app = express();

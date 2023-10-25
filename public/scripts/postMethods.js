@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
-const Post = require("./models/Post");
-const User = require("./models/User");
+const Post = require("../models/Post");
+const User = require("../models/User");
 const {connectdb} = require("./utils");
 
 

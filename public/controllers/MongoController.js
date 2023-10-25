@@ -1,6 +1,6 @@
-const {addPost} = require('../postMethods');
-const {addUser, searchByUsername, changePwsd, getUsers, usersLength, altUser, getHandledVip} = require('../userMethods');
-const {mongoCredentials} = require('../utils.js')
+const {addPost} = require('../scripts/postMethods');
+const {addUser, searchByUsername, changePwsd, getUsers, usersLength, altUser, getHandledVip} = require('../scripts/userMethods');
+const {mongoCredentials} = require('../scripts/utils.js')
 
 const createUser = async (req,res,next) => {
     try {
