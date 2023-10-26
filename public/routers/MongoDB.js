@@ -1,6 +1,6 @@
 const express = require('express');
 const {createUser,createPost, getSessionUser, getAllUsers, getUsersNumber, modifyUser, getVips,
-    createReservedChannel, addFollowers, addAdmins, deleteCh
+    createReservedChannel, addFollowers, addAdmins, deleteCh, createChannel, getChannelList
 } = require('../controllers/MongoController');
 const router = express.Router();
 
@@ -19,10 +19,14 @@ router.get('/getVips',getVips)
 router.post('/addPost',createPost);
 
 
-/* Channel Methods*/
+/* Reserved Channel Methods*/
 router.post('/ReservedChannel',createReservedChannel);
 router.post('/ReservedChannel/addFollower/',addFollowers);
 router.post('/ReservedChannel/addAdmin/',addAdmins);
 router.post('/ReservedChannel/delete',deleteCh);
+
+/* Channel Methods*/
+router.post('/Channel',createChannel);
+router.get('/Channel/list',getChannelList);
 
 module.exports = router;

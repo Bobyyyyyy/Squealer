@@ -1,5 +1,5 @@
 <script setup>
-  import {currentVip} from "../../utils";
+  import {currentVip} from "../../utilsSMM";
 
   defineProps({
     SMMname: String,

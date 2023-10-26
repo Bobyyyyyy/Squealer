@@ -4,7 +4,7 @@
   import AddPostModal from "../../views/AddPostModal.vue";
   import {Modal} from 'bootstrap'
   import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
-  import {currentVip, getPage, getSMMname, getVIPname, sideBarElements} from "../../utils";
+  import {currentVip, getPage, getSMMname, getVIPname, sideBarElements} from "../../utilsSMM";
 
   const windowWidth = ref(window.innerWidth);
   const modalState = reactive({Modal: null,})
@@ -104,7 +104,7 @@
                 class="nav-link text-danger d-flex flex-row align-items-center mb-3"
                :class="expanded ? 'justify-content-start' : 'justify-content-center'"
                @click="
-                        currentVip = ''
+                        currentVip = '';
                         this.$router.push('/SMM/handlevip');
                         $emit('setInWel')">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-left" viewBox="0 0 16 16">

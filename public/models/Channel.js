@@ -10,13 +10,11 @@ const ChannelSchema = new mongoose.Schema({
         type: String,
     },
 
-    /*
-    public: {
+
+    isPublic: {
         type: Boolean,
         required: true,
     },
-    PER ORA TUTTI PUBLIC
-     */
 
     posts: [
         {
@@ -34,7 +32,7 @@ const ChannelSchema = new mongoose.Schema({
     /* Altri utenti che sono proprietari */
     /* Possono aggiungere utenti agli scrittori/accettare nei canali privati */
 
-    ownership: [
+    admins: [
         {
             type:String,
             required: true,

@@ -39,7 +39,6 @@ const currentVip = ref('')
 function getSMMname(){
     return smm.value;
 }
-
 function getVIPname(){
     return currentVip.value
 }
@@ -52,7 +51,7 @@ export{
     getSMMname,
     getVIPname,
     getPage,
-    sideBarElements,
     smm,
+    sideBarElements,
     currentVip
 }

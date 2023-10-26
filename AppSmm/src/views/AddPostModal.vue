@@ -1,7 +1,7 @@
 <script setup>
 
 import {computed, ref} from "vue";
-import {currentVip} from "../utils";
+import {currentVip} from "../utilsSMM";
 
   const postType = ref('Select type')
   const destType = ref('receiver')
@@ -14,7 +14,7 @@ import {currentVip} from "../utils";
 
     try{
       let cnt = postType.value == 'image' ? imgUrl.value : document.getElementById("textPost").value;
-      console.log(receiverName.value);
+
       let post = {
         name: currentVip.value,
         contentType: postType.value,

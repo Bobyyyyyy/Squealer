@@ -1,17 +1,15 @@
-const mongoose = require('mongoose');
-const ReservedChannel = require("../models/ReservedChannel");
 const {connectdb} = require("./utils");
-const {searchByUsername} = require("./userMethods");
+const Channel = require("../models/Channel");
 const User = require("../models/User");
+const mongoose = require("mongoose");
+const {ObjectId} = require("mongodb");
 
-
-//POST
-const addOfficialChannel = async (body,credentials) => {
+const addChannel = async (body,credentials) => {
     try{
         await connectdb(credentials);
+        console.log(body);
         //check if channel exists already
-        let name = '§' + body.name.toUpperCase();
-        let findName = await ReservedChannel.findOne({name: name}).lean();
+        let findName = await Channel.findOne({name: body.name}).lean();
         if (findName) {
             let err = new Error("Canale Già esistente");
             err.statusCode = 400;
@@ -19,14 +17,17 @@ const addOfficialChannel = async (body,credentials) => {
             await mongoose.connection.close();
             throw err;
         }
-        let newChannel = new ReservedChannel({
-            name: name,
-            postList: {posts: []},
-            description: 'Ciao questo è il canale di bologna',
-            followers: {users: []},
-            administrators: {users: []},
-        });
-        //save new user in DB
+        const newChannel = new Channel({
+            name: body.name,
+            description: body.description,
+            isPublic: body.isPublic,
+            posts: [],
+            creator: new ObjectId(await User.findOne({username: body.creator},'_id')).toString(),
+            admins: [],
+            followers: []
+        })
+        //save new channel in DB
+            console.log(newChannel);
         await newChannel.save();
         await mongoose.connection.close();
         return newChannel;
@@ -38,112 +39,17 @@ const addOfficialChannel = async (body,credentials) => {
     }
 }
 
-
-const addFollower = async (body, credentials) => {
-    await connectdb(credentials);
-    //controlla se l'utente è presente nel database
-    let user = await searchByUsername(body,credentials);
-    let id = user._id.toString();
-    console.log(id);
-    //controllo se l'utente è già presente nel canale
-    let isInChannel = await ReservedChannel.findOne({$and: [{name: body.channel},{'followers.users': {$elemMatch: {$eq: id}}}]} );
-    if(isInChannel) {
-        let err = new Error("Utente già follower");
-        err.statusCode = 400;       // 400 ??
-        console.log(err);
-        throw err;
-    }
-    else {
-        //aggiunta nel canale
-        let channel = await ReservedChannel.findOneAndUpdate({name: body.channel},
-            {$push: {'followers.users': id}, new: true}).lean();
-        if (!channel) {
-            let err = new Error("Nessun canale trovato!");
-            err.statusCode = 400;       // 400 ??
-            console.log(err);
-            throw err;
-        }
-        await mongoose.connection.close();
-        return channel
-    }
-}
-
-const addAdmin = async (body, credentials) => {
-    await connectdb(credentials);
-    //controlla se l'utente è presente nel database
-    let user = await searchByUsername(body,credentials);
-    let id = user._id.toString();
-    //controllo se utente è moderatore
-    if(user.typeUser === 'mod') {
-        console.log(id);
-        //controllo se l'utente è già presente nel canale
-        let isInChannel = await ReservedChannel.findOne({$and: [{name: body.channel}, {'administrators.users': {$elemMatch: {$eq: id}}}]});
-        if (isInChannel) {
-            let err = new Error("Utente già amministratore");
-            err.statusCode = 400;       // 400 ??
-            console.log(err);
-            throw err;
-        } else {
-            //aggiunta nel canale
-            let channel = await ReservedChannel.findOneAndUpdate({name: body.channel},
-                {$push: {'administrators.users': id}, new: true}).lean();
-            if (!channel) {
-                let err = new Error("Nessun canale trovato!");
-                err.statusCode = 400;       // 400 ??
-                throw err;
-            }
-            await mongoose.connection.close();
-            return channel
-        }
-    }
-    else {
-        let err = new Error("Utente non moderatore");
-        err.statusCode = 400;       // 400 ??
-        console.log(err);
-        throw err;
-    }
-}
-
-const deleteChannel = async (body,credentials) => {
+const channelVipList = async (query,credentials) => {
     try{
-        await connectdb(credentials);
-        //check if channel exists already
-        let name = '§' + body.name.toUpperCase();
-        let findName = await ReservedChannel.findOneAndDelete({name: name}).lean();
-        console.log(findName)
-        if (!findName) {
-            let err = new Error("Nessun Canale Con questo nome");
-            err.statusCode = 400;
-            throw err;
-        }
-        await mongoose.connection.close();
-        return findName;
-    }
-    catch(err){
-        console.log(err);
-        throw err;
+        let vipId = new ObjectId(await User.findOne({username: query.vipName},'_id')).toString();
+        console.log(vipId);
+        return await Channel.find({ $or: [{ creator: vipId },{admins: {$in: [vipId] }}]})
+    }catch (e) {
+        console.log(e)
     }
 }
-
-const getChannels = async (query,credentials) =>{
-    try {
-        await connectdb(credentials);
-        console.log(query);
-        let offset = parseInt(query.offset);
-        let limit = parseInt(query.limit);
-        return await ReservedChannel.find({$or : [{name: {$regex: query.filter , $options: 'i'}}]}).skip(offset).limit(limit).lean();
-    }
-    catch (err){
-        throw err;
-    }
-}
-
-//manca un delete per provare le principali API
 
 module.exports = {
-    addOfficialChannel,
-    addFollower,
-    addAdmin,
-    deleteChannel,
-    getChannels,
+    addChannel,
+    channelVipList
 }
