@@ -27,7 +27,6 @@ const addChannel = async (body,credentials) => {
             followers: []
         })
         //save new channel in DB
-            console.log(newChannel);
         await newChannel.save();
         await mongoose.connection.close();
         return newChannel;
@@ -41,10 +40,13 @@ const addChannel = async (body,credentials) => {
 
 const channelVipList = async (query,credentials) => {
     try{
+        await connectdb(credentials);
         let vipId = new ObjectId(await User.findOne({username: query.vipName},'_id')).toString();
-        console.log(vipId);
-        return await Channel.find({ $or: [{ creator: vipId },{admins: {$in: [vipId] }}]})
+        let channels = await Channel.find({ $or: [{ creator: vipId },{admins: {$in: [vipId] }}]})
+        await mongoose.connection.close();
+        return channels;
     }catch (e) {
+        await mongoose.connection.close();
         console.log(e)
     }
 }
