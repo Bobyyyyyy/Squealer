@@ -95,7 +95,6 @@ const searchByUsername = async (query, credentials) =>{
             await mongoose.connection.close();
             throw err;
         }
-        await mongoose.connection.close();
         return user;
     }
     catch (err){

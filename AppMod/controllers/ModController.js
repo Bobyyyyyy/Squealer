@@ -1,6 +1,6 @@
 
 const homepageView = (req, res) => {
-    res.render('modHomepage.html');
+    res.render('modHomepage.html',{locals: {user: req.session.user}});
 }
 
 const userDashboardView = (req,res) => {

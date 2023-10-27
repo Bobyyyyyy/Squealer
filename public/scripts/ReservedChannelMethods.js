@@ -9,8 +9,15 @@ const User = require("../models/User");
 const addOfficialChannel = async (body,credentials) => {
     try{
         await connectdb(credentials);
+
+        // trasformare il nome in una forma ragionevole
+        let name = body.name.toUpperCase();
+        if(name.charAt(0) !== '§') {
+            name = '§' + name;
+        }
+        name = name.replace(/\s/g, "_");
+
         //check if channel exists already
-        let name = '§' + body.name.toUpperCase();
         let findName = await ReservedChannel.findOne({name: name}).lean();
         if (findName) {
             let err = new Error("Canale Già esistente");
@@ -26,7 +33,7 @@ const addOfficialChannel = async (body,credentials) => {
             followers: {users: []},
             administrators: {users: []},
         });
-        //save new user in DB
+        //save new reserved channel in DB
         await newChannel.save();
         await mongoose.connection.close();
         return newChannel;
@@ -44,6 +51,7 @@ const addFollower = async (body, credentials) => {
     //controlla se l'utente è presente nel database
     let user = await searchByUsername(body,credentials);
     let id = user._id.toString();
+    console.log(body);
     console.log(id);
     //controllo se l'utente è già presente nel canale
     let isInChannel = await ReservedChannel.findOne({$and: [{name: body.channel},{'followers.users': {$elemMatch: {$eq: id}}}]} );
@@ -108,7 +116,6 @@ const deleteChannel = async (body,credentials) => {
     try{
         await connectdb(credentials);
         //check if channel exists already
-        let name = '§' + body.name.toUpperCase();
         let findName = await ReservedChannel.findOneAndDelete({name: name}).lean();
         console.log(findName)
         if (!findName) {
@@ -128,13 +135,24 @@ const deleteChannel = async (body,credentials) => {
 const getChannels = async (query,credentials) =>{
     try {
         await connectdb(credentials);
-        console.log(query);
         let offset = parseInt(query.offset);
         let limit = parseInt(query.limit);
         return await ReservedChannel.find({$or : [{name: {$regex: query.filter , $options: 'i'}}]}).skip(offset).limit(limit).lean();
     }
     catch (err){
         throw err;
+    }
+}
+
+const channelsLength = async (query,credentials) => {
+    try {
+        await connectdb(credentials);
+        let channels = await ReservedChannel.find({name: {$regex: query.filter , $options: 'i'}}).lean();
+        await mongoose.connection.close();
+        return {length: channels.length};
+    }
+    catch (Error){
+        throw Error;
     }
 }
 
@@ -146,4 +164,5 @@ module.exports = {
     addAdmin,
     deleteChannel,
     getChannels,
+    channelsLength,
 }

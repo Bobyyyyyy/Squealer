@@ -21,11 +21,10 @@ function updateModifyParameters()  {
 }
 
 
-function updateLastCall(limit,offset,filter,users) {
+function updateLastCall(limit,offset,filter) {
     LastCall.limit = limit;
     LastCall.offset = offset;
     LastCall.filter = filter;
-    LastCall.users = users;
 }
 
 
@@ -63,7 +62,7 @@ function showUserModal(user,daily,weekly,monthly) {
 
 function userTable (limit,offset,filter) {
     getUsersNumber(filter);
-    updateLastCall(limit,offset,filter,LastCall.users);
+    updateLastCall(limit,offset,filter);
     $.ajax({
         url: '/db/users',
         data: {limit: limit, offset: offset, filter: filter},
@@ -72,7 +71,7 @@ function userTable (limit,offset,filter) {
             console.log(data);
             $('#pages').empty();
         let html = `
-                    <table class="table table-dark table-hover table-bordered table-striped" style="vertical-align: middle; text-align: center">
+                    <table class="table table-light table-hover table-bordered table-striped botder border-dark rounded" style="vertical-align: middle; text-align: center;">
                         <!-- Header Tabella -->
                         <thead>
                             <th> Nome </th>
@@ -89,7 +88,7 @@ function userTable (limit,offset,filter) {
                                 <td> ${user.email} </td> 
                                 <script> 
                                     if('${user.typeUser}' !== 'mod') {
-                                    $('#${user.username}').on('click',() => {showUserModal('${user.username}','${user.characters.daily}','${user.characters.weekly}','${user.characters.monthly}')});
+                                        $('#${user.username}').on('click',() => {showUserModal('${user.username}','${user.characters.daily}','${user.characters.weekly}','${user.characters.monthly}')});
                                     } 
                                 </script>
                                 <!-- Caratteri e tipo -->
