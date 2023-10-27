@@ -1,26 +1,28 @@
 <script setup>
-  import {ref} from "vue";
+import {onMounted, ref} from "vue";
   import Post from "../components/post/Post.vue";
+import {currentVip, getVIPname, postType, sortPosts} from "../utilsSMM";
+
+  const readyPosts = ref(false);
 
   const profilePicturePath ="/img/profilePicture.png";
   const nFoll = 10;
   const nPost = 500;
-  const username = "Popi";
 
   const quotaRes = {
     daily: 10,
     weekly: 180,
     monthly: 12000
   }
-  const filterValues =['Pubblici', 'Privati', 'Singoli']
-  const postType = ['Geolocalizzazione','testo','immagine']
-  const sortPosts = ['più recente', 'meno recente', 'meno visual', 'più visual', 'reaction positive', 'reaction negative']
 
+  const filterValues =['Pubblici', 'Privati', 'Singoli']
 
   const keyWordFilter = ref(false);
   const textFilter = ref('Filter');
-  const typePostFilter = ref('Type')
-  const sortFilter = ref('Sort')
+  const typePostFilter = ref('Type');
+  const sortFilter = ref('Sort');
+
+  let curPosts = []
 
   function setKeyWdFilter() {
     keyWordFilter.value = !keyWordFilter.value
@@ -40,6 +42,19 @@
   function updateSortFilter(newText){
     sortFilter.value=newText
   }
+
+  onMounted(async ()=>{
+    try{
+      let res = await fetch(`/db/posts?name=${getVIPname()}`,{
+        method:"GET",
+      });
+      curPosts = await res.json();
+      readyPosts.value=true
+    }catch (e) {
+      console.log(e)
+    }
+
+  })
 
 </script>
 
@@ -61,7 +76,7 @@
           </div>
         </div>
         <div>
-          <p class="m-0 fs-3 text-center">{{username}}</p>
+          <p class="m-0 fs-3 text-center">{{ getVIPname() }}</p>
         </div>
         <div>
           <p class="m-0">Quota rimanente:</p>
@@ -99,12 +114,15 @@
           </div>
         </div>
       </div>
-      <div class="d-flex flex-row flex-wrap justify-content-around mt-3">
-        <Post v-for="(el,i) in 10" :key="i"
+      <div v-if="readyPosts" class="d-flex flex-row flex-wrap justify-content-around mt-3">
+        <Post v-for="(post,i) in curPosts" :key="i"
+              :user="post.owner.name"
+              :dest= "post.destination.destType == 'channel'? `§${post.destination.receiver.name}`:`@${post.destination.receiver.name}`"
+              :content="post.content"
+              picProfile = "/img/defaultUser.jpeg"
         />
       </div>
     </div>
-
   </div>
 </template>
 

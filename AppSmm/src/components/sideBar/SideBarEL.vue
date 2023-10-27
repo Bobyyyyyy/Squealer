@@ -27,6 +27,7 @@ import {getPage} from "../../utilsSMM";
                   expanded ? 'justify-content-start' : 'justify-content-center'"
          @click ="$emit('changeActive',item.text);
                   $emit('pushTo',item.text);"
+         type="button"
       >
 
         <svg xmlns="http://www.w3.org/2000/svg" class="icon"  fill="currentColor" :class="item.class" viewBox="0 0 16 16">

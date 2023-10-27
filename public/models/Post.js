@@ -5,23 +5,31 @@ const destTypes = ['channel', 'user']
 const reactionTypes = ['love','like','meh','disagreement','hate']
 
 const PostSchema = new mongoose.Schema({
-    ownerId: {
-        type: String,
-        required: true,
+    owner: {
+        Id:{
+            type: String,
+            required: true,
+        },
+        name:{
+            type: String,
+            required: true,
+        }
     },
     destination: {
-        type: {
-            destType: {
-                type: String,
-                enum: destTypes,
-            },
-            receiver: {
+        destType: {
+            type: String,
+            enum: destTypes,
+        },
+        receiver: {
+            id:{
                 type: String,
                 required: true,
             },
+            name:{
+                type: String,
+                required: true,
+            }
         },
-        required: true,
-
     },
     contentType:{
         type: String,       //geolocalizzazione, immagine o testo

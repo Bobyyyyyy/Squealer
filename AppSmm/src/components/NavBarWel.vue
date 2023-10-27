@@ -16,12 +16,12 @@
 </script>
 
 <template>
-  <nav class="navbar navbar-expand-lg bg-body-tertiary" >
-    <div class="d-flex flex-row justify-content-between flex-fill navBar">
+  <nav class="navbar navbar-expand-lg bg-body-tertiary maxHNav" >
+    <div class="d-flex flex-row justify-content-between navBar maxHNav">
       <div class="d-flex">
-        <a href="/SMM_App/public" class="d-flex align-items-center">
-          <span class="fs-4">LOGO</span>
-        </a>
+        <router-link to="/SMM/Profile" class="d-flex justify-content-center mb-3 h-100">
+            <img alt="logo" src="/img/logo.png" class="img-fluid object-fit-fill">
+        </router-link>
       </div>
       <div class="d-flex align-items-center">
         <h4 class="mb-0">{{centerText}}</h4>
@@ -41,6 +41,10 @@
 .navBar{
   margin-left: 3vw;
   margin-right: 3vw;
+}
+
+.maxHNav{
+  max-height: 13vh;
 }
 
 </style>

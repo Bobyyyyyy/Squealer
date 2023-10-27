@@ -66,9 +66,11 @@
 
     <div class="d-flex changeDirFlex setW100 setHeight">
       <div v-if="!smartPhone" class="">
-        <a href="/" class="d-flex align-items-center mb-3">
-          <span class="fs-4">LOGO</span>
-        </a>
+        <router-link to="/SMM/Profile" class="d-flex justify-content-center mb-3" @click="activeBut='Profile'">
+          <div class="fs-4 w-50 d-flex align-self-center">
+            <img alt="logo" src="/img/logo.png" class="img-fluid">
+          </div>
+        </router-link>
         <hr>
       </div>
 

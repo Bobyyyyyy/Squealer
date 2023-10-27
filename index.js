@@ -47,7 +47,7 @@ app.get(['/SMM','/SMM/*'], isSMM, (req,res) => {
 
 app.use('/js',express.static(rootDir + '/AppMod/public/js'));
 app.use('/css',express.static(rootDir + '/AppMod/public/css'));
-app.use('/img',express.static(rootDir + '/AppSmm/public'));
+app.use('/img',express.static(rootDir + '/public/img'));
 
 // avvio di node
 app.listen(8000,function() {

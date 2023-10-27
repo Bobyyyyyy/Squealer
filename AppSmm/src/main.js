@@ -1,4 +1,5 @@
 import {createApp} from 'vue'
+import { createStore } from 'vuex'
 import App from './App.vue'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap'
@@ -16,6 +17,23 @@ import HandleVIP from "./views/HandleVIP.vue";
 
 const app = createApp(App);
 
+const store = createStore({
+    state () {
+        return {
+            currentChannel: {
+                chName: '',
+                chDescription: '',
+            }
+        }
+    },
+    mutations: {
+        uploadChannel (state,channelInfo) {
+            state.currentChannel.chName = channelInfo.chName;
+            state.currentChannel.chDescription = channelInfo.chDescription;
+        }
+    },
+})
+
 const router = createRouter({
     history: createWebHistory(),
     routes: routes.routes,
@@ -23,6 +41,7 @@ const router = createRouter({
 
 
 app.use(router);
+app.use(store);
 
 app
     .component('NavBarWel', NavBarWel)

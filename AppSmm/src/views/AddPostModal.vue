@@ -14,6 +14,7 @@ import {currentVip} from "../utilsSMM";
 
     try{
       let cnt = postType.value == 'image' ? imgUrl.value : document.getElementById("textPost").value;
+      console.log(destType.value)
 
       let post = {
         name: currentVip.value,
@@ -21,7 +22,7 @@ import {currentVip} from "../utilsSMM";
         content: cnt,
         dateOfCreation: Date.now(),
         receiver: receiverName.value,
-        destTYpe: destType.value,
+        destType: destType.value,
       }
 
       await fetch("/db/addPost",{

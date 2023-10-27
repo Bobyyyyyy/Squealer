@@ -1,16 +1,28 @@
 <script setup>
-  defineProps({
+  import {useStore} from "vuex";
+
+  const props = defineProps({
     isPublic: Boolean,
     name: String,
     description: String,
   })
+
+  const store = useStore()
+
+  function changeChannel(){
+    store.commit('uploadChannel',{chName: props.name, chDescription: props.description})
+  }
+
 
 </script>
 
 <template>
   <div class="d-flex flex-row justify-content-between align-items-center lineDim">
     <div class="text-start bordEl">
-      <router-link to="/qualcosa" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">
+      <router-link :to="{path: `/SMM/Channels/${props.name.split(' ').join('')}`}"
+                   class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"
+                   @click="changeChannel()"
+      >
         {{ name }}
       </router-link>
     </div>

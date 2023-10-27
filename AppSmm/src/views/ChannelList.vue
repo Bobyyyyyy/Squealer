@@ -1,6 +1,6 @@
 
 <script setup>
-import Channel from "../components/Channel.vue";
+import Channel from "../components/channels/Channel.vue";
 import {onMounted, reactive, ref} from "vue";
 import {Modal} from "bootstrap";
 import AddChannelModal from "../components/AddChannelModal.vue";

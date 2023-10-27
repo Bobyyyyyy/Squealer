@@ -1,5 +1,4 @@
 <script setup>
-  //import Profile from './Profile.vue'
   const props = defineProps({
     name: String,
     channel: String,
