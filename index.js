@@ -24,8 +24,8 @@ app.use(session({
     store: MongoStore.create({
         mongoUrl: 'mongodb://localhost:27017',
         dbName: dbname,
-        ttl: 1000*4*64,
-        autoRemove: "native",
+        clear_interval: 660,
+        ttl: 600,
         stringify: false,
     }),
 }));
