@@ -2,7 +2,7 @@ const {addPost, getAllPost} = require('../scripts/postMethods');
 const {addUser, searchByUsername, changePwsd, getUsers, usersLength, altUser, getHandledVip} = require('../scripts/userMethods');
 const {mongoCredentials} = require('../scripts/utils.js')
 const {addOfficialChannel, addFollower, addAdmin, deleteChannel, channelsLength, getChannels} = require("../scripts/ReservedChannelMethods");
-const {addChannel, channelVipList} = require("../scripts/ReservedChannelMethods");
+const {addChannel, channelVipList} = require("../scripts/ChannelMethods");
 
 /* User Methods */
 const createUser = async (req,res,next) => {
