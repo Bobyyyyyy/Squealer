@@ -2,27 +2,14 @@
   import HeaderPost from "./HeaderPost.vue"
   import FooterPost from "./FooterPost.vue"
   const profilePicturePath ="/img/profilePicture.png"
-  /*
+
   defineProps({
-    user: Object,
-    postDB : Object,
+    user: String,
+    dest: String,
+    picProfile: String,
+    content: String,
   })
-*/
-  const user = {
-    name: "Popi",
-    channel:"cocainaCH",
-    img: profilePicturePath,
-  }
-  const postDB = {
-    img: profilePicturePath,
-    reaction:{
-      like:5,
-    },
-    comments:{
-      number:10,
-    },
-    views:500,
-  }
+
 
 </script>
 
@@ -30,17 +17,17 @@
 <template>
   <div class="card mb-4 mt-1 setDim">
     <HeaderPost
-        :name= "user.name"
-        :channel="user.channel"
-        :srcImg="user.img" />
+        :name= "user"
+        :channel="dest"
+        :srcImg="picProfile" />
     <div class="d-flex flex-row justify-content-center">
       <!-- SI devono poter inserire anche altre cose, non solo immagini! Swtich in base al tipo di messaggio? -->
-      <img :src=user.img  alt="silly cat" class="img-fluid object-fit-fill" />
+      <img @click="console.log(content)" :src="content"  alt="silly cat" class="img-fluid object-fit-fill" />
     </div>
     <FooterPost
-        :likes= "postDB.reaction.like"
-        :comments="postDB.comments.number"
-        :visual="postDB.views" />
+        :likes= "500"
+        :comments="500"
+        :visual= "500" />
   </div>
 </template>
 

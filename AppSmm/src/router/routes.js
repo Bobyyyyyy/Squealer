@@ -6,6 +6,7 @@ import Messages from "../views/Messages.vue";
 import Post from "../components/post/Post.vue";
 import SideBar from "../components/sideBar/SideBar.vue";
 import VipCard from "../components/handleVip/VipCard.vue";
+import ChannelProfile from "../components/channels/ChannelProfile.vue";
 
 const routes =[
     {
@@ -27,7 +28,7 @@ const routes =[
         path:"/SMM/handlevip",
         name:'HandleVIP',
         components: {
-            welcomingPage:HandleVIP
+            welcomingPage: HandleVIP
         },
     },
     {
@@ -46,6 +47,15 @@ const routes =[
             SbOn: ChannelList
         },
     },
+    {
+        path: "/SMM/Channels/:channelName" ,
+        name:"channelView",
+        components: {
+            sideBar: SideBar,
+            SbOn: ChannelProfile
+        },
+    },
+
     /*
     {
         path: "/SMM/:user/:vip/Messages",

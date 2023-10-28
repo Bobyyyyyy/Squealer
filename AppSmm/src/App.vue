@@ -1,6 +1,6 @@
 <script setup>
 import {onBeforeMount} from "vue";
-import {smm} from "./utils";
+import {smm} from "./utilsSMM";
 
 onBeforeMount(async () => {
   let res = await fetch("/db/userid",{

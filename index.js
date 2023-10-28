@@ -44,13 +44,13 @@ app.set('view engine','html');
 //il sito inizia dando il controllo al router della frontpage
 app.use('/', require('./Frontpage/routes/frontpage'));
 app.use('/db',require('./public/routers/MongoDB'));
-app.get('/SMM/*', isSMM, (req,res) => {
+app.get(['/SMM','/SMM/*'], isSMM, (req,res) => {
     res.sendFile(rootDir + '/AppSmm/index.html');
 })
 
 app.use('/js' ,express.static(rootDir + '/AppMod/public/js'));
 app.use('/css',express.static(rootDir + '/AppMod/public/css'));
-app.use('/img',express.static(rootDir + '/AppSmm/public'));
+app.use('/img',express.static(rootDir + '/public/img'));
 
 // avvio di node
 app.listen(8000,function() {

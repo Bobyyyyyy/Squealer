@@ -1,40 +1,43 @@
 <script setup>
 
 import {computed, ref} from "vue";
-import {currentVip} from "../utils";
+import {currentVip} from "../utilsSMM";
 
   const postType = ref('Select type')
+  const destType = ref('receiver')
+  const receiverName = ref('')
   const imgUrl = ref('')
   let currentImg = ref('')
   const showImg = ref(false)
 
   async function createPost() {
-    console.log(currentVip.value)
-    let cnt = postType.value == 'image' ? imgUrl.value : document.getElementById("textPost").value;
 
-    let post = {
-      name: currentVip.value,
-      contentType: postType.value,
-      content: cnt,
-      dateOfCreation: Date.now(),
-      receiver: document.getElementById("destPost").value,
-    }
+    try{
+      let cnt = postType.value == 'image' ? imgUrl.value : document.getElementById("textPost").value;
+      console.log(destType.value)
 
+      let post = {
+        name: currentVip.value,
+        contentType: postType.value,
+        content: cnt,
+        dateOfCreation: Date.now(),
+        receiver: receiverName.value,
+        destType: destType.value,
+      }
 
-    console.log(JSON.stringify(post))
-    console.log(JSON.parse(JSON.stringify(post)))
-    console.log("INIZIO FETCH")
-
-      const res = await fetch("/db/addPost",{
+      await fetch("/db/addPost",{
         method: "POST",
         body: JSON.stringify(post),
         headers: {
           "Content-Type":"application/json"
         }
       })
+      //GESTIRE ERRORI
+    }
+    catch (err){
+      console.log(err) //PAGINA DI GESTIONE ERRORE
+    }
 
-      const result = await res.json();
-      console.log(result);
 
   }
 
@@ -59,9 +62,21 @@ import {currentVip} from "../utils";
       <div class="modal-content flex-">
         <form id="addPostForm">
           <div class="modal-body d-flex flex-row justify-content-between">
-            <div>
-              <label for="destPost" class="form-label">Destinatario</label>
-              <input type="text" class="form-control" id="destPost" value="PippoVIP" required>
+            <div class="d-flex flex-row align-items-end">
+              <div class="d-flex flex-column">
+                <label for="destPost" class="form-label">Receiver</label>
+                <input type="text" class="form-control" id="destPost"  v-model="receiverName" required>
+              </div>
+
+              <div class="btn-group">
+                <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                  {{ destType }}
+                </button>
+                <ul class="dropdown-menu">
+                  <li class="dropdown-item" role="button" @click="destType = 'channel'"> channel </li>
+                  <li class="dropdown-item" role="button" @click="destType = 'user'"> user </li>
+                </ul>
+              </div>
               <!-- Aggiungere un pazzo validatore -->
             </div>
             <div class="btn-group">

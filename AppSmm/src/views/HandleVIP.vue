@@ -4,7 +4,7 @@
   import VipModal from "../components/handleVip/VipModal.vue";
   import {onBeforeMount, onBeforeUnmount, onBeforeUpdate, onMounted, reactive, ref} from "vue";
   import {Modal} from 'bootstrap'
-  import {getSMMname, getVIPname} from "../utils";
+  import {getSMMname} from "../utilsSMM";
 
   let vips = [];
 

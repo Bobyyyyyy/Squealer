@@ -4,7 +4,7 @@
   import AddPostModal from "../../views/AddPostModal.vue";
   import {Modal} from 'bootstrap'
   import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
-  import {currentVip, getPage, getSMMname, getVIPname, sideBarElements} from "../../utils";
+  import {currentVip, getPage, getSMMname, getVIPname, sideBarElements} from "../../utilsSMM";
 
   const windowWidth = ref(window.innerWidth);
   const modalState = reactive({Modal: null,})
@@ -66,9 +66,11 @@
 
     <div class="d-flex changeDirFlex setW100 setHeight">
       <div v-if="!smartPhone" class="">
-        <a href="/" class="d-flex align-items-center mb-3">
-          <span class="fs-4">LOGO</span>
-        </a>
+        <router-link to="/SMM/Profile" class="d-flex justify-content-center mb-3" @click="activeBut='Profile'">
+          <div class="fs-4 w-50 d-flex align-self-center">
+            <img alt="logo" src="/img/logo.png" class="img-fluid">
+          </div>
+        </router-link>
         <hr>
       </div>
 
@@ -104,7 +106,7 @@
                 class="nav-link text-danger d-flex flex-row align-items-center mb-3"
                :class="expanded ? 'justify-content-start' : 'justify-content-center'"
                @click="
-                        currentVip = ''
+                        currentVip = '';
                         this.$router.push('/SMM/handlevip');
                         $emit('setInWel')">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-left" viewBox="0 0 16 16">

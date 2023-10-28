@@ -33,13 +33,15 @@ const sideBarElements = [
     }
 ]
 
+const postType = ['Geolocalizzazione','testo','immagine']
+const sortPosts = ['più recente', 'meno recente', 'meno visual', 'più visual', 'reaction positive', 'reaction negative']
+
 const smm = ref('');
 const currentVip = ref('')
 
 function getSMMname(){
     return smm.value;
 }
-
 function getVIPname(){
     return currentVip.value
 }
@@ -52,7 +54,9 @@ export{
     getSMMname,
     getVIPname,
     getPage,
-    sideBarElements,
     smm,
-    currentVip
+    sideBarElements,
+    currentVip,
+    postType,
+    sortPosts,
 }

@@ -1,6 +1,6 @@
 <script setup>
 import {computed, onBeforeMount, onBeforeUpdate, onMounted, onUnmounted, onUpdated, ref} from "vue";
-import {getPage} from "../../utils";
+import {getPage} from "../../utilsSMM";
 
   const props = defineProps({
     item: Object,
@@ -27,6 +27,7 @@ import {getPage} from "../../utils";
                   expanded ? 'justify-content-start' : 'justify-content-center'"
          @click ="$emit('changeActive',item.text);
                   $emit('pushTo',item.text);"
+         type="button"
       >
 
         <svg xmlns="http://www.w3.org/2000/svg" class="icon"  fill="currentColor" :class="item.class" viewBox="0 0 16 16">

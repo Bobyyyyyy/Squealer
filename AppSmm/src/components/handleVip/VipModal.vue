@@ -1,5 +1,5 @@
 <script setup>
-  import {currentVip} from "../../utils";
+  import {currentVip} from "../../utilsSMM";
 
   defineProps({
     SMMname: String,
@@ -21,7 +21,7 @@
         <div class="modal-footer d-flex flex-row justify-content-around">
           <button type="button" class="btn btn-danger"
                   @click="$emit('closeModal')"
-          >No, escinpm reu</button>
+          >No, esci</button>
           <button type="button" class="btn btn-primary"
                   @click=
                       "
