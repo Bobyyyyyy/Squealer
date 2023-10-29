@@ -15,10 +15,16 @@ const PostSchema = new mongoose.Schema({
             required: true,
         }
     },
-    destination: {
-        destType: {
-            type: String,
-            enum: destTypes,
+    destination:{
+        dest:{
+            destType: {
+                type: String,
+                enum: destTypes,
+            },
+            isPublic: {     // DA INSERIRE SOLO SE CANALE
+                type: Boolean,
+                required: false,        //METTERE REQUIRED SE CANALE
+            }
         },
         receiver: {
             id:{

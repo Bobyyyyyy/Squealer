@@ -16,7 +16,6 @@ onMounted(async () => {
     method:"GET"
   });
   channels = await res.json();
-  console.log(channels)
   channelsReady.value = true;
 })
 

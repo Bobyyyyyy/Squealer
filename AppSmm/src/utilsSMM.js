@@ -32,10 +32,9 @@ const sideBarElements = [
         text:"Buy Quota"
     }
 ]
-
-const postType = ['Geolocalizzazione','testo','immagine']
+const postType = ['geolocalization','text','image', 'all']
 const sortPosts = ['più recente', 'meno recente', 'meno visual', 'più visual', 'reaction positive', 'reaction negative']
-const filterValues =['Pubblici', 'Privati', 'Singoli', 'Keyword']
+const filterValues =['public', 'private', 'user', 'keyword', 'all']
 const smm = ref('');
 const currentVip = ref('')
 

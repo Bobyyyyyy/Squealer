@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Post = require("../models/Post");
 const User = require("../models/User");
+const Channel = require("../models/Channel")
 const {connectdb} = require("./utils");
 const {ObjectId} = require("mongodb");
 
@@ -16,7 +17,13 @@ const addPost = async (body,credentials) => {
                 name: body.name,
             },
             destination:{
-                destType: body.destType,
+                dest:{
+                    destType: body.destType,
+                    ...(body.destType === 'channel') && {
+                        isPublic: (await Channel.findOne({name: body.receiver},'isPublic')).isPublic
+                    }
+
+                },
                 receiver: {
                     id: new ObjectId(await User.findOne({username: body.receiver},'_id')).toString(),
                     name: body.receiver
@@ -28,6 +35,7 @@ const addPost = async (body,credentials) => {
             dateOfCreation: body.dateOfCreation,
         })
 
+
         await newPost.save();
         await mongoose.connection.close();
 
@@ -36,22 +44,6 @@ const addPost = async (body,credentials) => {
     catch(err){
         console.log(err);
         throw err;
-    }
-}
-
-function getSort(sortString){
-    switch (sortString){
-        case 'più recente':
-            return {dateOfCreation: 1}
-        case 'meno recente':
-            return {dateOfCreation: -1}
-        case 'più visual':
-            return {views: -1}
-        case 'meno visual':
-            return {views: -1}
-        /*
-        Aggiungere altri sort
-         */
     }
 }
 
@@ -70,23 +62,21 @@ const sorts = {
     }
 }
 
-const filterType = {
-    'immagine': 'image',
-    /* AGGIUNGERE GLI ALTRI */
-}
-
 const getAllPost = async (query,credentials) =>{
     try{
         await connectdb(credentials)
 
         let vipId = new ObjectId(await User.findOne({username: query.name},'_id')).toString();
 
-        let posts = await Post.find({'owner.Id': vipId, ... (query.typeFilter) && {contentType: filterType[query.typeFilter]}})
+        let filter = {'owner.Id': vipId,
+            ... (query.typeFilter && query.typeFilter !== 'all') && {'contentType': query.typeFilter},
+            ... (query.destType && query.destType !== 'all') && {'destination.dest.destType': query.destType === 'user' ? 'user' : 'channel'},
+            ... (query.destType && query.destType !== 'all' && query.destType !== 'user') && {'destination.dest.isPublic': query.destType === 'public'} }
+
+        let posts = await Post.find(filter)
             .limit(12)
             .sort(sorts[query.sort ?  query.sort : 'più recente'])
             .lean();
-
-        //console.log(posts)
 
         await mongoose.connection.close()
         return posts;

@@ -26,7 +26,6 @@
 
   let curPosts = []
 
-
   function updatePostType(newText){
     if (typePostFilter.value === 'Type') query += `&typeFilter=${newText}`;
     else query = query.replace(`&typeFilter=${typePostFilter.value}`, `&typeFilter=${newText}`)
@@ -44,9 +43,18 @@
     getPosts()
   }
 
-  function updateDestFilter(el){
-    keyWordFilter.value = el === 'Keyword';
-    destFilter.value = el;
+  function updateDestFilter(newText){
+    keyWordFilter.value = newText === 'keyword'; //BOOL
+    if (!keyWordFilter.value){
+      if (destFilter.value === 'Filter') query += `&destType=${newText}`;
+      else query = query.replace(`&destType=${destFilter.value}`, `&destType=${newText}`)
+      destFilter.value = newText
+    }
+      //GESTIRE IL CASO DELLA KEYWORD
+
+    destFilter.value = newText;
+    console.log(query)
+    getPosts()
   }
 
   async function getPosts(){
@@ -56,7 +64,6 @@
         method:"GET",
       });
       curPosts = (await res.json()).map(post => { return {...post, dateOfCreation: new Date(Date.parse(post.dateOfCreation))} });
-      console.log(curPosts)
       readyPosts.value=true
     }catch (e) {
       throw e
@@ -129,11 +136,12 @@
       <div v-if="readyPosts" class="d-flex flex-row flex-wrap justify-content-around mt-3">
         <Post v-for="(post,i) in curPosts" :key="i"
               :user="post.owner.name"
-              :dest= "post.destination.destType == 'channel'? `§${post.destination.receiver.name}`:`@${post.destination.receiver.name}`"
+              :dest= "post.destination.dest.destType === 'channel'? `§${post.destination.receiver.name}`:`@${post.destination.receiver.name}`"
               :content="post.content"
               picProfile = "/img/defaultUser.jpeg"
               :creationDate="post.dateOfCreation"
               :contentType = "post.contentType"
+              :destType = "post.destination.dest.destType"
         />
       </div>
     </div>

@@ -2,7 +2,7 @@
 
   const props = defineProps({
     name: String,
-    channel: String,
+    dest: String,
     srcImg: String,
     dateCreation: Date,
   })
@@ -42,11 +42,11 @@
       <img @click="go2Profile" :src=" srcImg " alt="immagine profilo" class="imgFluid" />
       <div class="d-flex flex-column">
         <h3 @click="go2Profile" class="mb-0 setMargin"> {{ name }} </h3>
-        <h5 @click="go2Channel" class="mb-0" id="ChannelName"> {{channel}} </h5>
+        <h5 @click="go2Channel" class="mb-0" id="ChannelName"> {{dest}} </h5>
       </div>
     </div>
     <div class="d-flex text-center align-items-center ">
-      <h5  class="mb-0">
+      <h5 v-tooltip="dateCreation.toString()" class="mb-0">
         {{parseTime()}}
       </h5>
 

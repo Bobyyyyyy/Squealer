@@ -6,11 +6,13 @@
   defineProps({
     user: String,
     dest: String,
+    destType: String,
     picProfile: String,
     content: String,
     contentType:String,
     creationDate: Date,
   })
+
 
 
 </script>
@@ -21,7 +23,7 @@
     <div class="justify-content-center h-100">
       <HeaderPost
           :name= "user"
-          :channel="dest"
+          :dest="dest"
           :srcImg="picProfile"
           :dateCreation="creationDate"
       />
@@ -33,10 +35,13 @@
         </p>
       </div>
     </div>
-    <FooterPost
-        :likes= "500"
-        :comments="500"
-        :visual= "500" />
+    <div v-if="destType!=='user'">
+      <FooterPost
+                  :likes= "500"
+                  :comments="500"
+                  :visual= "500" />
+    </div>
+
   </div>
 </template>
 
