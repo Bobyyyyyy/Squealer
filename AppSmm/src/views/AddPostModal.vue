@@ -1,7 +1,7 @@
 <script setup>
 
-import {computed, ref} from "vue";
-import {currentVip} from "../utilsSMM";
+  import {ref} from "vue";
+  import {currentVip} from "../utilsSMM";
 
   const postType = ref('Select type')
   const destType = ref('receiver')

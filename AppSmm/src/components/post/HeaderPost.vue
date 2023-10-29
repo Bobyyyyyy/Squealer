@@ -1,8 +1,10 @@
 <script setup>
+
   const props = defineProps({
     name: String,
     channel: String,
     srcImg: String,
+    dateCreation: Date,
   })
 
   function go2Profile(){
@@ -18,20 +20,39 @@
     //quindi ci sarà un emits con routing
   }
 
+  function parseTime(){
+    let now = new Date().getTime()
+
+    let timePassed = (now - (props.dateCreation)?.getTime()) / 1000
+
+    return timePassed < 60 ? `${Math.floor(timePassed)} s.` :
+              timePassed < 60*60 ? `${Math.floor(timePassed/60)} m.` :
+                 timePassed < 60*60*24 ? `${Math.floor(timePassed/(60*60))} h.` :
+                     timePassed < 60*60*24*7 ? `${Math.floor(timePassed/(60*60*24))} d.` :
+                         timePassed < 60*60*24*7*4 ? `${Math.floor(timePassed/(60*60*24))} w.` :
+                             timePassed < 60*60*24*7*4*12 ? `${Math.floor(timePassed/(60*60*24*4))} m.` :
+                                 `1+ y.`
+  }
+
 </script>
 
 <template>
   <div class="card-header d-flex justify-content-between header_post ">
     <div class="d-flex justify-content-start align-items-center ">
       <img @click="go2Profile" :src=" srcImg " alt="immagine profilo" class="imgFluid" />
-      <h4 @click="go2Profile" class="mb-0 setMargin"> {{ name }} </h4>
+      <div class="d-flex flex-column">
+        <h3 @click="go2Profile" class="mb-0 setMargin"> {{ name }} </h3>
+        <h5 @click="go2Channel" class="mb-0" id="ChannelName"> {{channel}} </h5>
+      </div>
     </div>
-    <div @click="go2Channel" class="d-flex align-items-center ">
-      <h4 class="mb-0" id="ChannelName"> {{channel}} </h4>
+    <div class="d-flex text-center align-items-center ">
+      <h5  class="mb-0">
+        {{parseTime()}}
+      </h5>
+
     </div>
   </div>
 </template>
-
 
 <style>
 

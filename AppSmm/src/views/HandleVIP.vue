@@ -2,7 +2,7 @@
   import NavBarWel from "../components/NavBarWel.vue";
   import VipCard from "../components/handleVip/VipCard.vue";
   import VipModal from "../components/handleVip/VipModal.vue";
-  import {onBeforeMount, onBeforeUnmount, onBeforeUpdate, onMounted, reactive, ref} from "vue";
+  import {onMounted, reactive, ref} from "vue";
   import {Modal} from 'bootstrap'
   import {getSMMname} from "../utilsSMM";
 

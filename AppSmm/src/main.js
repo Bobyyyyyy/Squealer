@@ -50,4 +50,5 @@ app
     .component('Post', Post)
     .component('HandleVIP', HandleVIP)
 
+
 app.mount('#app');

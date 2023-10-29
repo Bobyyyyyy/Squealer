@@ -27,7 +27,7 @@
     <div class="d-flex flex-column postMargin">
       <h5 class="mb-0">Last Post: </h5>
       <div class="d-flex flex-row justify-content-center">
-        <Post />
+        <!--<Post /> -->
       </div>
     </div>
     <div class="d-flex justify-content-center">

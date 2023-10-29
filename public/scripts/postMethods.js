@@ -70,13 +70,21 @@ const sorts = {
     }
 }
 
+const filterType = {
+    'immagine': 'image',
+    /* AGGIUNGERE GLI ALTRI */
+}
+
 const getAllPost = async (query,credentials) =>{
     try{
         await connectdb(credentials)
 
         let vipId = new ObjectId(await User.findOne({username: query.name},'_id')).toString();
 
-        let posts = await Post.find({'owner.Id': vipId}).limit(12).sort(sorts[query.sort ?  query.sort : 'più recente']).lean();
+        let posts = await Post.find({'owner.Id': vipId, ... (query.typeFilter) && {contentType: filterType[query.typeFilter]}})
+            .limit(12)
+            .sort(sorts[query.sort ?  query.sort : 'più recente'])
+            .lean();
 
         //console.log(posts)
 

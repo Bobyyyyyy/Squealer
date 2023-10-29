@@ -8,6 +8,8 @@
     dest: String,
     picProfile: String,
     content: String,
+    contentType:String,
+    creationDate: Date,
   })
 
 
@@ -15,14 +17,21 @@
 
 
 <template>
-  <div class="card mb-4 mt-1 setDim">
-    <HeaderPost
-        :name= "user"
-        :channel="dest"
-        :srcImg="picProfile" />
-    <div class="d-flex flex-row justify-content-center">
-      <!-- SI devono poter inserire anche altre cose, non solo immagini! Swtich in base al tipo di messaggio? -->
-      <img @click="console.log(content)" :src="content"  alt="silly cat" class="img-fluid object-fit-fill" />
+  <div class="card mb-4 d-flex flex-column justify-content-between mt-1 setDim">
+    <div class="justify-content-center h-100">
+      <HeaderPost
+          :name= "user"
+          :channel="dest"
+          :srcImg="picProfile"
+          :dateCreation="creationDate"
+      />
+      <div class="d-flex flex-row justify-content-center text-center align-items-center">
+        <!-- SI devono poter inserire anche altre cose, non solo immagini! Swtich in base al tipo di messaggio? -->
+        <img v-if="contentType==='image'" :src="content"  alt="silly cat" class="img-fluid w-100 h-100 object-fit-fill" />
+        <p v-else class="mb-0">
+          {{content}}
+        </p>
+      </div>
     </div>
     <FooterPost
         :likes= "500"
@@ -34,8 +43,8 @@
 <style>
 
   .setDim{
-    width: auto;
-    max-width: 44rem;
+    width: 40rem;
+    height: auto;
   }
 
   @media screen and (max-width: 768px) {

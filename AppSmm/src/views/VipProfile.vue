@@ -4,6 +4,7 @@
   import {filterValues, getVIPname, postType, sortPosts} from "../utilsSMM";
   import Dropdown from "../components/Dropdown.vue";
 
+
   const readyPosts = ref(false);
 
   const profilePicturePath ="/img/profilePicture.png";
@@ -54,7 +55,8 @@
       let res = await fetch(`/db/posts?${query}`,{
         method:"GET",
       });
-      curPosts = await res.json();
+      curPosts = (await res.json()).map(post => { return {...post, dateOfCreation: new Date(Date.parse(post.dateOfCreation))} });
+      console.log(curPosts)
       readyPosts.value=true
     }catch (e) {
       throw e
@@ -130,6 +132,8 @@
               :dest= "post.destination.destType == 'channel'? `§${post.destination.receiver.name}`:`@${post.destination.receiver.name}`"
               :content="post.content"
               picProfile = "/img/defaultUser.jpeg"
+              :creationDate="post.dateOfCreation"
+              :contentType = "post.contentType"
         />
       </div>
     </div>
