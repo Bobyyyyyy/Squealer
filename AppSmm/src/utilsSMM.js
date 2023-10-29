@@ -35,7 +35,7 @@ const sideBarElements = [
 
 const postType = ['Geolocalizzazione','testo','immagine']
 const sortPosts = ['più recente', 'meno recente', 'meno visual', 'più visual', 'reaction positive', 'reaction negative']
-
+const filterValues =['Pubblici', 'Privati', 'Singoli', 'Keyword']
 const smm = ref('');
 const currentVip = ref('')
 
@@ -59,4 +59,5 @@ export{
     currentVip,
     postType,
     sortPosts,
+    filterValues
 }

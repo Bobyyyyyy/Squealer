@@ -1,7 +1,8 @@
 <script setup>
-import {onMounted, ref} from "vue";
+  import {onMounted, ref} from "vue";
   import Post from "../components/post/Post.vue";
-import {currentVip, getVIPname, postType, sortPosts} from "../utilsSMM";
+  import {filterValues, getVIPname, postType, sortPosts} from "../utilsSMM";
+  import Dropdown from "../components/Dropdown.vue";
 
   const readyPosts = ref(false);
 
@@ -15,47 +16,58 @@ import {currentVip, getVIPname, postType, sortPosts} from "../utilsSMM";
     monthly: 12000
   }
 
-  const filterValues =['Pubblici', 'Privati', 'Singoli']
-
   const keyWordFilter = ref(false);
-  const textFilter = ref('Filter');
+  const destFilter = ref('Filter');
   const typePostFilter = ref('Type');
   const sortFilter = ref('Sort');
 
+  let query = `name=${getVIPname()}`
+
   let curPosts = []
 
-  function setKeyWdFilter() {
-    keyWordFilter.value = !keyWordFilter.value
-  }
 
-  function disableKeyWdFilter(){
-    keyWordFilter.value=false
-  }
+  function updatePostType(newText){
+    if (typePostFilter.value === 'Type') query += `&typeFilter=${newText}`;
+    else query = query.replace(`&typeFilter=${typePostFilter.value}`, `&typeFilter=${newText}`)
 
-  function updateTextFilter(newText){
-    textFilter.value=newText
-  }
-
-  function updateTextType(newText){
     typePostFilter.value=newText
+    getPosts()
+
   }
   function updateSortFilter(newText){
-    sortFilter.value=newText
+
+    if (sortFilter.value === 'Sort') query += `&sort=${newText}`;
+    else query = query.replace(`&sort=${sortFilter.value}`, `&sort=${newText}`)
+
+    sortFilter.value = newText
+    getPosts()
   }
 
-  onMounted(async ()=>{
+  function updateDestFilter(el){
+    keyWordFilter.value = el === 'Keyword';
+    destFilter.value = el;
+  }
+
+  async function getPosts(){
+    readyPosts.value=false
     try{
-      let res = await fetch(`/db/posts?name=${getVIPname()}`,{
+      let res = await fetch(`/db/posts?${query}`,{
         method:"GET",
       });
       curPosts = await res.json();
       readyPosts.value=true
     }catch (e) {
+      throw e
+    }
+  }
+
+  onMounted(async ()=>{
+    try {
+      await getPosts()
+    } catch (e) {
       console.log(e)
     }
-
   })
-
 </script>
 
 <template>
@@ -85,33 +97,31 @@ import {currentVip, getVIPname, postType, sortPosts} from "../utilsSMM";
       </div>
       <div class="d-flex flex-row justify-content-between">
         <div class="d-flex flex-row justify-content-around align-items-center setFlexDirection">
-          <div class="dropdown">
-            <a class="btn btn-primary dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">{{textFilter}}</a>
-            <ul class="dropdown-menu">
-              <li v-for="(el,i) in filterValues" :key ="i">
-                <a class="dropdown-item" @click="disableKeyWdFilter(); updateTextFilter(el)">{{ el }}</a>
-              </li>
-              <li><a class="dropdown-item" v-on:click="setKeyWdFilter(); updateTextFilter('Keyword')">Keyword</a></li>
-            </ul>
-          </div>
+          <Dropdown
+              :filterRef="destFilter"
+              :dropItems="filterValues"
+              updateRef = 'updateDestFilter'
+              @updateDestFilter = updateDestFilter
+          />
           <div v-if="keyWordFilter" class="ms-1">
             <input type="text" placeholder="Keyword..." />
           </div>
         </div>
 
         <div class="d-flex flex-row justify-content-evenly setFlexDirection">
-          <div class="dropdown buttonDropDown">
-            <a class="btn btn-primary dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">{{typePostFilter}}</a>
-            <ul class="dropdown-menu">
-              <li v-for="(el,i) in postType" :key="i" ><a class="dropdown-item" v-on:click="disableKeyWdFilter();updateTextType(el)">{{ el }}</a></li>
-            </ul>
-          </div>
-          <div class="dropdown ms-1 buttonDropDown">
-            <a class="btn btn-primary dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">{{ sortFilter }}</a>
-            <ul class="dropdown-menu">
-              <li v-for="(el,i) in sortPosts" :key="i" ><a class="dropdown-item" v-on:click="disableKeyWdFilter(); updateSortFilter(el)">{{ el }}</a></li>
-            </ul>
-          </div>
+
+          <Dropdown class="buttonDropDown"
+                    :filterRef="typePostFilter"
+                    :dropItems="postType"
+                    updateRef = 'updatePostType'
+                    @updatePostType = updatePostType
+          />
+          <Dropdown  class="ms-1 buttonDropDown"
+                     :filterRef="sortFilter"
+                     :dropItems="sortPosts"
+                     updateRef = 'updateSort'
+                     @updateSort = updateSortFilter
+          />
         </div>
       </div>
       <div v-if="readyPosts" class="d-flex flex-row flex-wrap justify-content-around mt-3">

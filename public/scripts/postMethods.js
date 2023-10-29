@@ -39,14 +39,46 @@ const addPost = async (body,credentials) => {
     }
 }
 
+function getSort(sortString){
+    switch (sortString){
+        case 'più recente':
+            return {dateOfCreation: 1}
+        case 'meno recente':
+            return {dateOfCreation: -1}
+        case 'più visual':
+            return {views: -1}
+        case 'meno visual':
+            return {views: -1}
+        /*
+        Aggiungere altri sort
+         */
+    }
+}
+
+const sorts = {
+    'più recente':{
+        dateOfCreation: -1
+    },
+    'meno recente':{
+        dateOfCreation: 1
+    },
+    'più visual':{
+        views: -1
+    },
+    'meno visual':{
+        views: 1
+    }
+}
+
 const getAllPost = async (query,credentials) =>{
     try{
         await connectdb(credentials)
-        let vipId = new ObjectId(await User.findOne({username: query.name},'_id')).toString();
-        console.log(vipId)
-        let posts = await Post.find({'owner.Id': vipId}).limit(12).lean();
 
-        console.log(posts)
+        let vipId = new ObjectId(await User.findOne({username: query.name},'_id')).toString();
+
+        let posts = await Post.find({'owner.Id': vipId}).limit(12).sort(sorts[query.sort ?  query.sort : 'più recente']).lean();
+
+        //console.log(posts)
 
         await mongoose.connection.close()
         return posts;
