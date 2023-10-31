@@ -75,7 +75,6 @@ function userTable (limit,offset,filter) {
                         <!-- Header Tabella -->
                         <thead>
                             <th> Nome </th>
-                            <th> Email </th>
                             <th> Caratteri Rimanenti </th>
                             <th> Tipo </th>
                         </thead>
@@ -83,9 +82,8 @@ function userTable (limit,offset,filter) {
                             ${$.map(data, (user) => `
                             <!-- Righe Tabella -->
                             <tr id="${user.username}">
-                                <!-- Nome e Email -->
+                                <!-- Nome -->
                                 <td> ${user.username} </td>
-                                <td> ${user.email} </td> 
                                 <script> 
                                     if('${user.typeUser}' !== 'mod') {
                                         $('#${user.username}').on('click',() => {showUserModal('${user.username}','${user.characters.daily}','${user.characters.weekly}','${user.characters.monthly}')});

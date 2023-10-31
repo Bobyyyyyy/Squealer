@@ -6,6 +6,11 @@ const ReservedChannelSchema = new mongoose.Schema({
         required: true,
     },
 
+    creator: {
+        type: String,
+        required: true,
+    },
+
     description: {
         type: String,
         required: true
@@ -21,25 +26,13 @@ const ReservedChannelSchema = new mongoose.Schema({
         required: true
     },
 
-    followers: {
-        type: {
-            users: [
-                {
-                    type: String,     //utenti
-                    required: true,
-                }
-            ],
-        },
-        required: true
-    },
-
     administrators: {
         type: {
             users: [
-                {
-                    type: String,     //utenti
-                    required: true,
-                }
+                    {
+                        type: String,
+                        required: true,
+                    }
             ],
         },
         required: true

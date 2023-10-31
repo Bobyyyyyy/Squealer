@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/mod.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+</head>
+<body class="d-flex flex-column">
+
+<!-- NavBar -->
+<nav class="navbar navbar-expand-lg bg-dark navbar-dark sticky-top m">
+    <div class="d-flex flex-row justify-content-between w-100 p-1" >
+        <div class="navbar-collapse collapse dual-collapse2" style="flex-basis: 100%">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" aria-current="page" href="/mod/users">Utenti</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/mod/posts">Posts</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle active" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Channels
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/mod/officialChannels">Official Channels</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="/mod/privateChannels">Private Channels</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+        <div class="order-sm-first order-lg-0 mx-auto">
+            <a class="navbar-brand" href="/mod">SquealerMOD</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".dual-collapse2">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+
+        <div class="navbar-collapse collapse dual-collapse2" style="flex-basis: 100%">
+            <div class="ms-auto"></div>
+            <span class="navbar-text text-white ms-auto me-2" >@${user}
+            </span>
+            <button class="btn btn-light btn-outline-danger" onclick="window.location.href = '/logout'">Logout</button>
+        </div>
+    </div>
+</nav>
+
+
+
+<div class="d-flex flex-column">
+
+    <div class="p-5 flex-column text-white" id="div1" style="height: 100%; width: 100%">
+        <h1> §<span id="channel-name">${name}</span> </h1>
+        <h6> creato da @<span id="channel-creator"></span></h6>
+        <div class="d-inline-flex flex-row align-items-center pt-3">
+            <div id="channel-description" class="p-2 rounded d-inline bg-white text-dark"></div>
+            <i id="modify-description" class="p-2 bi bi-pencil-fill"> Modifica descrizione </i>
+            <button id="modify-button" type="button" class="btn btn-success ms-2" style="display: none">
+                Fatto
+            </button>
+        </div>
+        <!-- Modal Button -->
+        <div class="d-flex flex-row align-items-center p-3 pe-0">
+            <input class="form-control" id="filter" type="text" style="height: 10%; width: 15%; background-color: lightgray" placeholder="Cerca Canale..">
+                <div class="ms-auto m-1">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAdmin">
+                        Aggiungi Admin
+                    </button>
+                </div>
+                <div class="m-1">
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteChannel">
+                        Elimina Canale
+                    </button>
+                </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="deleteChannel" tabindex="-1" aria-labelledby="deleteChannelModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+                <div class="modal-body">
+                    <div class="text-dark">
+                        Stai per eliminare il canale, sei sicuro?
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
+                    <button type="submit" class="btn btn-danger" id="delete-button">Elimina</button>
+                </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="addAdmin" tabindex="-1" aria-labelledby="addAdminModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5">Inserisci Admin in §${name}</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" action="/db/ReservedChannel" id="channelform">
+                <div class="modal-body">
+                    <div>
+                        <label for="name" class="form-label w-100"> Nome:
+                            <input type="text" class="form-control" name="name" id="name" placeholder="NOME_CANALE"></label>
+                    </div>
+                    <div id="userlist" class="d-flex align-items-center justify-content-center flex-row">
+                        <div class="mx-auto">
+                        <div id="user-name">Nome Utente</div>
+                        <a class="link-underline-primary p-3">
+                            Aggiungi
+                        </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
+                    <button type="submit" class="btn btn-primary">Inserisci</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="/js/reservedChannelProfile.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+</body>
+</html>
+
