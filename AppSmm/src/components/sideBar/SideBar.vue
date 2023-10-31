@@ -27,8 +27,7 @@
 
   function setUpModal() {
     openAppModal();
-    beforeModalPage.value = window.location.pathname.split('/').slice(-1)[0];
-    console.log(beforeModalPage.value);
+    beforeModalPage.value = getPage();
   }
 
 

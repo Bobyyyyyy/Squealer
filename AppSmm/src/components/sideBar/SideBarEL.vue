@@ -10,7 +10,7 @@ import {getPage} from "../../utilsSMM";
     }
   })
 
-  const emit = defineEmits(['pushTo', 'changeActive'])
+  defineEmits(['pushTo', 'changeActive'])
 
   const name = props.item.text;
 

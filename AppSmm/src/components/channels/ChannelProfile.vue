@@ -1,22 +1,53 @@
 <script setup>
-import {computed, ref} from "vue";
+  import {computed, onMounted, ref} from "vue";
   import {useStore} from "vuex";
   import Post from "../post/Post.vue";
-  import {postType, sortPosts} from "../../utilsSMM";
+  import {getPosts, getVIPname, postType, sortPosts} from "../../utilsSMM";
+  import Dropdown from "../Dropdown.vue";
 
   const store = useStore()
 
-const typePostFilter = ref('Type');
-const sortFilter = ref('Sort');
+  const chInfo = computed(()=> store.state.currentChannel)
 
-function updateSortFilter(newText){
-  sortFilter.value=newText
-}
-function updateTextType(newText){
+  const typePostFilter = ref('Type');
+  const sortFilter = ref('Sort');
+  const readyPosts = ref(false);
+
+  let query = `name=${getVIPname()}&channel=${chInfo.value.chName}`
+  let curPosts = []
+
+  async function updateSortFilter(newText){
+    readyPosts.value=false
+
+    if (sortFilter.value === 'Sort') query += `&sort=${newText}`;
+    else query = query.replace(`&sort=${sortFilter.value}`, `&sort=${newText}`)
+
+    sortFilter.value = newText
+
+    curPosts = await getPosts(query)
+    readyPosts.value=true
+  }
+  async function updatePostType(newText){
+  readyPosts.value=false
+
+  if (typePostFilter.value === 'Type') query += `&typeFilter=${newText}`;
+  else query = query.replace(`&typeFilter=${typePostFilter.value}`, `&typeFilter=${newText}`)
+
   typePostFilter.value=newText
-}
 
-  let chInfo = computed(()=> store.state.currentChannel)
+  curPosts = await getPosts(query)
+  readyPosts.value=true
+ }
+
+  onMounted(async ()=>{
+    try {
+      readyPosts.value=false
+      curPosts = await getPosts(query)
+      readyPosts.value=true
+    } catch (e) {
+      console.log(e)
+    }
+  })
 
 </script>
 
@@ -33,21 +64,28 @@ function updateTextType(newText){
         <h5 class="m-1 text-center">{{ chInfo.chDescription }}</h5>
       </div>
       <div class="d-flex flex-row justify-content-end">
-        <div class="dropdown buttonDropDown">
-          <a class="btn btn-primary dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">{{typePostFilter}}</a>
-          <ul class="dropdown-menu">
-            <li v-for="(el,i) in postType" :key="i" ><a class="dropdown-item" @click="updateTextType(el)">{{ el }}</a></li>
-          </ul>
-        </div>
-        <div class="dropdown ms-1 buttonDropDown">
-          <a class="btn btn-primary dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">{{ sortFilter }}</a>
-          <ul class="dropdown-menu">
-            <li v-for="(el,i) in sortPosts" :key="i" ><a class="dropdown-item" @click="updateSortFilter(el)">{{ el }}</a></li>
-          </ul>
-        </div>
+        <Dropdown class="buttonDropDown"
+                  :filterRef="typePostFilter"
+                  :dropItems="postType"
+                  updateRef = 'updatePostType'
+                  @updatePostType = updatePostType
+        />
+        <Dropdown  class="ms-1 buttonDropDown"
+                   :filterRef="sortFilter"
+                   :dropItems="sortPosts"
+                   updateRef = 'updateSort'
+                   @updateSort = updateSortFilter
+        />
       </div>
-      <div class="d-flex flex-row flex-wrap justify-content-around mt-3">
-        <Post v-for="(el,i) in 10" :key="i"
+      <div v-if="readyPosts" class="d-flex flex-row flex-wrap justify-content-around mt-3">
+        <Post v-for="(post,i) in curPosts" :key="i"
+              :user="post.owner"
+              :dest= "(post.destination.destType === 'channel'? `§`:`@`) + post.destination.name"
+              :content="post.content"
+              picProfile = "/img/defaultUser.jpeg"
+              :creationDate="post.dateOfCreation"
+              :contentType = "post.contentType"
+              :destType = "post.destination.destType"
         />
       </div>
     </div>

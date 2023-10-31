@@ -7,7 +7,6 @@ const {ObjectId} = require("mongodb");
 const addChannel = async (body,credentials) => {
     try{
         await connectdb(credentials);
-        console.log(body);
         //check if channel exists already
         let findName = await Channel.findOne({name: body.name}).lean();
         if (findName) {
@@ -22,7 +21,7 @@ const addChannel = async (body,credentials) => {
             description: body.description,
             isPublic: body.isPublic,
             posts: [],
-            creator: new ObjectId(await User.findOne({username: body.creator},'_id')).toString(),
+            creator: body.creator,
             admins: [],
             followers: []
         })
@@ -41,8 +40,7 @@ const addChannel = async (body,credentials) => {
 const channelVipList = async (query,credentials) => {
     try{
         await connectdb(credentials);
-        let vipId = new ObjectId(await User.findOne({username: query.vipName},'_id')).toString();
-        let channels = await Channel.find({ $or: [{ creator: vipId },{admins: {$in: [vipId] }}]})
+        let channels = await Channel.find({ $or: [{ creator: query.vipName },{admins: {$in: [query.vipName] }}]})
         await mongoose.connection.close();
         return channels;
     }catch (e) {

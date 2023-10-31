@@ -29,7 +29,7 @@ const addUser = async (body,credentials) => {
             password: await bcrypt.hash(body.password,saltRounds),
             typeUser: body.type ? body.type : 'user',
             characters: body.type === 'mod' ? {daily: null, weekly: null, monthly: null} : quota,
-            vipHandled: body.type ==='smm' ? {} : undefined,
+            ...(body.type === 'smm') && {vipHandled: []},
         });
 
 
@@ -177,11 +177,11 @@ const altUser = async (body,credentials) => {
 const getHandledVip = async (query,credentials) => {
     try {
         await connectdb(credentials);
-        let SMM = await User.findOne({username: query.SMMname})
-        return await Promise.all(SMM.vipHandled.users.map( (vip) => {
-            return User.findById(vip);
-        }))
+        let vipHandled = (await User.findOne({username: query.SMMname},'vipHandled')).vipHandled;
+
         await mongoose.connection.close();
+
+        return vipHandled
     }
     catch (Error){
         throw Error;

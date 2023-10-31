@@ -1,7 +1,7 @@
 <script setup>
   import {onMounted, ref} from "vue";
   import Post from "../components/post/Post.vue";
-  import {filterValues, getVIPname, postType, sortPosts} from "../utilsSMM";
+  import {filterValues, getPosts, getVIPname, postType, sortPosts} from "../utilsSMM";
   import Dropdown from "../components/Dropdown.vue";
 
 
@@ -26,24 +26,32 @@
 
   let curPosts = []
 
-  function updatePostType(newText){
+  async function updatePostType(newText){
+    readyPosts.value=false
+
     if (typePostFilter.value === 'Type') query += `&typeFilter=${newText}`;
     else query = query.replace(`&typeFilter=${typePostFilter.value}`, `&typeFilter=${newText}`)
 
     typePostFilter.value=newText
-    getPosts()
 
+    curPosts = await getPosts(query)
+    readyPosts.value=true
   }
-  function updateSortFilter(newText){
+  async function updateSortFilter(newText){
+    readyPosts.value=false
 
     if (sortFilter.value === 'Sort') query += `&sort=${newText}`;
     else query = query.replace(`&sort=${sortFilter.value}`, `&sort=${newText}`)
 
     sortFilter.value = newText
-    getPosts()
+
+    curPosts = await getPosts(query)
+    readyPosts.value=true
   }
 
-  function updateDestFilter(newText){
+  async function updateDestFilter(newText){
+    readyPosts.value=false
+
     keyWordFilter.value = newText === 'keyword'; //BOOL
     if (!keyWordFilter.value){
       if (destFilter.value === 'Filter') query += `&destType=${newText}`;
@@ -53,30 +61,21 @@
       //GESTIRE IL CASO DELLA KEYWORD
 
     destFilter.value = newText;
-    console.log(query)
-    getPosts()
-  }
 
-  async function getPosts(){
-    readyPosts.value=false
-    try{
-      let res = await fetch(`/db/posts?${query}`,{
-        method:"GET",
-      });
-      curPosts = (await res.json()).map(post => { return {...post, dateOfCreation: new Date(Date.parse(post.dateOfCreation))} });
-      readyPosts.value=true
-    }catch (e) {
-      throw e
-    }
+    curPosts = await getPosts(query)
+    readyPosts.value=true
   }
 
   onMounted(async ()=>{
     try {
-      await getPosts()
+      readyPosts.value=false
+      curPosts = await getPosts(query)
+      readyPosts.value=true
     } catch (e) {
       console.log(e)
     }
   })
+
 </script>
 
 <template>
@@ -135,13 +134,13 @@
       </div>
       <div v-if="readyPosts" class="d-flex flex-row flex-wrap justify-content-around mt-3">
         <Post v-for="(post,i) in curPosts" :key="i"
-              :user="post.owner.name"
-              :dest= "post.destination.dest.destType === 'channel'? `§${post.destination.receiver.name}`:`@${post.destination.receiver.name}`"
+              :user="post.owner"
+              :dest= "post.destination.destType === 'channel'? `§${post.destination.name}`:`@${post.destination.name}`"
               :content="post.content"
-              picProfile = "/img/defaultUser.jpeg"
               :creationDate="post.dateOfCreation"
               :contentType = "post.contentType"
-              :destType = "post.destination.dest.destType"
+              :destType = "post.destination.destType"
+              picProfile = "/img/defaultUser.jpeg"
         />
       </div>
     </div>

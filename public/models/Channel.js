@@ -1,7 +1,7 @@
 const mongoose= require('mongoose');
 
 const ChannelSchema = new mongoose.Schema({
-    name:{
+    name:{      /* POST DEL CANALE CARICATI A PARTIRE DAL NOME, CHIAVE PRIMARIA */
         type: String,
         required: true,
     },
@@ -16,16 +16,9 @@ const ChannelSchema = new mongoose.Schema({
         required: true,
     },
 
-    posts: [
-        {
-            type: String,       //ID del post
-            required: true
-        }
-    ],
-
     /* primo proprietario */
     creator: {
-      type: String,
+      type: String,     /* NAME */
       required: true,
     },
 
@@ -34,7 +27,7 @@ const ChannelSchema = new mongoose.Schema({
 
     admins: [
         {
-            type:String,
+            type:String,    /* NAME */
             required: true,
         }
     ],

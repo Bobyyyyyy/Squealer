@@ -26,6 +26,7 @@
           :dest="dest"
           :srcImg="picProfile"
           :dateCreation="creationDate"
+          :destType = 'destType'
       />
       <div class="d-flex flex-row justify-content-center text-center align-items-center">
         <!-- SI devono poter inserire anche altre cose, non solo immagini! Swtich in base al tipo di messaggio? -->
@@ -35,7 +36,7 @@
         </p>
       </div>
     </div>
-    <div v-if="destType!=='user'">
+    <div v-if="destType !== 'user' ">
       <FooterPost
                   :likes= "500"
                   :comments="500"

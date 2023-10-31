@@ -6,36 +6,24 @@ const reactionTypes = ['love','like','meh','disagreement','hate']
 
 const PostSchema = new mongoose.Schema({
     owner: {
-        Id:{
+        type: String,       //NAME
+        required: true,
+    },
+    destination:{
+        destType: {
             type: String,
-            required: true,
+            enum: destTypes,
+        },
+        isPublic: {     // DA INSERIRE SOLO SE CANALE
+            type: Boolean,
+            required: function(){
+                return this.destination.destType === 'channel'
+            }
         },
         name:{
             type: String,
             required: true,
         }
-    },
-    destination:{
-        dest:{
-            destType: {
-                type: String,
-                enum: destTypes,
-            },
-            isPublic: {     // DA INSERIRE SOLO SE CANALE
-                type: Boolean,
-                required: false,        //METTERE REQUIRED SE CANALE
-            }
-        },
-        receiver: {
-            id:{
-                type: String,
-                required: true,
-            },
-            name:{
-                type: String,
-                required: true,
-            }
-        },
     },
     contentType:{
         type: String,       //geolocalizzazione, immagine o testo
@@ -48,9 +36,12 @@ const PostSchema = new mongoose.Schema({
     },
     reactions: [
         {
-            user: mongoose.Schema.ObjectId,
-            type: String,
-            enum: reactionTypes,
+            rtype:{     //reaction type
+                type: String,
+                enum: reactionTypes,
+            },
+            user: String,
+            date: Date,
         },
     ],
     dateOfCreation:{

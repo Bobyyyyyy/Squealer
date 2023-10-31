@@ -1,10 +1,13 @@
 <script setup>
 
+  import {getPage} from "../../utilsSMM";
+
   const props = defineProps({
     name: String,
     dest: String,
     srcImg: String,
     dateCreation: Date,
+    destType:String,
   })
 
   function go2Profile(){
@@ -18,6 +21,10 @@
     //leggi sopra
     console.log("vado nel canale: " +  props.channel);
     //quindi ci sarà un emits con routing
+  }
+
+  function isInChannels(){
+    return (getPage() !=='Channels') && (props.destType ==='channel');
   }
 
   function parseTime(){
@@ -40,9 +47,9 @@
   <div class="card-header d-flex justify-content-between header_post ">
     <div class="d-flex justify-content-start align-items-center ">
       <img @click="go2Profile" :src=" srcImg " alt="immagine profilo" class="imgFluid" />
-      <div class="d-flex flex-column">
+      <div class="d-flex flex-column flex-fill">
         <h3 @click="go2Profile" class="mb-0 setMargin"> {{ name }} </h3>
-        <h5 @click="go2Channel" class="mb-0" id="ChannelName"> {{dest}} </h5>
+        <h5 v-if="isInChannels()" @click="go2Channel" class="mb-0" id="ChannelName"> {{dest}} </h5>
       </div>
     </div>
     <div class="d-flex text-center align-items-center ">

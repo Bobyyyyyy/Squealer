@@ -12,21 +12,12 @@ const addPost = async (body,credentials) => {
         let vipId = new ObjectId(await User.findOne({username: body.name},'_id')).toString()
 
         let newPost = new Post({
-            owner: {
-                Id: vipId,
-                name: body.name,
-            },
+            owner: body.name,
             destination:{
-                dest:{
-                    destType: body.destType,
-                    ...(body.destType === 'channel') && {
-                        isPublic: (await Channel.findOne({name: body.receiver},'isPublic')).isPublic
-                    }
-
-                },
-                receiver: {
-                    id: new ObjectId(await User.findOne({username: body.receiver},'_id')).toString(),
-                    name: body.receiver
+                destType: body.destType,
+                name: body.receiver,
+                ...(body.destType === 'channel') && {
+                    isPublic: (await Channel.findOne({name: body.receiver},'isPublic')).isPublic
                 },
             },
             contentType: body.contentType,
@@ -66,12 +57,19 @@ const getAllPost = async (query,credentials) =>{
     try{
         await connectdb(credentials)
 
-        let vipId = new ObjectId(await User.findOne({username: query.name},'_id')).toString();
-
-        let filter = {'owner.Id': vipId,
+        let filter = {
+                /* Per i canali non mi serve l'id dell'utente che fa la richiesta */
+            ...(!query.channel) && {'owner':  query.name},
+                /* FILTRO PER TIPO DI POST */
             ... (query.typeFilter && query.typeFilter !== 'all') && {'contentType': query.typeFilter},
-            ... (query.destType && query.destType !== 'all') && {'destination.dest.destType': query.destType === 'user' ? 'user' : 'channel'},
-            ... (query.destType && query.destType !== 'all' && query.destType !== 'user') && {'destination.dest.isPublic': query.destType === 'public'} }
+
+                /* PER LA PAGINA DEL PROFILO : */
+            ... (query.destType && query.destType !== 'all') && {'destination.destType': query.destType === 'user' ? 'user' : 'channel'},
+            ... (query.destType && query.destType !== 'all' && query.destType !== 'user') && {'destination.isPublic': query.destType === 'public'},
+
+                /* PER IL CANALE SINGOLO */
+            ...(query.channel) && {'destination.name': query.channel}
+        }
 
         let posts = await Post.find(filter)
             .limit(12)

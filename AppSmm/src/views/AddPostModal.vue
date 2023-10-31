@@ -91,8 +91,11 @@
             </div>
           </div>
           <div class="paddingEqual">
+
             <textarea rows="6" id="textPost" v-if=" postType == 'text'" class="form-control"></textarea>
+
             <div v-if="postType == 'image'" class="d-flex flex-column">
+
               <div class="input-group d-flex flex-row">
                 <input class="w-75" type="text" placeholder="insert URL" id="pathImg" v-model="imgUrl" >
                 <button type="button" class="btn btn-secondary" @click=" currentImg = imgUrl; showImg = true">

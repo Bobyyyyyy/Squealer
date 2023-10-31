@@ -44,7 +44,7 @@
     <VipCard v-for="(vip,index) in vips"
             :key="index"
             :followers="100"
-             :username="vip.username"
+             :username="vip"
             @setModal = " (username) => openModal(username)"
     />
   </div>
