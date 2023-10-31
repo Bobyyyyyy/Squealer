@@ -12,10 +12,9 @@ const addUser = async (body,credentials) => {
         console.log(body);
         await connectdb(credentials);
         //GET user using email and name
-        let findEmail =  await User.find({email: body.email}).lean();
         let findName = await User.find({username: body.name}).lean();
 
-        if (findEmail.length !== 0 || findName.length !== 0) {
+        if (findName.length !== 0) {
             let err = new Error("Utente già registrato!");
             err.statusCode = 400;
             console.log(err);
@@ -25,7 +24,6 @@ const addUser = async (body,credentials) => {
 
         let newUser = new User({
             username: body.name,
-            email: body.email,
             password: await bcrypt.hash(body.password,saltRounds),
             typeUser: body.type ? body.type : 'user',
             characters: body.type === 'mod' ? {daily: null, weekly: null, monthly: null} : quota,

@@ -21,8 +21,25 @@ th {
     background-color: steelblue !important;
 }
 
-
 td {
     width: 20vw;
     height: 10vh;
+}
+
+.channeldiv {
+    background-color: white;
+}
+
+.channeldiv:hover {
+    background-color: wheat;
+    opacity: 100%;
+}
+
+#channel-description {
+    font-size:15px;
+    display:none
+}
+
+#description {
+    font-size:15px
 }

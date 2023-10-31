@@ -24,68 +24,23 @@ function getChannelsNumber(filter) {
     })
 }
 
-function createChannel (name) {
-    $.ajax({
-        url: '/db/ReservedChannel',
-        type: 'post',
-        data: {name: name},
-        success: (data) => {
-            console.log(data);
-        }
-    })
-}
-
-function deleteChannel(name) {
-    $.ajax({
-        url: '/db/ReservedChannel/delete',
-        type: 'post',
-        data: {name: name},
-        success: (data) => {
-            console.log(data);
-        },
-    })
-}
-
-function addFollower (name,channel) {
-    $.ajax({
-        url:'/db/ReservedChannel/addFollower',
-        type:'post',
-        data: {username: name, channel: channel},
-        success: (data) => {
-            console.log(data);
-        }
-    })
-}
-
-function addAdmin (name,channel) {
-    $.ajax({
-        url:'/db/ReservedChannel/addAdmin',
-        type:'post',
-        data: {username: name, channel: channel},
-        success: (data) => {
-            console.log(data);
-        }
-    })
-}
-
-
 function getChannels (limit,offset,filter) {
     getChannelsNumber(filter);
     updateLastCall(limit,offset,filter);
     $.ajax({
-        url:'/db/ReservedChannel',
+        url:'/db/ReservedChannels',
         type:'get',
         data: {limit: limit, offset: offset, filter: filter},
         success: (data) => {
             console.log(data);
             $('#pages').empty();
-
-            let html = `${$.map(data,(channel) => `<div class="mt-3 mx-auto bg-light rounded d-flex flex-row align-items-center text-center" style="height:6vh; width: 90vw">
-            <div style="width: 25%;"> ${channel.name}</> </div> 
-            <div style="width: 25%"> ${channel.followers.users.length}</div>
-            <div style="width: 25%"> ${channel.administrators.users.length}</div>
-            <div style="width: 25%"> ${channel.postList.posts.length} </div>
-        </div>`).join('\n')}`;
+            let html = `${$.map(data,(channel) => `
+            <div class="mt-3 mx-auto rounded d-flex flex-row align-items-center text-center channeldiv" onclick="window.location.href = 'officialChannels/${channel.name}'" style="height:6vh; width: 90vw;">
+                <div style="width: 25%;"> §${channel.name}</> </div>
+                <div style="width: 25%;"> @${channel.creator}</> </div> 
+                <div style="width: 25%"> ${channel.administrators.users.length}</div>
+                <div style="width: 25%"> ${channel.postList.posts.length} </div>
+            </div>`).join('\n')}`;
 
             if (offset !== 0) {
                 let previous = `<li class="page-item"><a class="page-link" onclick="getChannels(LastCall.limit,LastCall.offset - LastCall.limit,LastCall.filter)">Previous</a></li>`
