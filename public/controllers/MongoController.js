@@ -4,7 +4,7 @@ const {mongoCredentials} = require('../scripts/utils.js')
 const {addOfficialChannel, addFollower, addAdmin, deleteChannel, channelsLength, getChannels, searchByChannelName,
     modifyDescription
 } = require("../scripts/ReservedChannelMethods");
-const {addChannel, channelVipList} = require("../scripts/ChannelMethods");
+const {addChannel, channelVipList, checkUserChannel} = require("../scripts/ChannelMethods");
 
 /* User Methods */
 const createUser = async (req,res,next) => {
@@ -65,8 +65,24 @@ const getVips = async (req,res) => {
 
 /* Post Methods */
 const createPost = async (req,res) => {
-    res.send(await addPost(req.body,mongoCredentials));
+    try{
+        res.send(await addPost(req.body,mongoCredentials));
+    }
+    catch (err){
+        console.log(err);
+        res.send(err)
+    }
 }
+
+const getPosts = async (req,res) => {
+    try {
+        res.send(await getAllPost(req.query,mongoCredentials))
+    }
+    catch(error) {
+        res.send(error);
+    }
+}
+
 
 
 /* Reserved Channel Methods */
@@ -135,14 +151,6 @@ const getChannelList = async (req,res) => {
     }
 }
 
-const getPosts = async (req,res) => {
-    try {
-        res.send(await getAllPost(req.query,mongoCredentials))
-    }
-    catch(error) {
-        res.send(error);
-    }
-}
 
 const channel = async (req,res) => {
     try {
@@ -156,6 +164,15 @@ const channel = async (req,res) => {
 const modifyDesc = async (req,res) => {
     try {
         res.send(await modifyDescription(req.body,mongoCredentials))
+    }
+    catch(error) {
+        res.send(error);
+    }
+}
+
+const checkUserInChannel = async (req,res) => {
+    try {
+        res.send(await checkUserChannel(req.query,mongoCredentials))
     }
     catch(error) {
         res.send(error);
@@ -181,5 +198,6 @@ module.exports = {
     getChannelList,
     getPosts,
     channel,
-    modifyDesc
+    modifyDesc,
+    checkUserInChannel
 }

@@ -1,6 +1,6 @@
 <script setup>
   import {ref} from "vue";
-  import {getVIPname} from "../utilsSMM";
+  import {getVIPname} from "../../utilsSMM";
 
   const channelName = ref('')
   const channelDescription = ref('')
@@ -12,7 +12,7 @@
   async function createChannel(){
     try{
       const channel = {
-        name: channelName.value,
+        name: channelName.value.toLowerCase().split(' ').join('_'),
         description: channelDescription.value,
         isPublic: document.querySelector("input[name=btnTypeChannel]:checked").value === 'public',
         creator: getVIPname(),

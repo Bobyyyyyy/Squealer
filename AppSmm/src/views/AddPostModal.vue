@@ -1,7 +1,8 @@
 <script setup>
-
   import {ref} from "vue";
   import {currentVip} from "../utilsSMM";
+
+
 
   const postType = ref('Select type')
   const destType = ref('receiver')
@@ -11,10 +12,8 @@
   const showImg = ref(false)
 
   async function createPost() {
-
     try{
       let cnt = postType.value == 'image' ? imgUrl.value : document.getElementById("textPost").value;
-      console.log(destType.value)
 
       let post = {
         name: currentVip.value,
@@ -25,17 +24,20 @@
         destType: destType.value,
       }
 
-      await fetch("/db/addPost",{
+      let res = await fetch("/db/addPost",{
         method: "POST",
         body: JSON.stringify(post),
         headers: {
           "Content-Type":"application/json"
         }
       })
-      //GESTIRE ERRORI
+      let response = await res.json()
+      if(response.statusCode === 422){
+        throw response;
+      }
     }
     catch (err){
-      console.log(err) //PAGINA DI GESTIONE ERRORE
+      alert(err.mes)
     }
 
 
@@ -43,6 +45,8 @@
 
   function reset(){
     postType.value ='Select type'
+    destType.value = 'receiver'
+    receiverName.value = ''
     imgUrl.value = ''
     currentImg.value= ''
     showImg.value = false
@@ -115,7 +119,7 @@
             <button type="button" class="btn btn-danger"
                     @click="$emit('closeAppModal')"
             >Indietro</button>
-            <button class="btn btn-primary" type="button" @click="createPost(); reset()"> Crea Post </button>
+            <button class="btn btn-primary" type="button" @click="createPost(); reset(); $emit('closeAppModal')"> Crea Post </button>
           </div>
         </form>
       </div>

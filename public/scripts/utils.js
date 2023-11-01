@@ -31,7 +31,15 @@ const connectdb = async (credentials) => {
     catch(err){
         console.log(err);
     }
+}
 
+
+
+function createError (message,statusCodeError){
+    let err = new Error(message);
+    err.statusCode = statusCodeError;
+    err.mes = message
+    return err;
 }
 
 module.exports = {
@@ -40,4 +48,5 @@ module.exports = {
     mongoCredentials,
     dbname,
     quota,
+    createError
 }

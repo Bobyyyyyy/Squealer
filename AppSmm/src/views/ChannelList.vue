@@ -3,7 +3,7 @@
 import Channel from "../components/channels/Channel.vue";
 import {onMounted, reactive, ref} from "vue";
 import {Modal} from "bootstrap";
-import AddChannelModal from "../components/AddChannelModal.vue";
+import AddChannelModal from "../components/channels/AddChannelModal.vue";
 import {getVIPname} from "../utilsSMM";
 
 let channels = []

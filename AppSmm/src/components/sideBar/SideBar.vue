@@ -20,7 +20,7 @@
   function openAppModal() {
     modalState.Modal.show()
   }
-  function closeAppModal() {
+  function closeAppModal(newPost) {
     modalState.Modal.hide()
     activeBut.value = beforeModalPage.value
   }

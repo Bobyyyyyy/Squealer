@@ -2,14 +2,31 @@ const mongoose = require('mongoose');
 const Post = require("../models/Post");
 const User = require("../models/User");
 const Channel = require("../models/Channel")
-const {connectdb} = require("./utils");
-const {ObjectId} = require("mongodb");
+const {connectdb, createError} = require("./utils");
 
 
 const addPost = async (body,credentials) => {
     try{
         await connectdb(credentials)
-        let vipId = new ObjectId(await User.findOne({username: body.name},'_id')).toString()
+
+        /* ERROR HANDLING */
+
+        /* utente non esiste  */
+        if(body.destType === 'user' && !(await User.findOne({username: body.receiver})) ){
+            await mongoose.connection.close();
+            throw createError("utente non esistente!",422);
+        }
+        /* canale non esiste  */
+        else if(body.destType === 'channel' && !(await Channel.findOne({name: body.receiver}))){
+            await mongoose.connection.close();
+            throw createError("canale non esistente!",422);
+        }
+        /* tipo di destinatario non inserito */
+        else if (body.destType === 'receiver'){     /* DA VEDERE CON ALE COME MODIFICARE */
+            await mongoose.connection.close();
+            throw createError("Inserisci il tipo di destinatario!",422);
+        }
+
 
         let newPost = new Post({
             owner: body.name,
@@ -26,16 +43,12 @@ const addPost = async (body,credentials) => {
             dateOfCreation: body.dateOfCreation,
         })
 
-
         await newPost.save();
         await mongoose.connection.close();
 
         return newPost
     }
-    catch(err){
-        console.log(err);
-        throw err;
-    }
+    catch(err){ throw err; }
 }
 
 const sorts = {
