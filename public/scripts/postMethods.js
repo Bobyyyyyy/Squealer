@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Post = require("../models/Post");
 const User = require("../models/User");
 const Channel = require("../models/Channel")
-const {connectdb, createError} = require("./utils");
+const {connectdb, createError, sorts} = require("./utils");
 
 
 const addPost = async (body,credentials) => {
@@ -51,21 +51,6 @@ const addPost = async (body,credentials) => {
     catch(err){ throw err; }
 }
 
-const sorts = {
-    'più recente':{
-        dateOfCreation: -1
-    },
-    'meno recente':{
-        dateOfCreation: 1
-    },
-    'più visual':{
-        views: -1
-    },
-    'meno visual':{
-        views: 1
-    }
-}
-
 const getAllPost = async (query,credentials) =>{
     try{
         await connectdb(credentials)
@@ -98,7 +83,43 @@ const getAllPost = async (query,credentials) =>{
     }
 }
 
+const updateReac = async (body,credentials) => {
+    try{
+        await connectdb(credentials);
+        let hasReacted = (await Post.findOne({_id : body.postId, reactions:{$elemMatch:{user: body.user}}}));
+
+        if (hasReacted){
+            await Post.findByIdAndUpdate(body.postId, {$pull: {reactions: {user: body.user}}});
+        }
+
+        await Post.findByIdAndUpdate(body.postId, {$push:{reactions: { rtype: body.reaction, user: body.user, date: new Date()}}});
+
+        await mongoose.connection.close();
+
+        return body;
+    }
+    catch (err){
+        throw err;
+    }
+}
+
+const deleteReac = async (body,credentials) => {
+    try{
+        await connectdb(credentials);
+
+        await Post.findByIdAndUpdate(body.postId, {$pull: {reactions: {user: body.user}}});
+
+        await mongoose.connection.close();
+        return body;
+    }
+    catch (err){
+        throw err;
+    }
+}
+
 module.exports = {
     addPost,
-    getAllPost
+    getAllPost,
+    updateReac,
+    deleteReac
 }

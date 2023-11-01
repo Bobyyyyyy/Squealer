@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const {ObjectId} = require("mongodb");
 const contentTypes = ['geoloc','text','image']
 const destTypes = ['channel', 'user']
-const reactionTypes = ['love','like','meh','disagreement','hate']
+const reactionTypes = ['heart','thumbs-up','thumbs-down','heartbreak']
 
 const PostSchema = new mongoose.Schema({
     owner: {
@@ -40,7 +40,7 @@ const PostSchema = new mongoose.Schema({
                 type: String,
                 enum: reactionTypes,
             },
-            user: String,
+            user: String,       //NOME
             date: Date,
         },
     ],

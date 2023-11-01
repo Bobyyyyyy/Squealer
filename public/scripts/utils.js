@@ -16,6 +16,21 @@ const quota ={
     monthly: (baseQuota*6)*4,
 }
 
+const sorts = {
+    'più recente':{
+        dateOfCreation: -1
+    },
+    'meno recente':{
+        dateOfCreation: 1
+    },
+    'più visual':{
+        views: -1
+    },
+    'meno visual':{
+        views: 1
+    }
+}
+
 
 
 const connectdb = async (credentials) => {
@@ -48,5 +63,6 @@ module.exports = {
     mongoCredentials,
     dbname,
     quota,
-    createError
+    createError,
+    sorts
 }

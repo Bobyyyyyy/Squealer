@@ -1,16 +1,42 @@
 <script setup>
   import Reaction from "./Reaction.vue";
-  import {reactionsIcons} from "../../utilsSMM";
+  import {getVIPname, reactionsIcons} from "../../utilsSMM";
   import {ref} from "vue";
 
-  defineProps({
-      reactions: Array
+  const props = defineProps({
+    reactions: Array,
+    postId: String
   });
 
   const currentActive = ref('noOne');
 
-  const changeReac = (newReac) => {
+  const changeReac = async (newReac) => {
     currentActive.value = newReac;
+    await fetch(`/db/post/updateReaction`,{
+      method:"PUT",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body:JSON.stringify({
+        postId: props.postId,
+        user: getVIPname(),
+        reaction: newReac,
+      })
+    })
+  }
+
+  const deleteReac = async () => {
+    currentActive.value = 'noOne';
+    await fetch(`/db/post/deleteReaction`,{
+      method:"PUT",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body:JSON.stringify({
+        postId: props.postId,
+        user: getVIPname(),
+      })
+    })
   }
 
 </script>
@@ -25,11 +51,9 @@
                 :icon="reaction"
                 :active="currentActive"
                 @changeReac="(newReac) => changeReac(newReac)"
-                @deleteReac="() => {currentActive='NoOne'}"
+                @deleteReac="() => deleteReac() "
       />
     </div>
-
-
 
 
     <!--
