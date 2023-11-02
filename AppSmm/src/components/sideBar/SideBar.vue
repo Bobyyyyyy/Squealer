@@ -4,15 +4,18 @@
   import AddPostModal from "../../views/AddPostModal.vue";
   import {Modal} from 'bootstrap'
   import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
-  import {currentVip, getPage, getSMMname, getVIPname, sideBarElements} from "../../utilsSMM";
+  import {currentVip, getPage, sideBarElements, smm} from "../../utilsSMM";
 
   const windowWidth = ref(window.innerWidth);
   const modalState = reactive({Modal: null,})
   const beforeModalPage = ref('');
 
   const onWidthChange =  () => windowWidth.value = window.innerWidth
-  onMounted(() => window.addEventListener('resize', onWidthChange))
-  onMounted(() => { modalState.Modal = new Modal('#AddPostModal',{})})
+  onMounted(async () => {
+    window.addEventListener('resize', onWidthChange);
+
+    modalState.Modal = new Modal('#AddPostModal',{});
+  })
   onUnmounted(() => window.removeEventListener('resize', onWidthChange))
 
   const activeBut = ref(getPage());
@@ -20,7 +23,7 @@
   function openAppModal() {
     modalState.Modal.show()
   }
-  function closeAppModal(newPost) {
+  function closeAppModal() {
     modalState.Modal.hide()
     activeBut.value = beforeModalPage.value
   }
@@ -95,17 +98,16 @@
     <div v-if="!smartPhone" class="d-flex flex-column">
       <ul class="nav nav-pills flex-column mb-auto">
         <li class="nameUser" >
-          {{getSMMname()}}
+          {{smm}}
         </li>
         <li class="nameUser" >
-          {{getVIPname()}}
+          {{currentVip}}
         </li>
         <li>
             <a
                 class="nav-link text-danger d-flex flex-row align-items-center mb-3"
                :class="expanded ? 'justify-content-start' : 'justify-content-center'"
                @click="
-                        currentVip = '';
                         this.$router.push('/SMM/handlevip');
                         $emit('setInWel')">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-left" viewBox="0 0 16 16">

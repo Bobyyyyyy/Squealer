@@ -15,7 +15,7 @@ import VipCard from "./components/handleVip/VipCard.vue";
 import VipModal from "./components/handleVip/VipModal.vue";
 import Post from "./components/post/Post.vue";
 import HandleVIP from "./views/HandleVIP.vue";
-import {getVIPname} from "./utilsSMM";
+import {currentVip} from "./utilsSMM";
 
 
 const app = createApp(App);
@@ -26,6 +26,10 @@ const store = createStore({
             currentChannel: {
                 chName: '',
                 chDescription: '',
+            },
+            remainingQuota: {
+                daily: '',
+
             }
         }
     },
@@ -44,8 +48,8 @@ const router = createRouter({
 
 router.beforeEach(async (to,from)=> {
     if(to.name === 'channelView'){
-        console.log(to)
-        let res = await fetch(`/db/channelCheck?channel=${to.params.channelName}&user=${getVIPname()}`,{
+        let query = `/db/channelCheck?channel=${to.params.channelName}&user=${currentVip.value}`;
+        let res = await fetch(query,{
             method: "GET"
         })
         switch ((await res.json()).canAccessAs) {

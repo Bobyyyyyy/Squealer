@@ -1,7 +1,7 @@
 <script setup>
   import {onMounted, ref} from "vue";
   import Post from "../components/post/Post.vue";
-  import {filterValues, getPosts, getVIPname, postType, sortPosts} from "../utilsSMM";
+  import {currentVip, filterValues, getPosts, postType, sortPosts} from "../utilsSMM";
   import Dropdown from "../components/Dropdown.vue";
 
 
@@ -22,7 +22,7 @@
   const typePostFilter = ref('Type');
   const sortFilter = ref('Sort');
 
-  let query = `name=${getVIPname()}`
+  let query = ''
 
   let curPosts = []
 
@@ -48,7 +48,6 @@
     curPosts = await getPosts(query)
     readyPosts.value=true
   }
-
   async function updateDestFilter(newText){
     readyPosts.value=false
 
@@ -67,13 +66,10 @@
   }
 
   onMounted(async ()=>{
-    try {
-      readyPosts.value=false
-      curPosts = await getPosts(query)
-      readyPosts.value=true
-    } catch (e) {
-      console.log(e)
-    }
+    query = `name=${currentVip.value}`
+    readyPosts.value=false
+    curPosts = await getPosts(query)
+    readyPosts.value=true
   })
 
 </script>
@@ -96,7 +92,7 @@
           </div>
         </div>
         <div>
-          <p class="m-0 fs-3 text-center">{{ getVIPname() }}</p>
+          <p class="m-0 fs-3 text-center">{{ currentVip }}</p>
         </div>
         <div>
           <p class="m-0">Quota rimanente:</p>

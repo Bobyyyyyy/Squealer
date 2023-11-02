@@ -1,6 +1,6 @@
 <script setup>
   import Reaction from "./Reaction.vue";
-  import {getVIPname, reactionsIcons} from "../../utilsSMM";
+  import {currentVip, reactionsIcons} from "../../utilsSMM";
   import {onMounted, reactive, ref} from "vue";
 
   const props = defineProps({
@@ -31,7 +31,7 @@
       },
       body:JSON.stringify({
         postId: props.postId,
-        user: getVIPname(),
+        user: currentVip,
         reaction: newReac,
       })
     })
@@ -47,14 +47,14 @@
       },
       body:JSON.stringify({
         postId: props.postId,
-        user: getVIPname(),
+        user: currentVip,
       })
     })
   }
 
-  onMounted(()=>{
+  onMounted(async ()=>{
     props.reactions.forEach(el => {
-      if (el.user === getVIPname()) currentActive.value = el.rtype
+      if (el.user === currentVip.value) currentActive.value = el.rtype
       parsedReac[el.rtype] += 1;
     });
   })

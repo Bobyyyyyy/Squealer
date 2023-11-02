@@ -1,6 +1,6 @@
 <script setup>
   import {ref} from "vue";
-  import {getVIPname} from "../../utilsSMM";
+  import {currentVip} from "../../utilsSMM";
 
   const channelName = ref('')
   const channelDescription = ref('')
@@ -15,7 +15,7 @@
         name: channelName.value.toLowerCase().split(' ').join('_'),
         description: channelDescription.value,
         isPublic: document.querySelector("input[name=btnTypeChannel]:checked").value === 'public',
-        creator: getVIPname(),
+        creator: currentVip.value,
       }
 
       await fetch("/db/Channel",{

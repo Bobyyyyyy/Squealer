@@ -1,11 +1,14 @@
 const express = require('express');
 const {createUser,createPost, getSessionUser, getAllUsers, getUsersNumber, modifyUser, getVips,
     createReservedChannel, addFollowers, addAdmins, deleteCh, getChannelsNumber, getChannel, createChannel, getChannelList, getPosts, displayChannel,
-    channel, checkUserInChannel, updateReaction, deleteReaction,
+    channel, checkUserInChannel, updateReaction, deleteReaction, getSessionVip, updateSessionVip,
     modifyDesc
 } = require('../controllers/MongoController');
 const router = express.Router();
 
+/* Session Methods */
+router.put('/sessionVip',updateSessionVip);
+router.get('/sessionVip', getSessionVip);
 
 /* User Methods */
 router.post('/user',createUser,(req,res) => {

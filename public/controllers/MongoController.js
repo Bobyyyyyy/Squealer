@@ -27,6 +27,19 @@ const getSessionUser = async (req,res) => {
     res.send({username: req.session.user});
 }
 
+const updateSessionVip = async (req,res) => {
+    try{
+        req.session.vip = req.body.vipName;
+        req.session.save();
+        res.send({vip: req.session.vip})
+    }catch (e) {
+        console.log(e)
+    }
+}
+const getSessionVip = async (req,res) => {
+    res.send({vip: req.session.vip})
+}
+
 const modifyUser = async(req,res) => {
     try{
         res.send(await altUser(req.body,mongoCredentials));
@@ -219,5 +232,7 @@ module.exports = {
     modifyDesc,
     checkUserInChannel,
     updateReaction,
-    deleteReaction
+    deleteReaction,
+    getSessionVip,
+    updateSessionVip
 }
