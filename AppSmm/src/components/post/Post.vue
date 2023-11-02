@@ -12,6 +12,7 @@
     contentType:String,
     creationDate: Date,
     postId: String,
+    reactions: Array,
   })
 
 </script>
@@ -37,6 +38,7 @@
     </div>
     <div v-if="destType !== 'user' ">
       <FooterPost
+          :reactions="reactions"
           :postId = "postId"
       />
     </div>

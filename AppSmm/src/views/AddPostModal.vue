@@ -1,5 +1,5 @@
 <script setup>
-  import {ref} from "vue";
+import {onMounted, ref} from "vue";
   import {currentVip} from "../utilsSMM";
 
 
@@ -52,10 +52,6 @@
     showImg.value = false
   }
 
-/*TODO
-  fare richiesta e prendere i canali in cui posso scrivere, per far diminuire il numero di errori
-  capire come gestire la risposta del server in caso in cui l'utente non esista
- */
 
 </script>
 
@@ -114,6 +110,11 @@
               </div>
               <!--Aggiungere altri tipi di post-->
             </div>
+          </div>
+          <div class="d-flex justify-content-end">
+            <h6></h6>
+            <h6></h6>
+            <h6></h6>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-danger"

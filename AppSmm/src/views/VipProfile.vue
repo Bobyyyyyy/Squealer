@@ -138,6 +138,7 @@
               :dest= "post.destination.destType === 'channel'? `§${post.destination.name}`:`@${post.destination.name}`"
               :content="post.content"
               :creationDate="post.dateOfCreation"
+              :reactions = "post.reactions"
               :contentType = "post.contentType"
               :destType = "post.destination.destType"
               :postId = "post._id"

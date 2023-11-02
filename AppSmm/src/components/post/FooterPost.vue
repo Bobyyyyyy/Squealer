@@ -1,17 +1,29 @@
 <script setup>
   import Reaction from "./Reaction.vue";
   import {getVIPname, reactionsIcons} from "../../utilsSMM";
-  import {ref} from "vue";
+  import {onMounted, reactive, ref} from "vue";
 
   const props = defineProps({
     reactions: Array,
     postId: String
   });
 
-  const currentActive = ref('noOne');
+  const parsedReac = reactive ({
+    'heart': 0,
+    'thumbs-up': 0,
+    'thumbs-down': 0,
+    'heartbreak': 0,
+  })
+
+
+  const currentActive = ref('');
 
   const changeReac = async (newReac) => {
+    if (currentActive.value !== 'noOne'){
+        parsedReac[currentActive.value] -= 1;
+    }
     currentActive.value = newReac;
+    parsedReac[currentActive.value] += 1;
     await fetch(`/db/post/updateReaction`,{
       method:"PUT",
       headers: {
@@ -26,6 +38,7 @@
   }
 
   const deleteReac = async () => {
+    parsedReac[currentActive.value] -= 1;
     currentActive.value = 'noOne';
     await fetch(`/db/post/deleteReaction`,{
       method:"PUT",
@@ -39,6 +52,13 @@
     })
   }
 
+  onMounted(()=>{
+    props.reactions.forEach(el => {
+      if (el.user === getVIPname()) currentActive.value = el.rtype
+      parsedReac[el.rtype] += 1;
+    });
+  })
+
 </script>
 
 <template>
@@ -47,7 +67,7 @@
 
       <Reaction v-for="(reaction,index) in reactionsIcons"
                 :key="index"
-                :values="100"
+                :values="(parsedReac[reaction.name])"
                 :icon="reaction"
                 :active="currentActive"
                 @changeReac="(newReac) => changeReac(newReac)"
