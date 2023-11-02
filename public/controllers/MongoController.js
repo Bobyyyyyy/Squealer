@@ -1,5 +1,5 @@
 const {addPost, getAllPost, updateReac, deleteReac} = require('../scripts/postMethods');
-const {addUser, searchByUsername, changePwsd, getUsers, usersLength, altUser, getHandledVip} = require('../scripts/userMethods');
+const {addUser, searchByUsername, changePwsd, getUsers, usersLength, altUser, getHandledVip,getUserQuota} = require('../scripts/userMethods');
 const {mongoCredentials} = require('../scripts/utils.js')
 const {addOfficialChannel, addFollower, addAdmin, deleteChannel, channelsLength, getChannels, searchByChannelName,
     modifyDescription
@@ -70,6 +70,15 @@ const getUsersNumber = async (req,res) => {
 const getVips = async (req,res) => {
     try {
         res.send(await getHandledVip(req.query,mongoCredentials));
+    }
+    catch (error) {
+        res.send(error);
+    }
+}
+
+const getQuota = async (req,res) => {
+    try {
+        res.send(await getUserQuota(req.query,mongoCredentials));
     }
     catch (error) {
         res.send(error);
@@ -234,5 +243,6 @@ module.exports = {
     updateReaction,
     deleteReaction,
     getSessionVip,
-    updateSessionVip
+    updateSessionVip,
+    getQuota
 }

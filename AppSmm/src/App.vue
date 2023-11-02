@@ -1,6 +1,8 @@
 <script setup>
-import {currentVip, smm} from "./utilsSMM";
+import {currentVip, getUserQuota, smm} from "./utilsSMM";
 import {ref} from "vue";
+import {useStore} from "vuex";
+const store = useStore();
 
 const ready = ref(false);
 
@@ -15,6 +17,9 @@ async function start(){
     method:"GET",
   });
   currentVip.value = (await res.json()).vip;
+  if (currentVip.value){
+    store.commit('setQuota',await getUserQuota())
+  }
   ready.value = true;
 }
 

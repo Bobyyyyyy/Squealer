@@ -1,21 +1,17 @@
 <script setup>
-  import {onMounted, ref} from "vue";
+import {computed, onMounted, ref} from "vue";
   import Post from "../components/post/Post.vue";
-  import {currentVip, filterValues, getPosts, postType, sortPosts} from "../utilsSMM";
+  import {currentVip, filterValues, getPosts, getUserQuota, postType, sortPosts} from "../utilsSMM";
   import Dropdown from "../components/Dropdown.vue";
+  import {useStore} from "vuex";
 
+  const store = useStore();
+  let nFoll = 10;
+  let nPost = 10;
 
   const readyPosts = ref(false);
 
   const profilePicturePath ="/img/profilePicture.png";
-  const nFoll = 10;
-  const nPost = 500;
-
-  const quotaRes = {
-    daily: 10,
-    weekly: 180,
-    monthly: 12000
-  }
 
   const keyWordFilter = ref(false);
   const destFilter = ref('Filter');
@@ -66,8 +62,11 @@
   }
 
   onMounted(async ()=>{
-    query = `name=${currentVip.value}`
     readyPosts.value=false
+    query = `name=${currentVip.value}`
+
+    store.commit('setQuota',await getUserQuota())
+
     curPosts = await getPosts(query)
     readyPosts.value=true
   })
@@ -96,7 +95,7 @@
         </div>
         <div>
           <p class="m-0">Quota rimanente:</p>
-          <p>{{quotaRes.daily}}/{{quotaRes.weekly}}/{{quotaRes.monthly}}</p>
+            <p>{{[store.getters.getQuota.daily,store.getters.getQuota.weekly,store.getters.getQuota.monthly].join('/')}}</p>
         </div>
       </div>
       <div class="d-flex flex-row justify-content-between">

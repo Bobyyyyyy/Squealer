@@ -28,8 +28,9 @@ const store = createStore({
                 chDescription: '',
             },
             remainingQuota: {
-                daily: '',
-
+                daily: 0,
+                weekly: 0,
+                monthly: 0,
             }
         }
     },
@@ -37,8 +38,24 @@ const store = createStore({
         uploadChannel (state,channelInfo) {
             state.currentChannel.chName = channelInfo.chName;
             state.currentChannel.chDescription = channelInfo.chDescription;
+        },
+        setQuota (state, quota) {
+            console.log(quota)
+            state.remainingQuota.daily = quota.daily;
+            state.remainingQuota.weekly = quota.weekly;
+            state.remainingQuota.monthly = quota.monthly;
+        },
+        uploadQuota (state, used) {
+            state.remainingQuota.daily -= used;
+            state.remainingQuota.weekly -= used;
+            state.remainingQuota.monthly -= used;
         }
     },
+    getters:{
+        getQuota(state){
+            return state.remainingQuota;
+        }
+    }
 })
 
 const router = createRouter({

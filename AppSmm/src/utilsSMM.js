@@ -107,6 +107,19 @@ async function getPosts(query){
     }
 }
 
+async function getUserQuota() {
+    try{
+        let res = await fetch(`/db/user/quota?user=${currentVip.value}`,{
+            method:'GET',
+        })
+        return (await res.json());
+    }
+    catch (err) {
+        throw err;
+    }
+}
+
+
 
 export{
     getPage,
@@ -118,4 +131,5 @@ export{
     filterValues,
     getPosts,
     reactionsIcons,
+    getUserQuota,
 }

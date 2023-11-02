@@ -16,12 +16,12 @@
   onMounted(async ()=>{
     modalState.myModal = new Modal('#choiceModal',{});
 
-    console.log(smm.value);
-
     let res = await fetch(`/db/getVips?SMMname=${smm.value}`,{
       method:"GET"
     })
     vips = await res.json()
+
+    console.log(vips);
 
     requestCompleted.value=true;
   })
