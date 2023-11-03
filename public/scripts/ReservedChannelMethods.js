@@ -25,9 +25,7 @@ const addOfficialChannel = async (body,credentials,creator) => {
         let newChannel = new ReservedChannel({
             name: name,
             creator: creator.name,
-            postList: {posts: []},
             description: body.description,
-            administrators: {users: []},
         });
         //save new reserved channel in DB
         await newChannel.save();
@@ -36,68 +34,6 @@ const addOfficialChannel = async (body,credentials,creator) => {
     }
     catch(err){
         await mongoose.connection.close();
-        console.log(err);
-        throw err;
-    }
-}
-
-
-/*const addFollower = async (body, credentials) => {
-    await connectdb(credentials);
-    //controlla se l'utente è presente nel database
-    let user = await searchByUsername(body,credentials);
-    //controllo se l'utente è già presente nel canale
-    let isInChannel = await ReservedChannel.findOne({$and: [{name: body.channel},{'followers.users': {$elemMatch: {$eq: user.username}}}]} );
-    if(isInChannel) {
-        let err = new Error("Utente già follower");
-        err.statusCode = 400;       // 400 ??
-        console.log(err);
-        throw err;
-    }
-    else {
-        //aggiunta nel canale
-        let channel = await ReservedChannel.findOneAndUpdate({name: body.channel},
-            {$push: {'followers.users': user.username}, new: true}).lean();
-        if (!channel) {
-            let err = new Error("Nessun canale trovato!");
-            err.statusCode = 400;       // 400 ??
-            console.log(err);
-            throw err;
-        }
-        await mongoose.connection.close();
-        return channel
-    }
-}
-*/
-const addAdmin = async (body, credentials) => {
-    await connectdb(credentials);
-    //controlla se l'utente è presente nel database
-    let user = await searchByUsername(body,credentials);
-    //controllo se utente è moderatore
-    if(user.typeUser === 'mod') {
-        //controllo se l'utente è già presente nel canale
-        let isInChannel = await ReservedChannel.findOne({$and: [{name: body.channel}, {'administrators.users': {$elemMatch: {$eq: user.username}}}]});
-        if (isInChannel) {
-            let err = new Error("Utente già amministratore");
-            err.statusCode = 400;       // 400 ??
-            console.log(err);
-            throw err;
-        } else {
-            //aggiunta nel canale
-            let channel = await ReservedChannel.findOneAndUpdate({name: body.channel},
-                {$push: {'administrators.users': user.username}, new: true}).lean();
-            if (!channel) {
-                let err = new Error("Nessun canale trovato!");
-                err.statusCode = 400;       // 400 ??
-                throw err;
-            }
-            await mongoose.connection.close();
-            return channel
-        }
-    }
-    else {
-        let err = new Error("Utente non moderatore");
-        err.statusCode = 400;       // 400 ??
         console.log(err);
         throw err;
     }
@@ -187,7 +123,6 @@ const modifyDescription = async (body, credentials) => {
 
 module.exports = {
     addOfficialChannel,
-    addAdmin,
     deleteChannel,
     getChannels,
     channelsLength,

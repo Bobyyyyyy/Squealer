@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const Post = require("../models/Post");
 const User = require("../models/User");
 const Channel = require("../models/Channel")
+const ReservedChannel = require("../models/ReservedChannel");
 const {connectdb, createError} = require("./utils");
 
 
@@ -10,7 +11,6 @@ const addPost = async (body,credentials) => {
         await connectdb(credentials)
 
         /* ERROR HANDLING */
-
         /* utente non esiste  */
         if(body.destType === 'user' && !(await User.findOne({username: body.receiver})) ){
             await mongoose.connection.close();
@@ -20,6 +20,12 @@ const addPost = async (body,credentials) => {
         else if(body.destType === 'channel' && !(await Channel.findOne({name: body.receiver}))){
             await mongoose.connection.close();
             throw createError("canale non esistente!",422);
+        }
+        /* canale ufficiale non esiste e l'utente non mod*/
+        else if(body.destType === 'official' && (!(await ReservedChannel.findOne({name: body.receiver}))
+            || (await User.findOne({username: body.name},'typeUser')).typeUser !== 'mod')){
+            await mongoose.connection.close();
+            throw createError("canale ufficiale non esistente o utente non moderatore!",422);
         }
         /* tipo di destinatario non inserito */
         else if (body.destType === 'receiver'){     /* DA VEDERE CON ALE COME MODIFICARE */
@@ -98,7 +104,36 @@ const getAllPost = async (query,credentials) =>{
     }
 }
 
+const deletePost = async (body,credentials) => {
+    try{
+        await connectdb(credentials);
+
+
+        //controllo se sei il creatore e se esiste il post
+        if (!(await Post.findOne({_id: body.id, creator: body.name},'creator').lean())) {
+            // se non sei il creatore controlla se sei mod
+            if(body.type !== 'mod') {
+                let err = new Error("Rimozione non valida");
+                err.statusCode = 400;
+                throw err;
+            }
+        }
+
+        let postToDelete = await Post.findByIdAndRemove(body.id).lean();
+        await mongoose.connection.close();
+        return postToDelete;
+    }
+    catch(err){
+        console.log(err);
+        throw err;
+    }
+}
+
+
+
+
 module.exports = {
     addPost,
-    getAllPost
+    getAllPost,
+    deletePost
 }

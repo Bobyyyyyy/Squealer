@@ -36,10 +36,8 @@ function getChannels (limit,offset,filter) {
             $('#pages').empty();
             let html = `${$.map(data,(channel) => `
             <div class="mt-3 mx-auto rounded d-flex flex-row align-items-center text-center channeldiv" onclick="window.location.href = 'officialChannels/${channel.name}'" style="height:6vh; width: 90vw;">
-                <div style="width: 25%;"> §${channel.name}</> </div>
-                <div style="width: 25%;"> @${channel.creator}</> </div> 
-                <div style="width: 25%"> ${channel.administrators.users.length}</div>
-                <div style="width: 25%"> ${channel.postList.posts.length} </div>
+                <div style="width: 50%;"> §${channel.name}</> </div>
+                <div style="width: 50%;"> @${channel.creator}</> </div> 
             </div>`).join('\n')}`;
 
             if (offset !== 0) {

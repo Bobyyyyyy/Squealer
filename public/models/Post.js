@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const {ObjectId} = require("mongodb");
 const contentTypes = ['geoloc','text','image']
-const destTypes = ['channel', 'user']
+const destTypes = ['channel', 'user','official']
 const reactionTypes = ['love','like','meh','disagreement','hate']
 
 const PostSchema = new mongoose.Schema({

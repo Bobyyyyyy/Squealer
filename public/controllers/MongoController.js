@@ -1,7 +1,7 @@
-const {addPost, getAllPost} = require('../scripts/postMethods');
+const {addPost, getAllPost, deletePost} = require('../scripts/postMethods');
 const {addUser, searchByUsername, changePwsd, getUsers, usersLength, altUser, getHandledVip} = require('../scripts/userMethods');
 const {mongoCredentials} = require('../scripts/utils.js')
-const {addOfficialChannel, addFollower, addAdmin, deleteChannel, channelsLength, getChannels, searchByChannelName,
+const {addOfficialChannel, deleteChannel, channelsLength, getChannels, searchByChannelName,
     modifyDescription
 } = require("../scripts/ReservedChannelMethods");
 const {addChannel, channelVipList, checkUserChannel} = require("../scripts/ChannelMethods");
@@ -95,16 +95,6 @@ const createReservedChannel = async (req,res,next) => {
         res.send(error);
     }
 }
-
-const addAdmins = async (req,res) => {
-    try {
-        res.send(await addAdmin(req.body,mongoCredentials))
-    }
-    catch(error) {
-        res.send(error);
-    }
-}
-
 const deleteCh = async (req,res) => {
     try {
         res.send(await deleteChannel(req.body,mongoCredentials));
@@ -179,6 +169,17 @@ const checkUserInChannel = async (req,res) => {
     }
 }
 
+
+const removePost = async (req,res) => {
+    try {
+        let body = {id: req.body.id, name: req.session.user, type: req.session.type}
+        res.send(await deletePost(body,mongoCredentials))
+    }
+    catch(error) {
+        res.send(error);
+    }
+}
+
 module.exports = {
     createUser,
     createPost,
@@ -190,7 +191,6 @@ module.exports = {
     modifyUser,
     getVips,
     createReservedChannel,
-    addAdmins,
     deleteCh,
     getChannelsNumber,
     getChannel,
@@ -199,5 +199,6 @@ module.exports = {
     getPosts,
     channel,
     modifyDesc,
-    checkUserInChannel
+    checkUserInChannel,
+    removePost
 }

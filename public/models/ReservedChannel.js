@@ -15,28 +15,6 @@ const ReservedChannelSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-
-    postList: {
-        type: {
-            posts: [{
-                type: String,     //post
-            }
-            ],
-        },
-        required: true
-    },
-
-    administrators: {
-        type: {
-            users: [
-                    {
-                        type: String,
-                        required: true,
-                    }
-            ],
-        },
-        required: true
-    }
 })
 
 const ReservedChannel = mongoose.model("ReservedChannel", ReservedChannelSchema);
