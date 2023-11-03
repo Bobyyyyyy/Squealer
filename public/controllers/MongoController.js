@@ -1,5 +1,5 @@
-const {addPost, getAllPost, deletePost} = require('../scripts/postMethods');
-const {addUser, searchByUsername, changePwsd, getUsers, usersLength, altUser, getHandledVip} = require('../scripts/userMethods');
+const {addPost, getAllPost, deletePost, updateReac, deleteReac} = require('../scripts/postMethods');
+const {addUser, searchByUsername, changePwsd, getUsers, usersLength, altUser, getHandledVip,getUserQuota} = require('../scripts/userMethods');
 const {mongoCredentials} = require('../scripts/utils.js')
 const {addOfficialChannel, deleteChannel, channelsLength, getChannels, searchByChannelName,
     modifyDescription
@@ -25,6 +25,19 @@ const changePassword = async (req,res) => {
 
 const getSessionUser = async (req,res) => {
     res.send({username: req.session.user});
+}
+
+const updateSessionVip = async (req,res) => {
+    try{
+        req.session.vip = req.body.vipName;
+        req.session.save();
+        res.send({vip: req.session.vip})
+    }catch (e) {
+        console.log(e)
+    }
+}
+const getSessionVip = async (req,res) => {
+    res.send({vip: req.session.vip})
 }
 
 const modifyUser = async(req,res) => {
@@ -63,6 +76,15 @@ const getVips = async (req,res) => {
     }
 }
 
+const getQuota = async (req,res) => {
+    try {
+        res.send(await getUserQuota(req.query,mongoCredentials));
+    }
+    catch (error) {
+        res.send(error);
+    }
+}
+
 /* Post Methods */
 const createPost = async (req,res) => {
     try{
@@ -77,6 +99,24 @@ const createPost = async (req,res) => {
 const getPosts = async (req,res) => {
     try {
         res.send(await getAllPost(req.query,mongoCredentials))
+    }
+    catch(error) {
+        res.send(error);
+    }
+}
+
+const updateReaction = async (req,res) => {
+    try {
+        res.send(await updateReac(req.body,mongoCredentials))
+    }
+    catch(error) {
+        res.send(error);
+    }
+}
+
+const deleteReaction = async (req,res) => {
+    try {
+        res.send(await deleteReac(req.body,mongoCredentials))
     }
     catch(error) {
         res.send(error);
@@ -200,5 +240,10 @@ module.exports = {
     channel,
     modifyDesc,
     checkUserInChannel,
-    removePost
+    removePost,
+    updateReaction,
+    deleteReaction,
+    getSessionVip,
+    updateSessionVip,
+    getQuota
 }

@@ -1,19 +1,26 @@
 <script setup>
-  import {ref} from "vue";
+import {computed, onBeforeUpdate, onMounted, ref} from "vue";
   import {currentVip} from "../utilsSMM";
-
-
+  import {useStore} from "vuex";
+  const store = useStore();
 
   const postType = ref('Select type')
   const destType = ref('receiver')
   const receiverName = ref('')
   const imgUrl = ref('')
-  let currentImg = ref('')
+  const currentImg = ref('')
   const showImg = ref(false)
+  const textSqueal = ref('')
+
+  const quota2remove = computed(() => postType.value ==='text' ? textSqueal.value.length : postType.value ==='Select type' ? 0 : 15);
+  /* 15 è il valore tolto per immagie e geolocalizzazione */
+  const getLiveDQuota = computed(()=> (store.getters.getQuota.daily - quota2remove.value));
+  const getLiveWQuota = computed(()=> (store.getters.getQuota.weekly - quota2remove.value))
+  const getLiveMQuota = computed(()=> (store.getters.getQuota.monthly - quota2remove.value))
 
   async function createPost() {
     try{
-      let cnt = postType.value == 'image' ? imgUrl.value : document.getElementById("textPost").value;
+      let cnt = postType.value == 'image' ? imgUrl.value : textSqueal.value;
 
       let post = {
         name: currentVip.value,
@@ -39,8 +46,6 @@
     catch (err){
       alert(err.mes)
     }
-
-
   }
 
   function reset(){
@@ -51,11 +56,6 @@
     currentImg.value= ''
     showImg.value = false
   }
-
-/*TODO
-  fare richiesta e prendere i canali in cui posso scrivere, per far diminuire il numero di errori
-  capire come gestire la risposta del server in caso in cui l'utente non esista
- */
 
 </script>
 
@@ -96,9 +96,9 @@
           </div>
           <div class="paddingEqual">
 
-            <textarea rows="6" id="textPost" v-if=" postType == 'text'" class="form-control"></textarea>
+            <textarea rows="6" v-model="textSqueal" v-if=" postType == 'text'" class="form-control"></textarea>
 
-            <div v-if="postType == 'image'" class="d-flex flex-column">
+            <div v-if="postType == 'image'"  class="d-flex flex-column">
 
               <div class="input-group d-flex flex-row">
                 <input class="w-75" type="text" placeholder="insert URL" id="pathImg" v-model="imgUrl" >
@@ -114,6 +114,15 @@
               </div>
               <!--Aggiungere altri tipi di post-->
             </div>
+          </div>
+          <div :class="getLiveDQuota < 0 ? 'justify-content-evenly':'justify-content-center'" class="d-flex flex-row w-100 ms-3 me-3">
+              <h6 v-if="getLiveDQuota < 0">extra: {{-getLiveDQuota}}</h6>
+            <div class="d-flex flex-row">
+              <h6 :class="getLiveDQuota < 0 ? 'text-danger':''">{{getLiveDQuota}}</h6>
+              <h6 :class="getLiveWQuota < 0 ? 'text-danger':''">/{{getLiveWQuota}}</h6>
+              <h6 :class="getLiveMQuota < 0 ? 'text-danger':''">/{{getLiveMQuota}}</h6>
+            </div>
+
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-danger"

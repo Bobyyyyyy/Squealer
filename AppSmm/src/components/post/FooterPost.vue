@@ -1,17 +1,63 @@
 <script setup>
   import Reaction from "./Reaction.vue";
-  import {reactionsIcons} from "../../utilsSMM";
-  import {ref} from "vue";
+  import {currentVip, reactionsIcons} from "../../utilsSMM";
+  import {onMounted, reactive, ref} from "vue";
 
-  defineProps({
-      reactions: Array
+  const props = defineProps({
+    reactions: Array,
+    postId: String
   });
 
-  const currentActive = ref('noOne');
+  const parsedReac = reactive ({
+    'heart': 0,
+    'thumbs-up': 0,
+    'thumbs-down': 0,
+    'heartbreak': 0,
+  })
 
-  const changeReac = (newReac) => {
+
+  const currentActive = ref('');
+
+  const changeReac = async (newReac) => {
+    if (currentActive.value !== 'noOne'){
+        parsedReac[currentActive.value] -= 1;
+    }
     currentActive.value = newReac;
+    parsedReac[currentActive.value] += 1;
+    await fetch(`/db/post/updateReaction`,{
+      method:"PUT",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body:JSON.stringify({
+        postId: props.postId,
+        user: currentVip,
+        reaction: newReac,
+      })
+    })
   }
+
+  const deleteReac = async () => {
+    parsedReac[currentActive.value] -= 1;
+    currentActive.value = 'noOne';
+    await fetch(`/db/post/deleteReaction`,{
+      method:"PUT",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body:JSON.stringify({
+        postId: props.postId,
+        user: currentVip,
+      })
+    })
+  }
+
+  onMounted(async ()=>{
+    props.reactions.forEach(el => {
+      if (el.user === currentVip.value) currentActive.value = el.rtype
+      parsedReac[el.rtype] += 1;
+    });
+  })
 
 </script>
 
@@ -21,15 +67,13 @@
 
       <Reaction v-for="(reaction,index) in reactionsIcons"
                 :key="index"
-                :values="100"
+                :values="(parsedReac[reaction.name])"
                 :icon="reaction"
                 :active="currentActive"
                 @changeReac="(newReac) => changeReac(newReac)"
-                @deleteReac="() => {currentActive='NoOne'}"
+                @deleteReac="() => deleteReac() "
       />
     </div>
-
-
 
 
     <!--

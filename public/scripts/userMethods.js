@@ -186,7 +186,20 @@ const getHandledVip = async (query,credentials) => {
     }
 }
 
+const getUserQuota = async (query,credentials) => {
+    try {
+        await connectdb(credentials);
+        let quota = (await User.findOne({username: query.user},'characters')).characters;
+        console.log(quota)
 
+        await mongoose.connection.close();
+
+        return quota;
+    }
+    catch (Error){
+        throw Error;
+    }
+}
 
 //manca un delete per provare le principali API
 
@@ -198,5 +211,6 @@ module.exports = {
     getUsers,
     usersLength,
     altUser,
-    getHandledVip
+    getHandledVip,
+    getUserQuota
 }

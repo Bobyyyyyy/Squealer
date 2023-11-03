@@ -35,7 +35,6 @@ const sideBarElements = [
 const postType = ['geolocalization','text','image', 'all']
 const sortPosts = ['più recente', 'meno recente', 'meno visual', 'più visual', 'reaction positive', 'reaction negative']
 const filterValues =['public', 'private', 'user', 'keyword', 'all']
-
 const reactionsIcons = [
     /*
         0 -> heart
@@ -93,13 +92,6 @@ const reactionsIcons = [
 const smm = ref('');
 const currentVip = ref('')
 
-function getSMMname(){
-    return smm.value;
-}
-function getVIPname(){
-    return currentVip.value
-}
-
 function getPage(){
     return window.location.pathname.split('/')[2];
 }
@@ -115,10 +107,21 @@ async function getPosts(query){
     }
 }
 
+async function getUserQuota() {
+    try{
+        let res = await fetch(`/db/user/quota?user=${currentVip.value}`,{
+            method:'GET',
+        })
+        return (await res.json());
+    }
+    catch (err) {
+        throw err;
+    }
+}
+
+
 
 export{
-    getSMMname,
-    getVIPname,
     getPage,
     smm,
     sideBarElements,
@@ -127,5 +130,6 @@ export{
     sortPosts,
     filterValues,
     getPosts,
-    reactionsIcons
+    reactionsIcons,
+    getUserQuota,
 }

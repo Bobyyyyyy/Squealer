@@ -4,15 +4,16 @@ import Channel from "../components/channels/Channel.vue";
 import {onMounted, reactive, ref} from "vue";
 import {Modal} from "bootstrap";
 import AddChannelModal from "../components/channels/AddChannelModal.vue";
-import {getVIPname} from "../utilsSMM";
+import {currentVip} from "../utilsSMM";
 
 let channels = []
 const channelsReady = ref(false);
 
 const modalState = reactive({Modal: null,})
-onMounted(() => { modalState.ChannelModal = new Modal('#AddChannelModal',{})})
 onMounted(async () => {
-  let res = await fetch(`/db/Channel/list?vipName=${getVIPname()}`,{
+  modalState.ChannelModal = new Modal('#AddChannelModal',{})
+
+  let res = await fetch(`/db/Channel/list?vipName=${currentVip.value}`,{
     method:"GET"
   });
   channels = await res.json();

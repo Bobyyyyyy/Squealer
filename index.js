@@ -7,11 +7,18 @@ global.frontViews = __dirname + "/Frontpage/views"
 global.startDate = null;
 
 
-
 const express = require('express');
 const cors = require('cors');
 const {dbname} = require("./public/scripts/utils");
 const {isSMM} = require("./Frontpage/controllers/FrontPageController");
+
+const storeSession = MongoStore.create({
+    mongoUrl: 'mongodb://localhost:27017',
+    dbName: dbname,
+    clear_interval: 660,
+    ttl: 600,
+    stringify: false,
+})
 
 let app = express();
 
@@ -21,13 +28,7 @@ app.use(session({
     secret: 'sburo',
     resave: false,
     saveUninitialized: false,
-    store: MongoStore.create({
-        mongoUrl: 'mongodb://localhost:27017',
-        dbName: dbname,
-        clear_interval: 660,
-        ttl: 600,
-        stringify: false,
-    }),
+    store: storeSession,
 }));
 
 //https://dev.to/alisinayousofi/why-we-use-appuseexpressjson-in-our-express-web-app-384

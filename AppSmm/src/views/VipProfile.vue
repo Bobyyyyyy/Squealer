@@ -1,28 +1,24 @@
 <script setup>
-  import {onMounted, ref} from "vue";
+import {computed, onMounted, ref} from "vue";
   import Post from "../components/post/Post.vue";
-  import {filterValues, getPosts, getVIPname, postType, sortPosts} from "../utilsSMM";
+  import {currentVip, filterValues, getPosts, getUserQuota, postType, sortPosts} from "../utilsSMM";
   import Dropdown from "../components/Dropdown.vue";
+  import {useStore} from "vuex";
 
+  const store = useStore();
+  let nFoll = 10;
+  let nPost = 10;
 
   const readyPosts = ref(false);
 
   const profilePicturePath ="/img/profilePicture.png";
-  const nFoll = 10;
-  const nPost = 500;
-
-  const quotaRes = {
-    daily: 10,
-    weekly: 180,
-    monthly: 12000
-  }
 
   const keyWordFilter = ref(false);
   const destFilter = ref('Filter');
   const typePostFilter = ref('Type');
   const sortFilter = ref('Sort');
 
-  let query = `name=${getVIPname()}`
+  let query = ''
 
   let curPosts = []
 
@@ -48,7 +44,6 @@
     curPosts = await getPosts(query)
     readyPosts.value=true
   }
-
   async function updateDestFilter(newText){
     readyPosts.value=false
 
@@ -67,13 +62,13 @@
   }
 
   onMounted(async ()=>{
-    try {
-      readyPosts.value=false
-      curPosts = await getPosts(query)
-      readyPosts.value=true
-    } catch (e) {
-      console.log(e)
-    }
+    readyPosts.value=false
+    query = `name=${currentVip.value}`
+
+    store.commit('setQuota',await getUserQuota())
+
+    curPosts = await getPosts(query)
+    readyPosts.value=true
   })
 
 </script>
@@ -96,11 +91,11 @@
           </div>
         </div>
         <div>
-          <p class="m-0 fs-3 text-center">{{ getVIPname() }}</p>
+          <p class="m-0 fs-3 text-center">{{ currentVip }}</p>
         </div>
         <div>
           <p class="m-0">Quota rimanente:</p>
-          <p>{{quotaRes.daily}}/{{quotaRes.weekly}}/{{quotaRes.monthly}}</p>
+            <p>{{[store.getters.getQuota.daily,store.getters.getQuota.weekly,store.getters.getQuota.monthly].join('/')}}</p>
         </div>
       </div>
       <div class="d-flex flex-row justify-content-between">
@@ -133,13 +128,15 @@
         </div>
       </div>
       <div v-if="readyPosts" class="d-flex flex-row flex-wrap justify-content-around mt-3">
-        <Post v-for="(post,i) in curPosts" :key="i"
+        <Post v-for="post in curPosts" :key="post._id"
               :user="post.owner"
               :dest= "post.destination.destType === 'channel'? `§${post.destination.name}`:`@${post.destination.name}`"
               :content="post.content"
               :creationDate="post.dateOfCreation"
+              :reactions = "post.reactions"
               :contentType = "post.contentType"
               :destType = "post.destination.destType"
+              :postId = "post._id"
               picProfile = "/img/defaultUser.jpeg"
         />
       </div>

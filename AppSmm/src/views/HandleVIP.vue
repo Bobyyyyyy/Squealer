@@ -4,7 +4,7 @@
   import VipModal from "../components/handleVip/VipModal.vue";
   import {onMounted, reactive, ref} from "vue";
   import {Modal} from 'bootstrap'
-  import {getSMMname} from "../utilsSMM";
+  import {smm} from "../utilsSMM";
 
   let vips = [];
 
@@ -13,15 +13,16 @@
   const name2Use = ref('')
   const requestCompleted = ref(false);
 
-  onMounted(()=>{
-    modalState.myModal = new Modal('#choiceModal',{})
-  })
-
   onMounted(async ()=>{
-    let res = await fetch(`/db/getVips?SMMname=${getSMMname()}`,{
+    modalState.myModal = new Modal('#choiceModal',{});
+
+    let res = await fetch(`/db/getVips?SMMname=${smm.value}`,{
       method:"GET"
     })
     vips = await res.json()
+
+    console.log(vips);
+
     requestCompleted.value=true;
   })
 
@@ -35,7 +36,6 @@
     modalState.myModal.hide()
   }
 
-
 </script>
 
 <template>
@@ -48,8 +48,9 @@
             @setModal = " (username) => openModal(username)"
     />
   </div>
+
   <VipModal
-            :SMMname="getSMMname()"
+            :SMMname="smm"
             :VIPname="name2Use"
             @closeModal = "closeModal()"
 

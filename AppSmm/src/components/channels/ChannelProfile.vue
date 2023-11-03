@@ -2,7 +2,7 @@
   import {computed, onMounted, ref} from "vue";
   import {useStore} from "vuex";
   import Post from "../post/Post.vue";
-  import {getPosts, getVIPname, postType, sortPosts} from "../../utilsSMM";
+  import {currentVip, getPosts, postType, sortPosts} from "../../utilsSMM";
   import Dropdown from "../Dropdown.vue";
 
   const store = useStore()
@@ -13,7 +13,7 @@
   const sortFilter = ref('Sort');
   const readyPosts = ref(false);
 
-  let query = `name=${getVIPname()}&channel=${chInfo.value.chName}`
+  let query = ''
   let curPosts = []
 
   async function updateSortFilter(newText){
@@ -40,13 +40,10 @@
  }
 
   onMounted(async ()=>{
-    try {
-      readyPosts.value=false
-      curPosts = await getPosts(query)
-      readyPosts.value=true
-    } catch (e) {
-      console.log(e)
-    }
+    query =`name=${currentVip.value}&channel=${chInfo.value.chName}`;
+    readyPosts.value=false
+    curPosts = await getPosts(query)
+    readyPosts.value=true
   })
 
 </script>
@@ -78,14 +75,16 @@
         />
       </div>
       <div v-if="readyPosts" class="d-flex flex-row flex-wrap justify-content-around mt-3">
-        <Post v-for="(post,i) in curPosts" :key="i"
+        <Post v-for="post in curPosts" :key="post._id"
               :user="post.owner"
-              :dest= "(post.destination.destType === 'channel'? `§`:`@`) + post.destination.name"
+              :dest= "post.destination.destType === 'channel'? `§${post.destination.name}`:`@${post.destination.name}`"
               :content="post.content"
-              picProfile = "/img/defaultUser.jpeg"
               :creationDate="post.dateOfCreation"
+              :reactions = "post.reactions"
               :contentType = "post.contentType"
               :destType = "post.destination.destType"
+              :postId = "post._id"
+              picProfile = "/img/defaultUser.jpeg"
         />
       </div>
     </div>

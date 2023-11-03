@@ -1,10 +1,26 @@
 <script setup>
-  import {currentVip} from "../../utilsSMM";
 
-  defineProps({
+
+import {currentVip} from "../../utilsSMM";
+
+  const props = defineProps({
     SMMname: String,
     VIPname: String,
   })
+
+  async function updateSes (){
+    {
+      let res = await fetch("/db/sessionVip",{
+        method:"PUT",
+        headers:{
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({vipName: props.VIPname})
+        })
+      currentVip.value = (await res.json()).vip;
+      console.log(currentVip.value);
+    }
+  }
 
 </script>
 
@@ -25,9 +41,11 @@
           <button type="button" class="btn btn-primary"
                   @click=
                       "
-                      currentVip = VIPname
+                      async ()=>{
+                      await updateSes();
                       this.$router.push('/SMM/Profile');
-                      $emit('closeModal')
+                      $emit('closeModal');
+                      }
                       ">
           Si, continua</button>
         </div>
