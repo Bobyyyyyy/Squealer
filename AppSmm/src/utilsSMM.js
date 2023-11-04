@@ -32,7 +32,7 @@ const sideBarElements = [
         text:"Buy Quota"
     }
 ]
-const postType = ['geolocalization','text','image', 'all']
+const postType = ['geolocation','text','image', 'all']
 const sortPosts = ['più recente', 'meno recente', 'meno visual', 'più visual', 'reaction positive', 'reaction negative']
 const filterValues =['public', 'private', 'user', 'keyword', 'all']
 const reactionsIcons = [
@@ -96,12 +96,15 @@ function getPage(){
     return window.location.pathname.split('/')[2];
 }
 
-async function getPosts(query){
+async function getPosts(query,offset){
     try{
-        let res = await fetch(`/db/posts?${query}`,{
+        let res = await fetch(`/db/posts?${query}&offset=${offset}`,{
             method:"GET",
         });
-        return (await res.json()).map(post => { return {...post, dateOfCreation: new Date(Date.parse(post.dateOfCreation))} });
+        let posts = (await res.json()).map(post => { return {...post, dateOfCreation: new Date(Date.parse(post.dateOfCreation))} });
+        console.log(posts);
+        if (posts) return posts;
+        else throw posts;
     }catch (e) {
         throw e
     }
@@ -118,7 +121,6 @@ async function getUserQuota() {
         throw err;
     }
 }
-
 
 
 export{

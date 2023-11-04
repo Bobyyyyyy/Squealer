@@ -1,5 +1,5 @@
 <script setup>
-import {computed, onMounted, ref} from "vue";
+import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
   import Post from "../components/post/Post.vue";
   import {currentVip, filterValues, getPosts, getUserQuota, postType, sortPosts} from "../utilsSMM";
   import Dropdown from "../components/Dropdown.vue";
@@ -9,6 +9,8 @@ import {computed, onMounted, ref} from "vue";
   let nFoll = 10;
   let nPost = 10;
 
+
+
   const readyPosts = ref(false);
 
   const profilePicturePath ="/img/profilePicture.png";
@@ -17,10 +19,11 @@ import {computed, onMounted, ref} from "vue";
   const destFilter = ref('Filter');
   const typePostFilter = ref('Type');
   const sortFilter = ref('Sort');
+  const offset = ref(0);
 
   let query = ''
 
-  let curPosts = []
+  let curPosts = reactive([]);
 
   async function updatePostType(newText){
     readyPosts.value=false
@@ -30,7 +33,7 @@ import {computed, onMounted, ref} from "vue";
 
     typePostFilter.value=newText
 
-    curPosts = await getPosts(query)
+    curPosts = (await getPosts(query,0))
     readyPosts.value=true
   }
   async function updateSortFilter(newText){
@@ -41,7 +44,7 @@ import {computed, onMounted, ref} from "vue";
 
     sortFilter.value = newText
 
-    curPosts = await getPosts(query)
+    curPosts = (await getPosts(query,0))
     readyPosts.value=true
   }
   async function updateDestFilter(newText){
@@ -57,24 +60,38 @@ import {computed, onMounted, ref} from "vue";
 
     destFilter.value = newText;
 
-    curPosts = await getPosts(query)
+    curPosts = (await getPosts(query,0))
     readyPosts.value=true
   }
 
-  onMounted(async ()=>{
-    readyPosts.value=false
+  async function updatePost(){
+    offset.value += 12;
+    curPosts.push(...(await getPosts(query,offset.value)));
+  }
+
+  let scrollendHandler = async () => await(updatePost())
+
+    onMounted(async ()=> {
+    readyPosts.value = false
     query = `name=${currentVip.value}`
+    window.addEventListener("scrollend", scrollendHandler);
 
-    store.commit('setQuota',await getUserQuota())
+    store.commit('setQuota', await getUserQuota())
 
-    curPosts = await getPosts(query)
-    readyPosts.value=true
+    curPosts.push(...(await getPosts(query, 0)));
+    readyPosts.value = true
   })
+
+  onUnmounted(() => {
+    window.removeEventListener("scrollend",scrollendHandler);
+    offset.value = 0;
+  })
+
 
 </script>
 
 <template>
-  <div class="centralDiv">
+  <div id="bodyDiv" class="centralDiv">
     <div class="marginCD">
       <div class="d-flex flex-row justify-content-center  profileDim">
         <div class="aspect-ratio object-fit-fill profileDim">
@@ -127,7 +144,7 @@ import {computed, onMounted, ref} from "vue";
           />
         </div>
       </div>
-      <div v-if="readyPosts" class="d-flex flex-row flex-wrap justify-content-around mt-3">
+      <div id="postContainer" v-if="readyPosts" class="d-flex flex-row flex-wrap justify-content-around mt-3">
         <Post v-for="post in curPosts" :key="post._id"
               :user="post.owner"
               :dest= "post.destination.destType === 'channel'? `§${post.destination.name}`:`@${post.destination.name}`"
