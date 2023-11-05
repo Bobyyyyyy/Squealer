@@ -145,7 +145,7 @@ import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
         </div>
       </div>
       <div id="postContainer" v-if="readyPosts" class="d-flex flex-row flex-wrap justify-content-around mt-3">
-        <Post v-for="post in curPosts" :key="post._id"
+        <Post v-for="(post,i) in curPosts" :key="post._id"
               :user="post.owner"
               :dest= "post.destination.destType === 'channel'? `§${post.destination.name}`:`@${post.destination.name}`"
               :content="post.content"
@@ -154,6 +154,7 @@ import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
               :contentType = "post.contentType"
               :destType = "post.destination.destType"
               :postId = "post._id"
+              :numberOfPost="i"
               picProfile = "/img/defaultUser.jpeg"
         />
       </div>

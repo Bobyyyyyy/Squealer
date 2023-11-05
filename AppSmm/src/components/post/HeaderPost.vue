@@ -10,22 +10,12 @@
     destType:String,
   })
 
-  function go2Profile(){
-    //fare qnpm ui fetch o al caricamento della pagina?
-    //let newUrl = "../profile/" + userName;
-    //routing
-    console.log("vado da "+ props.name);
-  }
-
   function go2Channel(){
     //leggi sopra
     console.log("vado nel canale: " +  props.channel);
     //quindi ci sarà un emits con routing
   }
 
-  function isInChannels(){
-    return (getPage() !=='Channels') && (props.destType ==='channel');
-  }
 
   function parseTime(){
     let now = new Date().getTime()
@@ -46,10 +36,12 @@
 <template>
   <div class="card-header d-flex justify-content-between header_post ">
     <div class="d-flex justify-content-start align-items-center ">
-      <img @click="go2Profile" :src=" srcImg " alt="immagine profilo" class="imgFluid" />
+      <img :src=" srcImg " alt="immagine profilo" class="imgFluid" />
       <div class="d-flex flex-column flex-fill">
-        <h3 @click="go2Profile" class="mb-0 setMargin"> {{ name }} </h3>
-        <h5 v-if="isInChannels()" @click="go2Channel" class="mb-0" id="ChannelName"> {{dest}} </h5>
+        <h3 class="mb-0 setMargin"> {{ name }} </h3>
+        <h5 v-if="getPage() !=='Channels'" @click="go2Channel" type="button" class="mb-0" id="ChannelName"> {{dest}} </h5>
+
+
       </div>
     </div>
     <div class="d-flex text-center align-items-center ">

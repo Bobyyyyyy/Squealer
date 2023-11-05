@@ -19,8 +19,6 @@ const sorts = {
     }
 }
 
-
-
 const addPost = async (body,credentials) => {
     try{
         await connectdb(credentials)
