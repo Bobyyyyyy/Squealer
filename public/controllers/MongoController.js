@@ -1,5 +1,5 @@
-const {addPost, getAllPost, updateReac, deleteReac} = require('../scripts/postMethods');
-const {addUser, searchByUsername, changePwsd, getUsers, usersLength, altUser, getHandledVip,getUserQuota} = require('../scripts/userMethods');
+const {addPost, getAllPost, updateReac, deleteReac, getLastPostUser} = require('../scripts/postMethods');
+const {addUser, searchByUsername, changePwsd, getUsers, usersLength, altUser, getHandledVip,getUserQuota,get_n_FollnPosts} = require('../scripts/userMethods');
 const {mongoCredentials} = require('../scripts/utils.js')
 const {addOfficialChannel, addFollower, addAdmin, deleteChannel, channelsLength, getChannels, searchByChannelName,
     modifyDescription
@@ -81,6 +81,23 @@ const getQuota = async (req,res) => {
         res.send(await getUserQuota(req.query,mongoCredentials));
     }
     catch (error) {
+        res.send(error);
+    }
+}
+
+const getFollnPosts = async(req,res)=> {
+    try {
+        res.send(await get_n_FollnPosts(req.query,mongoCredentials));
+    }
+    catch (error) {
+        res.send(error);
+    }
+}
+
+const getLastPost = async(req,res)=> {
+    try {
+        res.send(await getLastPostUser(req.query, mongoCredentials));
+    } catch (error) {
         res.send(error);
     }
 }
@@ -244,5 +261,7 @@ module.exports = {
     deleteReaction,
     getSessionVip,
     updateSessionVip,
-    getQuota
+    getQuota,
+    getFollnPosts,
+    getLastPost
 }

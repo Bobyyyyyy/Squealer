@@ -4,9 +4,10 @@
   import VipModal from "../components/handleVip/VipModal.vue";
   import {onMounted, reactive, ref} from "vue";
   import {Modal} from 'bootstrap'
-  import {smm} from "../utilsSMM";
+  import {getLastPost, smm} from "../utilsSMM";
 
   let vips = [];
+  let lastVipsPost = [];
 
   const modalState = reactive({myModal: null,})
 
@@ -21,7 +22,9 @@
     })
     vips = await res.json()
 
-    console.log(vips);
+    for (let i = 0; i < vips.length; i++) {
+      lastVipsPost[i] = await getLastPost(vips[i])
+    }
 
     requestCompleted.value=true;
   })
@@ -45,8 +48,10 @@
             :key="index"
             :followers="100"
              :username="vip"
+             :post="lastVipsPost[index]"
             @setModal = " (username) => openModal(username)"
     />
+
   </div>
 
   <VipModal

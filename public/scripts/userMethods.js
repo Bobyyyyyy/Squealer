@@ -4,6 +4,7 @@ const bcrypt = require("bcryptjs");
 const User = require("../models/User");
 const {connectdb,saltRounds,quota} = require("./utils");
 const {json} = require("express");
+const Post = require("../models/Post");
 
 
 //POST
@@ -201,6 +202,22 @@ const getUserQuota = async (query,credentials) => {
     }
 }
 
+const get_n_FollnPosts = async(body,credentials) => {
+    try{
+        await connectdb(credentials);
+
+        let posts = await Post.find({owner: body.user});
+
+        await mongoose.connection.close();
+
+        return {nposts: posts.length};
+    }
+    catch (err){
+        throw err;
+    }
+}
+
+
 //manca un delete per provare le principali API
 
 module.exports = {
@@ -212,5 +229,6 @@ module.exports = {
     usersLength,
     altUser,
     getHandledVip,
-    getUserQuota
+    getUserQuota,
+    get_n_FollnPosts
 }

@@ -1,15 +1,11 @@
 <script setup>
 import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
   import Post from "../components/post/Post.vue";
-  import {currentVip, filterValues, getPosts, getUserQuota, postType, sortPosts} from "../utilsSMM";
+import {currentVip, filterValues, getPosts, getUserInfo, getUserQuota, postType, sortPosts} from "../utilsSMM";
   import Dropdown from "../components/Dropdown.vue";
   import {useStore} from "vuex";
 
   const store = useStore();
-  let nFoll = 10;
-  let nPost = 10;
-
-
 
   const readyPosts = ref(false);
 
@@ -20,6 +16,9 @@ import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
   const typePostFilter = ref('Type');
   const sortFilter = ref('Sort');
   const offset = ref(0);
+
+  const follower= ref(0);
+  const n_post = ref(0);
 
   let query = ''
 
@@ -71,8 +70,12 @@ import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
 
   let scrollendHandler = async () => await(updatePost())
 
-    onMounted(async ()=> {
+onMounted(async ()=> {
     readyPosts.value = false
+
+    n_post.value = (await getUserInfo()).nposts;
+    console.log(n_post.value);
+
     query = `name=${currentVip.value}`
     window.addEventListener("scrollend", scrollendHandler);
 
@@ -101,10 +104,10 @@ import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
       <div class="d-flex flex-row w-100 justify-content-between">
         <div class="d-flex flex-column ">
           <div>
-            <p class="m-0">{{nFoll}} Followers</p>
+            <p class="m-0">{{follower}} Followers</p>
           </div>
           <div>
-            <p class="m-0">{{nPost}} Posts</p>
+            <p class="m-0">{{n_post}} Posts</p>
           </div>
         </div>
         <div>
