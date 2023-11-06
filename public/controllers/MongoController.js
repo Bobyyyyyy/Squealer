@@ -105,6 +105,7 @@ const getLastPost = async(req,res)=> {
 /* Post Methods */
 const createPost = async (req,res) => {
     try{
+
         res.send(await addPost(req.body,mongoCredentials));
     }
     catch (err){

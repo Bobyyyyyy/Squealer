@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const ReservedChannel = require("../models/ReservedChannel");
+const Post = require("../models/Post");
 const {connectdb} = require("./utils");
-const {searchByUsername} = require("./userMethods");
 const User = require("../models/User");
 
 
@@ -48,6 +48,7 @@ const deleteChannel = async (body,credentials) => {
             err.statusCode = 400;
             throw err;
         }
+        await Post.deleteMany({'destination.name': body.name});
         await mongoose.connection.close();
     }
     catch(err){

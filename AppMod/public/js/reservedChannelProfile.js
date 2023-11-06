@@ -77,8 +77,8 @@ $('#addPostButton').on('click',(contentType, content) => {
     const currentDate = new Date();
     $.ajax({
         url:'/db/addPost',
-        data: {name: User, destType: 'official', receiver: ChannelName,
-               contentType: contentType, content: content, dateOfCreation: currentDate},
+        data: {post: {name: User, destType: 'official', receiver: ChannelName,
+               contentType: contentType, content: content, dateOfCreation: currentDate}},
         type: 'post',
         success: (post) => {
             location.reload();
