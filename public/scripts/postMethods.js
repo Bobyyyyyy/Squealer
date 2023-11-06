@@ -20,8 +20,6 @@ const sorts = {
     }
 }
 
-
-
 const addPost = async (body,credentials) => {
     try{
         await connectdb(credentials)
@@ -83,14 +81,27 @@ const addPost = async (body,credentials) => {
     catch(err){ throw err; }
 }
 
+/**
+ *
+ * @param {Object} query
+ * @param {String} query.name - name of user requesting
+ * @param {String} query.channel - name of channel
+ * @param {Boolean} query.smm - is SMM requesting
+ * @param {String} query.destType - only if destType activated
+ * @param {String} query.typeFilter - only if type post filter activated
+ * @param {Number} query.offset - offset to skip
+ * @param {String} query.sort - only if Sort activated -- more recent by default
+ * @param credentials
+ * @returns {Promise<*>}
+ */
 const getAllPost = async (query,credentials) =>{
     try{
 
         await connectdb(credentials)
 
         let filter = {
-                /* Per i canali non mi serve l'id dell'utente che fa la richiesta */
-            ...(!query.channel) && {'owner':  query.name},
+                /* Per i canali non mi serve l'id dell'utente che fa la richiesta, a meno che non sia SMM*/
+            ...(query.smm || !query.channel) && {'owner':  query.name},
                 /* FILTRO PER TIPO DI POST */
             ... (query.typeFilter && query.typeFilter !== 'all') && {'contentType': query.typeFilter},
 
@@ -180,10 +191,28 @@ const deleteReac = async (body,credentials) => {
     }
 }
 
+const getLastPostUser = async (query,credentials) => {
+    try{
+
+        await connectdb(credentials);
+
+        console.log(query.user);
+
+        let posts = await Post.find({owner: query.user}).sort(sorts['più recente']).limit(1);
+
+        await mongoose.connection.close();
+        return posts[0];
+    }
+    catch (err){
+        throw err;
+    }
+}
+
 module.exports = {
     addPost,
     getAllPost,
     deletePost,
     updateReac,
-    deleteReac
+    deleteReac,
+    getLastPostUser
 }

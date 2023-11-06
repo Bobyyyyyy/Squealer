@@ -1,9 +1,10 @@
 <script setup>
   import HeaderPost from "./HeaderPost.vue"
   import FooterPost from "./FooterPost.vue"
+  import PostMap from "./PostMap.vue";
   const profilePicturePath ="/img/profilePicture.png"
 
-  defineProps({
+  const props = defineProps({
     user: String,
     dest: String,
     destType: String,
@@ -13,7 +14,12 @@
     creationDate: Date,
     postId: String,
     reactions: Array,
+    numberOfPost: Number,
   })
+
+  function getIdMap(){
+    return `map${props.numberOfPost}`;
+  }
 
 </script>
 
@@ -31,7 +37,11 @@
       <div class="d-flex flex-row justify-content-center text-center align-items-center">
         <!-- SI devono poter inserire anche altre cose, non solo immagini! Swtich in base al tipo di messaggio? -->
         <img v-if="contentType==='image'" :src="content"  alt="silly cat" class="img-fluid w-100 h-100 object-fit-fill" />
-        <p v-else class="mb-0">
+        <postMap v-if="contentType==='geolocation'"
+                 :latlng = "JSON.parse(content)"
+                 :mapID = "getIdMap()"
+        />
+        <p v-if="contentType === 'text'" class="mb-0">
           {{content}}
         </p>
       </div>

@@ -1,13 +1,14 @@
 <script setup>
   import Post from "../post/Post.vue";
-  import {reactive} from "vue";
+  import {onMounted, reactive, ref} from "vue";
+  import {getLastPost} from "../../utilsSMM";
   let srcImg="/img/profilePicture.png";
 
-  const props = defineProps({
+  defineProps({
     username: String,
     followers: Number,
+    post: Object,
   })
-
 
 </script>
 
@@ -20,14 +21,25 @@
       <div class="d-flex justify-content-center">
         <h4 class="mb-0">{{ username }}</h4>
       </div>
-      <div class="d-flex justify-content-center">
-        <h6>{{followers}} followers</h6>
-      </div>
     </div>
     <div class="d-flex flex-column postMargin">
       <h5 class="mb-0">Last Post: </h5>
-      <div class="d-flex flex-row justify-content-center">
-        <!--<Post /> -->
+      <div v-if="Object.keys(post).length !== 0" class="d-flex flex-row justify-content-center">
+        <Post
+              :user="post.owner"
+              :dest= "post.destination.destType === 'channel'? `§${post.destination.name}`:`@${post.destination.name}`"
+              :content="post.content"
+              :creationDate="new Date(post.dateOfCreation)"
+              :reactions = "post.reactions"
+              :contentType = "post.contentType"
+              :destType = "post.destination.destType"
+              :postId = "post._id"
+              :numberOfPost="1"
+              picProfile = "/img/defaultUser.jpeg"
+        />
+      </div>
+      <div v-else>
+        NON CI SONO POST
       </div>
     </div>
     <div class="d-flex justify-content-center">

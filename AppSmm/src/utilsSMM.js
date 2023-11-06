@@ -122,6 +122,31 @@ async function getUserQuota() {
     }
 }
 
+async function getUserInfo(){
+    try{
+        let res = await fetch(`/db/user/info?user=${currentVip.value}`,{
+            method:'GET',
+        })
+        return (await res.json());
+    }
+    catch (err) {
+        throw err;
+    }
+}
+
+async function getLastPost(vipName){
+    try{
+        let res = await fetch(`/db/user/lastPost?user=${vipName}`,{
+            method:'GET',
+        })
+        let post = await res.json();
+        return post;
+    }
+    catch (err) {
+        throw err;
+    }
+}
+
 
 export{
     getPage,
@@ -134,4 +159,6 @@ export{
     getPosts,
     reactionsIcons,
     getUserQuota,
+    getUserInfo,
+    getLastPost,
 }

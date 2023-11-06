@@ -1,7 +1,7 @@
 const express = require('express');
 const {createUser,createPost, getSessionUser, getAllUsers, getUsersNumber, modifyUser, getVips,
     createReservedChannel, deleteCh, getChannelsNumber, getChannel, createChannel, getChannelList, getPosts,
-    channel, checkUserInChannel, updateReaction, deleteReaction, getSessionVip, updateSessionVip, getQuota, removePost, modifyDesc
+    channel, checkUserInChannel, updateReaction, deleteReaction, getSessionVip, updateSessionVip, getQuota, getFollnPosts, getLastPost, removePost, modifyDesc
 } = require('../controllers/MongoController');
 const router = express.Router();
 
@@ -19,6 +19,9 @@ router.get('/nusers',getUsersNumber);
 router.get('/users',getAllUsers);
 router.get('/getVips',getVips)
 router.get('/user/quota',getQuota)
+router.get('/user/info',getFollnPosts);
+router.get('/user/lastPost',getLastPost);
+
 
 /* Post Methods */
 router.post('/addPost',createPost);

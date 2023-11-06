@@ -40,7 +40,7 @@
  }
 
   onMounted(async ()=>{
-    query =`name=${currentVip.value}&channel=${chInfo.value.chName}`;
+    query =`name=${currentVip.value}&channel=${chInfo.value.chName}&smm=${true}`;
     readyPosts.value=false
     curPosts = await getPosts(query)
     readyPosts.value=true

@@ -2,7 +2,7 @@
 import {computed, onBeforeUpdate, onMounted, ref} from "vue";
   import {currentVip} from "../utilsSMM";
   import {useStore} from "vuex";
-import Map from "../components/Map.vue";
+import Map from "../components/post/Map.vue";
 
   const store = useStore();
   const postType = ref('Select type')
@@ -12,6 +12,7 @@ import Map from "../components/Map.vue";
   const currentImg = ref('')
   const showImg = ref(false)
   const textSqueal = ref('')
+  const mapLocationLatLng = ref({});
 
   const quota2remove = computed(() => postType.value ==='text' ? textSqueal.value.length : postType.value ==='Select type' ? 0 : 15);
   /* 15 è il valore tolto per immagine e geolocalizzazione */
@@ -21,7 +22,9 @@ import Map from "../components/Map.vue";
 
   async function createPost() {
     try{
-      let cnt = postType.value === 'image' ? imgUrl.value : textSqueal.value;
+      let cnt = postType.value === 'image' ? imgUrl.value  :
+                  postType.value === 'geolocation' ? JSON.stringify(mapLocationLatLng.value.value) :
+                      textSqueal.value;
 
       let post = {
         name: currentVip.value,
@@ -127,9 +130,10 @@ import Map from "../components/Map.vue";
                   </div>
                   <Map v-if="postType === 'geolocation'"
                        class="map"
+                       :currentlatlng="mapLocationLatLng"
                   />
                 </div>
-                <div :class="getLiveDQuota < 0 ? 'justify-content-evenly':'justify-content-center'" class="d-flex flex-row w-100 ms-3 me-3">
+                <div :class="getLiveDQuota < 0 || getLiveWQuota < 0 ? 'justify-content-evenly':'justify-content-center'" class="d-flex flex-row w-100 ms-3 me-3">
                   <h6 v-if="getLiveDQuota < 0">extra daily quota: {{-getLiveDQuota}}</h6>
                   <h6 v-if="getLiveWQuota < 0">extra weekly quota: {{-getLiveWQuota}}</h6>
                   <div class="d-flex flex-row">
@@ -170,8 +174,7 @@ import Map from "../components/Map.vue";
     max-width: 60%;
   }
 
-  .map{
+  .map {
     min-height: 60vh;
   }
-
 </style>
