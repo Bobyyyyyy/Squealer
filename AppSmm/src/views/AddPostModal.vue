@@ -1,30 +1,57 @@
 <script setup>
-import {computed, onBeforeUpdate, onMounted, ref} from "vue";
+import {computed, onUpdated, ref} from "vue";
   import {currentVip} from "../utilsSMM";
   import {useStore} from "vuex";
-import Map from "../components/post/Map.vue";
+  import Map from "../components/post/Map.vue";
 
   const store = useStore();
+
+  /* TYPE and USER/CHANNEL */
   const postType = ref('Select type')
   const destType = ref('receiver')
   const receiverName = ref('')
-  const imgUrl = ref('')
-  const currentImg = ref('')
-  const showImg = ref(false)
-  const textSqueal = ref('')
-  const mapLocationLatLng = ref({});
 
+  /* TEXT */
+  const textSqueal = ref('')          //get text of squeal. Only in text squeal.
+
+  /* IMAGE */
+  const imgPath = ref('')             //live change of input value in URL insert.
+  const currentImgPath = ref('')      //to show last image from URL
+  const showImg = ref(false)          //show preview photo of inserted URL
+  const fileUploaded = ref({});       //get info of file uploaded (NOT URL).
+  const canUploadFile = computed(() => imgPath.value === '' || currentImgPath.value === '');
+
+  /* MAP */
+  const mapLocationLatLng = ref({});  //get [lat,lon] of current position.
+
+  /* QUOTA */
   const quota2remove = computed(() => postType.value ==='text' ? textSqueal.value.length : postType.value ==='Select type' ? 0 : 15);
   /* 15 è il valore tolto per immagine e geolocalizzazione */
   const getLiveDQuota = computed(()=> (store.getters.getQuota.daily - ((destType.value !== 'user') ? quota2remove.value : 0)));
   const getLiveWQuota = computed(()=> (store.getters.getQuota.weekly - ((destType.value !== 'user') ? quota2remove.value : 0)));
   const getLiveMQuota = computed(()=> (store.getters.getQuota.monthly - ((destType.value !== 'user') ? quota2remove.value : 0)));
 
+/*
+  async function getCamera(){
+    navigator?.mediaDevices.getUserMedia({video: true})
+        .then((success) => {
+          console.log(success);
+        })
+  }
+
+ */
+
+  function file2BLOB(file){
+    return new Blob([file],{type: file.type});
+  }
+
+
   async function createPost() {
     try{
-      let cnt = postType.value === 'image' ? imgUrl.value  :
-                  postType.value === 'geolocation' ? JSON.stringify(mapLocationLatLng.value.value) :
-                      textSqueal.value;
+      let cnt = postType.value === 'geolocation' ? JSON.stringify(mapLocationLatLng.value.value) :
+                  postType.value === 'text' ? textSqueal.value :
+                      Object.keys(fileUploaded).length === 0 ? imgPath.value :
+                          file2BLOB(fileUploaded.value[0]);
 
       let post = {
         name: currentVip.value,
@@ -63,16 +90,29 @@ import Map from "../components/post/Map.vue";
     postType.value ='Select type'
     destType.value = 'receiver'
     receiverName.value = ''
-    imgUrl.value = ''
-    currentImg.value= ''
+    imgPath.value = ''
+    currentImgPath.value= ''
     showImg.value = false
     textSqueal.value = ''
+    fileUploaded.value = {}
   }
 
+  function showPreviewUploaded(event) {
+    fileUploaded.value = event.target.files;
+    let blob = file2BLOB(fileUploaded.value[0]);
+    currentImgPath.value = URL.createObjectURL(blob);
+    showImg.value = true
+    console.log(fileUploaded.value[0]);
+  }
+/*
+  onUpdated(()=> {
+    if (postType.value === 'image') getCamera()
+  })
+ */
 </script>
 
 <template>
-  <div class="modal fade  w-100 h-100" id="AddPostModal"  tabindex="-1" aria-hidden="true">
+  <div class="modal fade  w-100 h-100 overflow-hidden" id="AddPostModal"  tabindex="-1" aria-hidden="true">
     <div class="centralDiv z-1">
       <div class="modal-dialog modal-dialog-centered ">
         <div class="modal-content">
@@ -111,21 +151,31 @@ import Map from "../components/post/Map.vue";
                   </div>
                 </div>
                 <div class="m-1">
+
                   <textarea v-if=" postType==='text'" rows="6" v-model="textSqueal"  class="form-control"></textarea>
 
                   <div v-if="postType === 'image'"  class="d-flex flex-column">
-                    <div class="input-group d-flex flex-row">
-                      <input class="w-75" type="text" placeholder="insert URL" id="pathImg" v-model="imgUrl" >
-                      <button type="button" class="btn btn-secondary" @click=" currentImg = imgUrl; showImg = true">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-upload" viewBox="0 0 16 16">
-                          <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
-                          <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/>
-                        </svg>
-                      </button>
+                    <div class="d-flex flex-row justify-content-between flex-wrap">
+                      <div class="d-flex flex-column">
+                        <label for="pathImgForm" class="form-label">Insert photo URL</label>
+                        <div class="input-group d-flex flex-row">
+                          <input :disabled="Object.keys(fileUploaded).length !== 0"  type="text" placeholder="insert URL" id="pathImgForm" v-model="imgPath" >
+                          <button :disabled="Object.keys(fileUploaded).length !== 0" type="button" class="btn btn-secondary" @click=" currentImgPath = imgPath; showImg = true">
+                            Preview
+                          </button>
+                        </div>
+                      </div>
+                      <div>
+                        <p class="m-0"> or </p>
+                      </div>
+                      <div>
+                        <label  for="formFile" class="form-label">upload Photo</label>
+                        <input :disabled="!canUploadFile" class="form-control" type="file" id="formFile" accept="image/png, image/jpeg"
+                               @change="(event) => showPreviewUploaded(event)">
+                      </div>
                     </div>
-
-                    <div v-if="showImg" id="imgAddPost" class=" d-flex flex-row align-self-center w-75">
-                      <img class="img-fluid" :src="currentImg" alt="NON FUNZIONA UN CAZZO">
+                    <div v-if="showImg" id="imgAddPost" class=" d-flex flex-row justify-content-center">
+                      <img class="img-fluid" :src="currentImgPath" alt="Path non trovato">
                     </div>
                   </div>
                   <Map v-if="postType === 'geolocation'"
@@ -163,6 +213,7 @@ import Map from "../components/post/Map.vue";
   #imgAddPost{
     padding: 2%;
     border: 10px;
+    max-height: 55vh;
   }
 
   #AddPostModal{
