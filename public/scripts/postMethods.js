@@ -116,7 +116,7 @@ const getAllPost = async (query,credentials) =>{
 
         let posts = await Post.find(filter)
             .skip(parseInt(query.offset))
-            .limit(1)
+            .limit(12)
             .sort(sorts[query.sort ?  query.sort : 'più recente'])
             .lean();
 

@@ -53,15 +53,16 @@ const showPosts = (filter,offset) => {
             let html = `${$.map(posts, (post,index) => {
                 let Post =
                     `<div id="post-${index}" class="card mt-5 w-50">
-                    <div class="card-header d-flex bg-info border-black p-3">
+                    <div class="card-header d-flex bg-info border-black align-items-center p-3">
                         @${post.owner}
-                        <i id="delete-${index}" class="ms-auto bi bi-trash-fill"></i>
+                        <button class="btn btn-light ms-auto"><i id="delete-${index}" class="bi bi-trash-fill"></i></button>
                 </div>
                 <div class="card-body">`
+                
                 switch (`${post.contentType}`) {
                     case 'text':
                         let parsedText = `${post.content}`.replace(urlRegex, function(url) {
-                            return `<a href="${url}">${url}</a>`;
+                            return `<a href="${url}" target="_blank">${url}</a>`;
                         })
                         Post = Post + `<span><p class='card-text'> ${parsedText} </p></span>`
                         break;
@@ -70,10 +71,31 @@ const showPosts = (filter,offset) => {
                         Post = Post + `<span><img src='${post.content}' class='card-img-top img-fluid' alt="content" style="height: 75vh; width: 100%"></span>`
                         break;
 
-                    case 'geo':
-                        //geo
+                    case 'geolocation':
+                        Post = Post + `<div id="map-'${index}'" class="" style="width: 50vw; height: 50vh"></div>
+                          <script> 
+
+                          let map; 
+                          let position = JSON.parse('${post.content}')
+                             console.log(position);
+                             console.log('map-${index}')
+                              map = L.map('map-${index}').fitWorld();
+                              console.log(map)
+                              L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
+                                maxZoom: 19,
+                                attribution: '© OpenStreetMap',
+                                animate: true,
+                                doubleClickZoom: false,
+                              }).addTo(map);
+                              L.marker(position).addTo(map);
+                              L.circle(position, 3).addTo(map);
+                              map.setView(position,15);  
+
+                        </script>`
                         break;
                 }
+                
+                
                 Post = Post +`</div>
                     <div class="card-footer text-muted">
                         ${post.dateOfCreation.split('T')[0]},
@@ -129,8 +151,20 @@ $('#delete-button').on('click', () => {
 
 $('#addPostButton').on('click',(contentType, content) => {
     contentType = $('#type-select option:selected').val();
-    content = $('#post-content').val();
-    const currentDate = new Date();
+
+    console.log(contentType);
+
+    if(contentType === 'geolocation') {
+        content = $('#post-content').html();
+    }
+
+    else {
+        content = $('#post-content').val();
+    }
+
+    console.log(content)
+
+  const currentDate = new Date();
     $.ajax({
         url:'/db/addPost',
         data: {post: {name: User, destType: 'official', receiver: ChannelName,
@@ -169,9 +203,6 @@ $('#type-select').on('change',() => {
                                     <textarea class="form-control" id="post-content" name="content" rows="1" placeholder="Inserisci link immagine" style="resize: none" data-role="none"></textarea>
                                 </label>
                             </div>`
-
-
-
             $('#content').empty().html(imageInput);
             $('#content').append(preview);
             $('#preview-button').on('click', () => {
@@ -179,8 +210,8 @@ $('#type-select').on('change',() => {
             })
             break;
 
-        case 'geo':
-            //geolocalizzazione
+        case 'geolocation':
+            $('#content').empty().html(`<div class="d-flex flex-column" style="width: 80vw; height: 60vh"><div id="map" class="mx-auto ms-2 w-100 h-100"></div><div class="mt-3" id="post-content"></div></div><script src="/js/map.js"></script>`);
             break;
     }
 })
