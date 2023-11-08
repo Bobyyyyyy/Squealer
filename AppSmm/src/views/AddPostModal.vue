@@ -3,13 +3,23 @@ import {computed, onUpdated, ref} from "vue";
   import {currentVip} from "../utilsSMM";
   import {useStore} from "vuex";
   import Map from "../components/post/Map.vue";
+import Dropdown from "../components/Dropdown.vue";
 
   const store = useStore();
+
+  const infoTimed = `Squeal syntax:<br>{NUM} to get the number of squeal post<br>{TIME} to get time of squeal post<br>{DATE} to get date of squeal post`
+
+console.log(infoTimed)
 
   /* TYPE and USER/CHANNEL */
   const postType = ref('Select type')
   const destType = ref('receiver')
   const receiverName = ref('')
+
+  /* TIMED MESSAGE */
+  const timed = ref(false);
+  const numberOfRepetitions = ref(0);
+  const typeFrequency = ref('select Frequency')
 
   /* TEXT */
   const textSqueal = ref('')          //get text of squeal. Only in text squeal.
@@ -25,7 +35,9 @@ import {computed, onUpdated, ref} from "vue";
   const mapLocationLatLng = ref({});  //get [lat,lon] of current position.
 
   /* QUOTA */
-  const quota2remove = computed(() => postType.value ==='text' ? textSqueal.value.length : postType.value ==='Select type' ? 0 : 15);
+  const quota2remove = computed(() => (postType.value === 'text' ? textSqueal.value.length : postType.value === 'Select type' ? 0 : 125)
+      * (timed.value && numberOfRepetitions.value > 2 ? parseInt(numberOfRepetitions.value) : 1)
+  );
   /* 15 è il valore tolto per immagine e geolocalizzazione */
   const getLiveDQuota = computed(()=> (store.getters.getQuota.daily - ((destType.value !== 'user') ? quota2remove.value : 0)));
   const getLiveWQuota = computed(()=> (store.getters.getQuota.weekly - ((destType.value !== 'user') ? quota2remove.value : 0)));
@@ -41,26 +53,42 @@ import {computed, onUpdated, ref} from "vue";
 
  */
 
-  function file2BLOB(file){
-    return new Blob([file],{type: file.type});
-  }
-
 
   async function createPost() {
     try{
-      let cnt = postType.value === 'geolocation' ? JSON.stringify(mapLocationLatLng.value.value) :
-                  postType.value === 'text' ? textSqueal.value :
-                      Object.keys(fileUploaded).length === 0 ? imgPath.value :
-                          file2BLOB(fileUploaded.value[0]);
+
+      /* #, to create channel by hashtag */
+      /*
+      let tags = [];
+      if (postType.value === 'text'){
+        tags = textSqueal.value.match(/\#\w+/g)
+      }
+       */
 
       let post = {
         name: currentVip.value,
         contentType: postType.value,
-        content: cnt,
         dateOfCreation: Date.now(),
         receiver: receiverName.value,
         destType: destType.value,
       }
+
+      const toBase64 = file => new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+      })
+
+
+      /* content based on squeal type */
+      let content = postType.value === 'geolocation' ? JSON.stringify(mapLocationLatLng.value.value) :
+                      postType.value === 'text' ? textSqueal.value :
+                        fileUploaded.value.length === 0 ? imgPath.value :
+                            await toBase64(fileUploaded.value[0]);
+
+      post = {...post, content: content};
+
+      console.log(post);
 
       let res = await fetch("/db/addPost",{
         method: "POST",
@@ -82,7 +110,7 @@ import {computed, onUpdated, ref} from "vue";
       }
     }
     catch (err){
-      alert(err.mes)
+      alert(err)
     }
   }
 
@@ -99,10 +127,8 @@ import {computed, onUpdated, ref} from "vue";
 
   function showPreviewUploaded(event) {
     fileUploaded.value = event.target.files;
-    let blob = file2BLOB(fileUploaded.value[0]);
-    currentImgPath.value = URL.createObjectURL(blob);
+    currentImgPath.value = URL.createObjectURL(fileUploaded.value[0]);
     showImg.value = true
-    console.log(fileUploaded.value[0]);
   }
 /*
   onUpdated(()=> {
@@ -123,7 +149,7 @@ import {computed, onUpdated, ref} from "vue";
             <form id="addPostForm">
               <div class="d-flex flex-column">
                 <div class="d-flex flex-row justify-content-between align-items-end">
-                  <div class="d-flex flex-row align-items-end">
+                  <div class="d-flex flex-row align-items-end" style="flex:1">
                     <div class="d-flex flex-column">
                       <label for="destPost" class="form-label">Receiver</label>
                       <input type="text" class="form-control" id="destPost"  v-model="receiverName" required>
@@ -139,7 +165,12 @@ import {computed, onUpdated, ref} from "vue";
                       </ul>
                     </div>
                   </div>
-                  <div class="btn-group">
+                  <div class="d-flex justify-content-center" style="flex:1">
+                    <input type="checkbox" class="btn-check" id="btn-check-outlined" v-model="timed" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="btn-check-outlined">Timed</label><br>
+                  </div>
+
+                  <div class="btn-group d-flex" style="flex:1">
                     <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                       {{ postType }}
                     </button>
@@ -175,7 +206,7 @@ import {computed, onUpdated, ref} from "vue";
                       </div>
                     </div>
                     <div v-if="showImg" id="imgAddPost" class=" d-flex flex-row justify-content-center">
-                      <img class="img-fluid" :src="currentImgPath" alt="Path non trovato">
+                      <img class="img-fluid object-fit-contain" :src="currentImgPath" alt="Path non trovato">
                     </div>
                   </div>
                   <Map v-if="postType === 'geolocation'"
@@ -183,7 +214,7 @@ import {computed, onUpdated, ref} from "vue";
                        :currentlatlng="mapLocationLatLng"
                   />
                 </div>
-                <div :class="getLiveDQuota < 0 || getLiveWQuota < 0 ? 'justify-content-evenly':'justify-content-center'" class="d-flex flex-row w-100 ms-3 me-3">
+                <div :class="getLiveDQuota < 0 || getLiveWQuota < 0 ? 'justify-content-evenly':'justify-content-center'" class="d-flex flex-row">
                   <h6 v-if="getLiveDQuota < 0">extra daily quota: {{-getLiveDQuota}}</h6>
                   <h6 v-if="getLiveWQuota < 0">extra weekly quota: {{-getLiveWQuota}}</h6>
                   <div class="d-flex flex-row">
@@ -192,12 +223,39 @@ import {computed, onUpdated, ref} from "vue";
                     <h6 :class="getLiveMQuota < 0 ? 'text-danger':''">/{{getLiveMQuota}}</h6>
                   </div>
                 </div>
-                <div class="d-flex flex-row justify-content-end">
-                  <button type="button" class="btn btn-danger m-1"
-                          @click="$emit('closeAppModal'); reset()"
-                  >back</button>
-                  <button class="btn btn-primary m-1" type="button" @click="createPost(); reset(); $emit('closeAppModal')"> add Squeal </button>
+                <div class="d-flex flex-row justify-content-between">
+                  <div v-if="timed" class="d-flex flex-row flex-fill">
+                    <div class="d-flex flex-column">
+                      <label for="numTimed" class="form-label">Squeal Number</label>
+                      <input type="number" class="form-control" id="numTimed" v-model="numberOfRepetitions">
+                    </div>
+                    <div class="d-flex flex-column ms-2">
+                      <label for="repFrequency" class="form-label">Frequency</label>
+                      <div class="input-group" id="repFrequency">
+                        <input type="number" class="form-control" id="numFrequency">
+                        <Dropdown :filterRef="typeFrequency"
+                                  updateRef="updateTypeF"
+                                  @updateTypeF="(el) => typeFrequency=el"
+                                  :dropItems="['minutes', 'days', 'weeks']"
+                                  classButton="btn-outline-secondary"
+                        />
+                      </div>
+                    </div>
+                    <div class="d-flex ms-3">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16" v-tooltip="infoTimed">
+                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                        <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                      </svg>
+                    </div>
+                  </div>
+                  <div class="d-flex flex-row justify-content-end flex-fill align-items-end">
+                    <button type="button" class="btn btn-danger m-1"
+                            @click="$emit('closeAppModal'); reset()"
+                    >back</button>
+                    <button class="btn btn-primary m-1" type="button" @click="createPost(); reset(); $emit('closeAppModal')"> add Squeal </button>
+                  </div>
                 </div>
+
               </div>
             </form>
           </div>
@@ -210,11 +268,6 @@ import {computed, onUpdated, ref} from "vue";
 </template>
 
 <style scoped>
-  #imgAddPost{
-    padding: 2%;
-    border: 10px;
-    max-height: 55vh;
-  }
 
   #AddPostModal{
     height: 50%;
@@ -228,4 +281,11 @@ import {computed, onUpdated, ref} from "vue";
   .map {
     min-height: 60vh;
   }
+
+  #imgAddPost{
+    padding: 2%;
+    border: 10px;
+    max-height: 55vh;
+  }
+
 </style>

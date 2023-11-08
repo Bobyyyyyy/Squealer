@@ -1,21 +1,20 @@
-Note per capire fasi e struttura:
-
-Utilizziamo un modello MVC (Model-View-Controller)
-
-Database:
-
-Non ha senso creare un DB. Mongo funziona così:
-- un dataBase esiste solo se c'è qualcosa dentro. Dunque al primo inserimento viene creato
-- un DB contiene molteplici collezioni (canali, post, utenti)
-- ogni collezione contiene molteplici Documenti (che sono le istanze della collezione)
-usare la funzione insert_one per inserire
-Dunque funzione di creazione del DB non ha senso.
-
-
-
 TODO:
-- tutto frontend
-- definire per bene tutti i modelli
+- SMM
+    - grafica !!!
+    - grafici
+    - comprare quota
+    - pagina dei messaggi
+    - pagina dei grafici
+    - vedere se usare BLOB invece di FIlE alleggerisce
+
+- MOD:
+    - canali privati
+    - cerca dei post ?
+
+- Backend
+    - quote e aggiornamento di quote
+    - gestione messaggi temporizzati
+    - funzioni per salvare un BLOB nel DB
 
 
-
+- BIG REFACTORING

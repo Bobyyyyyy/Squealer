@@ -48,8 +48,6 @@ async function go2loc(){
 
   clearMap();
 
-
-
   map.flyTo(latlng, 14);
 
   marker = L.marker(latlng);
@@ -57,6 +55,7 @@ async function go2loc(){
 }
 
 async function onLocationFound(e) {
+
   await updatePlaceName(e.latlng);
 
   props.currentlatlng.value = e.latlng;
