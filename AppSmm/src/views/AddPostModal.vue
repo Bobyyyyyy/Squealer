@@ -5,11 +5,13 @@ import {computed, onUpdated, ref} from "vue";
   import Map from "../components/post/Map.vue";
 import Dropdown from "../components/Dropdown.vue";
 
+  const QUALITY = 0.7;
+  const MAX_HEIGHT = 1200;
+  const MAX_WIDTH = 1200;
+
   const store = useStore();
 
   const infoTimed = `Squeal syntax:<br>{NUM} to get the number of squeal post<br>{TIME} to get time of squeal post<br>{DATE} to get date of squeal post`
-
-console.log(infoTimed)
 
   /* TYPE and USER/CHANNEL */
   const postType = ref('Select type')
@@ -50,7 +52,6 @@ console.log(infoTimed)
           console.log(success);
         })
   }
-
  */
 
 
@@ -73,10 +74,48 @@ console.log(infoTimed)
         destType: destType.value,
       }
 
-      const toBase64 = file => new Promise((resolve) => {
+      function calculateSize(img, maxWidth, maxHeight) {
+        let width = img.width;
+        let height = img.height;
+
+        // calculate the width and height, constraining the proportions
+        if (width > height) {
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
+        }
+        return [width, height];
+      }
+
+
+      const blob2base64 = (blob) => new Promise((resolve) => {
         const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result);
+        reader.onloadend = () => resolve(reader.result);
+        reader.readAsDataURL(blob);
+      });
+
+      const compressBlob = (file) => new Promise((resolve) => {
+        console.log(file instanceof File);
+        let blobURL = URL.createObjectURL(file);
+        let compressedImg = new Image();
+        compressedImg.src = blobURL;
+        compressedImg.onload = () => {
+          const [newWidth, newHeight] = calculateSize(compressedImg, MAX_WIDTH, MAX_HEIGHT);
+          const canvas = document.createElement('canvas');
+          canvas.height = newHeight;
+          canvas.width = newWidth;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(compressedImg, 0, 0, newWidth, newHeight);
+          canvas.toBlob(blob => {
+            resolve(blob);
+          },file.type, QUALITY)
+        }
       })
 
 
@@ -84,11 +123,10 @@ console.log(infoTimed)
       let content = postType.value === 'geolocation' ? JSON.stringify(mapLocationLatLng.value.value) :
                       postType.value === 'text' ? textSqueal.value :
                         fileUploaded.value.length === 0 ? imgPath.value :
-                            await toBase64(fileUploaded.value[0]);
+                            await blob2base64(await compressBlob(fileUploaded.value.item(0)));
 
       post = {...post, content: content};
 
-      console.log(post);
 
       let res = await fetch("/db/addPost",{
         method: "POST",

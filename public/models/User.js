@@ -40,13 +40,28 @@ const UserSchema = new mongoose.Schema({
             },
             monthly:{
                 type:Number,
-
             },
         },
         required: function(){
             return this.typeUser !== 'mod';
         },
     },
+    maxQuota: {
+        type:{
+            daily:{
+                type:Number,
+            },
+            weekly: {
+                type:Number,
+            },
+            monthly:{
+                type:Number,
+            },
+        },
+        required: function(){
+            return this.typeUser !== 'mod';
+        },
+    }
 })
 
 const User = mongoose.model("User", UserSchema);
