@@ -8,6 +8,13 @@ let LastCall = {
     filter: ''
 }
 
+
+function charactersModal () {
+    $('#changeReactions').modal("show");
+}
+
+
+
 function updateLastCall(limit,offset,filter) {
     LastCall.limit = limit;
     LastCall.offset = offset;
@@ -50,12 +57,31 @@ const showPosts = (filter,offset) => {
         success: (posts) => {
             $('#post-trovati').html(posts.length);
 
+
             let html = `${$.map(posts, (post,index) => {
+                let reactions = {
+                    heart: post.reactions.filter((reaction) => reaction.rtype === 'heart').length,
+                    heartbreak : post.reactions.filter((reaction) => reaction.rtype === 'heartbreak').length,
+                    'thumbs-up': post.reactions.filter((reaction) => reaction.rtype === 'thumbs-up').length,
+                    'thumbs-down': post.reactions.filter((reaction) => reaction.rtype === 'thumbs-down').length,
+                }
+                
                 let Post =
                     `<div id="post-${index}" class="card mt-5 w-50">
                     <div class="card-header d-flex bg-info border-black align-items-center p-3 h5 fw-bold">
                         @${post.owner}
-                        <button class="btn btn-light ms-auto" id="delete-${index}"><i  class="bi bi-trash-fill"></i></button>
+                        <div class="d-flex flex-row ms-auto">
+                            <div class="btn-group dropup">
+                                <button class="ms-2 btn btn-info"  data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-three-dots"></i></i>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li onclick="charactersModal(${reactions.heart}, ${reactions.heartbreak}, ${reactions["thumbs-up"]}, ${reactions["thumbs-down"]})" class="dropdown-item"> Modifica Reazioni</li>
+                                </ul>
+                            </div>
+                            
+                            <button class="btn btn-info" id="delete-${index}"><i  class="bi bi-trash"></i></button>
+                        </div>
                 </div>
                 <div class="card-body flex-row">`
                 
@@ -68,7 +94,7 @@ const showPosts = (filter,offset) => {
                         break;
 
                     case 'image':
-                        Post = Post + `<span><img src='${post.content}' class='card-img-top img-fluid' alt="content" style="height: 75vh; width: 100%"></span>`
+                        Post = Post + `<span><img src='${post.content}' class='card-img-top img-fluid' alt="content"></span>`
                         break;
 
                     case 'geolocation':
@@ -82,10 +108,10 @@ const showPosts = (filter,offset) => {
                     <div class="card-footer text-muted">
                         <div class="d-flex flex-row">
                             <div id="reactions-${index}" class="me-auto d-inline-flex"> 
-                                <div class="d-flex flex-row"><i class="bi bi-heart-fill"></i> <div class="ms-1">${post.reactions.filter((reaction) => reaction.rtype === 'heart').length}</div> </div>
-                                <div class="d-flex flex-row ms-3"><i class="bi bi-heartbreak"></i><div class="ms-1">${post.reactions.filter((reaction) => reaction.rtype === 'heartbreak').length}</div></div>
-                                <div class="d-flex flex-row ms-3"><i class="bi bi-hand-thumbs-up-fill"></i> <div class="ms-1">${post.reactions.filter((reaction) => reaction.rtype === 'thumbs-up').length}</div></div>
-                                <div class="d-flex flex-row ms-3"><i class="bi bi-hand-thumbs-down"></i><div class="ms-1">${post.reactions.filter((reaction) => reaction.rtype === 'thumbs-down').length}</div></div>
+                                <div class="d-flex flex-row"><i class="bi bi-heart-fill"></i> <div class="ms-1">${reactions.heart}</div> </div>
+                                <div class="d-flex flex-row ms-3"><i class="bi bi-heartbreak"></i><div class="ms-1">${reactions.heartbreak}</div></div>
+                                <div class="d-flex flex-row ms-3"><i class="bi bi-hand-thumbs-up-fill"></i> <div class="ms-1">${reactions["thumbs-up"]}</div></div>
+                                <div class="d-flex flex-row ms-3"><i class="bi bi-hand-thumbs-down"></i><div class="ms-1">${reactions["thumbs-down"]}</div></div>
                                
                             </div>
                             <div id="creation-${index}" class="ms-auto">
@@ -178,12 +204,12 @@ $('#type-select').on('change',() => {
             let textInput = `
                         <div id="content" class="mt-2" style="width: 100%">
                             <div class="d-flex flex-row align-items-center">
-                                <label for="shortener" class="mt-2 form-label w-25">
+                                <label for="short-link" class="mt-2 form-label w-25">
                                     <textarea class="form-control" id="short-link" name="shortener" rows="1" placeholder="Inserisci link" style="resize: none" data-role="none" autocomplete="off"></textarea>
                                 </label>
                                 <button type="button" id="shortener-button" class="btn btn-primary ms-2"> Accorcia link </button>
                             </div>
-                            <label for="content" class="form-label w-100" style>
+                            <label for="post-content" class="form-label w-100" style>
                                 <textarea class="form-control" name="content" id="post-content" rows="3" placeholder="Inserisci testo o link per immagine...." style="resize: none" data-role="none" autocomplete="off"></textarea>
                             </label>
                         </div>
@@ -199,25 +225,23 @@ $('#type-select').on('change',() => {
 
             let imageInput = `
                             <div id="content" class="mt-3 d-flex flex-row" style="width: 100%">
-                                <label for="content" class="form-label w-100" style>
+                                <label for="post-content" class="form-label w-100" style>
                                     <textarea class="form-control" id="post-content" name="content" rows="1" placeholder="Inserisci link immagine" style="resize: none" data-role="none" autocomplete="off"></textarea>
                                 </label>
-                            </div<div id="preview"></div>`
+                            </div><div id="preview"></div>`
             $('#content').empty().replaceWith(imageInput);
             $('#content').append(preview);
             $('#preview-button').on('click', () => {
-                $('#preview').html(`<img src="${$('#post-content').val()}" class='img-fluid mt-3' alt="Image Preview" style="height: 720px; width: 720px">`)
+                $('#preview').html(`<img src="${$('#post-content').val()}" class='img-fluid mt-3' alt="Image Preview">`)
             })
             break;
 
         case 'geolocation':
-            $('#content').empty().html(`<div class="d-flex flex-column" style="width: 80vw; height: 60vh"><div id="map" class="mx-auto ms-2 w-100 h-100"></div><div class="mt-3" id="post-content"></div></div><script>inputMap()</script>`);
+            $('#content').empty().html(`<div class="d-flex flex-column" style=" height: 60vh"><div id="map" class="mx-auto ms-2 w-100 h-100"></div><div class="mt-3" id="post-content"></div></div><script>inputMap()</script>`);
             break;
     }
 })
 
-$('#shortener-button').on('click',() => {
-})
 
 $('#post-filters').on('change', () => {
 

@@ -62,7 +62,6 @@ function inputMap() {
         map.flyTo(e.latlng,curZoom);
         marker = L.marker(e.latlng);
         position = e.latlng;
-        console.log(position);
         $('#post-content').html(JSON.stringify(position));
         marker.addTo(map);
     }
@@ -88,9 +87,7 @@ function inputMap() {
 function showMap(id,content) {
     let map;
     let position = JSON.parse(content)
-    console.log(position);
     map = L.map(id).fitWorld();
-    console.log(map)
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
         maxZoom: 19,
         attribution: '© OpenStreetMap',

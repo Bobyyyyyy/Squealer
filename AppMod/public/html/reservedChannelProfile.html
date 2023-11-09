@@ -110,8 +110,8 @@
 <div class="modal fade" id="addPost" tabindex="-1" aria-labelledby="addPostModal" aria-hidden="true">
 <div class="modal-dialog modal-lg">
     <div class="modal-content">
-        <div class="modal-header">
-            <h1 class="modal-title fs-5">Inserisci post in §${name}</h1>
+        <div class="modal-header bg-info">
+            <h1 class="modal-title fs-5 fw-bold">Inserisci post in §${name}</h1>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
             <div class="modal-body">
@@ -126,12 +126,12 @@
                 <div class="form-group d-flex align-items-center flex-column">
                     <div id="content" class="mt-2" style="width: 100%">
                         <div class="d-flex flex-row align-items-center">
-                            <label for="shortener" class="mt-2 form-label w-25">
+                            <label for="short-link" class="mt-2 form-label w-25">
                                 <textarea class="form-control" id="short-link" name="shortener" rows="1" placeholder="Inserisci link" style="resize: none" data-role="none" autocomplete="off"></textarea>
                             </label>
                             <button type="button" id="shortener-button" class="btn btn-primary ms-2"> Accorcia link </button>
                         </div>
-                        <label for="content" class="form-label w-100" style>
+                        <label for="post-content" class="form-label w-100" style>
                             <textarea class="form-control" name="content" id="post-content" rows="3" placeholder="Inserisci testo o link per immagine...." style="resize: none" data-role="none" autocomplete="off"></textarea>
                         </label>
                     </div>
@@ -164,6 +164,41 @@
     </div>
 </div>
 
+
+<div class="modal fade" id="changeReactions" tabindex="-1" aria-labelledby="changeReactionsModal" aria-hidden="true" style="top:25%">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form>
+                <div class="modal-body d-flex flex-row">
+                    <div class="d-flex flex-column align-items-center">
+                        <label for="heart" class="form-label w-75"> <i class="bi bi-heart-fill"></i> Heart
+                            <input type="number" class="form-control" name="heart" id="heart">
+                        </label>
+                    </div>
+                    <div class="d-flex flex-column align-items-center">
+                        <label for="heartbreak" class="form-label w-75"> <i class="bi bi-heartbreak"></i> Heartbreak
+                            <input type="number" class="form-control" name="heartbreak" id="heartbreak">
+                        </label>
+                    </div>
+                    <div class="d-flex flex-column align-items-center">
+                        <label for="thumbs-up" class="form-label w-75"> <i class="bi bi-hand-thumbs-up-fill"></i> Thumbs-Up
+                            <input type="number" class="form-control" name="thumbs-up" id="thumbs-up">
+                        </label>
+                    </div>
+                    <div class="d-flex flex-column align-items-center">
+                        <label for="thumbs-down" class="form-label w-75"> <i class="bi bi-hand-thumbs-down"></i> Thumbs-Down
+                            <input type="number" class="form-control" name="thumbs-down" id="thumbs-down">
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
+                    <button class="btn btn-primary" id="changeReactionsButton">Modifica</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 
 
