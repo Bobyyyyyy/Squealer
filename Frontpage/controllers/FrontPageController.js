@@ -55,8 +55,7 @@ const isSessionActive = (req,res,next) => {
     else {
         switch (req.session.type) {
             case 'user':
-            case 'vip':
-                res.redirect('/homepage');
+                res.redirect('/user')
                 break;
 
             case 'mod':

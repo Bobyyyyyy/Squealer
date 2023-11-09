@@ -2,9 +2,10 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev:frontend": "vite",
+    "dev:frontend_VUE": "cd AppSmm && npm run dev",
+    "dev:frontend_REACT": "cd AppUser && npm run dev",
     "dev:backend": "nodemon server/index.js",
-    "dev": "concurrently 'npm:dev:frontend' 'npm:dev:backend'"
+    "dev": "concurrently  'npm:dev:frontend_REACT' 'npm:dev:frontend_VUE' 'npm:dev:backend'"
   },
   "dependencies": {
     "@popperjs/core": "^2.11.8",
@@ -24,10 +25,7 @@
     "node-cron": "^3.0.3",
     "nodemon": "^3.0.1",
     "npm": "^10.1.0",
-    "vite": "^4.5.0",
-    "vue": "^3.3.6",
-    "vue-router": "^4.2.5",
-    "vuex": "^4.0.2"
+    "vite": "^4.5.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.4.0"

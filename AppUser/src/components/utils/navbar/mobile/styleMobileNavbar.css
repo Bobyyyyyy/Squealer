@@ -1,0 +1,27 @@
+.allBtnsMobile {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-between;
+    margin: 0 2em 0 2em;
+}
+
+.singolBtnMobile {
+    width: fit-content;
+    height: fit-content;
+    margin: 0;
+    padding: 0;
+}
+
+.navbar {
+    display: flex;
+    margin: 12px 0 12px 0;
+}
+
+.containerOfNavbar {
+    border-top: solid black;
+    position: fixed;
+    bottom: 0;
+    width: 100vw;
+    background: #ffffff;
+}

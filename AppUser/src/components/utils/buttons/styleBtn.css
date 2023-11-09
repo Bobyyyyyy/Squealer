@@ -1,0 +1,60 @@
+.text{
+    width: fit-content;
+    font-size: medium;
+    height: auto;
+    margin: 0;
+    /* padding: 0 0 0 12px;
+
+     */
+    padding: 0 0 0 12px;
+}
+
+.imageIcon {
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    margin: 0;
+}
+
+.imageAndText {
+    display: flex;
+    align-items: center;
+    width: fit-content;
+}
+
+.contentBtnWithText {
+    display: flex;
+    align-items: flex-start;
+}
+
+.btnStyle {
+    border-radius: 5px;
+    background: #F0F0F0;
+    padding: 0 12px 0 12px;
+    height: 48px;
+
+    transition: background-color 0.3s;
+    &:active {
+        background: #C8C8C8; /* Change the background color when clicked */
+    }
+}
+
+.btnStyleNoText {
+    width: 48px;
+}
+
+.btnStyleWithText {
+    width: fit-content;
+}
+
+
+.containerOfButton {
+    margin: 0;
+    display: flex;
+}
+
+button {
+    border: none;
+    outline: none; /* Removes the focus outline on click */
+    box-shadow: none;
+}

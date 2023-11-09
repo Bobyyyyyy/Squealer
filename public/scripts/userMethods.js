@@ -29,8 +29,8 @@ const addUser = async (body,credentials) => {
             typeUser: body.type ? body.type : 'user',
             characters: body.type === 'mod' ? {daily: null, weekly: null, monthly: null} : quota,
             ...(body.type === 'smm') && {vipHandled: []},
+            maxQuota: quota,
         });
-
 
 
         //save new user in DB
