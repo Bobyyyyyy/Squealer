@@ -221,23 +221,23 @@ const get_n_FollnPosts = async(body,credentials) => {
 const resetQuota = async (type, credentials) => {
     try{
         await connectdb(credentials);
-        console.log("Entro --> " + type);
+
         switch (type){
             case 'D':
-                await User.updateMany({},{$set: {'characters.daily': "$maxQuota.$daily"}})
+                await User.updateMany({typeUser: {$not: {$eq:'mod'}}},[{$set: {"characters.daily": "$maxQuota.daily"}}])
                 break;
             case 'W':
-                await User.updateMany({},{$set: {'characters.weekly': "$maxQuota.$weekly"}})
+                await User.updateMany({typeUser: {$not: {$eq:'mod'}}},[{$set: {"characters.weekly": "$maxQuota.weekly"}}])
                 break;
             case 'M':
-                await User.updateMany({},{$set: {'characters.monthly': "$maxQuota.$monthly"}})
+                await User.updateMany({typeUser: {$not: {$eq:'mod'}}},[{$set: {"characters.monthly": "$maxQuota.monthly"}}])
                 break;
         }
-        console.log("updated type "+ type);
+
         await mongoose.connection.close();
 
     }catch (e) {
-        throw e
+        console.log(e)
     }
 }
 

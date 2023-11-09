@@ -64,13 +64,10 @@ const nodeCron =require('node-cron')
 const CC = require('./public/controllers/CronController')
 
 // quota reset
-/*
 nodeCron.schedule(CC.resetDtimeout, async () => {await CC.resetQuota('D')}).start()
 nodeCron.schedule(CC.resetWtimeout, async () => {await CC.resetQuota('W')}).start()
 nodeCron.schedule(CC.resetMtimeout, async () => {await CC.resetQuota('M')}).start()
 
-
- */
 
 
 // avvio di node
