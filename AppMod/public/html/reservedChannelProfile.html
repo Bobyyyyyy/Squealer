@@ -53,8 +53,8 @@
 <div class="d-flex flex-column">
 
     <div class="p-5 flex-column text-white" id="div1" style="height: 100%; width: 100%">
-        <h1> §<span id="channel-name">${name}</span> </h1>
-        <h6> creato da @<span id="channel-creator"></span></h6>
+        <h1> §<span id="channel-name" class="fw-bold">${name}</span> </h1>
+        <h6 class="fw-light"> creato da @<span id="channel-creator"></span></h6>
         <div class="d-inline-flex flex-row align-items-center pt-3">
             <div id="channel-description" class="p-2 rounded d-inline bg-white text-dark"></div>
             <i id="modify-description" class="p-2 bi bi-pencil-fill"> Modifica </i>
@@ -122,13 +122,18 @@
                         <option id="" value="geolocation">Geolocalizzazione</option>
                     </select>
                 </div>
+
                 <div class="form-group d-flex align-items-center flex-column">
-                    <div id="content" class="mt-2 d-flex flex-row align-items-center" style="width: 100%">
+                    <div id="content" class="mt-2" style="width: 100%">
+                        <div class="d-flex flex-row align-items-center">
+                            <label for="shortener" class="mt-2 form-label w-25">
+                                <textarea class="form-control" id="short-link" name="shortener" rows="1" placeholder="Inserisci link" style="resize: none" data-role="none" autocomplete="off"></textarea>
+                            </label>
+                            <button type="button" id="shortener-button" class="btn btn-primary ms-2"> Accorcia link </button>
+                        </div>
                         <label for="content" class="form-label w-100" style>
-                            <textarea class="form-control" name="content" id="post-content" rows="3" placeholder="Inserisci testo o link per immagine...." style="resize: none" data-role="none"></textarea>
+                            <textarea class="form-control" name="content" id="post-content" rows="3" placeholder="Inserisci testo o link per immagine...." style="resize: none" data-role="none" autocomplete="off"></textarea>
                         </label>
-                    </div>
-                    <div id="preview">
                     </div>
                 </div>
             </div>
@@ -164,6 +169,7 @@
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script src="/js/reservedChannelProfile.js"></script>
+<script src="/js/map.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 </body>
 </html>

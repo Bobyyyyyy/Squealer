@@ -160,10 +160,13 @@ const deletePost = async (body,credentials) => {
 const updateReac = async (body,credentials) => {
     try{
         await connectdb(credentials);
-        let hasReacted = (await Post.findOne({_id : body.postId, reactions:{$elemMatch:{user: body.user}}}));
 
-        if (hasReacted){
-            await Post.findByIdAndUpdate(body.postId, {$pull: {reactions: {user: body.user}}});
+        if(await User.findOne({username: body.user},'typeUser').typeUser !== 'mod') {
+            let hasReacted = (await Post.findOne({_id : body.postId, reactions:{$elemMatch:{user: body.user}}}));
+
+            if (hasReacted){
+                await Post.findByIdAndUpdate(body.postId, {$pull: {reactions: {user: body.user}}});
+            }
         }
 
         await Post.findByIdAndUpdate(body.postId, {$push:{reactions: { rtype: body.reaction, user: body.user, date: new Date()}}});
