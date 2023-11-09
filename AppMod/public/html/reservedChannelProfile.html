@@ -1,9 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html xmlns="http://www.w3.org/1999/html">
 <head>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <link rel="stylesheet" href="/css/mod.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 </head>
 <body class="d-flex flex-column">
 
@@ -40,8 +42,7 @@
 
         <div class="navbar-collapse collapse dual-collapse2" style="flex-basis: 100%">
             <div class="ms-auto"></div>
-            <span class="navbar-text text-white ms-auto me-2" >@${user}
-            </span>
+            <span class="navbar-text text-white ms-auto me-2">@<span id="session-user" >${user}</span></span>
             <button class="btn btn-light btn-outline-danger" onclick="window.location.href = '/logout'">Logout</button>
         </div>
     </div>
@@ -52,31 +53,99 @@
 <div class="d-flex flex-column">
 
     <div class="p-5 flex-column text-white" id="div1" style="height: 100%; width: 100%">
-        <h1> §<span id="channel-name">${name}</span> </h1>
-        <h6> creato da @<span id="channel-creator"></span></h6>
+        <h1> §<span id="channel-name" class="fw-bold">${name}</span> </h1>
+        <h6 class="fw-light"> creato da @<span id="channel-creator"></span></h6>
         <div class="d-inline-flex flex-row align-items-center pt-3">
             <div id="channel-description" class="p-2 rounded d-inline bg-white text-dark"></div>
-            <i id="modify-description" class="p-2 bi bi-pencil-fill"> Modifica descrizione </i>
+            <i id="modify-description" class="p-2 bi bi-pencil-fill"> Modifica </i>
             <button id="modify-button" type="button" class="btn btn-success ms-2" style="display: none">
                 Fatto
             </button>
         </div>
         <!-- Modal Button -->
-        <div class="d-flex flex-row align-items-center p-3 pe-0">
-            <input class="form-control" id="filter" type="text" style="height: 10%; width: 15%; background-color: lightgray" placeholder="Cerca Canale..">
+        <div class="d-flex flex-row align-items-center pt-4">
+            <div class="me-2">Filters: </div>
+            <div id="post-filters" class="btn-group" role="group" aria-label="Basic radio toggle button group">
+                <input type="radio" class="btn-check" name="filters" id="filter-all" value="" checked>
+                <label class="btn btn-light" for="filter-all">Mostra tutti</label>
+
+                <input type="radio" class="btn-check" name="filters" id="filter-text" value="text">
+                <label class="btn btn-light" for="filter-text">Testo</label>
+
+                <input type="radio" class="btn-check" name="filters" id="filter-image" value="image">
+                <label class="btn btn-light" for="filter-image">Immagini</label>
+
+                <input type="radio" class="btn-check" name="filters" id="filter-geo" value="geolocation">
+                <label class="btn btn-light" for="filter-geo">Geolocalizzazione</label>
+
+
+
+            </div>
+
                 <div class="ms-auto m-1">
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAdmin">
-                        Aggiungi Admin
+                    <button type="button" class="btn btn-primary ms-auto " data-bs-toggle="modal" data-bs-target="#addPost">
+                        Aggiungi Post
                     </button>
-                </div>
-                <div class="m-1">
                     <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteChannel">
                         Elimina Canale
                     </button>
                 </div>
         </div>
+
+        <div class="d-flex flex-row align-items-center">
+            <div class="me-auto mt-2">
+                <p> Post trovati: <span id="post-trovati"></span> </p>
+            </div>
+        </div>
+
+        <div id="posts" class="d-flex flex-column align-items-center">
+
+        </div>
+
     </div>
 </div>
+
+
+
+<div class="modal fade" id="addPost" tabindex="-1" aria-labelledby="addPostModal" aria-hidden="true">
+<div class="modal-dialog modal-lg">
+    <div class="modal-content">
+        <div class="modal-header bg-info">
+            <h1 class="modal-title fs-5 fw-bold">Inserisci post in §${name}</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+            <div class="modal-body">
+                <div>
+                    <select id="type-select" class="form-select" aria-label="Post type select" autocomplete="off">
+                        <option id="" value="text" selected>Testo</option>
+                        <option id="" value="image">Immagine</option>
+                        <option id="" value="geolocation">Geolocalizzazione</option>
+                    </select>
+                </div>
+
+                <div class="form-group d-flex align-items-center flex-column">
+                    <div id="content" class="mt-2" style="width: 100%">
+                        <div class="d-flex flex-row align-items-center">
+                            <label for="short-link" class="mt-2 form-label w-25">
+                                <textarea class="form-control" id="short-link" name="shortener" rows="1" placeholder="Inserisci link" style="resize: none" data-role="none" autocomplete="off"></textarea>
+                            </label>
+                            <button type="button" id="shortener-button" class="btn btn-primary ms-2"> Accorcia link </button>
+                        </div>
+                        <label for="post-content" class="form-label w-100" style>
+                            <textarea class="form-control" name="content" id="post-content" rows="3" placeholder="Inserisci testo o link per immagine...." style="resize: none" data-role="none" autocomplete="off"></textarea>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
+                <button type="submit" id="addPostButton" class="btn btn-primary">Inserisci</button>
+            </div>
+    </div>
+</div>
+</div>
+
+
 
 
 <div class="modal fade" id="deleteChannel" tabindex="-1" aria-labelledby="deleteChannelModal" aria-hidden="true">
@@ -96,31 +165,35 @@
 </div>
 
 
-<div class="modal fade" id="addAdmin" tabindex="-1" aria-labelledby="addAdminModal" aria-hidden="true">
-    <div class="modal-dialog">
+<div class="modal fade" id="changeReactions" tabindex="-1" aria-labelledby="changeReactionsModal" aria-hidden="true" style="top:25%">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5">Inserisci Admin in §${name}</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form method="post" action="/db/ReservedChannel" id="channelform">
-                <div class="modal-body">
-                    <div>
-                        <label for="name" class="form-label w-100"> Nome:
-                            <input type="text" class="form-control" name="name" id="name" placeholder="NOME_CANALE"></label>
+            <form>
+                <div class="modal-body d-flex flex-row">
+                    <div class="d-flex flex-column align-items-center">
+                        <label for="heart" class="form-label w-75"> <i class="bi bi-heart-fill"></i> Heart
+                            <input type="number" class="form-control" name="heart" id="heart">
+                        </label>
                     </div>
-                    <div id="userlist" class="d-flex align-items-center justify-content-center flex-row">
-                        <div class="mx-auto">
-                        <div id="user-name">Nome Utente</div>
-                        <a class="link-underline-primary p-3">
-                            Aggiungi
-                        </a>
-                        </div>
+                    <div class="d-flex flex-column align-items-center">
+                        <label for="heartbreak" class="form-label w-75"> <i class="bi bi-heartbreak"></i> Heartbreak
+                            <input type="number" class="form-control" name="heartbreak" id="heartbreak">
+                        </label>
+                    </div>
+                    <div class="d-flex flex-column align-items-center">
+                        <label for="thumbs-up" class="form-label w-75"> <i class="bi bi-hand-thumbs-up-fill"></i> Thumbs-Up
+                            <input type="number" class="form-control" name="thumbs-up" id="thumbs-up">
+                        </label>
+                    </div>
+                    <div class="d-flex flex-column align-items-center">
+                        <label for="thumbs-down" class="form-label w-75"> <i class="bi bi-hand-thumbs-down"></i> Thumbs-Down
+                            <input type="number" class="form-control" name="thumbs-down" id="thumbs-down">
+                        </label>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
-                    <button type="submit" class="btn btn-primary">Inserisci</button>
+                    <button class="btn btn-primary" id="changeReactionsButton">Modifica</button>
                 </div>
             </form>
         </div>
@@ -128,8 +201,10 @@
 </div>
 
 
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script src="/js/reservedChannelProfile.js"></script>
+<script src="/js/map.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 </body>
 </html>
