@@ -2,7 +2,6 @@
   import HeaderPost from "./HeaderPost.vue"
   import FooterPost from "./FooterPost.vue"
   import PostMap from "./PostMap.vue";
-  const profilePicturePath ="/img/profilePicture.png"
 
   const props = defineProps({
     user: String,

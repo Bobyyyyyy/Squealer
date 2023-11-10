@@ -1,10 +1,11 @@
 <script setup>
   import SideBarEL from "./SideBarEL.vue";
-  import NavBarWel from "../NavBarWel.vue";
-  import AddPostModal from "../../views/AddPostModal.vue";
+  import NavBarWel from "../navbar/NavBar.vue";
+  import AddPostModal from "../post/AddPostModal.vue";
   import {Modal} from 'bootstrap'
   import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
-  import {currentVip, getPage, sideBarElements, smm} from "../../utilsSMM.js";
+  import {getPage} from "../../utils/functions.js";
+  import {currentVip, sideBarElements, smm } from "../../utils/config.js"
 
   const windowWidth = ref(window.innerWidth);
   const modalState = reactive({Modal: null,})

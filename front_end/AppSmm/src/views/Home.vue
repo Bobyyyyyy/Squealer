@@ -1,6 +1,6 @@
 <script setup>
-  import NavBar from "../components/NavBarWel.vue";
-  import {smm} from "../utilsSMM.js"
+  import NavBar from "../components/navbar/NavBar.vue";
+  import {smm} from "../utils/config.js"
 
 </script>
 

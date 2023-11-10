@@ -1,7 +1,8 @@
 <script setup>
-import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
+  import {onMounted, onUnmounted, reactive, ref} from "vue";
+  import {currentVip, filterValues, postType, sortPosts} from "../utils/config.js"
+  import {getPosts, getUserInfo, getUserQuota} from "../utils/functions.js";
   import Post from "../components/post/Post.vue";
-import {currentVip, filterValues, getPosts, getUserInfo, getUserQuota, postType, sortPosts} from "../utilsSMM.js";
   import Dropdown from "../components/Dropdown.vue";
   import {useStore} from "vuex";
 
@@ -74,7 +75,6 @@ onMounted(async ()=> {
     readyPosts.value = false
 
     n_post.value = (await getUserInfo()).nposts;
-    console.log(n_post.value);
 
     query = `name=${currentVip.value}`
     window.addEventListener("scrollend", scrollendHandler);

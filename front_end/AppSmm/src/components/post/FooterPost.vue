@@ -1,6 +1,6 @@
 <script setup>
   import Reaction from "./Reaction.vue";
-  import {currentVip, reactionsIcons} from "../../utilsSMM.js";
+  import {currentVip, reactionsIcons} from "../../utils/config.js";
   import {onMounted, reactive, ref} from "vue";
 
   const props = defineProps({

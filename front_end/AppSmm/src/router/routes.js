@@ -2,13 +2,10 @@ import HandleVIP from "../views/HandleVIP.vue";
 import Home from "../views/Home.vue"
 import ChannelList from "../views/ChannelList.vue";
 import VipProfile from "../views/VipProfile.vue";
-import Messages from "../views/Messages.vue";
-import Post from "../components/post/Post.vue";
 import SideBar from "../components/sideBar/SideBar.vue";
-import VipCard from "../components/handleVip/VipCard.vue";
 import ChannelProfile from "../components/channels/ChannelProfile.vue";
 
-const routes =[
+export const routes =[
     {
         path:"/SMM",
         redirect:  { name: "Home" }
@@ -99,6 +96,4 @@ const routes =[
 ]
 
 
-export default {
-    routes,
-};
+

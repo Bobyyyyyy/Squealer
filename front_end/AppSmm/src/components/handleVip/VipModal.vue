@@ -1,7 +1,7 @@
 <script setup>
 
 
-import {currentVip} from "../../utilsSMM.js";
+import {currentVip} from "../../utils/config.js";
 
   const props = defineProps({
     SMMname: String,
@@ -10,7 +10,7 @@ import {currentVip} from "../../utilsSMM.js";
 
   async function updateSes (){
     {
-      let res = await fetch("/db/sessionVip",{
+      let res = await fetch("/db/user/sessionVip",{
         method:"PUT",
         headers:{
           "Content-Type": "application/json",
@@ -18,7 +18,6 @@ import {currentVip} from "../../utilsSMM.js";
         body: JSON.stringify({vipName: props.VIPname})
         })
       currentVip.value = (await res.json()).vip;
-      console.log(currentVip.value);
     }
   }
 

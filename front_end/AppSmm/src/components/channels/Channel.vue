@@ -1,5 +1,7 @@
 <script setup>
-  import {useStore} from "vuex";
+import {useStore} from "vuex";
+
+const store = useStore();
 
   const props = defineProps({
     isPublic: Boolean,
@@ -7,7 +9,6 @@
     description: String,
   })
 
-  const store = useStore()
 
   function changeChannel(){
     store.commit('uploadChannel',{chName: props.name, chDescription: props.description})

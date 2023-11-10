@@ -1,6 +1,6 @@
 <script setup>
   import {ref} from "vue";
-  import {currentVip} from "../../utilsSMM.js";
+  import {currentVip} from "../../utils/config.js";
 
   const channelName = ref('')
   const channelDescription = ref('')
@@ -18,7 +18,7 @@
         creator: currentVip.value,
       }
 
-      await fetch("/db/Channel",{
+      await fetch("/db/channel",{
         method:"POST",
         body: JSON.stringify(channel),
         headers: {

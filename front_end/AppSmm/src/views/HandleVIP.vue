@@ -1,10 +1,11 @@
 <script setup>
-  import NavBarWel from "../components/NavBarWel.vue";
+  import NavBarWel from "../components/navbar/NavBar.vue";
   import VipCard from "../components/handleVip/VipCard.vue";
   import VipModal from "../components/handleVip/VipModal.vue";
-  import {onMounted, reactive, ref} from "vue";
   import {Modal} from 'bootstrap'
-  import {getLastPost, smm} from "../utilsSMM.js";
+  import {onMounted, reactive, ref} from "vue";
+  import {getLastPost} from "../utils/functions.js";
+  import {smm} from "../utils/config.js";
 
   let vips = [];
   let lastVipsPost = [];
@@ -17,7 +18,7 @@
   onMounted(async ()=>{
     modalState.myModal = new Modal('#choiceModal',{});
 
-    let res = await fetch(`/db/getVips?SMMname=${smm.value}`,{
+    let res = await fetch(`/db/user/getVips?SMMname=${smm.value}`,{
       method:"GET"
     })
     vips = await res.json()

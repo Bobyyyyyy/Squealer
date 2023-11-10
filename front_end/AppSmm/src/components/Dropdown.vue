@@ -1,7 +1,4 @@
 <script setup>
-
-  import {onUpdated} from "vue";
-
   defineProps({
     filterRef: {
       default: null,

@@ -1,5 +1,6 @@
 import {ref} from "vue";
 
+
 const sideBarElements = [
     {
         class:"bi bi-person",
@@ -89,76 +90,14 @@ const reactionsIcons = [
         },
     },
 ]
+
 const smm = ref('');
 const currentVip = ref('')
 
-function getPage(){
-    return window.location.pathname.split('/')[2];
-}
-
-async function getPosts(query,offset){
-    try{
-        let res = await fetch(`/db/posts?${query}&offset=${offset}`,{
-            method:"GET",
-        });
-        let posts = (await res.json()).map(post => { return {...post, dateOfCreation: new Date(Date.parse(post.dateOfCreation))} });
-        console.log(posts);
-        if (posts) return posts;
-        else throw posts;
-    }catch (e) {
-        throw e
-    }
-}
-
-async function getUserQuota() {
-    try{
-        let res = await fetch(`/db/user/quota?user=${currentVip.value}`,{
-            method:'GET',
-        })
-        return (await res.json());
-    }
-    catch (err) {
-        throw err;
-    }
-}
-
-async function getUserInfo(){
-    try{
-        let res = await fetch(`/db/user/info?user=${currentVip.value}`,{
-            method:'GET',
-        })
-        return (await res.json());
-    }
-    catch (err) {
-        throw err;
-    }
-}
-
-async function getLastPost(vipName){
-    try{
-        let res = await fetch(`/db/user/lastPost?user=${vipName}`,{
-            method:'GET',
-        })
-        let post = await res.json();
-        return post;
-    }
-    catch (err) {
-        throw err;
-    }
-}
+/* IMG compression */
+const QUALITY = 0.7;
+const MAX_HEIGHT = 1200;
+const MAX_WIDTH = 1200;
 
 
-export{
-    getPage,
-    smm,
-    sideBarElements,
-    currentVip,
-    postType,
-    sortPosts,
-    filterValues,
-    getPosts,
-    reactionsIcons,
-    getUserQuota,
-    getUserInfo,
-    getLastPost,
-}
+export {smm, sideBarElements, currentVip, postType, sortPosts, filterValues, reactionsIcons, QUALITY, MAX_WIDTH, MAX_HEIGHT}
