@@ -3,7 +3,7 @@ import {createStore} from 'vuex'
 import App from './App.vue'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap'
-import "../../public/style.css"
+import "../../back_end/style.css"
 
 import routes from './router/routes.js'
 import {createRouter, createWebHistory} from "vue-router";

@@ -1,5 +1,3 @@
-
-
 const session = require('express-session');
 const es6Renderer = require('express-es6-template-engine');
 
@@ -8,11 +6,10 @@ global.rootDir = __dirname; //Salviamo la directory locale
 global.frontViews = __dirname + "/Frontpage/views"
 global.startDate = null;
 
-
 const express = require('express');
 const cors = require('cors');
-const {dbname} = require("./public/scripts/utils");
-const {isSMM} = require("./Frontpage/controllers/FrontPageController");
+const {dbname} = require("./back_end/mongo/models/utils");
+const {isSMM} = require("./back_end/Frontpage/controllers/FrontPageController");
 
 const storeSession = MongoStore.create({
     mongoUrl: 'mongodb://localhost:27017',
@@ -41,27 +38,27 @@ app.use(cors());
 app.enable('trust proxy');
 
 app.engine('html', es6Renderer);
-app.set('views', [__dirname + '/AppMod/public/html', __dirname+ '/Frontpage/views', __dirname + '/AppUser/views']);
+app.set('views', [__dirname + '/back_end/AppMod/views', __dirname+ '/back_end/Frontpage/views']);
 app.set('view engine','html');
 
 //il sito inizia dando il controllo al router della frontpage
-app.use('/', require('./Frontpage/routes/frontpage'));
-app.use('/db',require('./public/routers/MongoDB'));
+app.use('/', require('./back_end/Frontpage/routes/frontpage'));
+app.use('/db',require('./back_end/mongo/routers/mongoRouter'));
 app.get(['/SMM','/SMM/*'], isSMM, (req,res) => {
-    res.sendFile(rootDir + '/AppSmm/index.html');
+    res.sendFile(rootDir + '/AppSmm/index');
 })
 
 app.get(['/user','/user/*',],(req,res) => {
-    res.sendFile(rootDir + '/AppUser/index.html');
+    res.sendFile(rootDir + '/AppUser/index');
 })
 
-app.use('/js' ,express.static(rootDir + '/AppMod/public/js'));
-app.use('/css',express.static(rootDir + '/AppMod/public/css'));
-app.use('/img',express.static(rootDir + '/public/img'));
+app.use('/js' ,express.static(rootDir + '/front_end/AppMod/src/js'));
+app.use('/css',express.static(rootDir + '/front_end/AppMod/src/css'));
+app.use('/img',express.static(rootDir + '/back_end/AppMod/img'));
 
 /* CRON */
 const nodeCron =require('node-cron')
-const CC = require('./public/controllers/CronController')
+const CC = require('./back_end/mongo/controllers/CronController')
 
 // quota reset
 nodeCron.schedule(CC.resetDtimeout, async () => {await CC.resetQuota('D')}).start()
