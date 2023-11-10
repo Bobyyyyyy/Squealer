@@ -44,6 +44,7 @@ app.set('view engine','html');
 //il sito inizia dando il controllo al router della frontpage
 app.use('/', require('./back_end/Frontpage/routes/frontpage'));
 app.use('/db',require('./back_end/mongo/routers/mongoRouter'));
+
 app.get(['/SMM','/SMM/*'], isSMM, (req,res) => {
     res.sendFile(rootDir + '/AppSmm/index');
 })

@@ -160,17 +160,20 @@ const deletePost = async (body,credentials) => {
 const updateReac = async (body,credentials) => {
     try{
         await connectdb(credentials);
+        await Post.findByIdAndUpdate(body.postId, {$push:{reactions: {$each: JSON.parse(body.reactions)}}});
+        let user = await User.findOne({username: body.user},'typeUser');
 
-        if(await User.findOne({username: body.user},'typeUser').typeUser !== 'mod') {
-            let hasReacted = (await Post.findOne({_id : body.postId, reactions:{$elemMatch:{user: body.user}}}));
-
-            if (hasReacted){
-                await Post.findByIdAndUpdate(body.postId, {$pull: {reactions: {user: body.user}}});
-            }
+        if(user.typeUser === 'mod') {
+            return await Post.findByIdAndUpdate(body.postId, {$push:{reactions: {$each: JSON.parse(body.reactions)}}});
         }
 
-        await Post.findByIdAndUpdate(body.postId, {$push:{reactions: { rtype: body.reaction, user: body.user, date: new Date()}}});
+        let hasReacted = (await Post.findOne({_id : body.postId, reactions:{$elemMatch:{user: body.user}}}));
 
+        if (hasReacted){
+            await Post.findByIdAndUpdate(body.postId, {$pull: {reactions: {user: body.user}}});
+        }
+
+        await Post.findByIdAndUpdate(body.postId, {$push:{reactions: {rtype: body.reaction, user: body.user, date: new Date()}}});
         await mongoose.connection.close();
 
         return body;
@@ -179,6 +182,9 @@ const updateReac = async (body,credentials) => {
         throw err;
     }
 }
+
+
+
 
 const deleteReac = async (body,credentials) => {
     try{

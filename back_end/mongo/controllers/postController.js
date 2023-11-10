@@ -24,6 +24,11 @@ const getPosts = async (req,res) => {
 
 const updateReaction = async (req,res) => {
     try {
+        if(req.session.type === 'mod') {
+                await postModel.updateReac(req.body, mongoCredentials);
+                res.sendStatus(200);
+        }
+        await postModel.updateReac({user: req.body.user, rtype: req.body.keys},mongoCredentials)
         res.send(await postModel.updateReac(req.body,mongoCredentials))
     }
     catch(error) {

@@ -8,11 +8,7 @@ let LastCall = {
     filter: ''
 }
 
-
-function charactersModal () {
-    $('#changeReactions').modal("show");
-}
-
+let post = ''
 
 
 function updateLastCall(limit,offset,filter) {
@@ -76,7 +72,7 @@ const showPosts = (filter,offset) => {
                                     <i class="bi bi-three-dots"></i></i>
                                 </button>
                                 <ul class="dropdown-menu">
-                                    <li onclick="charactersModal(${reactions.heart}, ${reactions.heartbreak}, ${reactions["thumbs-up"]}, ${reactions["thumbs-down"]})" class="dropdown-item"> Modifica Reazioni</li>
+                                    <li onclick = "post = '${post._id}'" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#changeReactions"> Modifica Reazioni</li>
                                 </ul>
                             </div>
                             
@@ -244,10 +240,67 @@ $('#type-select').on('change',() => {
 
 
 $('#post-filters').on('change', () => {
-
     let filter = $('#post-filters input:checked').val();
     showPosts(filter,LastCall.offset);
 })
+
+
+$('#changeReactionsButton').on('click',() => {
+
+    let reactions = {
+        heart: $('#heart').val(),
+        heartbreak: $('#heartbreak').val(),
+        'thumbs-up': $('#thumbs-up').val(),
+        'thumbs-down': $('#thumbs-down').val(),
+    }
+
+    let allReactions = []
+    for (let i = 0; i < reactions.heart; i++) {
+        allReactions.push({
+            rtype: 'heart',
+            user: User,
+            date: new Date(),
+        })
+    }
+
+    for (let i = 0; i < reactions.heartbreak; i++) {
+        allReactions.push({
+            rtype: 'heartbreak',
+            user: User,
+            date: new Date(),
+        })
+    }
+
+    for (let i = 0; i < reactions["thumbs-up"]; i++) {
+        allReactions.push({
+            rtype: 'thumbs-up',
+            user: User,
+            date: new Date(),
+        })
+    }
+    for (let i = 0; i < reactions["thumbs-down"]; i++) {
+        allReactions.push({
+            rtype: 'thumbs-down',
+            user: User,
+            date: new Date(),
+        })
+    }
+
+    if(allReactions.length > 500) {
+        alert('Puoi aggiungere al massimo 500 reactions!!');
+        return;
+    }
+
+    $.ajax({
+        url: '/db/post/updateReaction',
+        data: {reactions: JSON.stringify(allReactions), postId: post},
+        type: 'put',
+        success: (post) => {
+            location.reload();
+        }
+    })
+})
+
 
 
 $(window).on('scroll', () => {
