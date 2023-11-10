@@ -61,6 +61,10 @@
 >>>>>>> Fre_newVue
 ~*
 
+
+.DS_Store
+.idea
+
 # ignore node/grunt dependency directories
 node_modules/
 
