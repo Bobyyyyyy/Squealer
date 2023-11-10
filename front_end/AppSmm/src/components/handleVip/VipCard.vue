@@ -1,7 +1,7 @@
 <script setup>
   import Post from "../post/Post.vue";
   import {onMounted, reactive, ref} from "vue";
-  import {getLastPost} from "../../utilsSMM";
+  import {getLastPost} from "../../utilsSMM.js";
   let srcImg="/img/profilePicture.png";
 
   defineProps({

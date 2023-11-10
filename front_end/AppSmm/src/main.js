@@ -3,11 +3,11 @@ import {createStore} from 'vuex'
 import App from './App.vue'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap'
-import "../../back_end/style.css"
+import "../../../back_end/style.css"
 
 import routes from './router/routes.js'
 import {createRouter, createWebHistory} from "vue-router";
-import tooltips from "./directives/tooltips";
+import tooltips from "./directives/tooltips.js";
 
 
 import NavBarWel from "./components/NavBarWel.vue";
@@ -15,7 +15,7 @@ import VipCard from "./components/handleVip/VipCard.vue";
 import VipModal from "./components/handleVip/VipModal.vue";
 import Post from "./components/post/Post.vue";
 import HandleVIP from "./views/HandleVIP.vue";
-import {currentVip} from "./utilsSMM";
+import {currentVip} from "./utilsSMM.js";
 
 
 const app = createApp(App);

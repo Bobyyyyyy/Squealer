@@ -4,7 +4,7 @@
   import AddPostModal from "../../views/AddPostModal.vue";
   import {Modal} from 'bootstrap'
   import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
-  import {currentVip, getPage, sideBarElements, smm} from "../../utilsSMM";
+  import {currentVip, getPage, sideBarElements, smm} from "../../utilsSMM.js";
 
   const windowWidth = ref(window.innerWidth);
   const modalState = reactive({Modal: null,})

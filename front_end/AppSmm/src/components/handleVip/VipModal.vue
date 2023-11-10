@@ -1,7 +1,7 @@
 <script setup>
 
 
-import {currentVip} from "../../utilsSMM";
+import {currentVip} from "../../utilsSMM.js";
 
   const props = defineProps({
     SMMname: String,

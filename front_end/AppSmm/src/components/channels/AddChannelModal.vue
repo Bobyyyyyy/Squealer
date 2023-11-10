@@ -1,6 +1,6 @@
 <script setup>
   import {ref} from "vue";
-  import {currentVip} from "../../utilsSMM";
+  import {currentVip} from "../../utilsSMM.js";
 
   const channelName = ref('')
   const channelDescription = ref('')

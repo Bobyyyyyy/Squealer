@@ -2,7 +2,7 @@
   import {computed, onMounted, ref} from "vue";
   import {useStore} from "vuex";
   import Post from "../post/Post.vue";
-  import {currentVip, getPosts, postType, sortPosts} from "../../utilsSMM";
+  import {currentVip, getPosts, postType, sortPosts} from "../../utilsSMM.js";
   import Dropdown from "../Dropdown.vue";
 
   const store = useStore()

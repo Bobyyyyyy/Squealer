@@ -1,7 +1,7 @@
 <script setup>
 import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
   import Post from "../components/post/Post.vue";
-import {currentVip, filterValues, getPosts, getUserInfo, getUserQuota, postType, sortPosts} from "../utilsSMM";
+import {currentVip, filterValues, getPosts, getUserInfo, getUserQuota, postType, sortPosts} from "../utilsSMM.js";
   import Dropdown from "../components/Dropdown.vue";
   import {useStore} from "vuex";
 

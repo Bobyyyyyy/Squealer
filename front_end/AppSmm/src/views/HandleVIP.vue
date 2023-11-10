@@ -4,7 +4,7 @@
   import VipModal from "../components/handleVip/VipModal.vue";
   import {onMounted, reactive, ref} from "vue";
   import {Modal} from 'bootstrap'
-  import {getLastPost, smm} from "../utilsSMM";
+  import {getLastPost, smm} from "../utilsSMM.js";
 
   let vips = [];
   let lastVipsPost = [];

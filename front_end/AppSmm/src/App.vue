@@ -1,5 +1,5 @@
 <script setup>
-import {currentVip, getUserQuota, smm} from "./utilsSMM";
+import {currentVip, getUserQuota, smm} from "./utilsSMM.js";
 import {ref} from "vue";
 import {useStore} from "vuex";
 const store = useStore();

@@ -1,6 +1,6 @@
 <script setup>
 import {computed, onUpdated, ref} from "vue";
-  import {currentVip} from "../utilsSMM";
+  import {currentVip} from "../utilsSMM.js";
   import {useStore} from "vuex";
   import Map from "../components/post/Map.vue";
 import Dropdown from "../components/Dropdown.vue";

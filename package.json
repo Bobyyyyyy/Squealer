@@ -2,8 +2,8 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev:frontend_VUE": "cd AppSmm && npm run dev",
-    "dev:frontend_REACT": "cd AppUser && npm run dev",
+    "dev:frontend_VUE": "cd front_end/AppSmm && npm run dev",
+    "dev:frontend_REACT": "cd front_end/AppUser && npm run dev",
     "dev:backend": "nodemon server/index.js",
     "dev": "concurrently  'npm:dev:frontend_REACT' 'npm:dev:frontend_VUE' 'npm:dev:backend'"
   },

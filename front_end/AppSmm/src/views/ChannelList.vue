@@ -4,7 +4,7 @@ import Channel from "../components/channels/Channel.vue";
 import {onMounted, reactive, ref} from "vue";
 import {Modal} from "bootstrap";
 import AddChannelModal from "../components/channels/AddChannelModal.vue";
-import {currentVip} from "../utilsSMM";
+import {currentVip} from "../utilsSMM.js";
 
 let channels = []
 const channelsReady = ref(false);
