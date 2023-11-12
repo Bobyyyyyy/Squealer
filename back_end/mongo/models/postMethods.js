@@ -90,6 +90,7 @@ const addPost = async (body,credentials) => {
  * @param {String} query.destType - only if destType activated
  * @param {String} query.typeFilter - only if type post filter activated
  * @param {Number} query.offset - offset to skip
+ * @param {String} query.limit - max number of post to return
  * @param {String} query.sort - only if Sort activated -- more recent by default
  * @param credentials
  * @returns {Promise<*>}
@@ -99,6 +100,7 @@ const getAllPost = async (query,credentials) =>{
 
         await connectdb(credentials)
 
+        console.log(query);
         let filter = {
                 /* Per i canali non mi serve l'id dell'utente che fa la richiesta, a meno che non sia SMM*/
             ...(query.smm || !query.channel) && {'owner':  query.name},
@@ -116,7 +118,7 @@ const getAllPost = async (query,credentials) =>{
 
         let posts = await Post.find(filter)
             .skip(parseInt(query.offset))
-            .limit(12)
+            .limit(parseInt(query.limit))
             .sort(sorts[query.sort ?  query.sort : 'più recente'])
             .lean();
 
@@ -132,7 +134,6 @@ const getAllPost = async (query,credentials) =>{
 const deletePost = async (body,credentials) => {
     try{
         await connectdb(credentials);
-
 
         //controllo se sei il creatore e se esiste il post
         if (!(await Post.findOne({_id: body.id, creator: body.name},'creator').lean())) {
@@ -217,11 +218,28 @@ const getLastPostUser = async (query,credentials) => {
     }
 }
 
+const postLength = async (filter,credentials) => {
+    try {
+        await connectdb(credentials);
+        let posts = await Post.find(
+            { ... (filter && filter !== '') && {contentType: filter}}
+        ).lean();
+        return {length: posts.length};
+    }
+    catch (Error){
+        throw Error;
+    }
+}
+
+
+
+
 module.exports = {
     addPost,
     getAllPost,
     deletePost,
     updateReac,
     deleteReac,
-    getLastPostUser
+    getLastPostUser,
+    postLength
 }

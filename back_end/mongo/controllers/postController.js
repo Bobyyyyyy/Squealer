@@ -55,10 +55,22 @@ const removePost = async (req,res) => {
     }
 }
 
+const postLength = async (req,res) => {
+    try {
+        console.log(req.query);
+        res.send(await postModel.postLength(req.query.filter,mongoCredentials))
+    }
+    catch (error) {
+        res.send(error);
+    }
+
+}
+
 module.exports = {
     createPost,
     getPosts,
     updateReaction,
     deleteReaction,
     removePost,
+    postLength
 }

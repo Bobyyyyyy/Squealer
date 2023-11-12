@@ -2,7 +2,7 @@ let ChannelName = $('#channel-name').html();
 let User = $('#session-user').html();
 
 let LastCall = {
-    limit : 1,
+    limit : 3,
     offset: 0,
     posts: 0,
     filter: ''
@@ -10,17 +10,30 @@ let LastCall = {
 
 let post = ''
 
-
 function updateLastCall(limit,offset,filter) {
     LastCall.limit = limit;
     LastCall.offset = offset;
     LastCall.filter = filter;
 }
 
+
+ function getPostsNumber (filter) {
+    $.ajax({
+        url:'/db/post/number',
+        data: {filter: filter},
+        async: false,
+        type: 'get',
+        success: (data) => {
+            LastCall.posts = data.length;
+        }
+    })
+}
+
+
 // regular expression for link in text
 const urlRegex =/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
 
-const deletePost = (id) => {
+const deletePost = async (id) => {
     $.ajax({
         url:'/db/post/delete',
         data: {id: id},
@@ -42,19 +55,20 @@ const showChannel = (name) => {
             $('#channel-creator').html(channel.creator);
         }
     })
-    showPosts();
+    showPosts(LastCall.filter,LastCall.offset,LastCall.limit);
 }
 
-const showPosts = (filter,offset) => {
+const showPosts = (filter,offset,limit,append = false) => {
+    getPostsNumber(filter);
+    updateLastCall(limit,offset,filter);
     $.ajax({
         url:'/db/post/all',
-        data: {channel: ChannelName, typeFilter: filter , offset: offset},
+        data: {channel: ChannelName, typeFilter: filter , offset: offset, limit: limit},
         type: 'get',
         success: (posts) => {
-            $('#post-trovati').html(posts.length);
-
-
             let html = `${$.map(posts, (post,index) => {
+                let id = post._id;
+                id = id.substring(id.length - 10);
                 let reactions = {
                     heart: post.reactions.filter((reaction) => reaction.rtype === 'heart').length,
                     heartbreak : post.reactions.filter((reaction) => reaction.rtype === 'heartbreak').length,
@@ -63,7 +77,7 @@ const showPosts = (filter,offset) => {
                 }
                 
                 let Post =
-                    `<div id="post-${index}" class="card mt-5 w-50">
+                    `<div id="post-${id}" class="card mt-5 w-50">
                     <div class="card-header d-flex bg-info border-black align-items-center p-3 h5 fw-bold">
                         @${post.owner}
                         <div class="d-flex flex-row ms-auto">
@@ -76,7 +90,7 @@ const showPosts = (filter,offset) => {
                                 </ul>
                             </div>
                             
-                            <button class="btn btn-info" id="delete-${index}"><i  class="bi bi-trash"></i></button>
+                            <button class="btn btn-info" id="delete-${id}"><i  class="bi bi-trash"></i></button>
                         </div>
                 </div>
                 <div class="card-body flex-row">`
@@ -94,23 +108,22 @@ const showPosts = (filter,offset) => {
                         break;
 
                     case 'geolocation':
-                        Post = Post + `<div class="align-self-center" style="height: 50vh"><div id="map-${index}" class="w-100 h-100" ></div></div>
-                          <script>showMap('map-${index}','${post.content}')</script>`
+                        Post = Post + `<div class="align-self-center" style="height: 50vh"><div id="map-${id}" class="w-100 h-100" ></div></div>
+                          <script>showMap('map-${id}','${post.content}')</script>`
                         break;
                 }
-
-
+                
                 Post = Post +`</div>
                     <div class="card-footer text-muted">
                         <div class="d-flex flex-row">
-                            <div id="reactions-${index}" class="me-auto d-inline-flex"> 
+                            <div id="reactions-${id}" class="me-auto d-inline-flex"> 
                                 <div class="d-flex flex-row"><i class="bi bi-heart-fill"></i> <div class="ms-1">${reactions.heart}</div> </div>
                                 <div class="d-flex flex-row ms-3"><i class="bi bi-heartbreak"></i><div class="ms-1">${reactions.heartbreak}</div></div>
                                 <div class="d-flex flex-row ms-3"><i class="bi bi-hand-thumbs-up-fill"></i> <div class="ms-1">${reactions["thumbs-up"]}</div></div>
                                 <div class="d-flex flex-row ms-3"><i class="bi bi-hand-thumbs-down"></i><div class="ms-1">${reactions["thumbs-down"]}</div></div>
                                
                             </div>
-                            <div id="creation-${index}" class="ms-auto">
+                            <div id="creation-${id}" class="ms-auto">
                                 ${post.dateOfCreation.split('T')[0]},
                                 ${post.dateOfCreation.split('T')[1].split('.')[0]}
                             </div>
@@ -118,8 +131,7 @@ const showPosts = (filter,offset) => {
                     </div>
                         </div>
                 <script>
-                
-                 $('#delete-${index}').on('click',() => {
+                 $('#delete-${id}').on('click',() => {
                     deletePost('${post._id}');
                 });
                 </script>`
@@ -128,7 +140,26 @@ const showPosts = (filter,offset) => {
                 return Post
             }).join('\n')}`;
 
-            $('#posts').empty().append(html);
+            if (offset + limit < LastCall.posts) {
+                $('#under_posts').html(`<div class="mx-auto"> <a id="load_posts" class="link-opacity-100 link-opacity-50-hover"> Carica altri post</a></div>`)
+            }
+            else {
+                $('#under_posts').empty();
+            }
+
+
+
+            if (append) {
+                $('#posts').append(html);
+            }
+            else {
+                $('#posts').empty().append(html);
+            }
+
+            $('#load_posts').on('click',() => {
+                showPosts(filter,offset+limit,limit,true);
+            })
+
         }
     })
 }
@@ -241,7 +272,7 @@ $('#type-select').on('change',() => {
 
 $('#post-filters').on('change', () => {
     let filter = $('#post-filters input:checked').val();
-    showPosts(filter,LastCall.offset);
+    showPosts(filter,LastCall.offset = 0,LastCall.limit);
 })
 
 
@@ -301,13 +332,6 @@ $('#changeReactionsButton').on('click',() => {
     })
 })
 
-
-
-$(window).on('scroll', () => {
-    if($(window).scrollTop() === $(document).height() - $(window).height()) {
-            //provare ad aggiornare post tramite scrolldown
-    }
-})
 
 
 $(document).ready(() => {
