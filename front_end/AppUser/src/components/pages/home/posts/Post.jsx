@@ -4,7 +4,7 @@ import Title from "./Title.jsx";
 import './stylePost.css'
 import {
     Dislike, Like, Heart, HeartBroken
-} from "../../../assets/images/index.jsx"
+} from "../../../assets/index.jsx"
 import Button from "../../../utils/buttons/Button.jsx";
 function Post({user, message}) {
 

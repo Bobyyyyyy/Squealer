@@ -1,4 +1,4 @@
-import Gatto from '../../../assets/images/gatto.jpg'
+import {ProfilePic} from "../../../assets/index.jsx"
 import './stylePost.css'
 function Title(props) {
     return (
@@ -7,7 +7,7 @@ function Title(props) {
                 <div className="title">
                     <div className="imageAndNames" >
                         <div className="containerOfPic">
-                            <img className="profilePicture" alt="foto profilo" src={Gatto}/>
+                            <img className="profilePicture" alt="foto profilo" src={ProfilePic}/>
                         </div>
                         <div className="containerOfNames">
                             <h3 className="profileName">{props.user.name}</h3>

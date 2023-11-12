@@ -1,5 +1,5 @@
 import {useMemo, useEffect, useState} from "react";
-import {HomeIcon, SearchIcon, AddIcon, UserIcon, ChannelIcon, SettingIcon, Logout} from "../../assets/images/index.jsx";
+import {HomeIcon, SearchIcon, AddIcon, UserIcon, ChannelIcon, SettingIcon, Logout} from "../../assets/index.jsx";
 import MobileNavbar from "./mobile/MobileNavbar.jsx";
 import {useNavigate} from "react-router-dom";
 import Sidebar from "./pc/Sidebar.jsx";
@@ -8,29 +8,34 @@ function Navbar () {
     const navigate = useNavigate();
 
     const navigationButtons = [
-        {id: 0, icon: HomeIcon, name: "home", route: "/home"},
+        {id: 0, icon: HomeIcon, name: "home", route: "user"},
         {id: 1, icon: SearchIcon, name: "search", route: "/search"},
         {id: 2, icon: AddIcon, name: "add post", route: "/addpost"},
         {id: 3, icon: ChannelIcon, name: "channels", route: "/channels"},
         {id: 4, icon: UserIcon, name: "profile", route: "/profile"},
-        {id: 5, icon: SettingIcon, name: "settings", route: "/settings"}
+        {id: 5, icon: SettingIcon, name: "settings", route: "/settingsIcons"}
     ];
 
     /*
     const settingButtons = [
-        {id: 5, icon: SettingIcon, name: "settings", route: "/settings"},
+        {id: 5, icon: SettingIcon, name: "settingsIcons", route: "/settingsIcons"},
         {id: 6, icon: Logout, name: "log out"}
     ];
 
      */
+    function getLastPartUrl(url) {
+        const path = url.split('/');
+        return path.at(-1);
+    }
 
     const [activeButton, setActiveButton] = useState(
         () => {
-            let page = window.location.pathname.split("/").pop();
-            let obj = navigationButtons.filter(function(item) {
-                return item.route.split("/").pop() === page;
-            });
-            return obj[0].id;
+            let currentPage = getLastPartUrl(window.location.pathname);
+            console.log("curr: "+currentPage)
+            let correctPage = navigationButtons.filter(item => item.route === currentPage);
+            console.log("corr:")
+            console.log(correctPage);
+
         }
     );
 

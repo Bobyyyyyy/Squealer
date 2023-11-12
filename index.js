@@ -55,6 +55,9 @@ app.get(['/user','/user/*',],(req,res) => {
 app.use('/js' ,express.static(rootDir + '/front_end/AppMod/src/js'));
 app.use('/css',express.static(rootDir + '/front_end/AppMod/src/css'));
 app.use('/img',express.static(rootDir + '/back_end/assets/img'))
+app.use('/icons/reactionIcons',express.static(rootDir + '/back_end/assets/icons/reactionIcons'))
+app.use('/icons/navbarIcons',express.static(rootDir + '/back_end/assets/icons/navbarIcons'))
+app.use('/icons/settingsIcons',express.static(rootDir + '/back_end/assets/icons/settingsIcons'))
 
 /* CRON */
 const nodeCron =require('node-cron')

@@ -83,7 +83,7 @@ const createSession = async(req,res) => {
         switch (req.response.typeUser) {
             case 'user':
             case 'vip':
-                res.redirect('/homepage');
+                res.redirect('/user');
                 break;
 
             case 'mod':
