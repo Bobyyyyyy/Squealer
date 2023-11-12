@@ -27,8 +27,6 @@ const connectdb = async (credentials) => {
                 useUnifiedTopology: true,
                 useNewUrlParser: true
             })
-
-        console.log('db connected')
     }
     catch(err){
         console.log(err);

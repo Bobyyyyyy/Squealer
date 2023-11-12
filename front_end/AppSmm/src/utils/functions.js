@@ -1,23 +1,6 @@
 
 import {smm, currentVip, QUALITY, MAX_HEIGHT, MAX_WIDTH} from './config.js'
 import {useStore} from "vuex";
-
-async function start(){
-    const store = useStore();
-    let res = await fetch("/db/user/session",{
-        method:"GET",
-    });
-    smm.value = (await res.json()).username;
-
-    res = await fetch("/db/user/sessionVip",{
-        method:"GET",
-    });
-    currentVip.value = (await res.json()).vip;
-    if (currentVip.value){
-        store.commit('setQuota',await getUserQuota())
-    }
-}
-
 function getPage(){
     return window.location.pathname.split('/')[2];
 }
@@ -115,7 +98,6 @@ const compressBlob = (file) => new Promise((resolve) => {
 })
 
 export{
-    start,
     getPage,
     getPosts,
     getUserQuota,

@@ -57,7 +57,7 @@ app.use('/css',express.static(rootDir + '/front_end/AppMod/src/css'));
 app.use('/img',express.static(rootDir + '/back_end/assets/img'))
 
 /* CRON */
-const nodeCron =require('node-cron')
+const nodeCron = require('node-cron')
 const CC = require('./back_end/mongo/controllers/CronController')
 
 // quota reset
@@ -66,10 +66,8 @@ nodeCron.schedule(CC.resetWtimeout, async () => {await CC.resetQuota('W')}).star
 nodeCron.schedule(CC.resetMtimeout, async () => {await CC.resetQuota('M')}).start()
 
 
-
 // avvio di node
 app.listen(8000,function() {
     global.startDate = new Date();
     console.log('App listening on port 8000 started' + ' ' + startDate.toLocaleString());
 });
-

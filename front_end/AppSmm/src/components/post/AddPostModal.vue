@@ -19,6 +19,7 @@
   const timed = ref(false);
   const numberOfRepetitions = ref(0);
   const typeFrequency = ref('select Frequency')
+  const numFrequency = ref(0);
 
   /* TEXT */
   const textSqueal = ref('')          //get text of squeal. Only in text squeal.
@@ -63,12 +64,18 @@
       }
        */
 
+
       let post = {
         name: currentVip.value,
         contentType: postType.value,
         dateOfCreation: Date.now(),
         receiver: receiverName.value,
         destType: destType.value,
+        timed: timed.value,
+        ... (timed) && {
+          squealNumber: numberOfRepetitions.value,
+          frequency: [numFrequency.value.toString(),typeFrequency.value].join(' ')
+        }
       }
 
 
@@ -223,11 +230,11 @@
                     <div class="d-flex flex-column ms-2">
                       <label for="repFrequency" class="form-label">Frequency</label>
                       <div class="input-group" id="repFrequency">
-                        <input type="number" class="form-control" id="numFrequency">
+                        <input type="number" class="form-control" id="numFrequency" v-model="numFrequency">
                         <Dropdown :filterRef="typeFrequency"
                                   updateRef="updateTypeF"
                                   @updateTypeF="(el) => typeFrequency=el"
-                                  :dropItems="['minutes', 'days', 'weeks']"
+                                  :dropItems="['seconds','minutes', 'days']"
                                   classButton="btn-outline-secondary"
                         />
                       </div>

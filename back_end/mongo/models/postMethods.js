@@ -3,7 +3,24 @@ const Post = require("../schemas/Post");
 const User = require("../schemas/User");
 const Channel = require("../schemas/Channel")
 const ReservedChannel = require("../schemas/officialChannels");
-const {connectdb, createError} = require("./utils");
+const {connectdb, createError, mongoCredentials} = require("./utils");
+
+const find_remove = (arr,id) => {
+    let index = arr.findIndex(obj => obj['id'] === id);
+    let el2ret = arr[index];
+    arr.splice(index,1);
+    return el2ret;
+}
+
+/**
+ *
+ * @param {Array} scheduledPostArr
+ * @param {ObjectId} postId
+ */
+const removeScheduledPost = (scheduledPostArr, postId) => {
+    let jobDel = find_remove(scheduledPostArr,postId);
+    jobDel.job.stop();
+}
 
 const sorts = {
     'più recente':{
@@ -17,6 +34,79 @@ const sorts = {
     },
     'meno visual':{
         views: 1
+    }
+}
+
+function parseText(squealText, squealNumber){
+    let specialWords = squealText.match(/\{[A-Z]+}/g);
+    if(specialWords){
+        console.log("ENTRO");
+        let currentDate = new Date().toDateString();
+        let currentTime = new Date().toLocaleTimeString('it-IT');
+        specialWords.forEach(el => {
+            switch (el) {
+                case '{NUM}':
+                    squealText = squealText.replaceAll(el, squealNumber)
+                    break;
+                case '{TIME}':
+                    squealText = squealText.replaceAll(el, currentTime)
+                    break;
+                case '{DATE}':
+                    squealText = squealText.replaceAll(el, currentDate)
+                    break;
+                default:
+                    break;
+            }
+        })
+    }
+    return squealText;
+}
+
+const addTimedPost = async (postId, scheduledArray, credentials) => {
+    try {
+        await connectdb(credentials);
+
+        let post = await Post.findById(postId);
+        let userQuota = (await User.findOne({username: post.owner})).characters;
+
+        await mongoose.connection.close();
+
+        let timedInfo = scheduledArray.find(el => el['id']===postId);
+
+            /* same structure of body passed in addPost */
+        let newPost = {
+            name: post.owner,
+            destType: post.destination.destType,
+            receiver: post.destination.name,
+            contentType: post.contentType,
+            dateOfCreation: Date.now(),
+            content: post.contentType === 'text' ? parseText(timedInfo.content,timedInfo.done + 1) : post.content
+        }
+
+
+        let quota2del = newPost.destType === 'user' ? 0 : (post.contentType === 'text' ? newPost.content.length : 125);
+        //GESTIRE CASI IN CUI NON PUO' INSERIRE
+        let id = await addPost({
+            post: newPost,
+            quota:{
+                daily: userQuota.daily - quota2del,
+                weekly: userQuota.weekly - quota2del,
+                monthly: userQuota.monthly - quota2del,
+            }
+        }, credentials);
+
+        //check se id restituisce errore;
+
+        let idx = scheduledArray.findIndex(el =>  el['id']===postId );
+        scheduledArray[idx].done += 1;
+        console.log(scheduledArray[idx].done);
+        console.log(postId);
+        if(scheduledArray[idx].done === scheduledArray[idx].allTimes) removeScheduledPost(scheduledArray,postId);
+
+        return {newPostId : id};
+
+    }catch (err) {
+        console.log(err);
     }
 }
 
@@ -58,7 +148,7 @@ const addPost = async (body,credentials) => {
                 },
             },
             contentType: body.post.contentType,
-            content: body.post.content,
+            content: (body.post.timed && body.post.contentType === 'text') ? parseText(body.post.content, 1) : body.post.content,
             reactions: [],
             dateOfCreation: body.post.dateOfCreation,
         })
@@ -76,7 +166,7 @@ const addPost = async (body,credentials) => {
 
         await mongoose.connection.close();
 
-        return body;
+        return {postId: newPost._id};
     }
     catch(err){ throw err; }
 }
@@ -217,5 +307,6 @@ module.exports = {
     deletePost,
     updateReac,
     deleteReac,
-    getLastPostUser
+    getLastPostUser,
+    addTimedPost
 }
