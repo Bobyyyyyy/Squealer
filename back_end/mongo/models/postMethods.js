@@ -4,6 +4,8 @@ const User = require("../schemas/User");
 const Channel = require("../schemas/Channel")
 const ReservedChannel = require("../schemas/officialChannels");
 const {connectdb, createError, mongoCredentials} = require("./utils");
+const {scheduledPostArr, getNextTick} = require("../controllers/utils");
+const nodeCron = require("node-cron");
 
 const find_remove = (arr,id) => {
     let index = arr.findIndex(obj => obj['id'] === id);
@@ -14,10 +16,28 @@ const find_remove = (arr,id) => {
 
 /**
  *
- * @param {Array} scheduledPostArr
  * @param {ObjectId} postId
  */
-const removeScheduledPost = (scheduledPostArr, postId) => {
+const updateScheduledPost = ( postId) => {
+    let idx = scheduledPostArr.findIndex(el =>  el['id']===postId );
+    scheduledPostArr[idx].done += 1;
+    if(scheduledPostArr[idx].done === scheduledPostArr[idx].allTimes) {
+        removeScheduledPost(postId);
+    }
+    else{
+        scheduledPostArr[idx].job.stop();
+        scheduledPostArr[idx].job = nodeCron.schedule(getNextTick(scheduledPostArr[idx].timestamp2next), async () => await addTimedPost(postId, mongoCredentials), {scheduled: false})
+        scheduledPostArr[idx].job.start();
+    }
+
+}
+
+
+/**
+ *
+ * @param {ObjectId} postId
+ */
+const removeScheduledPost = (postId) => {
     let jobDel = find_remove(scheduledPostArr,postId);
     jobDel.job.stop();
 }
@@ -62,7 +82,7 @@ function parseText(squealText, squealNumber){
     return squealText;
 }
 
-const addTimedPost = async (postId, scheduledArray, credentials) => {
+const addTimedPost = async (postId, credentials) => {
     try {
         await connectdb(credentials);
 
@@ -71,7 +91,7 @@ const addTimedPost = async (postId, scheduledArray, credentials) => {
 
         await mongoose.connection.close();
 
-        let timedInfo = scheduledArray.find(el => el['id']===postId);
+        let timedInfo = scheduledPostArr.find(el => el['id']===postId);
 
             /* same structure of body passed in addPost */
         let newPost = {
@@ -97,11 +117,7 @@ const addTimedPost = async (postId, scheduledArray, credentials) => {
 
         //check se id restituisce errore;
 
-        let idx = scheduledArray.findIndex(el =>  el['id']===postId );
-        scheduledArray[idx].done += 1;
-        console.log(scheduledArray[idx].done);
-        console.log(postId);
-        if(scheduledArray[idx].done === scheduledArray[idx].allTimes) removeScheduledPost(scheduledArray,postId);
+        updateScheduledPost(postId);
 
         return {newPostId : id};
 

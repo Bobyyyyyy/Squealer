@@ -59,11 +59,12 @@ app.use('/img',express.static(rootDir + '/back_end/assets/img'))
 /* CRON */
 const nodeCron = require('node-cron')
 const CC = require('./back_end/mongo/controllers/CronController')
+const {resetDtimeout, resetWtimeout,resetMtimeout } = require("./back_end/mongo/controllers/utils");
 
 // quota reset
-nodeCron.schedule(CC.resetDtimeout, async () => {await CC.resetQuota('D')}).start()
-nodeCron.schedule(CC.resetWtimeout, async () => {await CC.resetQuota('W')}).start()
-nodeCron.schedule(CC.resetMtimeout, async () => {await CC.resetQuota('M')}).start()
+nodeCron.schedule(resetDtimeout, async () => {await CC.resetQuota('D')}).start()
+nodeCron.schedule(resetWtimeout, async () => {await CC.resetQuota('W')}).start()
+nodeCron.schedule(resetMtimeout, async () => {await CC.resetQuota('M')}).start()
 
 
 // avvio di node
