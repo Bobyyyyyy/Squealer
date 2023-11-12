@@ -1,6 +1,6 @@
 <script setup>
 
-  import {getPage} from "../../utilsSMM.js";
+  import {getPage} from "../../utils/functions.js";
 
   const props = defineProps({
     name: String,

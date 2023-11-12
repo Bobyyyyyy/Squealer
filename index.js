@@ -46,16 +46,16 @@ app.use('/', require('./back_end/Frontpage/routes/frontpage'));
 app.use('/db',require('./back_end/mongo/routers/mongoRouter'));
 
 app.get(['/SMM','/SMM/*'], isSMM, (req,res) => {
-    res.sendFile(rootDir + '/AppSmm/index');
+    res.sendFile(rootDir + '/front_end/AppSmm/index.html');
 })
 
 app.get(['/user','/user/*',],(req,res) => {
-    res.sendFile(rootDir + '/AppUser/index');
+    res.sendFile(rootDir + '/front_end/AppUser/index.html');
 })
 
 app.use('/js' ,express.static(rootDir + '/front_end/AppMod/src/js'));
 app.use('/css',express.static(rootDir + '/front_end/AppMod/src/css'));
-app.use('/img',express.static(rootDir + '/back_end/AppMod/img'));
+app.use('/img',express.static(rootDir + '/back_end/assets/img'))
 
 /* CRON */
 const nodeCron =require('node-cron')

@@ -9,7 +9,6 @@
   async function logout(){
 
     let res = await fetch("/logout");
-    console.log(res);
     window.location.href= res.url;
   }
 

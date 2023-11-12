@@ -1,6 +1,5 @@
 <script setup>
-import {computed, onBeforeMount, onBeforeUpdate, onMounted, onUnmounted, onUpdated, ref} from "vue";
-import {getPage} from "../../utilsSMM.js";
+import {computed} from "vue";
 
   const props = defineProps({
     item: Object,

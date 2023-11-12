@@ -1,11 +1,12 @@
 <script setup>
   import {computed, onMounted, ref} from "vue";
-  import {useStore} from "vuex";
   import Post from "../post/Post.vue";
-  import {currentVip, getPosts, postType, sortPosts} from "../../utilsSMM.js";
   import Dropdown from "../Dropdown.vue";
+  import {currentVip, postType, sortPosts} from "../../utils/config.js";
+  import {getPosts} from "../../utils/functions.js";
+  import {useStore} from "vuex";
 
-  const store = useStore()
+  const store = useStore();
 
   const chInfo = computed(()=> store.state.currentChannel)
 

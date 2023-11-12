@@ -1,10 +1,10 @@
 
 <script setup>
-import Channel from "../components/channels/Channel.vue";
 import {onMounted, reactive, ref} from "vue";
 import {Modal} from "bootstrap";
 import AddChannelModal from "../components/channels/AddChannelModal.vue";
-import {currentVip} from "../utilsSMM.js";
+import Channel from "../components/channels/Channel.vue";
+import {currentVip} from "../utils/config.js";
 
 let channels = []
 const channelsReady = ref(false);
@@ -13,7 +13,7 @@ const modalState = reactive({Modal: null,})
 onMounted(async () => {
   modalState.ChannelModal = new Modal('#AddChannelModal',{})
 
-  let res = await fetch(`/db/Channel/list?vipName=${currentVip.value}`,{
+  let res = await fetch(`/db/channel/list?vipName=${currentVip.value}`,{
     method:"GET"
   });
   channels = await res.json();
