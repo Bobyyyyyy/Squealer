@@ -5,15 +5,12 @@ TODO:
     - comprare quota
     - pagina dei messaggi
     - pagina dei grafici
-    - vedere se usare BLOB invece di FIlE alleggerisce
 
 - MOD:
     - canali privati
     - cerca dei post ?
 
 - Backend
-    - quote e aggiornamento di quote
-    - gestione messaggi temporizzati
     - funzioni per salvare un BLOB nel DB
 
 

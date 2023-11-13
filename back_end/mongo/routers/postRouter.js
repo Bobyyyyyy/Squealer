@@ -9,6 +9,8 @@ router.post('/delete',postController.removePost);
 router.get('/all',postController.getPosts);
 router.put('/updateReaction', postController.updateReaction);
 router.put('/deleteReaction', postController.deleteReaction);
+router.get('/allDates', postController.getPostsDate);
+router.get('/allReactionMonth', postController.getReactionLast30days)
 
 
 module.exports = router;

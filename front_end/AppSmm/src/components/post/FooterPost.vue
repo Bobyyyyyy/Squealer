@@ -31,7 +31,7 @@
       },
       body:JSON.stringify({
         postId: props.postId,
-        user: currentVip,
+        user: currentVip.value,
         reaction: newReac,
       })
     })
@@ -47,7 +47,7 @@
       },
       body:JSON.stringify({
         postId: props.postId,
-        user: currentVip,
+        user: currentVip.value,
       })
     })
   }

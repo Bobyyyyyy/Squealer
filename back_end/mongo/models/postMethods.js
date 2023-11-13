@@ -3,15 +3,66 @@ const Post = require("../schemas/Post");
 const User = require("../schemas/User");
 const Channel = require("../schemas/Channel")
 const ReservedChannel = require("../schemas/officialChannels");
-const {connectdb, createError, mongoCredentials} = require("./utils");
+const {connectdb, createError, mongoCredentials,find_remove} = require("./utils");
 const {scheduledPostArr, getNextTick} = require("../controllers/utils");
 const nodeCron = require("node-cron");
 
-const find_remove = (arr,id) => {
-    let index = arr.findIndex(obj => obj['id'] === id);
-    let el2ret = arr[index];
-    arr.splice(index,1);
-    return el2ret;
+/**
+ *
+ * @param {String} username
+ * @returns {Promise<[{reaction}]>}
+ */
+const getReactionLast30days = async(username) => {
+    try{
+        await connectdb(mongoCredentials);
+        let posts_id_reactions = await Post.find({owner: username, 'destination.destType': {$not: {$eq:'user'}}},'reactions');
+        await mongoose.connection.close();
+
+        let now = new Date();
+        let last30daysTS = (new Date(now.setDate(now.getDate() - 30))).getTime();
+
+        let reactions = [];
+
+        posts_id_reactions.forEach((post) => {
+            post.reactions.forEach((reac) => {
+                if(reac.date.getTime() >= last30daysTS) reactions.push(reac);
+            })
+        })
+
+        return reactions;
+
+    }catch (e) {
+        throw e;
+    }
+}
+/**
+ *
+ * @param {String} username
+ * @param {String} onlyThisMonth - get frequency of this month - Dovrebbe essere booleano, da aggiustare
+ * @returns {Promise<[String]>} - String are Dates
+ */
+const getPostsDate = async (username, onlyThisMonth ) => {
+    try{
+
+        await connectdb(mongoCredentials);
+
+        let postsId_Date = await Post.find({owner: username},'dateOfCreation');
+
+        await mongoose.connection.close();
+
+        let postsDate = []
+        let thisMonth = new Date().getMonth();
+        postsId_Date.forEach(obj => {
+            if (onlyThisMonth === 'false' || (onlyThisMonth && parseInt(obj.dateOfCreation.getMonth()) === thisMonth)) {
+                postsDate.push(obj.dateOfCreation);
+            }
+        })
+
+        return postsDate;
+    }
+    catch (err){
+        throw err;
+    }
 }
 
 /**
@@ -305,8 +356,6 @@ const getLastPostUser = async (query,credentials) => {
 
         await connectdb(credentials);
 
-        console.log(query.user);
-
         let posts = await Post.find({owner: query.user}).sort(sorts['più recente']).limit(1);
 
         await mongoose.connection.close();
@@ -324,5 +373,7 @@ module.exports = {
     updateReac,
     deleteReac,
     getLastPostUser,
-    addTimedPost
+    addTimedPost,
+    getPostsDate,
+    getReactionLast30days
 }

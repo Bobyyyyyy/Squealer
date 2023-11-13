@@ -54,6 +54,21 @@ async function getLastPost(vipName){
     }
 }
 
+//voglio che mi ritorni per ogni una lista di date.
+async function getPostsDate(vipname,onlyThisMonth){
+    try{
+        let res = await fetch(`/db/post/allDates?user=${vipname}&onlyMonth=${onlyThisMonth}`,{
+            method:"GET",
+        })
+        return await res.json();
+
+    }
+    catch (err){
+        console.log(err);
+    }
+}
+
+/* IMG TO BASE64 Compressed */
 function calculateSize(img, maxWidth, maxHeight) {
     let width = img.width;
     let height = img.height;
@@ -105,4 +120,5 @@ export{
     getLastPost,
     blob2base64,
     compressBlob,
+    getPostsDate
 }

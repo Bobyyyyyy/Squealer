@@ -54,10 +54,31 @@ const removePost = async (req,res) => {
     }
 }
 
+const getPostsDate = async (req,res) => {
+    try{
+        await res.send(await postModel.getPostsDate(req.query.user, req.query.onlyMonth));
+
+    }
+    catch (e) {
+        throw e;
+    }
+}
+
+const getReactionLast30days = async (req,res) => {
+    try{
+        await res.send(await postModel.getReactionLast30days(req.query.user));
+    }
+    catch (e) {
+        throw e;
+    }
+}
+
 module.exports = {
     createPost,
     getPosts,
     updateReaction,
     deleteReaction,
     removePost,
+    getPostsDate,
+    getReactionLast30days
 }
