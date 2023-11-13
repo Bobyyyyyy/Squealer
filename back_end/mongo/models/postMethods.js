@@ -126,46 +126,66 @@ const addTimedPost = async (postId, credentials) => {
     }
 }
 
-const addPost = async (body,credentials) => {
+const addPost = async (body,creator,credentials) => {
     try{
         await connectdb(credentials)
+        let destinations = JSON.parse(body.destinations);
+        let postCategory = 'private';
+        let officialChannels = [];
+        let creatorType = await User.findOne({username: creator}, 'typeUser').typeUser;
 
-        /* ERROR HANDLING */
-        /* utente non esiste  */
-        if(body.destType === 'user' && !(await User.findOne({username: body.receiver})) ){
-            await mongoose.connection.close();
-            throw createError("utente non esistente!",422);
+        for (const destination of destinations) {
+
+            let destinationType = destination.destType;
+            let channel = null
+
+            /* ERROR HANDLING */
+            /* utente non esiste  */
+            if (destinationType === 'user' && !(await User.findOne({username: destination.receiver}))) {
+                await mongoose.connection.close();
+                throw createError("utente non esistente!", 422);
+            }
+            /* canale non esiste  */
+            else if (destinationType === 'channel' && !(channel = await Channel.findOne({name: destination.receiver}))) {
+                await mongoose.connection.close();
+                throw createError("canale non esistente!", 422);
+            }
+            /* canale ufficiale non esiste e l'utente non mod*/
+            else if (destinationType === 'official' && (!(await ReservedChannel.findOne({name: destination.receiver}))
+                || creatorType !== 'mod')) {
+                await mongoose.connection.close();
+                throw createError("canale ufficiale non esistente o utente non moderatore!", 422);
+            }
+            /* tipo di destinatario non inserito */
+            else if (destinationType === 'receiver') {
+                await mongoose.connection.close();
+                throw createError("Inserisci il tipo di destinatario!", 422);
+            }
+
+            if (destinationType === 'official') {
+                postCategory = 'public';
+                officialChannels.push(destinationType.receiver);
+            }
+
+            else if (channel) {
+                if (channel.isPublic) {
+                    postCategory = 'public';
+                }
+            }
+
         }
-        /* canale non esiste  */
-        else if(body.destType === 'channel' && !(await Channel.findOne({name: body.receiver}))){
-            await mongoose.connection.close();
-            throw createError("canale non esistente!",422);
-        }
-        /* canale ufficiale non esiste e l'utente non mod*/
-        else if(body.destType === 'official' && (!(await ReservedChannel.findOne({name: body.receiver}))
-            || (await User.findOne({username: body.name},'typeUser')).typeUser !== 'mod')){
-            await mongoose.connection.close();
-            throw createError("canale ufficiale non esistente o utente non moderatore!",422);
-        }
-        /* tipo di destinatario non inserito */
-        else if (body.destType === 'receiver'){     /* DA VEDERE CON ALE COME MODIFICARE */
-            await mongoose.connection.close();
-            throw createError("Inserisci il tipo di destinatario!",422);
-        }
+
 
         /* POST SAVE */
         let newPost = new Post({
             owner: body.post.name,
-            destination:{
-                destType: body.post.destType,
-                name: body.post.receiver,
-                ...(body.post.destType === 'channel') && {
-                    isPublic: (await Channel.findOne({name: body.post.receiver},'isPublic')).isPublic
-                },
+            $push: {destinationsArray: {$each :  destinations},
             },
             contentType: body.post.contentType,
             content: (body.post.timed && body.post.contentType === 'text') ? parseText(body.post.content, 1) : body.post.content,
             reactions: [],
+            officialChannelsArray: officialChannels,
+            category: postCategory,
             dateOfCreation: body.post.dateOfCreation,
         })
 
@@ -227,6 +247,7 @@ const getAllPost = async (query,credentials) =>{
             .limit(parseInt(query.limit))
             .sort(sorts[query.sort ?  query.sort : 'più recente'])
             .lean();
+
 
         await mongoose.connection.close()
         return posts;

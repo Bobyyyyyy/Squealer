@@ -42,7 +42,7 @@ const PostSchema = new mongoose.Schema({
     category: {
             type: String,
             required: true,
-            enum: categories
+            enum: categories,
     },
 
     contentType:{
@@ -52,7 +52,7 @@ const PostSchema = new mongoose.Schema({
     },
 
     content:{
-        type: String,       // ?
+        type: String,
         required: true,
     },
 
@@ -72,10 +72,18 @@ const PostSchema = new mongoose.Schema({
         required: true,
     },
 
-    views: {
+    criticalMass: {
         type: Number,
+        default: 0,
     },
 
+    views: {
+        type: Number,
+        default: 0,
+    },
+
+
+    //TODO
     tag: {
         type: String,
     },
