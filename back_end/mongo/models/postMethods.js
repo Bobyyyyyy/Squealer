@@ -218,9 +218,20 @@ const getLastPostUser = async (query,credentials) => {
     }
 }
 
+
+/**
+ *
+ * @param {String} filter - filter for posts - ['all','image','text','geolocation']
+ * @param credentials - mongo credentials
+ * @returns {Promise<*>}
+ */
 const postLength = async (filter,credentials) => {
     try {
         await connectdb(credentials);
+
+        // controllo se il filtro che arriva è tra i valori dell'enum
+
+
         let posts = await Post.find(
             { ... (filter && filter !== '') && {contentType: filter}}
         ).lean();

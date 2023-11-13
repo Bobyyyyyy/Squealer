@@ -25,6 +25,7 @@ function updateLastCall(limit,offset,filter) {
         type: 'get',
         success: (data) => {
             LastCall.posts = data.length;
+            $('#post-trovati').html(`${data.length}`);
         }
     })
 }
