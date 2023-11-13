@@ -48,7 +48,8 @@ const deleteChannel = async (body,credentials) => {
             err.statusCode = 400;
             throw err;
         }
-        await Post.deleteMany({'destination.name': body.name});
+
+        await Post.deleteMany({'officialChannelsArray': body.name});
         await mongoose.connection.close();
     }
     catch(err){
