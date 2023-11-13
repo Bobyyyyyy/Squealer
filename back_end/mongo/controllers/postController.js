@@ -1,11 +1,15 @@
 const {mongoCredentials} = require('../models/utils.js')
 const postModel = require("../models/postMethods");
+const {createScheduledPost} = require("./CronController");
 
 
 const createPost = async (req,res) => {
     try{
-
-        res.send(await postModel.addPost(req.body,mongoCredentials));
+        let postSavedId = await postModel.addPost(req.body,mongoCredentials)
+        if (req.body.post?.timed){
+            await createScheduledPost(postSavedId.postId, req.body.post.frequency, req.body.post.squealNumber, req.body.post.content, req.body.post.contentType);
+        }
+        res.send({id: postSavedId});
     }
     catch (err){
         console.log(err);
