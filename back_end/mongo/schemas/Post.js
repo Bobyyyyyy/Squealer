@@ -17,12 +17,6 @@ const PostSchema = new mongoose.Schema({
                 type: String,
                 enum: destTypes,
             },
-            isPublic: {     // DA INSERIRE SOLO SE CANALE
-                type: Boolean,
-                required: function(){
-                    return this.destination.destType === 'channel'
-                }
-            },
             name: {
                 type: String,
                 required: true,
@@ -32,10 +26,8 @@ const PostSchema = new mongoose.Schema({
 
     officialChannelsArray: [
         {
-            name: {
                 type: String,
                 required: true,
-            }
         }
     ],
 

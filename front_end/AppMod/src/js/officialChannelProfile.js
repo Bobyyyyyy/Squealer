@@ -20,7 +20,7 @@ function updateLastCall(limit,offset,filter) {
  function getPostsNumber (filter) {
     $.ajax({
         url:'/db/post/number',
-        data: {filter: filter},
+        data: {filter: filter, channel: ChannelName},
         async: false,
         type: 'get',
         success: (data) => {
@@ -67,7 +67,8 @@ const showPosts = (filter,offset,limit,append = false) => {
         data: {channel: ChannelName, typeFilter: filter , offset: offset, limit: limit},
         type: 'get',
         success: (posts) => {
-            let html = `${$.map(posts, (post,index) => {
+            console.log(posts)
+            let html = `${$.map(posts, (post) => {
                 let id = post._id;
                 id = id.substring(id.length - 10);
                 let reactions = {
@@ -122,8 +123,8 @@ const showPosts = (filter,offset,limit,append = false) => {
                                 <div class="d-flex flex-row ms-3"><i class="bi bi-heartbreak"></i><div class="ms-1">${reactions.heartbreak}</div></div>
                                 <div class="d-flex flex-row ms-3"><i class="bi bi-hand-thumbs-up-fill"></i> <div class="ms-1">${reactions["thumbs-up"]}</div></div>
                                 <div class="d-flex flex-row ms-3"><i class="bi bi-hand-thumbs-down"></i><div class="ms-1">${reactions["thumbs-down"]}</div></div>
-                               
                             </div>
+                            <div class="d-flex flex-row "><i class="bi bi-eyeglasses"></i><div class="ms-1">${post.views}</div></div>
                             <div id="creation-${id}" class="ms-auto">
                                 ${post.dateOfCreation.split('T')[0]},
                                 ${post.dateOfCreation.split('T')[1].split('.')[0]}
@@ -205,18 +206,25 @@ $('#addPostButton').on('click',(contentType, content) => {
     if(contentType === 'geolocation') {
         content = $('#post-content').html();
     }
-
     else {
         content = $('#post-content').val();
     }
 
-    console.log(content)
 
-  const currentDate = new Date();
+    let destinations = []
+
+    destinations.push({
+        destType: 'official',
+        name: ChannelName,
+    });
+
+
+
+    const currentDate = new Date();
     $.ajax({
         url:'/db/post',
-        data: {post: {name: User, destType: 'official', receiver: ChannelName,
-               contentType: contentType, content: content, dateOfCreation: currentDate}},
+        data: {post: {creator: User, destinations: JSON.stringify(destinations),
+                contentType: contentType, content: content, dateOfCreation: currentDate}},
         type: 'post',
         success: (post) => {
             location.reload();

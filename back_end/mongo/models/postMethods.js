@@ -126,32 +126,37 @@ const addTimedPost = async (postId, credentials) => {
     }
 }
 
-const addPost = async (body,creator,credentials) => {
+/**
+ * @param {Object} post
+ * {creator: String, destination: array of objects{name: String, destType: String}, contentType: String, content: String, dateOfCreation: Date }
+ * @param credentials - mongo credentials
+ * @returns {Promise<{postId: *}>}
+ */
+const addPost = async (post,credentials) => {
     try{
         await connectdb(credentials)
-        let destinations = JSON.parse(body.destinations);
+        let destinations = JSON.parse(post.destinations);
         let postCategory = 'private';
         let officialChannels = [];
-        let creatorType = await User.findOne({username: creator}, 'typeUser').typeUser;
+        let creatorType = (await User.findOne({username: post.creator}, 'typeUser')).typeUser;
 
         for (const destination of destinations) {
-
             let destinationType = destination.destType;
-            let channel = null
+            let channel = await Channel.findOne({name: destination.name});
 
             /* ERROR HANDLING */
             /* utente non esiste  */
-            if (destinationType === 'user' && !(await User.findOne({username: destination.receiver}))) {
+            if (destinationType === 'user' && !(await User.findOne({username: destination.name}))) {
                 await mongoose.connection.close();
                 throw createError("utente non esistente!", 422);
             }
             /* canale non esiste  */
-            else if (destinationType === 'channel' && !(channel = await Channel.findOne({name: destination.receiver}))) {
+            else if (destinationType === 'channel' && channel.length === 0) {
                 await mongoose.connection.close();
                 throw createError("canale non esistente!", 422);
             }
             /* canale ufficiale non esiste e l'utente non mod*/
-            else if (destinationType === 'official' && (!(await ReservedChannel.findOne({name: destination.receiver}))
+            else if (destinationType === 'official' && (!(await ReservedChannel.findOne({name: destination.name}))
                 || creatorType !== 'mod')) {
                 await mongoose.connection.close();
                 throw createError("canale ufficiale non esistente o utente non moderatore!", 422);
@@ -164,41 +169,40 @@ const addPost = async (body,creator,credentials) => {
 
             if (destinationType === 'official') {
                 postCategory = 'public';
-                officialChannels.push(destinationType.receiver);
+                officialChannels.push(destination.name);
+                destinations.pop(destination);
             }
 
-            else if (channel) {
+            else if (channel.length === 0) {
                 if (channel.isPublic) {
                     postCategory = 'public';
                 }
             }
-
         }
-
 
         /* POST SAVE */
         let newPost = new Post({
-            owner: body.post.name,
-            $push: {destinationsArray: {$each :  destinations},
-            },
-            contentType: body.post.contentType,
-            content: (body.post.timed && body.post.contentType === 'text') ? parseText(body.post.content, 1) : body.post.content,
+            owner: post.creator,
+            destinationArray: destinations,
+            contentType: post.contentType,
+            content: (post.timed && post.contentType === 'text') ? parseText(post.content, 1) : post.content,
             reactions: [],
             officialChannelsArray: officialChannels,
             category: postCategory,
-            dateOfCreation: body.post.dateOfCreation,
+            dateOfCreation: post.dateOfCreation,
         })
 
         await newPost.save();
 
         /* QUOTA UPDATE */
-        await User.findOneAndUpdate({username: body.post.name}, {
+        await User.findOneAndUpdate({username: post.name}, {
             characters:{
-                daily: body.quota.daily,
-                weekly: body.quota.weekly,
-                monthly: body.quota.monthly,
+                daily: quota.daily,
+                weekly: quota.weekly,
+                monthly: quota.monthly,
             }
         } );
+
 
         await mongoose.connection.close();
 
@@ -226,7 +230,6 @@ const getAllPost = async (query,credentials) =>{
 
         await connectdb(credentials)
 
-        console.log(query);
         let filter = {
                 /* Per i canali non mi serve l'id dell'utente che fa la richiesta, a meno che non sia SMM*/
             ...(query.smm || !query.channel) && {'owner':  query.name},
@@ -234,13 +237,13 @@ const getAllPost = async (query,credentials) =>{
             ... (query.typeFilter && query.typeFilter !== 'all') && {'contentType': query.typeFilter},
 
                 /* PER LA PAGINA DEL PROFILO : */
-            ... (query.destType && query.destType !== 'all') && {'destination.destType': query.destType === 'user' ? 'user' : 'channel'},
-            ... (query.destType && query.destType !== 'all' && query.destType !== 'user') && {'destination.isPublic': query.destType === 'public'},
+            ... (query.destType && query.destType !== 'all') && {'destinationArray.destType':  query.destType === 'user' ? 'user' : 'channel'},
+            ... (query.destType && query.destType !== 'all' && query.destType !== 'user') && {'category': query.destType === 'public'},
 
                 /* PER IL CANALE SINGOLO */
-            ...(query.channel) && {'destination.name': query.channel}
+            $or: [{...(query.channel) && {'destinationArray.name': query.channel}},
+                 {...(query.channel) && {'officialChannelsArray': query.channel}}]
         }
-
 
         let posts = await Post.find(filter)
             .skip(parseInt(query.offset))
@@ -248,6 +251,10 @@ const getAllPost = async (query,credentials) =>{
             .sort(sorts[query.sort ?  query.sort : 'più recente'])
             .lean();
 
+        for (const post of posts) {
+            let views = post.views
+            await Post.findByIdAndUpdate(post._id,{'views': ++post.views});
+        }
 
         await mongoose.connection.close()
         return posts;
@@ -349,10 +356,11 @@ const getLastPostUser = async (query,credentials) => {
 /**
  *
  * @param {String} filter - filter for posts - ['all','image','text','geolocation']
+ * @param {String} channel - channel filter for posts
  * @param credentials - mongo credentials
  * @returns {Promise<*>}
  */
-const postLength = async (filter,credentials) => {
+const postLength = async (filter,channel,credentials) => {
     try {
         await connectdb(credentials);
 
@@ -360,8 +368,11 @@ const postLength = async (filter,credentials) => {
 
 
         let posts = await Post.find(
-            { ... (filter && filter !== '') && {contentType: filter}}
-        ).lean();
+            { ... (filter && filter !== '') && {contentType: filter},
+                '$or': [{'destinationArray.name': channel}, {'officialChannelsArray': channel}],
+                }).lean();
+
+
         return {length: posts.length};
     }
     catch (Error){

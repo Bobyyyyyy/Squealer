@@ -5,11 +5,12 @@ const {createScheduledPost} = require("./CronController");
 
 const createPost = async (req,res) => {
     try{
-        let postSavedId = await postModel.addPost(req.body,mongoCredentials)
-        if (req.body.post?.timed){
+        let postSavedId = await postModel.addPost(req.body.post,mongoCredentials)
+        if (req.body.post?.timed) {
             await createScheduledPost(postSavedId.postId, req.body.post.frequency, req.body.post.squealNumber, req.body.post.content, req.body.post.contentType);
+            res.send({id: postSavedId});
         }
-        res.send({id: postSavedId});
+        res.send({id: postSavedId})
     }
     catch (err){
         console.log(err);
@@ -62,7 +63,7 @@ const removePost = async (req,res) => {
 const postLength = async (req,res) => {
     try {
         console.log(req.query);
-        res.send(await postModel.postLength(req.query.filter,mongoCredentials))
+        res.send(await postModel.postLength(req.query.filter,req.query.channel,mongoCredentials))
     }
     catch (error) {
         res.send(error);
