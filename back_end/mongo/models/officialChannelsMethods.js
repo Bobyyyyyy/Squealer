@@ -103,7 +103,6 @@ const searchByChannelName = async (query, credentials) =>{
 const modifyDescription = async (body, credentials) => {
     try {
         await connectdb(credentials);
-        console.log(body);
         let channel = await ReservedChannel.findOneAndUpdate({name: body.channel},
             {description : body.description},{new: true}).lean();
 

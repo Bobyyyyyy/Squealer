@@ -40,7 +40,6 @@ const deletePost = async (id) => {
         data: {id: id},
         type: 'post',
         success: (post) => {
-            console.log(post);
             location.reload()
         }
     })
@@ -80,9 +79,13 @@ const showPosts = (filter,offset,limit,append = false) => {
                 
                 let Post =
                     `<div id="post-${id}" class="card mt-5 w-50">
-                    <div class="card-header d-flex bg-info border-black align-items-center p-3 h5 fw-bold">
-                        @${post.owner}
-                        <span class="ms-2">${post.category}</span>
+                    <div class="card-header d-flex bg-info border-black align-items-center">
+                        <div class="d-flex flex-row align-items-center justify-content-center">
+                            <div class="fw-bold">@${post.owner}</div>
+                            <div class="ms-2 fw-light">${post.category}</div>
+                            <div class="ms-2 fw-light">/${post.popularity}</div>  
+                        </div>
+                        
                         <div class="d-flex flex-row ms-auto">
                             <div class="btn-group dropup">
                                 <button class="ms-2 btn btn-info"  data-bs-toggle="dropdown" aria-expanded="false">
@@ -125,7 +128,7 @@ const showPosts = (filter,offset,limit,append = false) => {
                                 <div class="d-flex flex-row ms-3"><i class="bi bi-hand-thumbs-up-fill"></i> <div class="ms-1">${reactions["thumbs-up"]}</div></div>
                                 <div class="d-flex flex-row ms-3"><i class="bi bi-hand-thumbs-down"></i><div class="ms-1">${reactions["thumbs-down"]}</div></div>
                             </div>
-                            <div class="d-flex flex-row"><i class="bi bi-eye"></i></i><div class="ms-1">${post.views}</div></div>
+                            <div class="d-flex flex-row"><i class="bi bi-eye"></i></i><div class="ms-1">${post.views.length}</div></div>
                             <div class="d-flex flex-row ms-2"><i class="bi bi-people"></i><div class="ms-1">${post.criticalMass}</div></div>
                             
                             <div id="creation-${id}" class="ms-auto">
@@ -203,8 +206,6 @@ $('#delete-button').on('click', () => {
 
 $('#addPostButton').on('click',(contentType, content) => {
     contentType = $('#type-select option:selected').val();
-
-    console.log(contentType);
 
     if(contentType === 'geolocation') {
         content = $('#post-content').html();

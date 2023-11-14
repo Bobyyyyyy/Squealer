@@ -3,9 +3,10 @@ const Post = require("../schemas/Post");
 const User = require("../schemas/User");
 const Channel = require("../schemas/Channel")
 const ReservedChannel = require("../schemas/officialChannels");
-const {connectdb, createError, mongoCredentials,find_remove} = require("./utils");
+const {connectdb, createError, mongoCredentials,find_remove, CRITICAL_MASS_MULTIPLIER} = require("./utils");
 const {scheduledPostArr, getNextTick} = require("../controllers/utils");
 const nodeCron = require("node-cron");
+const {changePopularity} = require("./userMethods");
 
 /**
  *
@@ -233,23 +234,25 @@ const addPost = async (post,quota,credentials) => {
             contentType: post.contentType,
             content: (post.timed && post.contentType === 'text') ? parseText(post.content, 1) : post.content,
             reactions: [],
+            views: [],
             officialChannelsArray: officialChannels,
             category: postCategory,
+            popularity: 'neutral',
             dateOfCreation: post.dateOfCreation,
         })
 
         await newPost.save();
 
-        console.log(quota);
-
-        /* QUOTA UPDATE */
-        await User.findOneAndUpdate({username: post.creator}, {
-            characters:{
-                daily: quota.daily,
-                weekly: quota.weekly,
-                monthly: quota.monthly,
-            }
-        } );
+        if (creatorType !== 'mod' ) {
+            /* QUOTA UPDATE */
+            await User.findOneAndUpdate({username: post.creator}, {
+                characters:{
+                    daily: quota.daily,
+                    weekly: quota.weekly,
+                    monthly: quota.monthly,
+                }
+            } );
+        }
 
         await mongoose.connection.close();
 
@@ -261,10 +264,12 @@ const addPost = async (post,quota,credentials) => {
 /**
  *
  * @param {Object} query
+ * @param {String} sessionUser
  * @param {String} query.name - name of user requesting
  * @param {String} query.channel - name of channel
  * @param {Boolean} query.smm - is SMM requesting
  * @param {String} query.destType - only if destType activated
+ * @param {String} query.popularity - only if popularity is activated
  * @param {String} query.typeFilter - only if type post filter activated
  * @param {Number} query.offset - offset to skip
  * @param {String} query.limit - max number of post to return
@@ -272,7 +277,7 @@ const addPost = async (post,quota,credentials) => {
  * @param credentials
  * @returns {Promise<*>}
  */
-const getAllPost = async (query,credentials) =>{
+const getAllPost = async (query,sessionUser,credentials) =>{
     try{
 
         await connectdb(credentials)
@@ -286,12 +291,13 @@ const getAllPost = async (query,credentials) =>{
                 /* PER LA PAGINA DEL PROFILO : */
             ... (query.destType && query.destType !== 'all') && {'destinationArray.destType':  query.destType === 'user' ? 'user' : 'channel'},
             ... (query.destType && query.destType !== 'all' && query.destType !== 'user') && {'category': query.destType},
+            ... (query.popularity && query.popularity !== 'neutral') && {'popularity': query.popularity},
+
 
                 /* PER IL CANALE SINGOLO */
             $or: [{...(query.channel) && {'destinationArray.name': query.channel}},
                  {...(query.channel) && {'officialChannelsArray': query.channel}}]
         }
-
 
         let posts = await Post.find(filter)
             .skip(parseInt(query.offset))
@@ -300,11 +306,18 @@ const getAllPost = async (query,credentials) =>{
             .lean();
 
         for (const post of posts) {
-            let views = ++post.views
-            let postToUpdate = await Post.findByIdAndUpdate(post._id,{'views': post.views, 'criticalMass': parseInt(post.views * 0.25)});
-            await UpdateCategory(postToUpdate);
+            let filteredArray = post.views.filter(user => {return user.name === sessionUser})
+            if(filteredArray.length === 0) {
+                let NumberofViews = ++post.views.length;
+                let CriticalMass = post.criticalMass + (NumberofViews * CRITICAL_MASS_MULTIPLIER)
+                let view = {
+                    name: sessionUser,
+                    date: new Date(),
+                }
+                let postToUpdate = await Post.findByIdAndUpdate(post._id,{$push: {'views': view} , 'criticalMass': parseInt(CriticalMass)});
+                await UpdateCategory(postToUpdate);
+            }
         }
-
         await mongoose.connection.close()
         return posts;
     }
@@ -345,11 +358,11 @@ const updateReac = async (body,credentials) => {
     try{
         await connectdb(credentials);
 
-        let user = await User.findOne({username: body.user},'typeUser');
+        let user = await User.findOne({username: body.user});
 
         if(user.typeUser === 'mod') {
             let post = await Post.findByIdAndUpdate(body.postId, {$push:{reactions: {$each: JSON.parse(body.reactions)}}},{new: true});
-            await UpdateCategory(post);
+            await UpdateCategory(post,user._id);
             return body;
         }
 
@@ -359,7 +372,9 @@ const updateReac = async (body,credentials) => {
             await Post.findByIdAndUpdate(body.postId, {$pull: {reactions: {user: body.user}}});
         }
 
-        await Post.findByIdAndUpdate(body.postId, {$push:{reactions: {rtype: body.reaction, user: body.user, date: new Date()}}});
+        let post = await Post.findByIdAndUpdate(body.postId, {$push:{reactions: {rtype: body.reaction, user: body.user, date: new Date()}}});
+        await UpdateCategory(post,user._id);
+
         await mongoose.connection.close();
 
         return body;
@@ -386,13 +401,15 @@ const deleteReac = async (body,credentials) => {
 
 /**
  * @param {Object} post
+ * @param {String} userID
  * @returns {Promise<boolean>}
  */
-const UpdateCategory = async (post) => {
+const UpdateCategory = async (post, userID) => {
     let criticalMass = post.criticalMass;
     let positiveReactionsCount = 0;
     let negativeReactionsCount = 0;
 
+    console.log(userID);
      post.reactions.forEach((reaction) => {
          if (reaction.rtype === 'thumbs-up') {
              positiveReactionsCount ++;
@@ -403,36 +420,45 @@ const UpdateCategory = async (post) => {
          else if (reaction.rtype === 'thumbs-down') {
              negativeReactionsCount ++;
          }
-         else if (reaction.rtype === 'thumbs-up') {
+         else if (reaction.rtype === 'heartbreak') {
              negativeReactionsCount += 2;
          }
      })
 
     if (positiveReactionsCount > criticalMass) {
         if (negativeReactionsCount > criticalMass) {
-            await Post.findByIdAndUpdate(post._id, {category: 'controversial'});
+            await Post.findByIdAndUpdate(post._id, {popularity: 'controversial'});
         }
         else {
-            await Post.findByIdAndUpdate(post._id, {category: 'popular'});
+            await Post.findByIdAndUpdate(post._id, {popularity: 'popular'});
+            if(userID) {
+                await changePopularity(userID, true);
+            }
+
         }
         return true;
     }
 
     if (negativeReactionsCount > criticalMass) {
         if (positiveReactionsCount > criticalMass) {
-            await Post.findByIdAndUpdate(post._id, {category: 'controversial'});
+            await Post.findByIdAndUpdate(post._id, {popularity: 'controversial'});
         }
         else {
-            await Post.findByIdAndUpdate(post._id, {category: 'unpopular'});
+            await Post.findByIdAndUpdate(post._id, {popularity: 'unpopular'});
+            if(userID) {
+                await changePopularity(userID, false);
+            }
+
         }
         return true;
     }
 
-
-    if (post.category !== 'public') {
-        await Post.findByIdAndUpdate(post._id, {category: 'public'});
+    if (post.category !== 'neutral') {
+        await Post.findByIdAndUpdate(post._id, {popularity: 'neutral'});
         return true;
     }
+
+
 
     return false;
 }
@@ -463,9 +489,6 @@ const getLastPostUser = async (query,credentials) => {
 const postLength = async (filter,channel,credentials) => {
     try {
         await connectdb(credentials);
-
-        // controllo se il filtro che arriva è tra i valori dell'enum
-
 
         let posts = await Post.find(
             { ... (filter && filter !== '') && {contentType: filter},

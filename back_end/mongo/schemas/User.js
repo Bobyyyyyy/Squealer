@@ -46,6 +46,7 @@ const UserSchema = new mongoose.Schema({
             return this.typeUser !== 'mod';
         },
     },
+
     maxQuota: {
         type:{
             daily:{
@@ -61,6 +62,12 @@ const UserSchema = new mongoose.Schema({
         required: function(){
             return this.typeUser !== 'mod';
         },
+    },
+
+    popularity: {
+        type: Number,
+        required: true,
+        default: 0,
     }
 })
 

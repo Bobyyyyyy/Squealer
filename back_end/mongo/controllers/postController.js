@@ -19,7 +19,7 @@ const createPost = async (req,res) => {
 
 const getPosts = async (req,res) => {
     try {
-        res.send(await postModel.getAllPost(req.query,mongoCredentials))
+        res.send(await postModel.getAllPost(req.query,req.session.user,mongoCredentials))
     }
     catch(error) {
         res.send(error);
@@ -81,7 +81,6 @@ const getReactionLast30days = async (req,res) => {
 
 const postLength = async (req,res) => {
     try {
-        console.log(req.query);
         res.send(await postModel.postLength(req.query.filter,req.query.channel,mongoCredentials))
     }
     catch (error) {
