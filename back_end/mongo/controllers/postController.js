@@ -30,10 +30,12 @@ const updateReaction = async (req,res) => {
     try {
         if(req.session.type === 'mod') {
                 await postModel.updateReac(req.body, mongoCredentials);
-                res.sendStatus(200);
+                res.send('200');
         }
-        await postModel.updateReac({user: req.body.user, rtype: req.body.keys},mongoCredentials)
-        res.send(await postModel.updateReac(req.body,mongoCredentials))
+        else {
+            await postModel.updateReac({user: req.body.user, rtype: req.body.keys}, mongoCredentials)
+            res.send(await postModel.updateReac(req.body, mongoCredentials));
+        }
     }
     catch(error) {
         res.send(error);
@@ -62,7 +64,6 @@ const removePost = async (req,res) => {
 const getPostsDate = async (req,res) => {
     try{
         await res.send(await postModel.getPostsDate(req.query.user, req.query.onlyMonth));
-
     }
     catch (e) {
         throw e;

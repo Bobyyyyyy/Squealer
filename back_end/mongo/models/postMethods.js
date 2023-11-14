@@ -183,7 +183,7 @@ const addTimedPost = async (postId, credentials) => {
 const addPost = async (post,quota,credentials) => {
     try{
         await connectdb(credentials)
-        let destinations = (post.destinations instanceof String) ? JSON.parse(post.destinations) : post.destinations;
+        let destinations = ((typeof post.destinations) === 'string') ? JSON.parse(post.destinations) : post.destinations;
         let postCategory = 'private';
         let officialChannels = [];
         let creatorType = (await User.findOne({username: post.creator}, 'typeUser')).typeUser;
@@ -300,8 +300,9 @@ const getAllPost = async (query,credentials) =>{
             .lean();
 
         for (const post of posts) {
-            let views = post.views
-            await Post.findByIdAndUpdate(post._id,{'views': ++post.views});
+            let views = ++post.views
+            let postToUpdate = await Post.findByIdAndUpdate(post._id,{'views': post.views, 'criticalMass': parseInt(post.views * 0.25)});
+            await UpdateCategory(postToUpdate);
         }
 
         await mongoose.connection.close()
@@ -343,10 +344,13 @@ const deletePost = async (body,credentials) => {
 const updateReac = async (body,credentials) => {
     try{
         await connectdb(credentials);
+
         let user = await User.findOne({username: body.user},'typeUser');
 
         if(user.typeUser === 'mod') {
-            return await Post.findByIdAndUpdate(body.postId, {$push:{reactions: {$each: JSON.parse(body.reactions)}}});
+            let post = await Post.findByIdAndUpdate(body.postId, {$push:{reactions: {$each: JSON.parse(body.reactions)}}},{new: true});
+            await UpdateCategory(post);
+            return body;
         }
 
         let hasReacted = (await Post.findOne({_id : body.postId, reactions:{$elemMatch:{user: body.user}}}));
@@ -377,6 +381,60 @@ const deleteReac = async (body,credentials) => {
     catch (err){
         throw err;
     }
+};
+
+
+/**
+ * @param {Object} post
+ * @returns {Promise<boolean>}
+ */
+const UpdateCategory = async (post) => {
+    let criticalMass = post.criticalMass;
+    let positiveReactionsCount = 0;
+    let negativeReactionsCount = 0;
+
+     post.reactions.forEach((reaction) => {
+         if (reaction.rtype === 'thumbs-up') {
+             positiveReactionsCount ++;
+         }
+         else if (reaction.rtype === 'heart') {
+             positiveReactionsCount += 2;
+         }
+         else if (reaction.rtype === 'thumbs-down') {
+             negativeReactionsCount ++;
+         }
+         else if (reaction.rtype === 'thumbs-up') {
+             negativeReactionsCount += 2;
+         }
+     })
+
+    if (positiveReactionsCount > criticalMass) {
+        if (negativeReactionsCount > criticalMass) {
+            await Post.findByIdAndUpdate(post._id, {category: 'controversial'});
+        }
+        else {
+            await Post.findByIdAndUpdate(post._id, {category: 'popular'});
+        }
+        return true;
+    }
+
+    if (negativeReactionsCount > criticalMass) {
+        if (positiveReactionsCount > criticalMass) {
+            await Post.findByIdAndUpdate(post._id, {category: 'controversial'});
+        }
+        else {
+            await Post.findByIdAndUpdate(post._id, {category: 'unpopular'});
+        }
+        return true;
+    }
+
+
+    if (post.category !== 'public') {
+        await Post.findByIdAndUpdate(post._id, {category: 'public'});
+        return true;
+    }
+
+    return false;
 }
 
 const getLastPostUser = async (query,credentials) => {

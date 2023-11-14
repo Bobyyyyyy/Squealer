@@ -3,7 +3,7 @@ const {ObjectId} = require("mongodb");
 const contentTypes = ['geolocation','text','image']
 const destTypes = ['channel', 'user','official']
 const reactionTypes = ['heart','thumbs-up','thumbs-down','heartbreak']
-const categories = ['private','public','popolar','unpopolar','controversial'];
+const categories = ['private','public','popular','unpopular','controversial'];
 
 const PostSchema = new mongoose.Schema({
     owner: {
