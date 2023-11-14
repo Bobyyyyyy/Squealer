@@ -1,23 +1,6 @@
 
 import {smm, currentVip, QUALITY, MAX_HEIGHT, MAX_WIDTH} from './config.js'
 import {useStore} from "vuex";
-
-async function start(){
-    const store = useStore();
-    let res = await fetch("/db/user/session",{
-        method:"GET",
-    });
-    smm.value = (await res.json()).username;
-
-    res = await fetch("/db/user/sessionVip",{
-        method:"GET",
-    });
-    currentVip.value = (await res.json()).vip;
-    if (currentVip.value){
-        store.commit('setQuota',await getUserQuota())
-    }
-}
-
 function getPage(){
     return window.location.pathname.split('/')[2];
 }
@@ -27,8 +10,7 @@ async function getPosts(query,offset){
         let res = await fetch(`/db/post/all?${query}&offset=${offset}`,{
             method:"GET",
         });
-        let posts = (await res.json()).map(post => { return {...post, dateOfCreation: new Date(Date.parse(post.dateOfCreation))} });
-        console.log(posts);
+        let posts =  (await res.json()).map(post => { return {...post, dateOfCreation: new Date(Date.parse(post.dateOfCreation))} });
         return posts;
     }catch (e) {
         throw e
@@ -71,6 +53,21 @@ async function getLastPost(vipName){
     }
 }
 
+//voglio che mi ritorni per ogni una lista di date.
+async function getPostsDate(vipname,onlyThisMonth){
+    try{
+        let res = await fetch(`/db/post/allDates?user=${vipname}&onlyMonth=${onlyThisMonth}`,{
+            method:"GET",
+        })
+        return await res.json();
+
+    }
+    catch (err){
+        console.log(err);
+    }
+}
+
+/* IMG TO BASE64 Compressed */
 function calculateSize(img, maxWidth, maxHeight) {
     let width = img.width;
     let height = img.height;
@@ -97,7 +94,6 @@ const blob2base64 = (blob) => new Promise((resolve) => {
 });
 
 const compressBlob = (file) => new Promise((resolve) => {
-    console.log(file instanceof File);
     let blobURL = URL.createObjectURL(file);
     let compressedImg = new Image();
     compressedImg.src = blobURL;
@@ -114,8 +110,20 @@ const compressBlob = (file) => new Promise((resolve) => {
     }
 })
 
+/**
+ *
+ * @param {Array<{name:String,destType:String}>} destinations
+ * @return {String} - '@francesco, §popi_ma_buoni,'
+ */
+const parseDestinations = (destinations) => {
+    let arr = [];
+    destinations.forEach(dest => {
+        arr.push(dest.destType === 'channel' ? `§${dest.name}` : `@${dest.name}`)
+    })
+    return arr.join(', ');
+}
+
 export{
-    start,
     getPage,
     getPosts,
     getUserQuota,
@@ -123,4 +131,6 @@ export{
     getLastPost,
     blob2base64,
     compressBlob,
+    getPostsDate,
+    parseDestinations
 }

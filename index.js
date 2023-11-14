@@ -44,6 +44,7 @@ app.set('view engine','html');
 //il sito inizia dando il controllo al router della frontpage
 app.use('/', require('./back_end/Frontpage/routes/frontpage'));
 app.use('/db',require('./back_end/mongo/routers/mongoRouter'));
+
 app.get(['/SMM','/SMM/*'], isSMM, (req,res) => {
     res.sendFile(rootDir + '/front_end/AppSmm/index.html');
 })
@@ -60,14 +61,14 @@ app.use('/icons/navbarIcons',express.static(rootDir + '/back_end/assets/icons/na
 app.use('/icons/settingsIcons',express.static(rootDir + '/back_end/assets/icons/settingsIcons'))
 
 /* CRON */
-const nodeCron =require('node-cron')
+const nodeCron = require('node-cron')
 const CC = require('./back_end/mongo/controllers/CronController')
+const {resetDtimeout, resetWtimeout,resetMtimeout } = require("./back_end/mongo/controllers/utils");
 
 // quota reset
-nodeCron.schedule(CC.resetDtimeout, async () => {await CC.resetQuota('D')}).start()
-nodeCron.schedule(CC.resetWtimeout, async () => {await CC.resetQuota('W')}).start()
-nodeCron.schedule(CC.resetMtimeout, async () => {await CC.resetQuota('M')}).start()
-
+nodeCron.schedule(resetDtimeout, async () => {await CC.resetQuota('D')}).start()
+nodeCron.schedule(resetWtimeout, async () => {await CC.resetQuota('W')}).start()
+nodeCron.schedule(resetMtimeout, async () => {await CC.resetQuota('M')}).start()
 
 
 // avvio di node
@@ -75,4 +76,3 @@ app.listen(8000,function() {
     global.startDate = new Date();
     console.log('App listening on port 8000 started' + ' ' + startDate.toLocaleString());
 });
-

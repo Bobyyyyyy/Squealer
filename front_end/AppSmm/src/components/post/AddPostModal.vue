@@ -12,13 +12,17 @@
 
   /* TYPE and USER/CHANNEL */
   const postType = ref('Select type')
-  const destType = ref('receiver')
-  const receiverName = ref('')
+  const receivers = ref('')
+  const receiverArr = computed(()=> receivers.value.split(', '))
+  const inChannel = computed(()=> {
+    return !!receiverArr.value.find(el => el.startsWith('§'));
+  });
 
   /* TIMED MESSAGE */
   const timed = ref(false);
   const numberOfRepetitions = ref(0);
   const typeFrequency = ref('select Frequency')
+  const numFrequency = ref(0);
 
   /* TEXT */
   const textSqueal = ref('')          //get text of squeal. Only in text squeal.
@@ -38,9 +42,9 @@
       * (timed.value && numberOfRepetitions.value > 2 ? parseInt(numberOfRepetitions.value) : 1)
   );
   /* 15 è il valore tolto per immagine e geolocalizzazione */
-  const getLiveDQuota = computed(()=> (store.getters.getQuota.daily - ((destType.value !== 'user') ? quota2remove.value : 0)));
-  const getLiveWQuota = computed(()=> (store.getters.getQuota.weekly - ((destType.value !== 'user') ? quota2remove.value : 0)));
-  const getLiveMQuota = computed(()=> (store.getters.getQuota.monthly - ((destType.value !== 'user') ? quota2remove.value : 0)));
+  const getLiveDQuota = computed(()=> (store.getters.getQuota.daily - (inChannel.value ? quota2remove.value : 0)));
+  const getLiveWQuota = computed(()=> (store.getters.getQuota.weekly - (inChannel.value ? quota2remove.value : 0)));
+  const getLiveMQuota = computed(()=> (store.getters.getQuota.monthly - (inChannel.value ? quota2remove.value : 0)));
 
 /*
   async function getCamera(){
@@ -51,6 +55,16 @@
   }
  */
 
+  function parseDestinations(){
+    let arr = [];
+    receiverArr.value.forEach(receiver => {
+      arr.push({
+        name: receiver.substring(1),
+        destType: receiver.startsWith('§') ? 'channel' : receiver.startsWith('@') ? 'user' : 'errore',
+      })
+    })
+    return arr;
+  }
 
   async function createPost() {
     try{
@@ -63,12 +77,17 @@
       }
        */
 
+
       let post = {
-        name: currentVip.value,
+        creator: currentVip.value,
         contentType: postType.value,
         dateOfCreation: Date.now(),
-        receiver: receiverName.value,
-        destType: destType.value,
+        destinations: parseDestinations(receiverArr.value),
+        timed: timed.value,
+        ... (timed) && {
+          squealNumber: numberOfRepetitions.value,
+          frequency: [numFrequency.value.toString(),typeFrequency.value].join(' ')
+        }
       }
 
 
@@ -87,8 +106,8 @@
           post: post,
           quota: {
             daily: getLiveDQuota.value < 0 ? 0 : getLiveDQuota.value,
-            weekly: getLiveWQuota.value - (getLiveDQuota.value < 0 ? -getLiveDQuota.value : 0),
-            monthly: getLiveMQuota.value - (getLiveWQuota.value < 0 ? -getLiveWQuota.value : 0),
+            weekly: getLiveWQuota.value - (getLiveDQuota.value < 0 ? - getLiveDQuota.value : 0),
+            monthly: getLiveMQuota.value - (getLiveWQuota.value < 0 ? - getLiveWQuota.value : 0),
           }
         }),
         headers: {
@@ -107,8 +126,7 @@
 
   function reset(){
     postType.value ='Select type'
-    destType.value = 'receiver'
-    receiverName.value = ''
+    receivers.value = ''
     imgPath.value = ''
     currentImgPath.value= ''
     showImg.value = false
@@ -143,18 +161,9 @@
                   <div class="d-flex flex-row align-items-end" style="flex:1">
                     <div class="d-flex flex-column">
                       <label for="destPost" class="form-label">Receiver</label>
-                      <input type="text" class="form-control" id="destPost"  v-model="receiverName" required>
+                      <input type="text" class="form-control" id="destPost"  v-model="receivers" required>
                     </div>
 
-                    <div class="btn-group">
-                      <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                        {{ destType }}
-                      </button>
-                      <ul class="dropdown-menu">
-                        <li class="dropdown-item" role="button" @click="destType = 'channel'"> channel </li>
-                        <li class="dropdown-item" role="button" @click="destType = 'user'"> user </li>
-                      </ul>
-                    </div>
                   </div>
                   <div class="d-flex justify-content-center" style="flex:1">
                     <input type="checkbox" class="btn-check" id="btn-check-outlined" v-model="timed" autocomplete="off">
@@ -223,11 +232,11 @@
                     <div class="d-flex flex-column ms-2">
                       <label for="repFrequency" class="form-label">Frequency</label>
                       <div class="input-group" id="repFrequency">
-                        <input type="number" class="form-control" id="numFrequency">
+                        <input type="number" class="form-control" id="numFrequency" v-model="numFrequency">
                         <Dropdown :filterRef="typeFrequency"
                                   updateRef="updateTypeF"
                                   @updateTypeF="(el) => typeFrequency=el"
-                                  :dropItems="['minutes', 'days', 'weeks']"
+                                  :dropItems="['seconds','minutes', 'days']"
                                   classButton="btn-outline-secondary"
                         />
                       </div>

@@ -1,11 +1,30 @@
 <script setup>
+import {currentVip,smm} from "./utils/config.js";
+import {getUserQuota} from "./utils/functions.js";
 import {ref} from "vue";
-import {start} from "./utils/functions.js";
+import {useStore} from "vuex";
+const store = useStore();
+
 const ready = ref(false);
 
-start();
-ready.value = true;
+async function start(){
 
+  let res = await fetch("/db/user/session",{
+    method:"GET",
+  });
+  smm.value = (await res.json()).username;
+
+  res = await fetch("/db/user/sessionVip",{
+    method:"GET",
+  });
+  currentVip.value = (await res.json()).vip;
+  if (currentVip.value){
+    store.commit('setQuota',await getUserQuota())
+  }
+  ready.value = true;
+}
+
+start();
 </script>
 
 <template>

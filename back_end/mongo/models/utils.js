@@ -27,8 +27,6 @@ const connectdb = async (credentials) => {
                 useUnifiedTopology: true,
                 useNewUrlParser: true
             })
-
-        console.log('db connected')
     }
     catch(err){
         console.log(err);
@@ -44,6 +42,14 @@ function createError (message,statusCodeError){
     return err;
 }
 
+const find_remove = (arr,id) => {
+    let index = arr.findIndex(obj => obj['id'] === id);
+    let el2ret = arr[index];
+    arr.splice(index,1);
+    return el2ret;
+}
+
+
 module.exports = {
     connectdb,
     saltRounds,
@@ -51,4 +57,5 @@ module.exports = {
     dbname,
     quota,
     createError,
+    find_remove,
 }

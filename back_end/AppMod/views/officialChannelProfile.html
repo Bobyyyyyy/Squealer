@@ -99,7 +99,9 @@
         </div>
 
         <div id="posts" class="d-flex flex-column align-items-center">
+        </div>
 
+        <div id="under_posts" class="d-flex align-items-center mt-5">
         </div>
 
     </div>
@@ -168,26 +170,25 @@
 <div class="modal fade" id="changeReactions" tabindex="-1" aria-labelledby="changeReactionsModal" aria-hidden="true" style="top:25%">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <form>
                 <div class="modal-body d-flex flex-row">
                     <div class="d-flex flex-column align-items-center">
                         <label for="heart" class="form-label w-75"> <i class="bi bi-heart-fill"></i> Heart
-                            <input type="number" class="form-control" name="heart" id="heart">
+                            <input type="number" class="form-control" name="heart" id="heart" min="0" value="0">
                         </label>
                     </div>
                     <div class="d-flex flex-column align-items-center">
                         <label for="heartbreak" class="form-label w-75"> <i class="bi bi-heartbreak"></i> Heartbreak
-                            <input type="number" class="form-control" name="heartbreak" id="heartbreak">
+                            <input type="number" class="form-control" name="heartbreak" id="heartbreak" min="0" value="0">
                         </label>
                     </div>
                     <div class="d-flex flex-column align-items-center">
                         <label for="thumbs-up" class="form-label w-75"> <i class="bi bi-hand-thumbs-up-fill"></i> Thumbs-Up
-                            <input type="number" class="form-control" name="thumbs-up" id="thumbs-up">
+                            <input type="number" class="form-control" name="thumbs-up" id="thumbs-up" min="0"  value="0">
                         </label>
                     </div>
                     <div class="d-flex flex-column align-items-center">
                         <label for="thumbs-down" class="form-label w-75"> <i class="bi bi-hand-thumbs-down"></i> Thumbs-Down
-                            <input type="number" class="form-control" name="thumbs-down" id="thumbs-down">
+                            <input type="number" class="form-control" name="thumbs-down" id="thumbs-down" min="0" pattern="[0-9]{10}" value="0">
                         </label>
                     </div>
                 </div>
@@ -195,7 +196,6 @@
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
                     <button class="btn btn-primary" id="changeReactionsButton">Modifica</button>
                 </div>
-            </form>
         </div>
     </div>
 </div>

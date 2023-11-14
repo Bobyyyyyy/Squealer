@@ -2,18 +2,13 @@ let ChannelName = $('#channel-name').html();
 let User = $('#session-user').html();
 
 let LastCall = {
-    limit : 1,
+    limit : 3,
     offset: 0,
     posts: 0,
     filter: ''
 }
 
-
-function charactersModal () {
-    $('#changeReactions').modal("show");
-}
-
-
+let post = ''
 
 function updateLastCall(limit,offset,filter) {
     LastCall.limit = limit;
@@ -21,10 +16,25 @@ function updateLastCall(limit,offset,filter) {
     LastCall.filter = filter;
 }
 
+
+ function getPostsNumber (filter) {
+    $.ajax({
+        url:'/db/post/number',
+        data: {filter: filter, channel: ChannelName},
+        async: false,
+        type: 'get',
+        success: (data) => {
+            LastCall.posts = data.length;
+            $('#post-trovati').html(`${data.length}`);
+        }
+    })
+}
+
+
 // regular expression for link in text
 const urlRegex =/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
 
-const deletePost = (id) => {
+const deletePost = async (id) => {
     $.ajax({
         url:'/db/post/delete',
         data: {id: id},
@@ -46,19 +56,21 @@ const showChannel = (name) => {
             $('#channel-creator').html(channel.creator);
         }
     })
-    showPosts();
+    showPosts(LastCall.filter,LastCall.offset,LastCall.limit);
 }
 
-const showPosts = (filter,offset) => {
+const showPosts = (filter,offset,limit,append = false) => {
+    getPostsNumber(filter);
+    updateLastCall(limit,offset,filter);
     $.ajax({
         url:'/db/post/all',
-        data: {channel: ChannelName, typeFilter: filter , offset: offset},
+        data: {channel: ChannelName, typeFilter: filter , offset: offset, limit: limit},
         type: 'get',
         success: (posts) => {
-            $('#post-trovati').html(posts.length);
-
-
-            let html = `${$.map(posts, (post,index) => {
+            console.log(posts)
+            let html = `${$.map(posts, (post) => {
+                let id = post._id;
+                id = id.substring(id.length - 10);
                 let reactions = {
                     heart: post.reactions.filter((reaction) => reaction.rtype === 'heart').length,
                     heartbreak : post.reactions.filter((reaction) => reaction.rtype === 'heartbreak').length,
@@ -67,20 +79,21 @@ const showPosts = (filter,offset) => {
                 }
                 
                 let Post =
-                    `<div id="post-${index}" class="card mt-5 w-50">
+                    `<div id="post-${id}" class="card mt-5 w-50">
                     <div class="card-header d-flex bg-info border-black align-items-center p-3 h5 fw-bold">
                         @${post.owner}
+                        <span class="ms-2">${post.category}</span>
                         <div class="d-flex flex-row ms-auto">
                             <div class="btn-group dropup">
                                 <button class="ms-2 btn btn-info"  data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="bi bi-three-dots"></i></i>
                                 </button>
                                 <ul class="dropdown-menu">
-                                    <li onclick="charactersModal(${reactions.heart}, ${reactions.heartbreak}, ${reactions["thumbs-up"]}, ${reactions["thumbs-down"]})" class="dropdown-item"> Modifica Reazioni</li>
+                                    <li onclick = "post = '${post._id}'" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#changeReactions"> Modifica Reazioni</li>
                                 </ul>
                             </div>
                             
-                            <button class="btn btn-info" id="delete-${index}"><i  class="bi bi-trash"></i></button>
+                            <button class="btn btn-info" id="delete-${id}"><i  class="bi bi-trash"></i></button>
                         </div>
                 </div>
                 <div class="card-body flex-row">`
@@ -98,23 +111,24 @@ const showPosts = (filter,offset) => {
                         break;
 
                     case 'geolocation':
-                        Post = Post + `<div class="align-self-center" style="height: 50vh"><div id="map-${index}" class="w-100 h-100" ></div></div>
-                          <script>showMap('map-${index}','${post.content}')</script>`
+                        Post = Post + `<div class="align-self-center" style="height: 50vh"><div id="map-${id}" class="w-100 h-100" ></div></div>
+                          <script>showMap('map-${id}','${post.content}')</script>`
                         break;
                 }
-
-
+                
                 Post = Post +`</div>
                     <div class="card-footer text-muted">
                         <div class="d-flex flex-row">
-                            <div id="reactions-${index}" class="me-auto d-inline-flex"> 
+                            <div id="reactions-${id}" class="me-auto d-inline-flex"> 
                                 <div class="d-flex flex-row"><i class="bi bi-heart-fill"></i> <div class="ms-1">${reactions.heart}</div> </div>
                                 <div class="d-flex flex-row ms-3"><i class="bi bi-heartbreak"></i><div class="ms-1">${reactions.heartbreak}</div></div>
                                 <div class="d-flex flex-row ms-3"><i class="bi bi-hand-thumbs-up-fill"></i> <div class="ms-1">${reactions["thumbs-up"]}</div></div>
                                 <div class="d-flex flex-row ms-3"><i class="bi bi-hand-thumbs-down"></i><div class="ms-1">${reactions["thumbs-down"]}</div></div>
-                               
                             </div>
-                            <div id="creation-${index}" class="ms-auto">
+                            <div class="d-flex flex-row"><i class="bi bi-eye"></i></i><div class="ms-1">${post.views}</div></div>
+                            <div class="d-flex flex-row ms-2"><i class="bi bi-people"></i><div class="ms-1">${post.criticalMass}</div></div>
+                            
+                            <div id="creation-${id}" class="ms-auto">
                                 ${post.dateOfCreation.split('T')[0]},
                                 ${post.dateOfCreation.split('T')[1].split('.')[0]}
                             </div>
@@ -122,8 +136,7 @@ const showPosts = (filter,offset) => {
                     </div>
                         </div>
                 <script>
-                
-                 $('#delete-${index}').on('click',() => {
+                 $('#delete-${id}').on('click',() => {
                     deletePost('${post._id}');
                 });
                 </script>`
@@ -132,7 +145,26 @@ const showPosts = (filter,offset) => {
                 return Post
             }).join('\n')}`;
 
-            $('#posts').empty().append(html);
+            if (offset + limit < LastCall.posts) {
+                $('#under_posts').html(`<div class="mx-auto"> <a id="load_posts" class="link-opacity-100 link-opacity-50-hover"> Carica altri post</a></div>`)
+            }
+            else {
+                $('#under_posts').empty();
+            }
+
+
+
+            if (append) {
+                $('#posts').append(html);
+            }
+            else {
+                $('#posts').empty().append(html);
+            }
+
+            $('#load_posts').on('click',() => {
+                showPosts(filter,offset+limit,limit,true);
+            })
+
         }
     })
 }
@@ -148,7 +180,7 @@ $('#modify-description').on('click', () => {
 $('#modify-button').on('click' ,() => {
     let newDescription = $('#description').val();
     $.ajax({
-        url:'/db/ReservedChannel',
+        url:'/db/official',
         data: {channel:ChannelName ,description: newDescription},
         type: 'put',
         success: () => {
@@ -177,18 +209,25 @@ $('#addPostButton').on('click',(contentType, content) => {
     if(contentType === 'geolocation') {
         content = $('#post-content').html();
     }
-
     else {
         content = $('#post-content').val();
     }
 
-    console.log(content)
 
-  const currentDate = new Date();
+    let destinations = []
+
+    destinations.push({
+        destType: 'official',
+        name: ChannelName,
+    });
+
+
+
+    const currentDate = new Date();
     $.ajax({
         url:'/db/post',
-        data: {post: {name: User, destType: 'official', receiver: ChannelName,
-               contentType: contentType, content: content, dateOfCreation: currentDate}},
+        data: {post: {creator: User, destinations: JSON.stringify(destinations),
+                contentType: contentType, content: content, dateOfCreation: currentDate}},
         type: 'post',
         success: (post) => {
             location.reload();
@@ -244,17 +283,67 @@ $('#type-select').on('change',() => {
 
 
 $('#post-filters').on('change', () => {
-
     let filter = $('#post-filters input:checked').val();
-    showPosts(filter,LastCall.offset);
+    showPosts(filter,LastCall.offset = 0,LastCall.limit);
 })
 
 
-$(window).on('scroll', () => {
-    if($(window).scrollTop() === $(document).height() - $(window).height()) {
-            //provare ad aggiornare post tramite scrolldown
+$('#changeReactionsButton').on('click',() => {
+
+    let reactions = {
+        heart: $('#heart').val(),
+        heartbreak: $('#heartbreak').val(),
+        'thumbs-up': $('#thumbs-up').val(),
+        'thumbs-down': $('#thumbs-down').val(),
     }
+
+    let allReactions = []
+    for (let i = 0; i < reactions.heart; i++) {
+        allReactions.push({
+            rtype: 'heart',
+            user: User,
+            date: new Date(),
+        })
+    }
+
+    for (let i = 0; i < reactions.heartbreak; i++) {
+        allReactions.push({
+            rtype: 'heartbreak',
+            user: User,
+            date: new Date(),
+        })
+    }
+
+    for (let i = 0; i < reactions["thumbs-up"]; i++) {
+        allReactions.push({
+            rtype: 'thumbs-up',
+            user: User,
+            date: new Date(),
+        })
+    }
+    for (let i = 0; i < reactions["thumbs-down"]; i++) {
+        allReactions.push({
+            rtype: 'thumbs-down',
+            user: User,
+            date: new Date(),
+        })
+    }
+
+    if(allReactions.length > 500) {
+        alert('Puoi aggiungere al massimo 500 reactions!!');
+        return;
+    }
+
+    $.ajax({
+        url: '/db/post/updateReaction',
+        data: {user: User, reactions: JSON.stringify(allReactions), postId: post},
+        type: 'put',
+        success: (data) => {
+            location.reload();
+        }
+    })
 })
+
 
 
 $(document).ready(() => {

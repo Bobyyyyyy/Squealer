@@ -4,6 +4,7 @@ import ChannelList from "../views/ChannelList.vue";
 import VipProfile from "../views/VipProfile.vue";
 import SideBar from "../components/sideBar/SideBar.vue";
 import ChannelProfile from "../components/channels/ChannelProfile.vue";
+import statsPage from "../views/statsPage.vue";
 
 export const routes =[
     {
@@ -82,17 +83,14 @@ export const routes =[
         path:"/SMM/*",
         redirect:  { name: "Home" }
     },
-    /*
     {
-        path: "/SMM/:user/:vip/Stats",
+        path: "/SMM/Stats",
         name:"Stats",
         components: {
             sideBar: SideBar,
-            SbOn: VipCard
+            SbOn: statsPage
         },
     }
-
-     */
 ]
 
 

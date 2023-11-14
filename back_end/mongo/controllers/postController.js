@@ -1,11 +1,15 @@
 const {mongoCredentials} = require('../models/utils.js')
 const postModel = require("../models/postMethods");
+const {createScheduledPost} = require("./CronController");
 
 
 const createPost = async (req,res) => {
     try{
-
-        res.send(await postModel.addPost(req.body,mongoCredentials));
+        let postSavedId = await postModel.addPost(req.body.post, req.body.quota,mongoCredentials)
+        if (req.body.post?.timed) {
+            await createScheduledPost(postSavedId.postId, req.body.post.frequency, req.body.post.squealNumber, req.body.post.content, req.body.post.contentType);
+        }
+        res.send({id: postSavedId})
     }
     catch (err){
         console.log(err);
@@ -24,7 +28,14 @@ const getPosts = async (req,res) => {
 
 const updateReaction = async (req,res) => {
     try {
-        res.send(await postModel.updateReac(req.body,mongoCredentials))
+        if(req.session.type === 'mod') {
+                await postModel.updateReac(req.body, mongoCredentials);
+                res.send('200');
+        }
+        else {
+            await postModel.updateReac({user: req.body.user, rtype: req.body.keys}, mongoCredentials)
+            res.send(await postModel.updateReac(req.body, mongoCredentials));
+        }
     }
     catch(error) {
         res.send(error);
@@ -50,10 +61,42 @@ const removePost = async (req,res) => {
     }
 }
 
+const getPostsDate = async (req,res) => {
+    try{
+        await res.send(await postModel.getPostsDate(req.query.user, req.query.onlyMonth));
+    }
+    catch (e) {
+        throw e;
+    }
+}
+
+const getReactionLast30days = async (req,res) => {
+    try{
+        await res.send(await postModel.getReactionLast30days(req.query.user));
+    }
+    catch (e) {
+        throw e;
+    }
+}
+
+const postLength = async (req,res) => {
+    try {
+        console.log(req.query);
+        res.send(await postModel.postLength(req.query.filter,req.query.channel,mongoCredentials))
+    }
+    catch (error) {
+        res.send(error);
+    }
+
+}
+
 module.exports = {
     createPost,
     getPosts,
     updateReaction,
     deleteReaction,
     removePost,
+    getPostsDate,
+    getReactionLast30days,
+    postLength
 }
