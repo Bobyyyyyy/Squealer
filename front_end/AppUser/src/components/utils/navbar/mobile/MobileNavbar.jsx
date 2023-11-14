@@ -1,4 +1,3 @@
-import "./styleMobileNavbar.css"
 import Button from "../../buttons/Button.jsx";
 
 function MobileNavbar({navigationButtons, activeButton, changeActiveButton}) {

@@ -1,3 +1,5 @@
+import {useRef} from "react";
+
 /* Navbar asset_user */
 
 const HomeIcon = {
@@ -48,7 +50,7 @@ const HeartBroken = {
 /* settingsIcons icon */
 
 const SettingIcon = {
-    active:"icons/settingsIcons/settingsFull.png",
+    active: "icons/settingsIcons/settingsFull.png",
     inactive: "icons/settingsIcons/settingsEmpty.png"
 };
 

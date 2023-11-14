@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import './styleBtn.css';
+//import './styleBtn.css';
 import {useNavigate} from "react-router-dom";
 
 function Button({icon, isActive, handleClick, sideEffectFunction, textDescription}) {

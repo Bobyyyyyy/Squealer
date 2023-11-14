@@ -1,5 +1,4 @@
 import Button from "../../buttons/Button.jsx";
-import "./styleSidebar.css"
 import {Logo} from "../../../assets/index.jsx";
 
 function Sidebar({windowWidth, navigationButtons, activeButton, changeActiveButton}) {

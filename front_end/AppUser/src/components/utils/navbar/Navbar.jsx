@@ -1,19 +1,19 @@
 import {useMemo, useEffect, useState} from "react";
 import {HomeIcon, SearchIcon, AddIcon, UserIcon, ChannelIcon, SettingIcon, Logout} from "../../assets/index.jsx";
 import MobileNavbar from "./mobile/MobileNavbar.jsx";
-import {useNavigate} from "react-router-dom";
+import {useNavigate, NavLink} from "react-router-dom";
 import Sidebar from "./pc/Sidebar.jsx";
 function Navbar () {
 
     const navigate = useNavigate();
 
     const navigationButtons = [
-        {id: 0, icon: HomeIcon, name: "home", route: "user"},
-        {id: 1, icon: SearchIcon, name: "search", route: "/search"},
-        {id: 2, icon: AddIcon, name: "add post", route: "/addpost"},
-        {id: 3, icon: ChannelIcon, name: "channels", route: "/channels"},
-        {id: 4, icon: UserIcon, name: "profile", route: "/profile"},
-        {id: 5, icon: SettingIcon, name: "settings", route: "/settingsIcons"}
+        {id: 0, icon: HomeIcon, name: "home", route: "/"},
+        {id: 1, icon: SearchIcon, name: "search", route: "search"},
+        {id: 2, icon: AddIcon, name: "add post", route: "addpost"},
+        {id: 3, icon: ChannelIcon, name: "channels", route: "channels"},
+        {id: 4, icon: UserIcon, name: "profile", route: "profile"},
+        {id: 5, icon: SettingIcon, name: "settings", route: "settings"}
     ];
 
     /*
@@ -61,7 +61,7 @@ function Navbar () {
         }
         console.log('dopo: '+window.location.pathname);
     }
-
+    /*
     return (windowWidth <= 510) ?
         (
         <MobileNavbar
@@ -77,6 +77,13 @@ function Navbar () {
             activeButton={activeButton}
         />
         );
+
+     */
+    return (
+        <>
+
+        </>
+    );
 }
 
 export default Navbar;
