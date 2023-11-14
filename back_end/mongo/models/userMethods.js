@@ -255,7 +255,6 @@ const changePopularity = async (userID, increase) => {
         await User.findByIdAndUpdate(userID, {'popularity': popularity});
     }
 
-
 }
 
 //manca un delete per provare le principali API

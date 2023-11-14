@@ -428,6 +428,12 @@ const UpdateCategory = async (post, userID) => {
     if (positiveReactionsCount > criticalMass) {
         if (negativeReactionsCount > criticalMass) {
             await Post.findByIdAndUpdate(post._id, {popularity: 'controversial'});
+            if (post.popularity === 'popular') {
+                await changePopularity(userID, false);
+            }
+            else if (post.popularity === 'unpopular'){
+                await changePopularity(userID, true);
+            }
         }
         else {
             await Post.findByIdAndUpdate(post._id, {popularity: 'popular'});
@@ -442,6 +448,12 @@ const UpdateCategory = async (post, userID) => {
     if (negativeReactionsCount > criticalMass) {
         if (positiveReactionsCount > criticalMass) {
             await Post.findByIdAndUpdate(post._id, {popularity: 'controversial'});
+            if (post.popularity === 'popular') {
+                await changePopularity(userID, false);
+            }
+            else if (post.popularity === 'unpopular'){
+                await changePopularity(userID, true);
+            }
         }
         else {
             await Post.findByIdAndUpdate(post._id, {popularity: 'unpopular'});
@@ -455,6 +467,12 @@ const UpdateCategory = async (post, userID) => {
 
     if (post.category !== 'neutral') {
         await Post.findByIdAndUpdate(post._id, {popularity: 'neutral'});
+        if (post.popularity === 'popular') {
+            await changePopularity(userID, false);
+        }
+        else if (post.popularity === 'unpopular'){
+            await changePopularity(userID, true);
+        }
         return true;
     }
 

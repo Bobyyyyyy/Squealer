@@ -79,7 +79,7 @@ const showPosts = (filter,offset,limit,append = false) => {
                 
                 let Post =
                     `<div id="post-${id}" class="card mt-5 w-50">
-                    <div class="card-header d-flex bg-info border-black align-items-center">
+                    <div id="header-${id}" class="card-header d-flex bg-info border-black align-items-center">
                         <div class="d-flex flex-row align-items-center justify-content-center">
                             <div class="fw-bold">@${post.owner}</div>
                             <div class="ms-2 fw-light">${post.category}</div>
@@ -100,6 +100,7 @@ const showPosts = (filter,offset,limit,append = false) => {
                         </div>
                 </div>
                 <div class="card-body flex-row">`
+                
                 
                 switch (`${post.contentType}`) {
                     case 'text':
