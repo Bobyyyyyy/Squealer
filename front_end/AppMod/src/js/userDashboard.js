@@ -96,6 +96,7 @@ function userTable (limit,offset,filter) {
                             <th> Nome </th>
                             <th> Quota Rimanente </th>
                             <th> Quota Massima </th>
+                            <th> Popolarita' </th>
                             <th> Tipo </th>
                         </thead>
                         <tbody>`
@@ -109,7 +110,7 @@ function userTable (limit,offset,filter) {
             <td> ${user.username} </td>`
 
                 if (`${user.typeUser}` === 'mod') {
-                    row = row + `<td><span>Not a Field</span></td><td><span>Not a Field</span></td>`
+                    row = row + `<td><span>Not a Field</span></td><td><span>Not a Field</span></td><td>${user.popularity}</td>`
                 } else {
                     let remainingQuota = {daily: user.characters.daily,weekly: user.characters.weekly,monthly: user.characters.monthly};
                     let maxQuota = {daily: user.maxQuota.daily, weekly: user.maxQuota.weekly, monthly: user.maxQuota.monthly};
@@ -123,6 +124,7 @@ function userTable (limit,offset,filter) {
                                     <li> Weekly: ${user.maxQuota.weekly} </li>
                                     <li> Monthly: ${user.maxQuota.monthly} </li>
                                  </ul></td>
+                                 <td> ${user.popularity}</td>
                              <script>
                              $('#user-'+${index}).on('click', () => {
                                 showUserModal(${user.username},${JSON.stringify(remainingQuota)},${JSON.stringify(maxQuota)});
