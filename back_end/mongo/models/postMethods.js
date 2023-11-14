@@ -177,57 +177,81 @@ const addTimedPost = async (postId, credentials) => {
     }
 }
 
-const addPost = async (body,credentials) => {
+/**
+ * @param {Object} post
+ * {creator: String, destination: array of objects{name: String, destType: String}, contentType: String, content: String, dateOfCreation: Date }
+ * @param {Object} quota - {daily,weekly-monthly} - remaining updated
+ * @param credentials - mongo credentials
+ * @returns {Promise<{postId: *}>}
+ */
+const addPost = async (post,quota,credentials) => {
     try{
         await connectdb(credentials)
+        let destinations = JSON.parse(post.destinations);
+        let postCategory = 'private';
+        let officialChannels = [];
+        let creatorType = (await User.findOne({username: post.creator}, 'typeUser')).typeUser;
 
-        /* ERROR HANDLING */
-        /* utente non esiste  */
-        if(body.destType === 'user' && !(await User.findOne({username: body.receiver})) ){
-            await mongoose.connection.close();
-            throw createError("utente non esistente!",422);
-        }
-        /* canale non esiste  */
-        else if(body.destType === 'channel' && !(await Channel.findOne({name: body.receiver}))){
-            await mongoose.connection.close();
-            throw createError("canale non esistente!",422);
-        }
-        /* canale ufficiale non esiste e l'utente non mod*/
-        else if(body.destType === 'official' && (!(await ReservedChannel.findOne({name: body.receiver}))
-            || (await User.findOne({username: body.name},'typeUser')).typeUser !== 'mod')){
-            await mongoose.connection.close();
-            throw createError("canale ufficiale non esistente o utente non moderatore!",422);
-        }
-        /* tipo di destinatario non inserito */
-        else if (body.destType === 'receiver'){     /* DA VEDERE CON ALE COME MODIFICARE */
-            await mongoose.connection.close();
-            throw createError("Inserisci il tipo di destinatario!",422);
+        for (const destination of destinations) {
+            let destinationType = destination.destType;
+            let channel = await Channel.findOne({name: destination.name});
+
+            /* ERROR HANDLING */
+            /* utente non esiste  */
+            if (destinationType === 'user' && !(await User.findOne({username: destination.name}))) {
+                await mongoose.connection.close();
+                throw createError("utente non esistente!", 422);
+            }
+            /* canale non esiste  */
+            else if (destinationType === 'channel' && channel.length === 0) {
+                await mongoose.connection.close();
+                throw createError("canale non esistente!", 422);
+            }
+            /* canale ufficiale non esiste e l'utente non mod*/
+            else if (destinationType === 'official' && (!(await ReservedChannel.findOne({name: destination.name}))
+                || creatorType !== 'mod')) {
+                await mongoose.connection.close();
+                throw createError("canale ufficiale non esistente o utente non moderatore!", 422);
+            }
+            /* tipo di destinatario non inserito */
+            else if (destinationType === 'receiver') {
+                await mongoose.connection.close();
+                throw createError("Inserisci il tipo di destinatario!", 422);
+            }
+
+            if (destinationType === 'official') {
+                postCategory = 'public';
+                officialChannels.push(destination.name);
+                destinations.pop(destination);
+            }
+
+            else if (channel.length === 0) {
+                if (channel.isPublic) {
+                    postCategory = 'public';
+                }
+            }
         }
 
         /* POST SAVE */
         let newPost = new Post({
-            owner: body.post.name,
-            destination:{
-                destType: body.post.destType,
-                name: body.post.receiver,
-                ...(body.post.destType === 'channel') && {
-                    isPublic: (await Channel.findOne({name: body.post.receiver},'isPublic')).isPublic
-                },
-            },
-            contentType: body.post.contentType,
-            content: (body.post.timed && body.post.contentType === 'text') ? parseText(body.post.content, 1) : body.post.content,
+            owner: post.creator,
+            destinationArray: destinations,
+            contentType: post.contentType,
+            content: (post.timed && post.contentType === 'text') ? parseText(post.content, 1) : post.content,
             reactions: [],
-            dateOfCreation: body.post.dateOfCreation,
+            officialChannelsArray: officialChannels,
+            category: postCategory,
+            dateOfCreation: post.dateOfCreation,
         })
 
         await newPost.save();
 
         /* QUOTA UPDATE */
-        await User.findOneAndUpdate({username: body.post.name}, {
+        await User.findOneAndUpdate({username: post.name}, {
             characters:{
-                daily: body.quota.daily,
-                weekly: body.quota.weekly,
-                monthly: body.quota.monthly,
+                daily: quota.daily,
+                weekly: quota.weekly,
+                monthly: quota.monthly,
             }
         } );
 
@@ -247,6 +271,7 @@ const addPost = async (body,credentials) => {
  * @param {String} query.destType - only if destType activated
  * @param {String} query.typeFilter - only if type post filter activated
  * @param {Number} query.offset - offset to skip
+ * @param {String} query.limit - max number of post to return
  * @param {String} query.sort - only if Sort activated -- more recent by default
  * @param credentials
  * @returns {Promise<*>}
@@ -263,19 +288,25 @@ const getAllPost = async (query,credentials) =>{
             ... (query.typeFilter && query.typeFilter !== 'all') && {'contentType': query.typeFilter},
 
                 /* PER LA PAGINA DEL PROFILO : */
-            ... (query.destType && query.destType !== 'all') && {'destination.destType': query.destType === 'user' ? 'user' : 'channel'},
-            ... (query.destType && query.destType !== 'all' && query.destType !== 'user') && {'destination.isPublic': query.destType === 'public'},
+            ... (query.destType && query.destType !== 'all') && {'destinationArray.destType':  query.destType === 'user' ? 'user' : 'channel'},
+            ... (query.destType && query.destType !== 'all' && query.destType !== 'user') && {'category': query.destType === 'public'},
 
                 /* PER IL CANALE SINGOLO */
-            ...(query.channel) && {'destination.name': query.channel}
+            $or: [{...(query.channel) && {'destinationArray.name': query.channel}},
+                 {...(query.channel) && {'officialChannelsArray': query.channel}}]
         }
 
 
         let posts = await Post.find(filter)
             .skip(parseInt(query.offset))
-            .limit(12)
+            .limit(parseInt(query.limit))
             .sort(sorts[query.sort ?  query.sort : 'più recente'])
             .lean();
+
+        for (const post of posts) {
+            let views = post.views
+            await Post.findByIdAndUpdate(post._id,{'views': ++post.views});
+        }
 
         await mongoose.connection.close()
         return posts;
@@ -289,7 +320,6 @@ const getAllPost = async (query,credentials) =>{
 const deletePost = async (body,credentials) => {
     try{
         await connectdb(credentials);
-
 
         //controllo se sei il creatore e se esiste il post
         if (!(await Post.findOne({_id: body.id, creator: body.name},'creator').lean())) {
@@ -317,17 +347,20 @@ const deletePost = async (body,credentials) => {
 const updateReac = async (body,credentials) => {
     try{
         await connectdb(credentials);
+        await Post.findByIdAndUpdate(body.postId, {$push:{reactions: {$each: JSON.parse(body.reactions)}}});
+        let user = await User.findOne({username: body.user},'typeUser');
 
-        if(await User.findOne({username: body.user},'typeUser').typeUser !== 'mod') {
-            let hasReacted = (await Post.findOne({_id : body.postId, reactions:{$elemMatch:{user: body.user}}}));
-
-            if (hasReacted){
-                await Post.findByIdAndUpdate(body.postId, {$pull: {reactions: {user: body.user}}});
-            }
+        if(user.typeUser === 'mod') {
+            return await Post.findByIdAndUpdate(body.postId, {$push:{reactions: {$each: JSON.parse(body.reactions)}}});
         }
 
-        await Post.findByIdAndUpdate(body.postId, {$push:{reactions: { rtype: body.reaction, user: body.user, date: new Date()}}});
+        let hasReacted = (await Post.findOne({_id : body.postId, reactions:{$elemMatch:{user: body.user}}}));
 
+        if (hasReacted){
+            await Post.findByIdAndUpdate(body.postId, {$pull: {reactions: {user: body.user}}});
+        }
+
+        await Post.findByIdAndUpdate(body.postId, {$push:{reactions: {rtype: body.reaction, user: body.user, date: new Date()}}});
         await mongoose.connection.close();
 
         return body;
@@ -366,6 +399,37 @@ const getLastPostUser = async (query,credentials) => {
     }
 }
 
+
+/**
+ *
+ * @param {String} filter - filter for posts - ['all','image','text','geolocation']
+ * @param {String} channel - channel filter for posts
+ * @param credentials - mongo credentials
+ * @returns {Promise<*>}
+ */
+const postLength = async (filter,channel,credentials) => {
+    try {
+        await connectdb(credentials);
+
+        // controllo se il filtro che arriva è tra i valori dell'enum
+
+
+        let posts = await Post.find(
+            { ... (filter && filter !== '') && {contentType: filter},
+                '$or': [{'destinationArray.name': channel}, {'officialChannelsArray': channel}],
+                }).lean();
+
+
+        return {length: posts.length};
+    }
+    catch (Error){
+        throw Error;
+    }
+}
+
+
+
+
 module.exports = {
     addPost,
     getAllPost,
@@ -376,4 +440,6 @@ module.exports = {
     addTimedPost,
     getPostsDate,
     getReactionLast30days
+    addTimedPost,
+    postLength
 }

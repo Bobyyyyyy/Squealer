@@ -5,11 +5,11 @@ const {createScheduledPost} = require("./CronController");
 
 const createPost = async (req,res) => {
     try{
-        let postSavedId = await postModel.addPost(req.body,mongoCredentials)
-        if (req.body.post?.timed){
+        let postSavedId = await postModel.addPost(req.body.post, req.body.quota,mongoCredentials)
+        if (req.body.post?.timed) {
             await createScheduledPost(postSavedId.postId, req.body.post.frequency, req.body.post.squealNumber, req.body.post.content, req.body.post.contentType);
         }
-        res.send({id: postSavedId});
+        res.send({id: postSavedId})
     }
     catch (err){
         console.log(err);
@@ -28,6 +28,11 @@ const getPosts = async (req,res) => {
 
 const updateReaction = async (req,res) => {
     try {
+        if(req.session.type === 'mod') {
+                await postModel.updateReac(req.body, mongoCredentials);
+                res.sendStatus(200);
+        }
+        await postModel.updateReac({user: req.body.user, rtype: req.body.keys},mongoCredentials)
         res.send(await postModel.updateReac(req.body,mongoCredentials))
     }
     catch(error) {
@@ -73,6 +78,17 @@ const getReactionLast30days = async (req,res) => {
     }
 }
 
+const postLength = async (req,res) => {
+    try {
+        console.log(req.query);
+        res.send(await postModel.postLength(req.query.filter,req.query.channel,mongoCredentials))
+    }
+    catch (error) {
+        res.send(error);
+    }
+
+}
+
 module.exports = {
     createPost,
     getPosts,
@@ -80,5 +96,6 @@ module.exports = {
     deleteReaction,
     removePost,
     getPostsDate,
-    getReactionLast30days
+    getReactionLast30days,
+    postLength
 }

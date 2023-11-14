@@ -11,6 +11,7 @@ router.put('/updateReaction', postController.updateReaction);
 router.put('/deleteReaction', postController.deleteReaction);
 router.get('/allDates', postController.getPostsDate);
 router.get('/allReactionMonth', postController.getReactionLast30days)
+router.get('/number',postController.postLength);
 
 
 module.exports = router;

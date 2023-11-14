@@ -3,37 +3,51 @@ const {ObjectId} = require("mongodb");
 const contentTypes = ['geolocation','text','image']
 const destTypes = ['channel', 'user','official']
 const reactionTypes = ['heart','thumbs-up','thumbs-down','heartbreak']
+const categories = ['private','public','popolar','unpopolar','controversial'];
 
 const PostSchema = new mongoose.Schema({
     owner: {
         type: String,       //NAME
         required: true,
     },
-    destination:{
-        destType: {
-            type: String,
-            enum: destTypes,
-        },
-        isPublic: {     // DA INSERIRE SOLO SE CANALE
-            type: Boolean,
-            required: function(){
-                return this.destination.destType === 'channel'
+
+    destinationArray: [
+        {
+            destType: {
+                type: String,
+                enum: destTypes,
+            },
+            name: {
+                type: String,
+                required: true,
             }
-        },
-        name:{
+        }
+    ],
+
+    officialChannelsArray: [
+        {
+                type: String,
+                required: true,
+        }
+    ],
+
+    category: {
             type: String,
             required: true,
-        }
+            enum: categories,
     },
+
     contentType:{
         type: String,       //geolocalizzazione, immagine o testo
         enum: contentTypes,
         required: true,
     },
+
     content:{
-        type: String,       // ?
+        type: String,
         required: true,
     },
+
     reactions: [
         {
             rtype:{     //reaction type
@@ -44,16 +58,28 @@ const PostSchema = new mongoose.Schema({
             date: Date,
         },
     ],
+
     dateOfCreation:{
         type: Date,
         required: true,
     },
+
+    criticalMass: {
+        type: Number,
+        default: 0,
+    },
+
     views: {
         type: Number,
+        default: 0,
     },
+
+
+    //TODO
     tag: {
         type: String,
     },
+
 })
 
 const Post = mongoose.model("Post", PostSchema);
