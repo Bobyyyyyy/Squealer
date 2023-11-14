@@ -2,11 +2,11 @@
   import HeaderPost from "./HeaderPost.vue"
   import FooterPost from "./FooterPost.vue"
   import PostMap from "./PostMap.vue";
+  import {computed} from "vue";
 
   const props = defineProps({
     user: String,
     dest: String,
-    destType: String,
     picProfile: String,
     content: String,
     contentType:String,
@@ -20,6 +20,14 @@
     return `map${props.numberOfPost}`;
   }
 
+  const onlyUser = computed(() => {
+    let tmpArr = props.dest.split(', ');
+    for (let i = 0; i < tmpArr.length; i++) {
+      if(tmpArr[i].startsWith('§')) return false;
+    }
+    return true;
+  })
+
 </script>
 
 
@@ -31,7 +39,6 @@
           :dest="dest"
           :srcImg="picProfile"
           :dateCreation="creationDate"
-          :destType = 'destType'
       />
       <div class="d-flex flex-row justify-content-center text-center align-items-center">
         <!-- SI devono poter inserire anche altre cose, non solo immagini! Swtich in base al tipo di messaggio? -->
@@ -45,7 +52,7 @@
         </p>
       </div>
     </div>
-    <div v-if="destType !== 'user' ">
+    <div v-if="!onlyUser">
       <FooterPost
           :reactions="reactions"
           :postId = "postId"

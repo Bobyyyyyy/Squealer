@@ -111,7 +111,6 @@ const sorts = {
 function parseText(squealText, squealNumber){
     let specialWords = squealText.match(/\{[A-Z]+}/g);
     if(specialWords){
-        console.log("ENTRO");
         let currentDate = new Date().toDateString();
         let currentTime = new Date().toLocaleTimeString('it-IT');
         specialWords.forEach(el => {
@@ -144,11 +143,11 @@ const addTimedPost = async (postId, credentials) => {
 
         let timedInfo = scheduledPostArr.find(el => el['id']===postId);
 
+
             /* same structure of body passed in addPost */
         let newPost = {
-            name: post.owner,
-            destType: post.destination.destType,
-            receiver: post.destination.name,
+            creator: post.owner,
+            destinations: post.destinationArray,
             contentType: post.contentType,
             dateOfCreation: Date.now(),
             content: post.contentType === 'text' ? parseText(timedInfo.content,timedInfo.done + 1) : post.content
@@ -157,14 +156,11 @@ const addTimedPost = async (postId, credentials) => {
 
         let quota2del = newPost.destType === 'user' ? 0 : (post.contentType === 'text' ? newPost.content.length : 125);
         //GESTIRE CASI IN CUI NON PUO' INSERIRE
-        let id = await addPost({
-            post: newPost,
-            quota:{
+        let id = await addPost(newPost, {
                 daily: userQuota.daily - quota2del,
                 weekly: userQuota.weekly - quota2del,
-                monthly: userQuota.monthly - quota2del,
-            }
-        }, credentials);
+                monthly: userQuota.monthly - quota2del}
+            , credentials);
 
         //check se id restituisce errore;
 
@@ -187,11 +183,10 @@ const addTimedPost = async (postId, credentials) => {
 const addPost = async (post,quota,credentials) => {
     try{
         await connectdb(credentials)
-        let destinations = JSON.parse(post.destinations);
+        let destinations = (post.destinations instanceof String) ? JSON.parse(post.destinations) : post.destinations;
         let postCategory = 'private';
         let officialChannels = [];
         let creatorType = (await User.findOne({username: post.creator}, 'typeUser')).typeUser;
-
         for (const destination of destinations) {
             let destinationType = destination.destType;
             let channel = await Channel.findOne({name: destination.name});
@@ -224,8 +219,7 @@ const addPost = async (post,quota,credentials) => {
                 officialChannels.push(destination.name);
                 destinations.pop(destination);
             }
-
-            else if (channel.length === 0) {
+            else if (channel) {             //null se la findOne non trova nulla
                 if (channel.isPublic) {
                     postCategory = 'public';
                 }
@@ -246,8 +240,10 @@ const addPost = async (post,quota,credentials) => {
 
         await newPost.save();
 
+        console.log(quota);
+
         /* QUOTA UPDATE */
-        await User.findOneAndUpdate({username: post.name}, {
+        await User.findOneAndUpdate({username: post.creator}, {
             characters:{
                 daily: quota.daily,
                 weekly: quota.weekly,
@@ -289,7 +285,7 @@ const getAllPost = async (query,credentials) =>{
 
                 /* PER LA PAGINA DEL PROFILO : */
             ... (query.destType && query.destType !== 'all') && {'destinationArray.destType':  query.destType === 'user' ? 'user' : 'channel'},
-            ... (query.destType && query.destType !== 'all' && query.destType !== 'user') && {'category': query.destType === 'public'},
+            ... (query.destType && query.destType !== 'all' && query.destType !== 'user') && {'category': query.destType},
 
                 /* PER IL CANALE SINGOLO */
             $or: [{...(query.channel) && {'destinationArray.name': query.channel}},
@@ -347,7 +343,6 @@ const deletePost = async (body,credentials) => {
 const updateReac = async (body,credentials) => {
     try{
         await connectdb(credentials);
-        await Post.findByIdAndUpdate(body.postId, {$push:{reactions: {$each: JSON.parse(body.reactions)}}});
         let user = await User.findOne({username: body.user},'typeUser');
 
         if(user.typeUser === 'mod') {
@@ -439,7 +434,6 @@ module.exports = {
     getLastPostUser,
     addTimedPost,
     getPostsDate,
-    getReactionLast30days
-    addTimedPost,
+    getReactionLast30days,
     postLength
 }

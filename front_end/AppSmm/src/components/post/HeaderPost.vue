@@ -7,7 +7,6 @@
     dest: String,
     srcImg: String,
     dateCreation: Date,
-    destType:String,
   })
 
   function go2Channel(){

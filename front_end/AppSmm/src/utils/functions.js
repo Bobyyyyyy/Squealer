@@ -10,8 +10,7 @@ async function getPosts(query,offset){
         let res = await fetch(`/db/post/all?${query}&offset=${offset}`,{
             method:"GET",
         });
-        let posts = (await res.json()).map(post => { return {...post, dateOfCreation: new Date(Date.parse(post.dateOfCreation))} });
-        console.log(posts);
+        let posts =  (await res.json()).map(post => { return {...post, dateOfCreation: new Date(Date.parse(post.dateOfCreation))} });
         return posts;
     }catch (e) {
         throw e
@@ -95,7 +94,6 @@ const blob2base64 = (blob) => new Promise((resolve) => {
 });
 
 const compressBlob = (file) => new Promise((resolve) => {
-    console.log(file instanceof File);
     let blobURL = URL.createObjectURL(file);
     let compressedImg = new Image();
     compressedImg.src = blobURL;
@@ -112,6 +110,19 @@ const compressBlob = (file) => new Promise((resolve) => {
     }
 })
 
+/**
+ *
+ * @param {Array<{name:String,destType:String}>} destinations
+ * @return {String} - '@francesco, §popi_ma_buoni,'
+ */
+const parseDestinations = (destinations) => {
+    let arr = [];
+    destinations.forEach(dest => {
+        arr.push(dest.destType === 'channel' ? `§${dest.name}` : `@${dest.name}`)
+    })
+    return arr.join(', ');
+}
+
 export{
     getPage,
     getPosts,
@@ -120,5 +131,6 @@ export{
     getLastPost,
     blob2base64,
     compressBlob,
-    getPostsDate
+    getPostsDate,
+    parseDestinations
 }
