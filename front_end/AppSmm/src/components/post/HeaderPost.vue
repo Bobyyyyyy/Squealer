@@ -19,7 +19,7 @@
   function parseTime(){
     let now = new Date().getTime()
 
-    let timePassed = (now - (props.dateCreation)?.getTime()) / 1000
+    let timePassed = (now - new Date(props.dateCreation).getTime()) / 1000
 
     return timePassed < 60 ? `${Math.floor(timePassed)} s.` :
               timePassed < 60*60 ? `${Math.floor(timePassed/60)} m.` :

@@ -56,6 +56,7 @@
       <FooterPost
           :reactions="reactions"
           :postId = "postId"
+          :idx = "numberOfPost"
       />
     </div>
 

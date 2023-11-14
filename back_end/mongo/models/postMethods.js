@@ -381,7 +381,6 @@ const deleteReac = async (body,credentials) => {
 
 const getLastPostUser = async (query,credentials) => {
     try{
-
         await connectdb(credentials);
 
         let posts = await Post.find({owner: query.user}).sort(sorts['più recente']).limit(1);

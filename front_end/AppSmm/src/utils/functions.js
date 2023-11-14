@@ -123,6 +123,51 @@ const parseDestinations = (destinations) => {
     return arr.join(', ');
 }
 
+function getLast30Days() {
+    let arr2ret = [];
+    for (let i = 1; i < 31; i++) {
+        let day = (new Date(new Date().setDate(new Date().getDate() - (30 - i))));
+        arr2ret.push( day.toString().split(' ').slice(1,3).join(' ') )
+    }
+    return arr2ret;
+}
+
+function getLength(reactions){
+    Object.keys(reactions).forEach(typeReac => {
+        Object.keys(reactions[typeReac]).forEach(date => {
+            reactions[typeReac][date] = reactions[typeReac][date].length;
+        })
+    })
+    return reactions
+}
+
+function parseReactionDate(reactions){
+    Object.keys(reactions).forEach(typeReac => {
+        let reac30days = getLast30Days().reduce((accumulator, value) => {
+            return {...accumulator, [value]: []};
+        }, {});
+        reactions[typeReac].forEach(reac => {
+            let monthDay = new Date(reac.date).toString().split(' ').slice(1,3).join(' ')
+            reac30days[monthDay].push(reac);
+        })
+        reactions[typeReac] = reac30days;
+    })
+    return reactions;
+}
+
+function parseReactionType(reactions){
+    let reactionType = {
+        'heart': [],
+        'thumbs-up': [],
+        'thumbs-down': [],
+        'heartbreak': []
+    }
+    reactions.forEach(reac => {
+        reactionType[reac.rtype].push(reac);
+    })
+    return reactionType;
+}
+
 export{
     getPage,
     getPosts,
@@ -132,5 +177,9 @@ export{
     blob2base64,
     compressBlob,
     getPostsDate,
-    parseDestinations
+    parseDestinations,
+    parseReactionDate,
+    parseReactionType,
+    getLength,
+    getLast30Days
 }

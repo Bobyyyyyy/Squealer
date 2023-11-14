@@ -92,7 +92,8 @@ const getFollnPosts = async(req,res)=> {
 
 const getLastPost = async(req,res)=> {
     try {
-        res.send(await postModel.getLastPostUser(req.query, mongoCredentials));
+        let response = await postModel.getLastPostUser(req.query, mongoCredentials)
+        res.send({post: response});
     } catch (error) {
         res.send(error);
     }
