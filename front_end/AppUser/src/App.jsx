@@ -9,7 +9,6 @@ import Search from "./components/pages/search/Search.jsx";
 import Settings from "./components/pages/settings/Settings.jsx";
 import {Routes, Route, BrowserRouter} from "react-router-dom";
 import React, {useEffect, useState} from "react";
-import Navbar from "./components/utils/navbar/Navbar.jsx";
 import RootLayout from "./layouts/RootLayout.jsx";
 
 
