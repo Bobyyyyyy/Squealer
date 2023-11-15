@@ -3,24 +3,27 @@
 import PubFrequencyYear from "../components/charts/PubFrequencyYear.vue";
 import Popularity30days from "../components/charts/Popularity30days.vue";
 import PubFrequencyMonth from "../components/charts/PubFrequencyMonth.vue";
-import {ref} from "vue";
+import {onMounted, reactive, ref} from "vue";
+import {parseReactionType} from "../utils/functions.js";
+import {currentVip} from "../utils/config.js";
 
+const dataFirstReady = ref(false);
 const firstReady = ref(false);
 const secondReady = ref(false);
+const dataChart = reactive({})
 
-/*
- Andamento del mese:
- - prendi i post filtrati dell'ultimo mese
- - unisci tutte le reazioni e le separi per data  ??
- - plotta
+onMounted(async ()=> {
+  let res =  await fetch(`/db/post/allReactionMonth?user=${currentVip.value}`,{
+    method:"GET",
+  })
 
+  let reactions = await res.json()
 
- Stats di ogni post:
- - numero di risposte
- - reazioni
+  dataChart.value = parseReactionType(reactions)
+  dataFirstReady.value = true;
+  firstReady.value = true;
 
- stats di ogni canale (generale o solo riguardate i miei post???)
- */
+})
 
 </script>
 
@@ -28,7 +31,7 @@ const secondReady = ref(false);
   <div class="centralDiv">
     <div class="marginCD">
       <h1 class="m-0 w-100 text-center"> GENERAL STATS </h1>
-      <Popularity30days @ready="firstReady = true"/>
+      <Popularity30days v-if="dataFirstReady" :post="false" :reactions="dataChart"/>
       <h3 class="m-0 w-100 text-center"> Squeal Frequency </h3>
       <PubFrequencyMonth v-if="firstReady" @ready="secondReady = true" />
       <h3 class="m-0 w-100 text-center"> Squeal Frequency this month </h3>

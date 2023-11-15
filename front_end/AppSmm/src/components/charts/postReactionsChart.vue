@@ -11,11 +11,18 @@
    Tooltip,
    ArcElement,
  } from "chart.js";
- import {computed, ref, toRaw, watch} from "vue";
- import {read} from "@popperjs/core";
+ import {onBeforeUpdate, onMounted, onUnmounted, onUpdated, ref, watch} from "vue";
+
+ ChartJS.register(ArcElement,CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
+
  const ready = ref(false);
- const isActive = ref(false);
- let dataChart = ref({})
+
+ let dataChart = ref({
+   'heart': 0,
+   'thumbs-up': 0,
+   'thumbs-down': 0,
+   'heartbreak': 0,
+ })
 
   const props = defineProps({
     reactions: {
@@ -23,26 +30,26 @@
     },
   })
 
- ChartJS.register(ArcElement,CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
+ const reacRef = ref(props.reactions);
 
- function setIsActive(){
-   isActive.value = true;
+ function updateChart() {
+   ready.value = false;
+  if(reacRef.value.value.heart){
+    dataChart.value['heart'] = reacRef.value.value['heart'].length;
+    dataChart.value['thumbs-up'] = reacRef.value.value['thumbs-up'].length
+    dataChart.value['thumbs-down'] = reacRef.value.value['thumbs-down'].length
+    dataChart.value['heartbreak'] = reacRef.value.value['heartbreak'].length
+    ready.value = true;
+  }
  }
 
- watch(props.reactions, (data) => {
-   if(data !== null) {
-     dataChart.value = toRaw(data)
-     ready.value = true;
-   }
+ defineExpose({
+   updateChart,
  })
-
-defineExpose({
-  setIsActive,
-})
 </script>
 
 <template>
-  <Doughnut v-if="ready && isActive"
+  <Doughnut v-if="ready"
             :data="{
     labels: ['heart', 'thumbs-up', 'thumbs-down', 'heartbreak'],
     datasets: [
@@ -53,8 +60,8 @@ defineExpose({
           ]
   }"
             :options = "{
-  responsive: true,
-  maintainAspectRatio: false
+    responsive: false,
+    maintainAspectRatio: false
 }"
   />
 </template>

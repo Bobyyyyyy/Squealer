@@ -2,7 +2,7 @@
   import HeaderPost from "./HeaderPost.vue"
   import FooterPost from "./FooterPost.vue"
   import PostMap from "./PostMap.vue";
-  import {computed} from "vue";
+  import {computed, onMounted} from "vue";
 
   const props = defineProps({
     user: String,
@@ -27,7 +27,6 @@
     }
     return true;
   })
-
 </script>
 
 
