@@ -29,6 +29,7 @@ const addUser = async (body,credentials) => {
             characters: body.type === 'mod' ? {daily: null, weekly: null, monthly: null} : quota,
             ...(body.type === 'smm') && {vipHandled: []},
             maxQuota: body.type === 'mod' ? {daily: null, weekly: null, monthly: null} : quota,
+            popularity: body.type === 'mod' ? null : 0,
         });
 
 

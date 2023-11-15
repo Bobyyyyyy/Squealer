@@ -66,8 +66,9 @@ const UserSchema = new mongoose.Schema({
 
     popularity: {
         type: Number,
-        required: true,
-        default: 0,
+        required: function(){
+            return this.typeUser !== 'mod';
+        },
     }
 })
 

@@ -40,6 +40,8 @@ function getUsersNumber(filter) {
     })
 }
 
+//TODO SPOSTARLA NEL CLICK DEL BOTTONE (COSI' NESSUNO PUò CHIAAMRLA A LIVELLO CLIENT)
+
 function modifyUser(parameters) {
 
     parameters = JSON.parse(parameters);

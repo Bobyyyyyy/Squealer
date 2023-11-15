@@ -305,19 +305,26 @@ const getAllPost = async (query,sessionUser,credentials) =>{
             .sort(sorts[query.sort ?  query.sort : 'più recente'])
             .lean();
 
-        for (const post of posts) {
-            let filteredArray = post.views.filter(user => {return user.name === sessionUser})
-            if(filteredArray.length === 0) {
-                let NumberofViews = ++post.views.length;
-                let CriticalMass = post.criticalMass + (NumberofViews * CRITICAL_MASS_MULTIPLIER)
-                let view = {
-                    name: sessionUser,
-                    date: new Date(),
+        // Update delle views e della categoria se necessario
+        let user = await User.findOne({username: sessionUser});
+
+        if(user.typeUser !== 'mod') {
+            for (const post of posts) {
+                let filteredArray = post.views.filter(user => {return user.name === sessionUser})
+                if(filteredArray.length === 0) {
+                    let NumberofViews = ++post.views.length;
+                    let CriticalMass = post.criticalMass + (NumberofViews * CRITICAL_MASS_MULTIPLIER)
+                    let view = {
+                        name: sessionUser,
+                        date: new Date(),
+                    }
+                    let postToUpdate = await Post.findByIdAndUpdate(post._id,{$push: {'views': view} , 'criticalMass': parseInt(CriticalMass)});
+                    await UpdateCategory(postToUpdate,user._id);
                 }
-                let postToUpdate = await Post.findByIdAndUpdate(post._id,{$push: {'views': view} , 'criticalMass': parseInt(CriticalMass)});
-                await UpdateCategory(postToUpdate);
             }
         }
+
+
         await mongoose.connection.close()
         return posts;
     }
@@ -409,7 +416,6 @@ const UpdateCategory = async (post, userID) => {
     let positiveReactionsCount = 0;
     let negativeReactionsCount = 0;
 
-    console.log(userID);
      post.reactions.forEach((reaction) => {
          if (reaction.rtype === 'thumbs-up') {
              positiveReactionsCount ++;
@@ -437,10 +443,7 @@ const UpdateCategory = async (post, userID) => {
         }
         else {
             await Post.findByIdAndUpdate(post._id, {popularity: 'popular'});
-            if(userID) {
-                await changePopularity(userID, true);
-            }
-
+            await changePopularity(userID, true);
         }
         return true;
     }
@@ -457,9 +460,7 @@ const UpdateCategory = async (post, userID) => {
         }
         else {
             await Post.findByIdAndUpdate(post._id, {popularity: 'unpopular'});
-            if(userID) {
-                await changePopularity(userID, false);
-            }
+            await changePopularity(userID, false);
 
         }
         return true;
