@@ -93,7 +93,7 @@ export default function RootLayout() {
     return (
         <div>
             <header>
-                <nav className={"fixed bottom-0 flex w-full flex-wrap items-center justify-between bg-[#FBFBFB] py-2 text-black-500 shadow-lg focus:text-neutral-700 dark:bg-neutral-600 lg:py-4"}>
+                <nav className={"fixed bottom-0 flex w-full flex-wrap items-center justify-between bg-[#FBFBFB] py-2 text-black-500 shadow-lg focus:text-neutral-700 dark:bg-neutral-600 lg:py-4 z-auto"}>
                     <div className={"flex w-full flex-wrap items-center justify-around px-3 content-around"}>
                         {navigationButtons.map( (item) => (
                             <NavLink

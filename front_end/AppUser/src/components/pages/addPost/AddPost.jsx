@@ -3,11 +3,10 @@ import * as Yup from "yup";
 import { Button } from "@material-tailwind/react";
 import {useState} from "react";
 
-
 const MAX_HEIGHT = 1200;
 const MAX_WIDTH = 1200;
 const QUALITY = 0.7;
-
+let imageObj = null;
 
 
 function AddPost () {
@@ -47,36 +46,37 @@ function AddPost () {
         return finalDest;
     }
 
-     function createPost(values) {
-        let content;
-        switch (values.contentType) {
-            case "text":
-                content = values.testo;
-                break
-            case "image":
-                content = blob2base64(compressBlob(values.foto));
-                console.log("content", content)
-                break
-        }
+     async function createPost(values) {
+         let content;
+         switch (values.contentType) {
+             case "text":
+                 content = values.testo;
+                 break
+             case "image":
+                 //content = imageObj;
+                 content = await blob2base64(await compressBlob(imageObj));
+                 console.log("content", content)
+                 break
+         }
 
-        let destinations = parseDestinations(values.destinatari);
+         let destinations = parseDestinations(values.destinatari);
 
-        return (
-            {
-                contentType: values.contentType,
-                dateOfCreation: Date.now(),
-                creator: "aleuser",
-                destinations: destinations,
-                content: content
-            }
-        );
-    }
+         return (
+             {
+                 contentType: values.contentType,
+                 dateOfCreation: Date.now(),
+                 creator: "aleuser",
+                 destinations: destinations,
+                 content: content
+             }
+         );
+     }
     const onSubmit = async (values) => {
 
         console.log("form submitted" ,values);
 
         try {
-            let post = createPost(values);
+            let post = await createPost(values);
 
             console.log("post", post);
 
@@ -182,13 +182,15 @@ function AddPost () {
 
 const Content = ({errors, touched, ...formikProps}) => {
     const {values ,submitForm} = useFormikContext();
-    let image;
+    const [isPreview, setIsPreview] = useState(false);
+
+
     return (
         <div className={"mt-4"}>
             {values.contentType === "text" &&
                 <>
                     <label
-                        className={"block font-latoBold text-xl"}
+                        className={"block font-latoBold text-xl mb-2"}
                     >
                         {errors.testo && touched.testo ? (
                             <div className={"text-red-600"}>{errors.testo}</div>
@@ -210,7 +212,7 @@ const Content = ({errors, touched, ...formikProps}) => {
             {values.contentType === "image" &&
                 <>
                     <label
-                        className={"block font-latoBold text-xl"}
+                        className={"block font-latoBold text-xl mb-2"}
                     >
                         {errors.foto && touched.foto ? (
                             <div className={"text-red-600"}>{errors.foto}</div>
@@ -223,22 +225,38 @@ const Content = ({errors, touched, ...formikProps}) => {
                         id={"foto"}
                         accept={"image/png, image/jpeg"}
                         onChange={async (e)=> {
-                            image = (URL.createObjectURL(e.target.files[0]));
-                            console.log("image", image);
-                            let x = await convertBase64(e.target.files[0]);
-                            console.log(x.substring(10,30));
-                            formikProps.setFieldValue("foto", image);
+                            let imageURL = (URL.createObjectURL(e.target.files[0]));
+                            imageObj = e.target.files[0];
+                            await formikProps.setFieldValue("foto", imageURL);
                     }}
                     />
 
-                    <img src={values.foto} alt={"suca"}/>
+                    {values.foto !== "" &&
+                        <>
+                            <label className="relative inline-flex items-center cursor-pointer mt-2">
+                            <input
+                                type="checkbox"
+                                value=""
+                                className="sr-only peer"
+                                onClick={()=> setIsPreview(!isPreview) }
+                            />
+                                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                                <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">Visualizza foto</span>
+                            </label>
+                            {isPreview && <img
+                                className={"h-auto w-auto mx-auto mt-2 "}
+                                src={values.foto}
+                                alt={"preview foto inserita"}
+                            />}
+                        </>
+                    }
                 </>
             }
         </div>
     );
 }
 
-/*
+
 function calculateSize(img, maxWidth, maxHeight) {
     let width = img.width;
     let height = img.height;
@@ -258,14 +276,10 @@ function calculateSize(img, maxWidth, maxHeight) {
     return [width, height];
 }
 
-
 const blob2base64 = (blob) => new Promise((resolve) => {
-    console.log("sono dentro blob2base")
     const reader = new FileReader();
     reader.onloadend = () => resolve(reader.result);
-    console.log("blob:", blob);
     reader.readAsDataURL(blob);
-
 });
 
 const compressBlob = (file) => new Promise((resolve) => {
@@ -279,28 +293,11 @@ const compressBlob = (file) => new Promise((resolve) => {
         canvas.width = newWidth;
         const ctx = canvas.getContext('2d');
         ctx.drawImage(compressedImg, 0, 0, newWidth, newHeight);
-        canvas.toBlob(blob => {
+        return ( canvas.toBlob(blob => {
             resolve(blob);
-        },file.type, QUALITY)
-    }
+        },file.type, QUALITY));
+    };
 })
-
- */
-
-const convertBase64 = (file) => {
-    return new Promise((resolve, reject) => {
-        const fileReader = new FileReader();
-        fileReader.readAsDataURL(file);
-
-        fileReader.onload = () => {
-            resolve(fileReader.result);
-        };
-
-        fileReader.onerror = (error) => {
-            reject(error);
-        };
-    });
-};
 
 
 export default AddPost;
