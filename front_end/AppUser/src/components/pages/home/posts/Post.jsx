@@ -24,7 +24,7 @@ function Post({user, message}) {
 
     return(
     <>
-        <div className="post">
+        <div className="post bg-blue">
             <Title user={user}/>
             <Body text={message} />
             <div className="reactionButtons" >

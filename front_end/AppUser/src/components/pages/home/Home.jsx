@@ -1,6 +1,7 @@
 import Post from "./posts/Post.jsx";
 import "./styleHome.css"
 import {useEffect, useState} from "react";
+import {all} from "express/lib/application.js";
 function Home() {
     const user = {name: "mario", age: 23};
 
@@ -13,36 +14,24 @@ function Home() {
         {id: 5, user: user, message: "dio gatto 424223"}
     ];
 
-    const [allPosts, setAllPosts] = useState(null);
-
     async function getPost () {
         try {
             let res = await fetch(`/db/post/all?name=aleuser&offset=0`);
-            let posts = (await res.json()).map(post => {
-                return {...post}
-            });
+            let posts = (await res.json());
+
             console.log("posts", posts);
             return posts;
         } catch (e) {
-            throw e
+            throw e;
         }
     }
 
-    getPost();
+    useEffect(() => {
 
+    }, []);
 
-    /*
-    {
-                    allPosts &&
-                        allPosts.map((post)=> (
-                            <Post
-                                key={post.id}
-                                user={post.user}
-                                message={post.message}
-                            />
-                        ))
-                }
-     */
+    //let allPosts = getPost();
+    //console.log("è un array? ", typeof allPosts );
 
     return (
         <>

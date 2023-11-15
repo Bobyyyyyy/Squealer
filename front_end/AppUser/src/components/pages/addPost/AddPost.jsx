@@ -1,41 +1,44 @@
-import { Field, Formik, Form, useFormikContext} from 'formik';
+import {Field, Formik, Form, useFormikContext, useField} from 'formik';
 import * as Yup from "yup";
 import { Button } from "@material-tailwind/react";
+import {useState} from "react";
+
+
+const MAX_HEIGHT = 1200;
+const MAX_WIDTH = 1200;
+const QUALITY = 0.7;
+
+
 
 function AddPost () {
+
 
     const initialValues = {
         contentType: "text",
         destinatari: "",
         testo: "",
         foto: "",
-        video: "",
         geolocation: ""
     };
 
     const validationSchema = Yup.object().shape({
         destinatari: Yup.string()
             .required("Inserisci i destinatari"),
-
         testo: Yup.string().when("contentType",{
             is: "text",
             then: () => Yup.string().required("Inserisci contenuto")
         }),
-        foto: Yup.string().when("contentType",{
+        foto: Yup.mixed().when("contentType",{
             is: "image",
             then: () => Yup.string().required("Inserisci una foto")
         }),
-        video: Yup.string().when("contentType", {
-            is: "video",
-            then: () => Yup.string().required("Inserisci l'url")
-        })
     });
+
 
     function parseDestinations(destinations) {
         let finalDest = [];
-        let allDest = destinations.split(",");
+        let allDest = destinations.replaceAll(" ", "").split(",");
         for (let dest of allDest) {
-            dest = dest.trim();
             finalDest.push({
                 name:  dest.substring(1),
                 destType: dest.startsWith('§') ? 'channel' : dest.startsWith('@') ? 'user' : 'errore',
@@ -44,17 +47,15 @@ function AddPost () {
         return finalDest;
     }
 
-    function createPost(values) {
+     function createPost(values) {
         let content;
         switch (values.contentType) {
             case "text":
                 content = values.testo;
                 break
-            case "video":
-                content = values.video;
-                break
             case "image":
-                content = values.foto;
+                content = blob2base64(compressBlob(values.foto));
+                console.log("content", content)
                 break
         }
 
@@ -71,6 +72,7 @@ function AddPost () {
         );
     }
     const onSubmit = async (values) => {
+
         console.log("form submitted" ,values);
 
         try {
@@ -91,10 +93,10 @@ function AddPost () {
 
             let response = await res.json();
             console.log("post inviato", response);
+            console.log("res ok?", response.ok);
         } catch (e) {
             console.log("errore:", e);
         }
-
     }
 
 
@@ -105,7 +107,7 @@ function AddPost () {
                 onSubmit={onSubmit}
                 validationSchema={validationSchema}
             >
-                {({errors, touched}) => (
+                {({errors, touched, ...formikProps}) => (
                 <Form
                     className={"bg-white flex flex-col justify-between rounded-lg w-full font-la"}
                 >
@@ -153,13 +155,12 @@ function AddPost () {
                                 <option value="text">Text</option>
                                 <option value="image">Image</option>
                                 <option value="geolocation">Geolocation</option>
-                                <option value="video">Video</option>
                             </Field>
                         </div>
 
                         {/* CONTENUTO DEL POST */}
                         <div>
-                            <Content errors={errors} touched={touched}/>
+                            <Content errors={errors} touched={touched} {...formikProps} />
                         </div>
                     </div>
                         <Button
@@ -179,8 +180,9 @@ function AddPost () {
 
 }
 
-const Content = ({errors, touched}) => {
+const Content = ({errors, touched, ...formikProps}) => {
     const {values ,submitForm} = useFormikContext();
+    let image;
     return (
         <div className={"mt-4"}>
             {values.contentType === "text" &&
@@ -215,35 +217,90 @@ const Content = ({errors, touched}) => {
                         ) : <span>Contenuto</span>
                         }
                     </label>
-                    <Field
-                        name={"foto"}
+                    <input
+                        type={"file"}
+                        className="relative m-0 block w-full min-w-0 flex-auto rounded border border-solid border-neutral-300 bg-clip-padding px-3 py-[0.32rem] text-base font-normal text-neutral-700 transition duration-300 ease-in-out file:-mx-3 file:-my-[0.32rem] file:overflow-hidden file:rounded-none file:border-0 file:border-solid file:border-inherit file:bg-neutral-100 file:px-3 file:py-[0.32rem] file:text-neutral-700 file:transition file:duration-150 file:ease-in-out file:[border-inline-end-width:1px] file:[margin-inline-end:0.75rem] hover:file:bg-neutral-200 focus:border-primary focus:text-neutral-700 focus:shadow-te-primary focus:outline-none dark:border-neutral-600 dark:text-neutral-200 dark:file:bg-neutral-700 dark:file:text-neutral-100 dark:focus:border-primary"
                         id={"foto"}
-                        className="relative m-0 block w-full min-w-0 flex-auto rounded border border-solid border-neutral-300 bg-clip-padding px-3 py-[0.32rem] text-base font-normal text-neutral-700 transition duration-300 ease-in-out file:-mx-3 file:-my-[0.32rem] file:overflow-hidden file:rounded-none file:border-0 file:border-solid file:border-inherit file:bg-neutral-100 file:px-3 file:py-[0.32rem] file:text-neutral-700 file:transition file:duration-150 file:ease-in-out file:[border-inline-end-width:1px] file:[margin-inline-end:0.75rem] hover:file:bg-neutral-200 focus:border-primary focus:text-neutral-700 focus:shadow-te-primary focus:outline-none dark:border-neutral-600 dark:text-neutral-200 dark:file:bg-neutral-700 dark:file:text-neutral-100 dark:focus:border-primary"
-                        type="file"
+                        accept={"image/png, image/jpeg"}
+                        onChange={async (e)=> {
+                            image = (URL.createObjectURL(e.target.files[0]));
+                            console.log("image", image);
+                            let x = await convertBase64(e.target.files[0]);
+                            console.log(x.substring(10,30));
+                            formikProps.setFieldValue("foto", image);
+                    }}
                     />
-                </>
-            }
-            {values.contentType === "video" &&
-                <>
-                    <label
-                        className={"block font-latoBold text-xl"}
-                    >
-                        {errors.video && touched.video ? (
-                            <div className={"text-red-600"}>{errors.video}</div>
-                        ) : <span>Contenuto</span>
-                        }
-                    </label>
-                    <Field
-                        name={"video"}
-                        id={"video"}
-                        placeholder="inserirsci l'url"
-                        className="relative m-0 block w-full min-w-0 flex-auto rounded border border-solid border-neutral-300 bg-clip-padding px-3 py-[0.32rem] text-base font-normal text-neutral-700 transition duration-300 ease-in-out file:-mx-3 file:-my-[0.32rem] file:overflow-hidden file:rounded-none file:border-0 file:border-solid file:border-inherit file:bg-neutral-100 file:px-3 file:py-[0.32rem] file:text-neutral-700 file:transition file:duration-150 file:ease-in-out file:[border-inline-end-width:1px] file:[margin-inline-end:0.75rem] hover:file:bg-neutral-200 focus:border-primary focus:text-neutral-700 focus:shadow-te-primary focus:outline-none dark:border-neutral-600 dark:text-neutral-200 dark:file:bg-neutral-700 dark:file:text-neutral-100 dark:focus:border-primary"
-                        type="url"
-                    />
+
+                    <img src={values.foto} alt={"suca"}/>
                 </>
             }
         </div>
     );
 }
+
+/*
+function calculateSize(img, maxWidth, maxHeight) {
+    let width = img.width;
+    let height = img.height;
+
+    // calculate the width and height, constraining the proportions
+    if (width > height) {
+        if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+        }
+    } else {
+        if (height > maxHeight) {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+        }
+    }
+    return [width, height];
+}
+
+
+const blob2base64 = (blob) => new Promise((resolve) => {
+    console.log("sono dentro blob2base")
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result);
+    console.log("blob:", blob);
+    reader.readAsDataURL(blob);
+
+});
+
+const compressBlob = (file) => new Promise((resolve) => {
+    let blobURL = URL.createObjectURL(file);
+    let compressedImg = new Image();
+    compressedImg.src = blobURL;
+    compressedImg.onload = () => {
+        const [newWidth, newHeight] = calculateSize(compressedImg, MAX_WIDTH, MAX_HEIGHT);
+        const canvas = document.createElement('canvas');
+        canvas.height = newHeight;
+        canvas.width = newWidth;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(compressedImg, 0, 0, newWidth, newHeight);
+        canvas.toBlob(blob => {
+            resolve(blob);
+        },file.type, QUALITY)
+    }
+})
+
+ */
+
+const convertBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+        const fileReader = new FileReader();
+        fileReader.readAsDataURL(file);
+
+        fileReader.onload = () => {
+            resolve(fileReader.result);
+        };
+
+        fileReader.onerror = (error) => {
+            reject(error);
+        };
+    });
+};
+
 
 export default AddPost;
