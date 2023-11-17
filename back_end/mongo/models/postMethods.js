@@ -10,12 +10,21 @@ const nodeCron = require("node-cron");
 /**
  *
  * @param {String} username
+ * @param {Object} channel  -   channel Name. Used for stats
  * @returns {Promise<[{reaction}]>}
  */
-const getReactionLast30days = async(username) => {
+const getReactionLast30days = async(username, channel = undefined) => {
     try{
+
+        let filter = {
+            owner: username,
+            ...(!!channel) && {'destinationArray.name': { $in: [channel] }},
+        }
+
         await connectdb(mongoCredentials);
-        let posts_id_reactions = await Post.find({owner: username, 'destination.destType': {$not: {$eq:'user'}}},'reactions');
+
+        let posts_id_reactions = await Post.find(filter,'reactions');
+
         await mongoose.connection.close();
 
         let now = new Date();
@@ -239,8 +248,6 @@ const addPost = async (post,quota,credentials) => {
         })
 
         await newPost.save();
-
-        console.log(quota);
 
         /* QUOTA UPDATE */
         await User.findOneAndUpdate({username: post.creator}, {

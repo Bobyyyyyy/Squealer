@@ -16,8 +16,6 @@
   const LChart = ref()
   const modalStateChart = reactive({chartPost:null})
   const ready = ref(false)
-  const chart = ref(null);
-  const parsedReac = ref ({})
   const liveReactions = reactive({});
 
 

@@ -38,7 +38,8 @@
       <img :src=" srcImg " alt="immagine profilo" class="imgFluid" />
       <div class="d-flex flex-column flex-fill">
         <h3 class="mb-0 setMargin"> {{ name }} </h3>
-        <h5 v-if="getPage() !=='Channels'" @click="go2Channel" type="button" class="mb-0" id="ChannelName"> {{dest}} </h5>
+        <!--<h5 v-if="getPage() !=='Channels'" @click="go2Channel" type="button" class="mb-0" id="ChannelName"> {{dest}} </h5>-->
+        <h5 @click="go2Channel" type="button" class="mb-0" id="ChannelName"> {{dest}} </h5>
 
 
       </div>

@@ -135,7 +135,6 @@
     padding-bottom: 2vh;
     padding-left: 1vh;
     width: 10vw;
-    background-color: white;
     z-index: 2000;
   }
   .nameUser{

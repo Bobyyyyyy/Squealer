@@ -22,19 +22,20 @@ const reacRef = ref(props.reactions);
 
 onMounted(()=>{
   if (!(props.post)){
-    let tmp = parseReactionDate(toRaw(props.reactions).value);
+    let tmp = parseReactionDate(toRaw(props.reactions)?.value ? toRaw(props.reactions).value : toRaw(props.reactions));
     dataChart.value = getLength(tmp);
+
     ready.value = true;
   }
 })
 
 function updateChart() {
   ready.value = false;
-  if(reacRef.value.value){
-    let tmp = parseReactionDate(toRaw(reacRef.value).value);
+  if(reacRef.value.value ){
+    let tmp = parseReactionDate(toRaw(props.reactions)?.value ? toRaw(props.reactions).value : toRaw(props.reactions));
     dataChart.value = getLength(tmp);
-    ready.value = true;
   }
+  ready.value = true;
 }
 
 defineExpose({
@@ -44,7 +45,7 @@ defineExpose({
 </script>
 
 <template>
-  <Line v-if="ready" :data="{
+    <Line v-if="ready" :data="{
     labels: ['day'],
     datasets: [
         {

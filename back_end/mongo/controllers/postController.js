@@ -71,7 +71,7 @@ const getPostsDate = async (req,res) => {
 
 const getReactionLast30days = async (req,res) => {
     try{
-        await res.send(await postModel.getReactionLast30days(req.query.user));
+        await res.send(await postModel.getReactionLast30days(req.query.user, req.query?.channel));
     }
     catch (e) {
         throw e;
