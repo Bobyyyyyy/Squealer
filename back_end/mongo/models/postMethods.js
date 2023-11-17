@@ -221,9 +221,11 @@ const addPost = async (post,quota,credentials) => {
                 destinations.pop(destination);
             }
             else if (channel) {             //null se la findOne non trova nulla
-                if (channel.isPublic) {
+                if (channel.type === 'public') {
                     postCategory = 'public';
                 }
+                //update post number in channel schema
+                await Channel.findOneAndUpdate({'name': channel.name}, {'postNumber': channel.postNumber+1})
             }
         }
 
@@ -435,15 +437,15 @@ const UpdateCategory = async (post, userID) => {
         if (negativeReactionsCount > criticalMass) {
             await Post.findByIdAndUpdate(post._id, {popularity: 'controversial'});
             if (post.popularity === 'popular') {
-                await changePopularity(userID, false);
+                await changePopularity(userID, 'popularity',false);
             }
             else if (post.popularity === 'unpopular'){
-                await changePopularity(userID, true);
+                await changePopularity(userID, 'unpopularity',false);
             }
         }
         else {
             await Post.findByIdAndUpdate(post._id, {popularity: 'popular'});
-            await changePopularity(userID, true);
+            await changePopularity(userID, 'popularity',true);
         }
         return true;
     }
@@ -452,15 +454,15 @@ const UpdateCategory = async (post, userID) => {
         if (positiveReactionsCount > criticalMass) {
             await Post.findByIdAndUpdate(post._id, {popularity: 'controversial'});
             if (post.popularity === 'popular') {
-                await changePopularity(userID, false);
+                await changePopularity(userID, 'popularity',false);
             }
             else if (post.popularity === 'unpopular'){
-                await changePopularity(userID, true);
+                await changePopularity(userID, 'unpopularity',false);
             }
         }
         else {
             await Post.findByIdAndUpdate(post._id, {popularity: 'unpopular'});
-            await changePopularity(userID, false);
+            await changePopularity(userID,'unpopularity',true);
 
         }
         return true;
@@ -469,10 +471,10 @@ const UpdateCategory = async (post, userID) => {
     if (post.category !== 'neutral') {
         await Post.findByIdAndUpdate(post._id, {popularity: 'neutral'});
         if (post.popularity === 'popular') {
-            await changePopularity(userID, false);
+            await changePopularity(userID, 'popularity' ,false);
         }
         else if (post.popularity === 'unpopular'){
-            await changePopularity(userID, true);
+            await changePopularity(userID, 'unpopularity',true);
         }
         return true;
     }

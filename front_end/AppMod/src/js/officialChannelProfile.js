@@ -21,11 +21,11 @@ function updateLastCall(limit,offset,filter) {
     $.ajax({
         url:'/db/post/number',
         data: {filter: filter, channel: ChannelName},
-        async: false,
         type: 'get',
         success: (data) => {
             LastCall.posts = data.length;
             $('#post-trovati').html(`${data.length}`);
+            showPosts(LastCall.filter,LastCall.offset,LastCall.limit);
         }
     })
 }
@@ -53,13 +53,12 @@ const showChannel = (name) => {
         success: (channel) => {
             $('#channel-description').html(channel.description);
             $('#channel-creator').html(channel.creator);
+            getPostsNumber(LastCall.filter);
         }
     })
-    showPosts(LastCall.filter,LastCall.offset,LastCall.limit);
 }
 
 const showPosts = (filter,offset,limit,append = false) => {
-    getPostsNumber(filter);
     updateLastCall(limit,offset,filter);
     $.ajax({
         url:'/db/post/all',

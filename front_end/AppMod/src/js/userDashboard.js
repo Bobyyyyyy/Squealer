@@ -32,10 +32,10 @@ function getUsersNumber(filter) {
     $.ajax({
         url:'/db/user/number',
         data: {filter: filter},
-        async: false,
         type: 'get',
         success: (data) => {
             LastCall.users = data.length;
+            userTable(LastCall.limit,LastCall.offset = 0,LastCall.filter);
         }
     })
 }
@@ -43,7 +43,6 @@ function getUsersNumber(filter) {
 //TODO SPOSTARLA NEL CLICK DEL BOTTONE (COSI' NESSUNO PUò CHIAAMRLA A LIVELLO CLIENT)
 
 function modifyUser(parameters) {
-
     parameters = JSON.parse(parameters);
     let maxQuota = {
         daily: $('#max-daily').html(),
@@ -51,9 +50,7 @@ function modifyUser(parameters) {
         monthly: $('#max-monthly').html(),
     }
 
-    console.log(maxQuota);
-
-    if(parameters.daily > maxQuota.daily || parameters.weekly > maxQuota.weekly || parameters.monthly > maxQuota.monthly) {
+    if(parseInt(parameters.daily)  > parseInt(maxQuota.daily) || parseInt(parameters.weekly) > parseInt(maxQuota.weekly) || parseInt(parameters.monthly)  > parseInt(maxQuota.monthly)) {
         alert('Max Quota Exceeded');
         return 0;
     }
@@ -71,8 +68,6 @@ function modifyUser(parameters) {
 
 
 function showUserModal(username,remainingQuota,maxQuota) {
-
-    console.log(remainingQuota);
     $('#max-daily').html(maxQuota.daily);
     $('#max-weekly').html(maxQuota.weekly);
     $('#max-monthly').html(maxQuota.monthly);
@@ -84,7 +79,6 @@ function showUserModal(username,remainingQuota,maxQuota) {
 }
 
 function userTable (limit,offset,filter) {
-    getUsersNumber(filter);
     updateLastCall(limit, offset, filter);
     $.ajax({
         url: '/db/user/all',
@@ -99,6 +93,7 @@ function userTable (limit,offset,filter) {
                             <th> Quota Rimanente </th>
                             <th> Quota Massima </th>
                             <th> Popolarita' </th>
+                            <th> Impopolarita' </th>
                             <th> Tipo </th>
                         </thead>
                         <tbody>`
@@ -112,7 +107,7 @@ function userTable (limit,offset,filter) {
             <td> ${user.username} </td>`
 
                 if (`${user.typeUser}` === 'mod') {
-                    row = row + `<td><span>Not a Field</span></td><td><span>Not a Field</span></td><td>${user.popularity}</td>`
+                    row = row + `<td><span>Not a Field</span></td><td><span>Not a Field</span></td><td>Not a Field</td><td>Not a Field</td>`
                 } else {
                     let remainingQuota = {daily: user.characters.daily,weekly: user.characters.weekly,monthly: user.characters.monthly};
                     let maxQuota = {daily: user.maxQuota.daily, weekly: user.maxQuota.weekly, monthly: user.maxQuota.monthly};
@@ -127,6 +122,7 @@ function userTable (limit,offset,filter) {
                                     <li> Monthly: ${user.maxQuota.monthly} </li>
                                  </ul></td>
                                  <td> ${user.popularity}</td>
+                                 <td> ${user.unpopularity}</td>
                              <script>
                              $('#user-'+${index}).on('click', () => {
                                 showUserModal(${user.username},${JSON.stringify(remainingQuota)},${JSON.stringify(maxQuota)});
@@ -159,7 +155,8 @@ function userTable (limit,offset,filter) {
 }
 $('#filter').on("keyup", () => {
     let value = $('#filter').val();
-    userTable(LastCall.limit,LastCall.offset = 0,value);
+    LastCall.filter = value;
+    getUsersNumber(value);
 });
 
 $('#modifyButton').click(() => {
@@ -170,5 +167,5 @@ $('#modifyButton').click(() => {
 })
 
 $(document).ready(function() {
-    userTable(LastCall.limit,LastCall.offset,LastCall.filter);
+    getUsersNumber(LastCall.filter);
 });

@@ -30,6 +30,7 @@ const addUser = async (body,credentials) => {
             ...(body.type === 'smm') && {vipHandled: []},
             maxQuota: body.type === 'mod' ? {daily: null, weekly: null, monthly: null} : quota,
             popularity: body.type === 'mod' ? null : 0,
+            unpopularity: body.type === 'mod' ? null : 0,
         });
 
 
@@ -239,22 +240,39 @@ const resetQuota = async (type, credentials) => {
 
 /**
  * @param {String} userID
- * @param {Boolean} increase
+ * @param {String} valueToModify
+ * @param {Boolean} increaseValue
  * @returns {Promise<boolean>}
  */
 
-const changePopularity = async (userID, increase) => {
+const changePopularity = async (userID, valueToModify, increaseValue) => {
     let user = await User.findById(userID, 'popularity');
-    let popularity = user.popularity;
 
-    if(increase) {
-        popularity++;
-        await User.findByIdAndUpdate(userID, {'popularity': popularity});
+    if(valueToModify === 'popularity') {
+        let popularity = user.popularity;
+        if(increaseValue) {
+            popularity++;
+            await User.findByIdAndUpdate(userID, {'popularity': popularity});
+        }
+        else {
+            popularity--;
+            await User.findByIdAndUpdate(userID, {'popularity': popularity});
+        }
     }
-    else {
-        popularity--;
-        await User.findByIdAndUpdate(userID, {'popularity': popularity});
+
+    else if(valueToModify === 'unpopularity') {
+        let unpopularity = user.unpopularity;
+        if(increaseValue) {
+            unpopularity++;
+            await User.findByIdAndUpdate(userID, {'unpopularity': unpopularity});
+        }
+        else {
+            unpopularity--;
+            await User.findByIdAndUpdate(userID, {'unpopularity': unpopularity});
+        }
     }
+
+
 
 }
 

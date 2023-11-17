@@ -15,17 +15,17 @@ function getChannelsNumber(filter) {
     $.ajax({
         url:'/db/official/number',
         data: {filter: filter},
-        async: false,
         type: 'get',
         success: (data) => {
+            console.log(data);
             console.log(data.length);
             LastCall.channels = data.length;
+            getChannels(LastCall.limit,LastCall.offset = 0,LastCall.filter);
         }
     })
 }
 
 function getChannels (limit,offset,filter) {
-    getChannelsNumber(filter);
     updateLastCall(limit,offset,filter);
     $.ajax({
         url:'/db/official/all',
@@ -62,10 +62,10 @@ function getChannels (limit,offset,filter) {
 
 $('#filter').on("keyup", () => {
     let value = $('#filter').val();
-    getChannels(LastCall.limit,LastCall.offset = 0,value);
+    getChannelsNumber(value);
 });
 
 
 $(document).ready(() => {
-    getChannels(LastCall.limit,LastCall.offset,LastCall.filter);
+    getChannelsNumber(LastCall.filter);
 })
