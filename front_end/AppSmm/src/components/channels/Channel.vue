@@ -60,7 +60,7 @@ const readyData = ref(false);
     </div>
   </div>
   <hr class="m-0 z-0" />
-  <ChartChannel v-if="readyData" :reactions="readyReac" @closed="readyData = false„" :channelName="name" />
+  <ChartChannel v-if="readyData" :reactions="readyReac" @closed="readyData = false" :channelName="name" />
 </template>
 
 <style>
