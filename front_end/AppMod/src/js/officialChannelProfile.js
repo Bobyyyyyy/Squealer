@@ -21,11 +21,11 @@ function updateLastCall(limit,offset,filter) {
     $.ajax({
         url:'/db/post/number',
         data: {filter: filter, channel: ChannelName},
-        async: false,
         type: 'get',
         success: (data) => {
             LastCall.posts = data.length;
             $('#post-trovati').html(`${data.length}`);
+            showPosts(LastCall.filter,LastCall.offset,LastCall.limit);
         }
     })
 }
@@ -40,7 +40,6 @@ const deletePost = async (id) => {
         data: {id: id},
         type: 'post',
         success: (post) => {
-            console.log(post);
             location.reload()
         }
     })
@@ -54,13 +53,12 @@ const showChannel = (name) => {
         success: (channel) => {
             $('#channel-description').html(channel.description);
             $('#channel-creator').html(channel.creator);
+            getPostsNumber(LastCall.filter);
         }
     })
-    showPosts(LastCall.filter,LastCall.offset,LastCall.limit);
 }
 
 const showPosts = (filter,offset,limit,append = false) => {
-    getPostsNumber(filter);
     updateLastCall(limit,offset,filter);
     $.ajax({
         url:'/db/post/all',
@@ -80,12 +78,16 @@ const showPosts = (filter,offset,limit,append = false) => {
                 
                 let Post =
                     `<div id="post-${id}" class="card mt-5 w-50">
-                    <div class="card-header d-flex bg-info border-black align-items-center p-3 h5 fw-bold">
-                        @${post.owner}
-                        <span class="ms-2">${post.category}</span>
+                    <div id="header-${id}" class="card-header d-flex border-black align-items-center" style="background-color: #CCBEF9">
+                        <div class="d-flex flex-row align-items-center justify-content-center">
+                            <div class="fw-bold">@${post.owner}</div>
+                            <div class="ms-2 fw-light">${post.category}</div>
+                            <div class="ms-2 fw-light">/${post.popularity}</div>  
+                        </div>
+                        
                         <div class="d-flex flex-row ms-auto">
                             <div class="btn-group dropup">
-                                <button class="ms-2 btn btn-info"  data-bs-toggle="dropdown" aria-expanded="false">
+                                <button class="ms-2 btn"  data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="bi bi-three-dots"></i></i>
                                 </button>
                                 <ul class="dropdown-menu">
@@ -93,10 +95,11 @@ const showPosts = (filter,offset,limit,append = false) => {
                                 </ul>
                             </div>
                             
-                            <button class="btn btn-info" id="delete-${id}"><i  class="bi bi-trash"></i></button>
+                            <button class="btn " id="delete-${id}"><i  class="bi bi-trash"></i></button>
                         </div>
                 </div>
-                <div class="card-body flex-row">`
+                <div class="card-body flex-row" style="background-color: #ECEAF5">`
+                
                 
                 switch (`${post.contentType}`) {
                     case 'text':
@@ -117,7 +120,7 @@ const showPosts = (filter,offset,limit,append = false) => {
                 }
                 
                 Post = Post +`</div>
-                    <div class="card-footer text-muted">
+                    <div class="card-footer text-muted" style="background-color: #ECEAF5">
                         <div class="d-flex flex-row">
                             <div id="reactions-${id}" class="me-auto d-inline-flex"> 
                                 <div class="d-flex flex-row"><i class="bi bi-heart-fill"></i> <div class="ms-1">${reactions.heart}</div> </div>
@@ -125,7 +128,7 @@ const showPosts = (filter,offset,limit,append = false) => {
                                 <div class="d-flex flex-row ms-3"><i class="bi bi-hand-thumbs-up-fill"></i> <div class="ms-1">${reactions["thumbs-up"]}</div></div>
                                 <div class="d-flex flex-row ms-3"><i class="bi bi-hand-thumbs-down"></i><div class="ms-1">${reactions["thumbs-down"]}</div></div>
                             </div>
-                            <div class="d-flex flex-row"><i class="bi bi-eye"></i></i><div class="ms-1">${post.views}</div></div>
+                            <div class="d-flex flex-row"><i class="bi bi-eye"></i></i><div class="ms-1">${post.views.length}</div></div>
                             <div class="d-flex flex-row ms-2"><i class="bi bi-people"></i><div class="ms-1">${post.criticalMass}</div></div>
                             
                             <div id="creation-${id}" class="ms-auto">
@@ -203,8 +206,6 @@ $('#delete-button').on('click', () => {
 
 $('#addPostButton').on('click',(contentType, content) => {
     contentType = $('#type-select option:selected').val();
-
-    console.log(contentType);
 
     if(contentType === 'geolocation') {
         content = $('#post-content').html();

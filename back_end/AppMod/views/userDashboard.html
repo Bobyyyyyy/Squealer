@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <link rel="stylesheet" href="/css/mod.css">
+    <title>Squealer</title>
 </head>
 <body class="d-flex flex-column">
 
@@ -24,7 +25,7 @@
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="/mod/officialChannels">Official Channels</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="/mod/privateChannels">Private Channels</a></li>
+                        <li><a class="dropdown-item" href="/mod/userChannels">Private Channels</a></li>
                     </ul>
                 </li>
             </ul>
@@ -52,7 +53,8 @@
 
     <div class="p-5 flex-column" id="div1" style="height: 100%; width: 100%;" >
         <!-- Modal Button -->
-    <div class="d-flex flex-row align-items-center p-3 pe-0">
+    <div class="d-flex flex-row pb-3 pe-0 align-items-center">
+        <label for="filter" class="form-label"></label>
         <input class="form-control" id="filter" type="text" style="height: 10%; width: 15%; background-color: lightgray" placeholder="Cerca Utente..">
         <button type="button" class="btn btn-primary ms-auto" data-bs-toggle="modal" data-bs-target="#addUser">
             Add User
@@ -110,7 +112,7 @@
                 </div>
                 <div class="form-check form-check-inline">
                     <input class="form-check-input" type="radio" name="type" id="vip" value="vip">
-                    <label class="form-check-label" for="Vip">
+                    <label class="form-check-label" for="vip">
                         Vip
                     </label>
                 </div>
@@ -132,26 +134,27 @@
                     <h1 class="modal-title fs-5" id="modUserLabel"></h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form>
                     <div class="modal-body">
-                        <div>
-                            <label for="daily" class="form-label w-100"> Giornalieri:
-                                <input type="number" class="form-control" name="daily" id="daily" placeholder="Inserisci caratteri giornalieri"></label>
+                        <label for="daily" class="form-label w-50 fw-bold text-center">Giornalieri</label>
+                        <div class="d-flex flex-row align-items-center">
+                            <input type="number" class="form-control w-50" name="daily" id="daily" min=0 placeholder="Inserisci caratteri giornalieri">
+                            <div class="mx-auto"><span class="fw-bold">Daily Max Quota: <span id="max-daily"></span> </span></div>
                         </div>
-                        <div>
-                            <label for="weekly" class="form-label w-100"> Settimanali:
-                                <input type="number" class="form-control" name="weekly" id="weekly" placeholder="Inserisci caratteri settimanali"></label>
+                        <label for="weekly" class="mt-2 form-label w-50 fw-bold text-center">Settimanali</label>
+                        <div class="d-flex flex-row align-items-center">
+                            <input type="number" class="form-control w-50" name="weekly" id="weekly" min=0 placeholder="Inserisci caratteri giornalieri">
+                            <div class="mx-auto"><span class="fw-bold">Weekly Max Quota: <span id="max-weekly"></span> </span></div>
                         </div>
-                        <div>
-                            <label for="monthly" class="form-label w-100"> Mensili:
-                                <input type="number" class="form-control" name="monthly" id="monthly" placeholder="Inserisci caratteri mensili"></label>
+                        <label for="monthly" class="mt-2 form-label w-50 fw-bold text-center">Mensile</label>
+                        <div class="d-flex flex-row align-items-center">
+                            <input type="number" class="form-control w-50" name="monthly" id="monthly" min=0 placeholder="Inserisci caratteri giornalieri">
+                            <div class="mx-auto"><span class="fw-bold">Monthly Max Quota: <span id="max-monthly"></span> </span></div>
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
                         <button class="btn btn-primary" id="modifyButton">Modifica</button>
                     </div>
-                </form>
             </div>
         </div>
     </div>

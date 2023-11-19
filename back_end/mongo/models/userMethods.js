@@ -10,7 +10,6 @@ const Post = require("../schemas/Post");
 //POST
 const addUser = async (body,credentials) => {
     try{
-        console.log(body);
         await connectdb(credentials);
         //GET user using email and name
         let findName = await User.find({username: body.name}).lean();
@@ -29,7 +28,9 @@ const addUser = async (body,credentials) => {
             typeUser: body.type ? body.type : 'user',
             characters: body.type === 'mod' ? {daily: null, weekly: null, monthly: null} : quota,
             ...(body.type === 'smm') && {vipHandled: []},
-            maxQuota: quota,
+            maxQuota: body.type === 'mod' ? {daily: null, weekly: null, monthly: null} : quota,
+            popularity: body.type === 'mod' ? null : 0,
+            unpopularity: body.type === 'mod' ? null : 0,
         });
 
 
@@ -130,7 +131,6 @@ const changePwsd = async(body,credentials) =>{
 const getUsers = async (query,credentials) =>{
     try {
         await connectdb(credentials);
-        console.log(query);
         let offset = parseInt(query.offset);
         let limit = parseInt(query.limit);
         return await User.find({$or : [{username: {$regex: query.filter , $options: 'i'}},{email: {$regex: query.filter , $options: 'i'}},{typeUser: {$regex: query.filter , $options: 'i'}}, ] } ).skip(offset).limit(limit).lean();
@@ -154,7 +154,6 @@ const usersLength = async (query,credentials) => {
 
 const altUser = async (body,credentials) => {
     try {
-        console.log(body);
         await connectdb(credentials);
         let user = await User.findOneAndUpdate(
             {username: {$regex: body.filter , $options: 'i'}},
@@ -163,7 +162,6 @@ const altUser = async (body,credentials) => {
             'characters.weekly':  parseInt(body.characters.weekly),
             'characters.monthly':  parseInt(body.characters.monthly)},
             {new: true}).lean();
-        console.log(user);
         await mongoose.connection.close();
         return user;
     }
@@ -191,8 +189,6 @@ const getUserQuota = async (query,credentials) => {
     try {
         await connectdb(credentials);
         let quota = (await User.findOne({username: query.user},'characters')).characters;
-        console.log(quota)
-
         await mongoose.connection.close();
 
         return quota;
@@ -241,6 +237,45 @@ const resetQuota = async (type, credentials) => {
     }
 }
 
+
+/**
+ * @param {String} userID
+ * @param {String} valueToModify
+ * @param {Boolean} increaseValue
+ * @returns {Promise<boolean>}
+ */
+
+const changePopularity = async (userID, valueToModify, increaseValue) => {
+    let user = await User.findById(userID, 'popularity');
+
+    if(valueToModify === 'popularity') {
+        let popularity = user.popularity;
+        if(increaseValue) {
+            popularity++;
+            await User.findByIdAndUpdate(userID, {'popularity': popularity});
+        }
+        else {
+            popularity--;
+            await User.findByIdAndUpdate(userID, {'popularity': popularity});
+        }
+    }
+
+    else if(valueToModify === 'unpopularity') {
+        let unpopularity = user.unpopularity;
+        if(increaseValue) {
+            unpopularity++;
+            await User.findByIdAndUpdate(userID, {'unpopularity': unpopularity});
+        }
+        else {
+            unpopularity--;
+            await User.findByIdAndUpdate(userID, {'unpopularity': unpopularity});
+        }
+    }
+
+
+
+}
+
 //manca un delete per provare le principali API
 
 module.exports = {
@@ -254,5 +289,6 @@ module.exports = {
     getHandledVip,
     getUserQuota,
     get_n_FollnPosts,
-    resetQuota
+    resetQuota,
+    changePopularity,
 }

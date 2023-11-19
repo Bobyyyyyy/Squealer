@@ -11,6 +11,7 @@ const addOfficialChannel = async (body,credentials,creator) => {
         await connectdb(credentials);
         // trasformare il nome in una forma ragionevole
         let name = body.name.toUpperCase();
+        name = name.trim();
         name = name.replace(/\s/g, "_");
         name = name.replace('/','_');
         //check if channel exists already
@@ -85,7 +86,7 @@ const channelsLength = async (query,credentials) => {
 const searchByChannelName = async (query, credentials) =>{
     try {
         await connectdb(credentials);
-        let ChannelName = query.name.toUpperCase();
+        let ChannelName = query.name.trim().toUpperCase();
         let channel = await ReservedChannel.findOne({name: ChannelName}).lean();
         if (!channel) {
             let err = new Error("Nessun canale trovato!");
@@ -103,7 +104,6 @@ const searchByChannelName = async (query, credentials) =>{
 const modifyDescription = async (body, credentials) => {
     try {
         await connectdb(credentials);
-        console.log(body);
         let channel = await ReservedChannel.findOneAndUpdate({name: body.channel},
             {description : body.description},{new: true}).lean();
 
