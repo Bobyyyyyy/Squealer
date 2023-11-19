@@ -1,8 +1,9 @@
 import './stylePost.css'
-function Body(props) {
-    return(
-        <p className="message">{props.text}</p>
-    );
+function Body({post}) {
+    return( (post.contentType === "text") ? (
+        <p className="message">{post.content}</p>
+        ) : (<img className={"message"} src={post.content} alt={"image"}/>
+        ));
 }
 
 export default Body;

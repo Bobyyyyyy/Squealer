@@ -13,6 +13,39 @@ import RootLayout from "./layouts/RootLayout.jsx";
 
 
 function App() {
+    const [user, setUser] = useState(null);
+/*
+    useEffect(() => {
+        console.log("storage",localStorage);
+
+        const getUser = async () => {
+            const prevStorage = JSON.parse(localStorage.getItem("username"));
+            console.log("user in storage?", prevStorage);
+            /*
+            if (prevStorage) {
+                console.log("prendo dallo storage")
+                setUser(prevStorage);
+            } else {
+                try {
+                    console.log("richiesta")
+                    let res = await fetch("/db/user/session");
+                    let username = await res.json();
+                    setUser(username.username);
+                    console.log("set user", user);
+                    localStorage.setItem("username", JSON.stringify(user));
+                } catch (e) {
+                    console.log("errore user: ", e);
+                }
+            }
+
+        };
+        getUser();
+
+    }, []);
+             */
+
+
+
     return (
         <BrowserRouter basename={"/user"}>
             <Routes>

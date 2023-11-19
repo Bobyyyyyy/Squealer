@@ -101,7 +101,7 @@ function AddPost () {
 
 
     return (
-        <main className={" items-start mt-4 flex justify-center m-4"}>
+        <main className={" items-start mt-4 flex justify-center m-4 pb-8"}>
             <Formik
                 initialValues={initialValues}
                 onSubmit={onSubmit}
@@ -149,12 +149,12 @@ function AddPost () {
                             <Field
                                 as={"select"}
                                 id={"contentType"}
-                                className="border-2 border-gray-500 rounded-md w-1/3 focus:border-teal-500 focus:ring-teal-500"
+                                className="border-2 border-gray-500 rounded-md w-2/5 focus:border-teal-500 focus:ring-teal-500"
                                 name="contentType"
                             >
-                                <option value="text">Text</option>
-                                <option value="image">Image</option>
-                                <option value="geolocation">Geolocation</option>
+                                <option value="text">Testo</option>
+                                <option value="image">Immagine</option>
+                                <option value="geolocation">Posizione</option>
                             </Field>
                         </div>
 

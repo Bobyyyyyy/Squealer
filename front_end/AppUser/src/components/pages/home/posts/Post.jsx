@@ -3,10 +3,10 @@ import React, {useState} from "react";
 import Title from "./Title.jsx";
 import './stylePost.css'
 import {
-    Dislike, Like, Heart, HeartBroken
+    Dislike, Like, Heart, HeartBroken, ProfilePic
 } from "../../../assets/index.jsx"
 import Button from "../../../utils/buttons/Button.jsx";
-function Post({user, message}) {
+function Post({post}) {
 
     const buttonsReaction = [
         {id: 0, icon: Heart},
@@ -25,8 +25,8 @@ function Post({user, message}) {
     return(
     <>
         <div className="post bg-blue">
-            <Title user={user}/>
-            <Body text={message} />
+            <Title post={post} />
+            <Body post={post}/>
             <div className="reactionButtons" >
                 {buttonsReaction.map( (item) => (
                     <Button
