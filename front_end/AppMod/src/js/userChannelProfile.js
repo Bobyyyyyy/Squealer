@@ -1,5 +1,6 @@
 let ChannelName = $('#channel-name').html();
 let User = $('#session-user').html();
+const urlRegex =/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
 
 let LastCall = {
     limit : 3,
@@ -23,6 +24,10 @@ const showChannel = (name) => {
         success: (channel) => {
             $('#channel-description').html(channel.description);
             $('#channel-creator').html(channel.creator);
+            $('#posts-number').html(channel.postNumber);
+            $('#followers').html(channel.followerNumber);
+
+            showPosts(LastCall.filter,LastCall.offset,LastCall.limit);
         }
     })
 }
@@ -36,6 +41,27 @@ const showPosts = (filter,offset,limit,append = false) => {
         success: (posts) => {
             console.log(posts)
             let html = `${$.map(posts, (post) => {
+                
+                let destinationNames = []
+                let officialChannelNames = [];
+                
+                post.destinationArray.forEach(destination => {
+                    if(destination.destType === "channel") {
+                        destinationNames.push('§' + destination.name + '');
+                    }
+
+                    if(destination.destType === "user") {
+                        destinationNames.push('@' + destination.name);
+                    }
+
+
+                })
+
+                post.officialChannelsArray.forEach(destination => {
+                    officialChannelNames.push('§' + destination);
+                })
+                
+                
                 let id = post._id;
                 id = id.substring(id.length - 10);
                 let reactions = {
@@ -47,12 +73,19 @@ const showPosts = (filter,offset,limit,append = false) => {
 
                 let Post =
                     `<div id="post-${id}" class="card mt-5 w-50">
-                    <div id="header-${id}" class="card-header d-flex border-black align-items-center" style="background-color: #CCBEF9">
-                        <div class="d-flex flex-row align-items-center justify-content-center">
+                    <div id="header-${id}" class="card-header d-flex flex border-black align-items-center" style="background-color: #CCBEF9">
+                    <div class="d-flex flex-column">
+                        <div class="d-flex flex-row align-items-center justify-content-start">
                             <div class="fw-bold">@${post.owner}</div>
-                            <div class="ms-2 fw-light">${post.category}</div>
-                            <div class="ms-2 fw-light">/${post.popularity}</div>  
+                            <div class="ms-1 fw-light">/${post.popularity}</div> 
                         </div>
+                        
+                        <div class="d-flex flex-row justify-content-start align-items-center" style="font-size: 10px">
+                            <div class="fw-light">${destinationNames}</div>
+                            <div class="ms-1 fw-light">${officialChannelNames}</div> 
+                        </div>
+                    </div>
+                        
                         
                         <div class="d-flex flex-row ms-auto">
                             <div class="btn-group dropup">
@@ -140,6 +173,63 @@ const showPosts = (filter,offset,limit,append = false) => {
         }
     })
 }
+
+$('#changeReactionsButton').on('click',() => {
+
+    let reactions = {
+        heart: $('#heart').val(),
+        heartbreak: $('#heartbreak').val(),
+        'thumbs-up': $('#thumbs-up').val(),
+        'thumbs-down': $('#thumbs-down').val(),
+    }
+
+    let allReactions = []
+    for (let i = 0; i < reactions.heart; i++) {
+        allReactions.push({
+            rtype: 'heart',
+            user: User,
+            date: new Date(),
+        })
+    }
+
+    for (let i = 0; i < reactions.heartbreak; i++) {
+        allReactions.push({
+            rtype: 'heartbreak',
+            user: User,
+            date: new Date(),
+        })
+    }
+
+    for (let i = 0; i < reactions["thumbs-up"]; i++) {
+        allReactions.push({
+            rtype: 'thumbs-up',
+            user: User,
+            date: new Date(),
+        })
+    }
+    for (let i = 0; i < reactions["thumbs-down"]; i++) {
+        allReactions.push({
+            rtype: 'thumbs-down',
+            user: User,
+            date: new Date(),
+        })
+    }
+
+    if(allReactions.length > 500) {
+        alert('Puoi aggiungere al massimo 500 reactions!!');
+        return;
+    }
+
+    $.ajax({
+        url: '/db/post/updateReaction',
+        data: {user: User, reactions: JSON.stringify(allReactions), postId: post},
+        type: 'put',
+        success: (data) => {
+            location.reload();
+        }
+    })
+})
+
 
 $(document).ready(() => {
     showChannel(ChannelName);
