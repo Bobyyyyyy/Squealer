@@ -56,6 +56,9 @@ app.get(['/user','/user/*',],(req,res) => {
 app.use('/js' ,express.static(rootDir + '/front_end/AppMod/src/js'));
 app.use('/css',express.static(rootDir + '/front_end/AppMod/src/css'));
 app.use('/img',express.static(rootDir + '/back_end/assets/img'))
+app.use('/scss',express.static(rootDir + '/public/assets'))
+
+
 
 /* CRON */
 const nodeCron = require('node-cron')

@@ -76,12 +76,14 @@ onMounted(async ()=> {
 
     n_post.value = (await getUserInfo()).nposts;
 
-    query = `name=${currentVip.value}`
     window.addEventListener("scrollend", scrollendHandler);
 
     store.commit('setQuota', await getUserQuota())
 
+    query = `name=${currentVip.value}`
+
     curPosts.push(...(await getPosts(query, 0)));
+
     readyPosts.value = true
   })
 

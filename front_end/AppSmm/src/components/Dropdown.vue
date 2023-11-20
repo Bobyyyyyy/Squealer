@@ -12,7 +12,7 @@
 
 <template>
   <div class="dropdown">
-    <a :class="classButton" class="btn dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">{{filterRef}}</a>
+    <a :class="classButton" class="btn btn-secondary dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">{{filterRef}}</a>
     <ul class="dropdown-menu">
       <li v-for="(el,i) in dropItems" :key ="i">
         <a class="dropdown-item" @click="$emit(updateRef, el)">{{ el }}</a>

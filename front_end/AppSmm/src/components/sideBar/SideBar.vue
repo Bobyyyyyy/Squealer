@@ -3,13 +3,15 @@
   import NavBarWel from "../navbar/NavBar.vue";
   import AddPostModal from "../post/AddPostModal.vue";
   import {Modal} from 'bootstrap'
-  import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
+  import {computed, onMounted, onUnmounted, reactive, ref, watch} from "vue";
   import {getPage} from "../../utils/functions.js";
   import {currentVip, sideBarElements, smm } from "../../utils/config.js"
+  import BuyQuotaModal from "../../quota/buyQuotaModal.vue";
 
   const windowWidth = ref(window.innerWidth);
   const modalState = reactive({Modal: null,})
   const beforeModalPage = ref('');
+  const quotaModal = ref();
 
   const onWidthChange =  () => windowWidth.value = window.innerWidth
   onMounted(async () => {
@@ -33,6 +35,10 @@
     openAppModal();
     beforeModalPage.value = getPage();
   }
+  function setUpQuotaModal() {
+    quotaModal.value.openModal();
+    beforeModalPage.value = getPage();
+  }
 
 
   const width = computed(() => windowWidth.value)
@@ -48,9 +54,6 @@
   window.addEventListener("popstate",()=>{
     activeBut.value = window.location.pathname.split('/').slice(-1).join().split(/(?=[A-Z])/).join(' ');
   },false)
-
-
-
 
 
 </script>
@@ -91,6 +94,7 @@
 
                    @pushTo = "(name) => {
                      if(name === 'Add Post') setUpModal()
+                     else if (name === 'Buy Quota') setUpQuotaModal();
                      else this.$router.push(getUrlPage(name))
                    }"
         />
@@ -126,6 +130,7 @@
   <AddPostModal
     @closeAppModal = "closeAppModal"
   />
+  <buyQuotaModal ref="quotaModal"/>
 </template>
 
 <style>
@@ -135,7 +140,6 @@
     padding-bottom: 2vh;
     padding-left: 1vh;
     width: 10vw;
-    background-color: white;
     z-index: 2000;
   }
   .nameUser{

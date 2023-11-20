@@ -35,7 +35,7 @@
 
 <template>
   <div class="modal fade w-100 h-100" id="AddChannelModal"  tabindex="-1" aria-hidden="true">
-    <div class="d-flex centralDiv z-1 align-items-center">
+    <div class="d-flex centralDiv align-items-center">
       <div class="modal-dialog modalDim">
         <div class="modal-content flex-">
           <form id="addChannelForm">
@@ -75,3 +75,6 @@
     </div>
   </div>
 </template>
+
+<style>
+</style>

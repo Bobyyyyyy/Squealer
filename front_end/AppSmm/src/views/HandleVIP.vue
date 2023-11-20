@@ -22,9 +22,9 @@
       method:"GET"
     })
     vips = await res.json()
-
     for (let i = 0; i < vips.length; i++) {
-      lastVipsPost[i] = await getLastPost(vips[i])
+      let lastPost =  (await getLastPost(vips[i])).post;
+      lastVipsPost[i] =lastPost
     }
 
     requestCompleted.value=true;
@@ -49,7 +49,7 @@
             :key="index"
             :followers="100"
              :username="vip"
-             :post="lastVipsPost[index]"
+             :post="lastVipsPost[index] ? lastVipsPost[index] : {}"
             @setModal = " (username) => openModal(username)"
     />
 

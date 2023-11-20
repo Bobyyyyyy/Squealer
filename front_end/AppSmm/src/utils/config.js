@@ -95,9 +95,9 @@ const smm = ref('');
 const currentVip = ref('')
 
 /* IMG compression */
-const QUALITY = 0.7;
-const MAX_HEIGHT = 1200;
-const MAX_WIDTH = 1200;
+const QUALITY = 0.4;
+const MAX_HEIGHT = 800;
+const MAX_WIDTH = 800;
 
 
 export {smm, sideBarElements, currentVip, postType, sortPosts, filterValues, reactionsIcons, QUALITY, MAX_WIDTH, MAX_HEIGHT}
