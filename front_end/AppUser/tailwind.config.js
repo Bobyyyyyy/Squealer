@@ -7,9 +7,13 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        latoRegular: 'Montserrat',
-        latoBold: 'Montserrat',
+        mont: 'Montserrat',
       },
+      colors: {
+
+        primary: '#ADD9F4',
+        secondary: '#235789'
+      }
     },
   },
   plugins: [

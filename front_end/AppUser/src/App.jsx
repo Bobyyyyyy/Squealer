@@ -1,49 +1,25 @@
 import './index.css'
 
-import NotFound from "./components/pages/notFound/NotFound.jsx";
-import Home from "./components/pages/home/Home.jsx";
-import Channels from "./components/pages/channels/Channels.jsx";
-import AddPost from "./components/pages/addPost/AddPost.jsx";
-import Profile from "./components/pages/profile/Profile.jsx";
-import Search from "./components/pages/search/Search.jsx";
-import Settings from "./components/pages/settings/Settings.jsx";
+import NotFound from "./pages/notFound/NotFound.jsx";
+import Home from "./pages/home/Home.jsx";
+import Channels from "./pages/channels/Channels.jsx";
+import AddPost from "./pages/addPost/AddPost.jsx";
+import Profile from "./pages/profile/Profile.jsx";
+import Search from "./pages/search/Search.jsx";
+import Settings from "./pages/settings/Settings.jsx";
 import {Routes, Route, BrowserRouter} from "react-router-dom";
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import RootLayout from "./layouts/RootLayout.jsx";
-
+import {setQuotaInLocStor, setUsernameInLocStor} from "./components/utils/usefulFunctions.js";
 
 function App() {
     const [user, setUser] = useState(null);
-/*
+    const savedUser = useRef(false);
+
     useEffect(() => {
-        console.log("storage",localStorage);
-
-        const getUser = async () => {
-            const prevStorage = JSON.parse(localStorage.getItem("username"));
-            console.log("user in storage?", prevStorage);
-            /*
-            if (prevStorage) {
-                console.log("prendo dallo storage")
-                setUser(prevStorage);
-            } else {
-                try {
-                    console.log("richiesta")
-                    let res = await fetch("/db/user/session");
-                    let username = await res.json();
-                    setUser(username.username);
-                    console.log("set user", user);
-                    localStorage.setItem("username", JSON.stringify(user));
-                } catch (e) {
-                    console.log("errore user: ", e);
-                }
-            }
-
-        };
-        getUser();
-
+        setUsernameInLocStor();
+        setQuotaInLocStor();
     }, []);
-             */
-
 
 
     return (

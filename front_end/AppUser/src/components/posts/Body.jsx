@@ -1,4 +1,3 @@
-import './stylePost.css'
 function Body({post}) {
     return( (post.contentType === "text") ? (
         <p className="message">{post.content}</p>

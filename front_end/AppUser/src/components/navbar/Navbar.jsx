@@ -1,5 +1,5 @@
 import {useMemo, useEffect, useState} from "react";
-import {HomeIcon, SearchIcon, AddIcon, UserIcon, ChannelIcon, SettingIcon, Logout} from "../../assets/index.jsx";
+import {HomeIcon, SearchIcon, AddIcon, UserIcon, ChannelIcon, SettingIcon, Logout} from "../assets/index.jsx";
 import MobileNavbar from "./mobile/MobileNavbar.jsx";
 import {useNavigate, NavLink} from "react-router-dom";
 import Sidebar from "./pc/Sidebar.jsx";

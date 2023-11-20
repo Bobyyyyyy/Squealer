@@ -281,7 +281,6 @@ const addPost = async (post,quota,credentials) => {
  */
 const getAllPost = async (query,sessionUser,credentials) =>{
     try{
-
         await connectdb(credentials)
 
         let filter = {
@@ -308,7 +307,7 @@ const getAllPost = async (query,sessionUser,credentials) =>{
             .lean();
 
         // Update delle views e della categoria se necessario
-        let user = await User.findOne({username: sessionUser});
+        let user = await User.findOne({username: sessionUser}).lean();
 
         if(user.typeUser !== 'mod') {
             for (const post of posts) {

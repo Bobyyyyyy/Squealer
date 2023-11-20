@@ -1,7 +1,8 @@
 import {Field, Formik, Form, useFormikContext} from 'formik';
 import * as Yup from "yup";
-import { Button } from "@material-tailwind/react";
+import {alert, Button} from "@material-tailwind/react";
 import {useState} from "react";
+import {getUsernameFromLocStor} from "../../components/utils/usefulFunctions.js"
 
 const MAX_HEIGHT = 1200;
 const MAX_WIDTH = 1200;
@@ -10,7 +11,6 @@ let imageObj = null;
 
 
 function AddPost () {
-
 
     const initialValues = {
         contentType: "text",
@@ -53,19 +53,18 @@ function AddPost () {
                  content = values.testo;
                  break
              case "image":
-                 //content = imageObj;
                  content = await blob2base64(await compressBlob(imageObj));
-                 console.log("content", content)
                  break
          }
 
          let destinations = parseDestinations(values.destinatari);
+         let currUser = getUsernameFromLocStor();
 
          return (
              {
                  contentType: values.contentType,
                  dateOfCreation: Date.now(),
-                 creator: "aleuser",
+                 creator: currUser,
                  destinations: destinations,
                  content: content
              }
@@ -93,7 +92,15 @@ function AddPost () {
 
             let response = await res.json();
             console.log("post inviato", response);
-            console.log("res ok?", response.ok);
+            /* DA SISTEMARE IL CONTROLLO DEL CORRETTO INVIO DEL POST */
+
+            if (JSON.stringify(response) === '{}') {
+                // quando invio il post correttamente ritorna {}, perché ?
+                window.alert("hai inviato correttamente il post");
+            }
+            else {
+                window.alert("il destinatario non esiste");
+            }
         } catch (e) {
             console.log("errore:", e);
         }
@@ -101,7 +108,7 @@ function AddPost () {
 
 
     return (
-        <main className={" items-start mt-4 flex justify-center m-4 pb-8"}>
+        <main className={" items-start flex justify-center m-4 pb-8"}>
             <Formik
                 initialValues={initialValues}
                 onSubmit={onSubmit}
@@ -165,7 +172,8 @@ function AddPost () {
                     </div>
                         <Button
                             className="flex align-center justify-center gap-2 bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded"
-                            type={"submit"}>
+                            type={"submit"}
+                        >
                             Submit
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />

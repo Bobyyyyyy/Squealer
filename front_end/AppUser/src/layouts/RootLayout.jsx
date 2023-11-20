@@ -22,7 +22,7 @@ import {
     IconButton,
 } from "@material-tailwind/react";
 
-import sidebar from "../components/utils/navbar/pc/Sidebar.jsx";
+import sidebar from "../components/navbar/pc/Sidebar.jsx";
 export default function RootLayout() {
     const navigationButtons = [
         {id: 0,

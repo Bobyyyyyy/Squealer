@@ -9,7 +9,7 @@ global.startDate = null;
 const express = require('express');
 const cors = require('cors');
 const {dbname} = require("./back_end/mongo/models/utils");
-const {isSMM} = require("./back_end/Frontpage/controllers/FrontPageController");
+const {isSMM, isUser} = require("./back_end/Frontpage/controllers/FrontPageController");
 
 const storeSession = MongoStore.create({
     mongoUrl: 'mongodb://localhost:27017',
@@ -49,7 +49,7 @@ app.get(['/SMM','/SMM/*'], isSMM, (req,res) => {
     res.sendFile(rootDir + '/front_end/AppSmm/index.html');
 })
 
-app.get(['/user','/user/*',],(req,res) => {
+app.get(['/user','/user/*'], isUser, (req,res) => {
     res.sendFile(rootDir + '/front_end/AppUser/index.html');
 })
 

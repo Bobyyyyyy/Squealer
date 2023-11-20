@@ -188,9 +188,11 @@ const getHandledVip = async (query,credentials) => {
 const getUserQuota = async (query,credentials) => {
     try {
         await connectdb(credentials);
-        let quota = (await User.findOne({username: query.user},'characters')).characters;
+        let quota = (await User.findOne({username: query.user},'characters maxQuota')).lean();
         await mongoose.connection.close();
 
+        delete quota._id;
+        console.log("quota", quota);
         return quota;
     }
     catch (Error){

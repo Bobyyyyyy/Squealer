@@ -1,18 +1,18 @@
 import Body from "./Body.jsx";
 import React, {useState} from "react";
 import Title from "./Title.jsx";
-import './stylePost.css'
+
 import {
-    Dislike, Like, Heart, HeartBroken, ProfilePic
-} from "../../../assets/index.jsx"
-import Button from "../../../utils/buttons/Button.jsx";
+    Dislike, Like, Heart, MadIcon, ProfilePic
+} from "../assets/index.jsx"
+
 function Post({post}) {
 
     const buttonsReaction = [
         {id: 0, icon: Heart},
         {id: 1, icon: Like},
         {id: 2, icon: Dislike},
-        {id: 3, icon: HeartBroken}
+        {id: 3, icon: MadIcon}
     ];
 
     // controllo bottoni
@@ -29,13 +29,12 @@ function Post({post}) {
             <Body post={post}/>
             <div className="reactionButtons" >
                 {buttonsReaction.map( (item) => (
-                    <Button
+                    <button
                         key = {item.id}
-                        icon = {item.icon}
-                        isActive={item.id === activeButton}
-                        handleClick={ () => changeActiveButton({id: item.id})}
-                        sideEffectFunction={() => alert("width: "+ window.innerWidth+ " height: "+ window.innerHeight)}
-                    />
+                        onClick={ () => changeActiveButton({id: item.id})}
+                    >
+                        { (activeButton === item.id) ? item.icon.active : item.icon.inactive }
+                    </button>
                 ))}
             </div>
         </div>

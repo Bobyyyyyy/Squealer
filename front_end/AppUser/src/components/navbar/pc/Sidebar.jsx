@@ -1,5 +1,5 @@
 import Button from "../../buttons/Button.jsx";
-import {Logo} from "../../../assets/index.jsx";
+import {Logo} from "../../assets/index.jsx";
 
 function Sidebar({windowWidth, navigationButtons, activeButton, changeActiveButton}) {
     const settingsBtn = navigationButtons[navigationButtons.length-1];
