@@ -42,14 +42,16 @@ function Home() {
     return (
         <>
             {isLoading && <h1>Caricamento...</h1>}
-            {posts.map((post)=> {
-                console.log("id",post._id)
-                return(
-                    <Post
-                        key={post._id}
-                        post={post}
-                    />
-            )})}
+            <div className={"flex flex-wrap gap-8 items-center justify-center "}>
+                {posts.map((post)=> {
+                    console.log("id",post._id)
+                    return(
+                        <Post
+                            key={post._id}
+                            post={post}
+                        />
+                )})}
+            </div>
          </>
     );
 }

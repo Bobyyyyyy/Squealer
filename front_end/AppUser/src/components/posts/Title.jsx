@@ -5,28 +5,23 @@ function Title({post}) {
     let allDest = post.destinationArray.map((dest) => {
         return dest.name;
     })
+    //{post.dateOfCreation}
     console.log("title", ProfilePic);
     return (
         <>
-            <div className="">
-                <div className="">
-                    <div className="imageAndNames" >
-                        <div className="containerOfPic">
-                            <img className="profilePicture" alt="foto profilo" src={ProfilePic}/>
-                        </div>
-                        <div className="containerOfNames">
-                            <h3 className="text-primary">
-                                {post.owner}
-                            </h3>
-                            <h2 className="text-">
-                                {allDest.join(", ")}
-                            </h2>
-                        </div>
-                    </div>
-                    <div className="containerOfHours">
-                        <span className="hours">{post.dateOfCreation}</span>
+            <div className="flex justify-between items-center px-4 py-2">
+                <div className="flex w-full items-center" >
+                    <img className="w-14 h-14 rounded-full" alt="foto profilo" src={ProfilePic} />
+                    <div className="flex flex-col ml-4 gap-2">
+                        <h3 className="text-primary w-fit h-fit">
+                            {post.owner}
+                        </h3>
+                        <h2 className="w-fit h-fit">
+                            {allDest.join(", ")}
+                        </h2>
                     </div>
                 </div>
+                    <span className="min-w-fit">9h fa</span>
             </div>
         </>
     );

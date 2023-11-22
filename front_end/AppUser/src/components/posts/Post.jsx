@@ -24,10 +24,13 @@ function Post({post}) {
 
     return(
     <>
-        <div className="post bg-blue">
+        <div className="w-96 border border-gray-200">
             <Title post={post} />
-            <Body post={post}/>
-            <div className="reactionButtons" >
+            <div>
+
+            <Body post={post} />
+            </div>
+            <div className="flex w-full justify-evenly" >
                 {buttonsReaction.map( (item) => (
                     <button
                         key = {item.id}
