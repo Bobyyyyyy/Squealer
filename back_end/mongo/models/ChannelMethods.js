@@ -1,8 +1,9 @@
-const {connectdb} = require("./utils");
+const {connectdb, createError} = require("./utils");
 const Channel = require("../schemas/Channel");
 const User = require("../schemas/User");
 const mongoose = require("mongoose");
 const {ObjectId} = require("mongodb");
+const {create} = require("connect-mongo");
 
 const sorts = {
     'Populars': {
@@ -208,6 +209,34 @@ const checkUserChannel = async (query,credentials) => {
     }
 }
 
+
+const blockChannel = async (user,channelName,credentials) => {
+    try {
+        await connectdb(credentials);
+
+        let name = await User.findOne({username: user});
+
+        console.log(name);
+        if(!name || name.typeUser !== 'mod') {
+            throw createError('User not found or not moderator',400)
+        }
+
+        let channel = await Channel.findOneAndUpdate({name: channelName}, [{$set: {isBlocked: {$not: '$isBlocked'}}}]);
+
+        if(!channel) {
+            throw createError('Channel not found',400);
+        }
+
+        return true;
+    }
+
+    catch (error) {
+        throw error;
+    }
+}
+
+
+
 module.exports = {
     addChannel,
     channelVipList,
@@ -215,4 +244,5 @@ module.exports = {
     getChannels,
     getChannelsNumber,
     getSingleChannel,
+    blockChannel
 }

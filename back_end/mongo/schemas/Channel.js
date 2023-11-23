@@ -53,8 +53,12 @@ const ChannelSchema = new mongoose.Schema({
     postNumber: {
         type: Number,
         default: 0
-    }
+    },
 
+    isBlocked: {
+        type: Boolean,
+        default: false
+    }
 })
 
 const Channel = mongoose.model("Channel", ChannelSchema);

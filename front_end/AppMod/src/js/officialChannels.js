@@ -17,10 +17,8 @@ function getChannelsNumber(filter) {
         data: {filter: filter},
         type: 'get',
         success: (data) => {
-            console.log(data);
-            console.log(data.length);
             LastCall.channels = data.length;
-            getChannels(LastCall.limit,LastCall.offset = 0,LastCall.filter);
+            getChannels(LastCall.limit,LastCall.offset = 0,filter);
         }
     })
 }
@@ -32,8 +30,12 @@ function getChannels (limit,offset,filter) {
         type:'get',
         data: {limit: limit, offset: offset, filter: filter},
         success: (data) => {
-            console.log(data);
             $('#pages').empty();
+
+            if(data.length === 0) {
+                $('#channels').empty().append(`<h4 class="text-white">Nessun Canale Trovato</h4>`);
+                return;
+            }
 
             let html = `${$.map(data,(channel,index) => `
             <div class="mt-3 mx-auto rounded d-flex flex-row align-items-center text-center channeldiv" onclick="window.location.href = 'officialChannels/${channel.name}'" style="height:6vh; width: 90vw;">

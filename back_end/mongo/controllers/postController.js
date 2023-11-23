@@ -53,8 +53,7 @@ const deleteReaction = async (req,res) => {
 
 const removePost = async (req,res) => {
     try {
-        let body = {id: req.body.id, name: req.session.user, type: req.session.type}
-        res.send(await postModel.deletePost(body,mongoCredentials))
+        res.send(await postModel.removeDestination(req.body.destination,req.body.postID,mongoCredentials))
     }
     catch(error) {
         res.send(error);

@@ -200,7 +200,6 @@ const addPost = async (post,quota,credentials) => {
         for (const destination of destinations) {
             let destinationType = destination.destType;
             let channel = await Channel.findOne({name: destination.name});
-
             /* ERROR HANDLING */
             /* utente non esiste  */
             if (destinationType === 'user' && !(await User.findOne({username: destination.name}))) {
@@ -229,7 +228,10 @@ const addPost = async (post,quota,credentials) => {
                 officialChannels.push(destination.name);
                 destinations.pop(destination);
             }
-            else if (channel) {             //null se la findOne non trova nulla
+            else if (channel) {
+                if(channel.isBlocked) {
+                    throw createError('Il canale è bloccato',400);
+                }
                 if (channel.type === 'public') {
                     postCategory = 'public';
                 }
@@ -345,26 +347,40 @@ const getAllPost = async (query,sessionUser,credentials) =>{
     }
 }
 
-const deletePost = async (body,credentials) => {
-    try{
+
+const removeDestination = async (destination,postID,credentials)=> {
+    try {
         await connectdb(credentials);
 
-        //controllo se sei il creatore e se esiste il post
-        if (!(await Post.findOne({_id: body.id, creator: body.name},'creator').lean())) {
-            // se non sei il creatore controlla se sei mod
-            if(body.type !== 'mod') {
-                let err = new Error("Rimozione non valida");
-                err.statusCode = 400;
-                throw err;
-            }
+        let channel = await Channel.findOne({name: destination});
+
+        let checkArrayDestination = await Post.findByIdAndUpdate(postID, {$pull: { destinationArray: {name: destination}}}, {new: true});
+
+        let checkOfficialDestination = await Post.findByIdAndUpdate(postID, {$pull: { officialChannelsArray: destination}}, {new: true});
+
+        if(!checkArrayDestination && !checkOfficialDestination) {
+            throw createError("Destinazione non nel post", 422);
         }
 
-        let postToDelete = await Post.findByIdAndRemove(body.id).lean();
+        await Channel.findOneAndUpdate({'name': channel.name}, {'postNumber': channel.postNumber-1})
+
+        if(checkArrayDestination.destinationArray.length === 0 && checkOfficialDestination.officialChannelsArray.length === 0) {
+            await deletePost(postID);
+        }
+    }
+    catch (error) {
+        throw err;
+    }
+}
+
+const deletePost = async (postID,credentials) => {
+    try{
+        await connectdb(credentials)
+        let postToDelete = await Post.findByIdAndRemove(postID).lean();
         await mongoose.connection.close();
         return postToDelete;
     }
     catch(err){
-        console.log(err);
         throw err;
     }
 }
@@ -538,6 +554,7 @@ const postLength = async (filter,channel,credentials) => {
 module.exports = {
     addPost,
     getAllPost,
+    removeDestination,
     deletePost,
     updateReac,
     deleteReac,

@@ -36,7 +36,7 @@ function updateLastCall(limit,offset,filter) {
 const deletePost = async (id) => {
     $.ajax({
         url:'/db/post/delete',
-        data: {id: id},
+        data: {destination: ChannelName, postID: id},
         type: 'post',
         success: (post) => {
             location.reload()
@@ -64,6 +64,10 @@ const showPosts = (filter,offset,limit,append = false) => {
         data: {channel: ChannelName, typeFilter: filter , offset: offset, limit: limit},
         type: 'get',
         success: (posts) => {
+            if(posts.length === 0) {
+                $('#posts').empty().append(`<h4>Nessun Post Trovato</h4>`);
+                return;
+            }
             let html = `${$.map(posts, (post) => {
                 let id = post._id;
                 id = id.substring(id.length - 10);

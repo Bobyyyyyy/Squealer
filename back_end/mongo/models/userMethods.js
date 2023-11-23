@@ -285,9 +285,6 @@ const changePopularity = async (userID, valueToModify, increaseValue) => {
             await User.findByIdAndUpdate(userID, {'unpopularity': unpopularity});
         }
     }
-
-
-
 }
 
 

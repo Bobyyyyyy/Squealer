@@ -26,7 +26,6 @@ const showChannel = (name) => {
             $('#channel-creator').html(channel.creator);
             $('#posts-number').html(channel.postNumber);
             $('#followers').html(channel.followerNumber);
-
             showPosts(LastCall.filter,LastCall.offset,LastCall.limit);
         }
     })
@@ -39,7 +38,10 @@ const showPosts = (filter,offset,limit,append = false) => {
         data: {channel: ChannelName, typeFilter: filter , offset: offset, limit: limit},
         type: 'get',
         success: (posts) => {
-            console.log(posts)
+            if(posts.length === 0) {
+                $('#posts').empty().append(`<h4>Nessun Post Trovato</h4>`);
+                return;
+            }
             let html = `${$.map(posts, (post) => {
                 
                 let destinationNames = []
@@ -230,6 +232,45 @@ $('#changeReactionsButton').on('click',() => {
     })
 })
 
+
+$('#block-button').on('click', () => {
+    $.ajax({
+        url: '/db/channel/block',
+        data: {user: User, channel: ChannelName},
+        type: 'put',
+        success: (data) => {
+            location.reload();
+        }
+    })
+})
+
+
+const blockButton = () => {
+    $.ajax({
+        url: '/db/channel/block',
+        data: {user: User, channel: ChannelName},
+        type: 'put',
+        success: (data) => {
+            location.reload();
+        }
+    })
+}
+
+$('#post-filters').on('change', () => {
+    let filter = $('#post-filters input:checked').val();
+    showPosts(filter,LastCall.offset = 0,LastCall.limit);
+})
+
+const deletePost = async (id) => {
+    $.ajax({
+        url:'/db/post/delete',
+        data: {destination: ChannelName, postID: id},
+        type: 'post',
+        success: (post) => {
+            location.reload()
+        }
+    })
+}
 
 $(document).ready(() => {
     showChannel(ChannelName);
