@@ -15,25 +15,27 @@ function getChannelsNumber(filter) {
     $.ajax({
         url:'/db/official/number',
         data: {filter: filter},
-        async: false,
         type: 'get',
         success: (data) => {
-            console.log(data.length);
             LastCall.channels = data.length;
+            getChannels(LastCall.limit,LastCall.offset = 0,filter);
         }
     })
 }
 
 function getChannels (limit,offset,filter) {
-    getChannelsNumber(filter);
     updateLastCall(limit,offset,filter);
     $.ajax({
         url:'/db/official/all',
         type:'get',
         data: {limit: limit, offset: offset, filter: filter},
         success: (data) => {
-            console.log(data);
             $('#pages').empty();
+
+            if(data.length === 0) {
+                $('#channels').empty().append(`<h4 class="text-white">Nessun Canale Trovato</h4>`);
+                return;
+            }
 
             let html = `${$.map(data,(channel,index) => `
             <div class="mt-3 mx-auto rounded d-flex flex-row align-items-center text-center channeldiv" onclick="window.location.href = 'officialChannels/${channel.name}'" style="height:6vh; width: 90vw;">
@@ -62,10 +64,10 @@ function getChannels (limit,offset,filter) {
 
 $('#filter').on("keyup", () => {
     let value = $('#filter').val();
-    getChannels(LastCall.limit,LastCall.offset = 0,value);
+    getChannelsNumber(value);
 });
 
 
 $(document).ready(() => {
-    getChannels(LastCall.limit,LastCall.offset,LastCall.filter);
+    getChannelsNumber(LastCall.filter);
 })

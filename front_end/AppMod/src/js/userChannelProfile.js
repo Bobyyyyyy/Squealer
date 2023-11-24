@@ -9,7 +9,6 @@ let LastCall = {
     filter: ''
 }
 
-let post = ''
 
 function updateLastCall(limit,offset,filter) {
     LastCall.limit = limit;
@@ -18,41 +17,16 @@ function updateLastCall(limit,offset,filter) {
 }
 
 
- function getPostsNumber (filter) {
-    $.ajax({
-        url:'/db/post/number',
-        data: {filter: filter, channel: ChannelName},
-        type: 'get',
-        success: (data) => {
-            LastCall.posts = data.length;
-            $('#post-trovati').html(`${data.length}`);
-            showPosts(LastCall.filter,LastCall.offset,LastCall.limit);
-        }
-    })
-}
-
-
-
-const deletePost = async (id) => {
-    $.ajax({
-        url:'/db/post/delete',
-        data: {destination: ChannelName, postID: id},
-        type: 'post',
-        success: (post) => {
-            location.reload()
-        }
-    })
-}
-
 const showChannel = (name) => {
     $.ajax({
-        url:'/db/official',
-        data: {name: name},
+        url:`/db/channel/${name}`,
         type: 'get',
         success: (channel) => {
             $('#channel-description').html(channel.description);
             $('#channel-creator').html(channel.creator);
-            getPostsNumber(LastCall.filter);
+            $('#posts-number').html(channel.postNumber);
+            $('#followers').html(channel.followerNumber);
+            showPosts(LastCall.filter,LastCall.offset,LastCall.limit);
         }
     })
 }
@@ -69,6 +43,27 @@ const showPosts = (filter,offset,limit,append = false) => {
                 return;
             }
             let html = `${$.map(posts, (post) => {
+                
+                let destinationNames = []
+                let officialChannelNames = [];
+                
+                post.destinationArray.forEach(destination => {
+                    if(destination.destType === "channel") {
+                        destinationNames.push('§' + destination.name + '');
+                    }
+
+                    if(destination.destType === "user") {
+                        destinationNames.push('@' + destination.name);
+                    }
+
+
+                })
+
+                post.officialChannelsArray.forEach(destination => {
+                    officialChannelNames.push('§' + destination);
+                })
+                
+                
                 let id = post._id;
                 id = id.substring(id.length - 10);
                 let reactions = {
@@ -77,15 +72,22 @@ const showPosts = (filter,offset,limit,append = false) => {
                     'thumbs-up': post.reactions.filter((reaction) => reaction.rtype === 'thumbs-up').length,
                     'thumbs-down': post.reactions.filter((reaction) => reaction.rtype === 'thumbs-down').length,
                 }
-                
+
                 let Post =
                     `<div id="post-${id}" class="card mt-5 w-50">
-                    <div id="header-${id}" class="card-header d-flex border-black align-items-center" style="background-color: #CCBEF9">
-                        <div class="d-flex flex-row align-items-center justify-content-center">
+                    <div id="header-${id}" class="card-header d-flex flex border-black align-items-center" style="background-color: #CCBEF9">
+                    <div class="d-flex flex-column">
+                        <div class="d-flex flex-row align-items-center justify-content-start">
                             <div class="fw-bold">@${post.owner}</div>
-                            <div class="ms-2 fw-light">${post.category}</div>
-                            <div class="ms-2 fw-light">/${post.popularity}</div>
+                            <div class="ms-1 fw-light">/${post.popularity}</div> 
                         </div>
+                        
+                        <div class="d-flex flex-row justify-content-start align-items-center" style="font-size: 10px">
+                            <div class="fw-light">${destinationNames}</div>
+                            <div class="ms-1 fw-light">${officialChannelNames}</div> 
+                        </div>
+                    </div>
+                        
                         
                         <div class="d-flex flex-row ms-auto">
                             <div class="btn-group dropup">
@@ -101,8 +103,8 @@ const showPosts = (filter,offset,limit,append = false) => {
                         </div>
                 </div>
                 <div class="card-body flex-row" style="background-color: #ECEAF5">`
-                
-                
+
+
                 switch (`${post.contentType}`) {
                     case 'text':
                         let parsedText = `${post.content}`.replace(urlRegex, function(url) {
@@ -120,7 +122,7 @@ const showPosts = (filter,offset,limit,append = false) => {
                           <script>showMap('map-${id}','${post.content}')</script>`
                         break;
                 }
-                
+
                 Post = Post +`</div>
                     <div class="card-footer text-muted" style="background-color: #ECEAF5">
                         <div class="d-flex flex-row">
@@ -173,123 +175,6 @@ const showPosts = (filter,offset,limit,append = false) => {
         }
     })
 }
-
-
-$('#modify-description').on('click', () => {
-    let textarea = `<textarea class="form-control" id="description" name="description" cols="130" rows="1" maxlength="150" style="resize: none;" data-role="none">${$('#channel-description').html()}</textarea>`
-    $('#channel-description').replaceWith(textarea);
-    $('#modify-description').hide()
-    $('#modify-button').show()
-})
-
-$('#modify-button').on('click' ,() => {
-    let newDescription = $('#description').val();
-    $.ajax({
-        url:'/db/official',
-        data: {channel:ChannelName ,description: newDescription},
-        type: 'put',
-        success: () => {
-            location.reload();
-        }
-    })
-})
-
-$('#delete-button').on('click', () => {
-    $.ajax({
-        url: '/db/official/delete',
-        type: 'post',
-        data: {name: ChannelName},
-        success: () => {
-            window.location.href = '/mod/officialChannels';
-        }
-    })
-})
-
-
-$('#addPostButton').on('click',(contentType, content) => {
-    contentType = $('#type-select option:selected').val();
-
-    if(contentType === 'geolocation') {
-        content = $('#post-content').html();
-    }
-    else {
-        content = $('#post-content').val();
-    }
-
-
-    let destinations = []
-
-    destinations.push({
-        destType: 'official',
-        name: ChannelName,
-    });
-
-
-
-    const currentDate = new Date();
-    $.ajax({
-        url:'/db/post',
-        data: {post: {creator: User, destinations: JSON.stringify(destinations),
-                contentType: contentType, content: content, dateOfCreation: currentDate}},
-        type: 'post',
-        success: (post) => {
-            location.reload();
-        }
-    })
-})
-
-$('#type-select').on('change',() => {
-    $('#preview').empty();
-    let contentType = $('#type-select option:selected').val();
-    switch (contentType) {
-        case 'text':
-            let textInput = `
-                        <div id="content" class="mt-2" style="width: 100%">
-                            <div class="d-flex flex-row align-items-center">
-                                <label for="short-link" class="mt-2 form-label w-25">
-                                    <textarea class="form-control" id="short-link" name="shortener" rows="1" placeholder="Inserisci link" style="resize: none" data-role="none" autocomplete="off"></textarea>
-                                </label>
-                                <button type="button" id="shortener-button" class="btn btn-primary ms-2"> Accorcia link </button>
-                            </div>
-                            <label for="post-content" class="form-label w-100" style>
-                                <textarea class="form-control" name="content" id="post-content" rows="3" placeholder="Inserisci testo o link per immagine...." style="resize: none" data-role="none" autocomplete="off"></textarea>
-                            </label>
-                        </div>
-`
-            $('#content').empty().replaceWith(textInput)
-            break;
-
-        case 'image':
-            let preview = `
-                        <div class="mx-auto">
-                            <button id="preview-button" class="btn btn-success ms-2"><i class="bi bi-upload"></i></button>
-                        </div>`
-
-            let imageInput = `
-                            <div id="content" class="mt-3 d-flex flex-row" style="width: 100%">
-                                <label for="post-content" class="form-label w-100" style>
-                                    <textarea class="form-control" id="post-content" name="content" rows="1" placeholder="Inserisci link immagine" style="resize: none" data-role="none" autocomplete="off"></textarea>
-                                </label>
-                            </div><div id="preview"></div>`
-            $('#content').empty().replaceWith(imageInput);
-            $('#content').append(preview);
-            $('#preview-button').on('click', () => {
-                $('#preview').html(`<img src="${$('#post-content').val()}" class='img-fluid mt-3' alt="Image Preview">`)
-            })
-            break;
-
-        case 'geolocation':
-            $('#content').empty().html(`<div class="d-flex flex-column" style=" height: 60vh"><div id="map" class="mx-auto ms-2 w-100 h-100"></div><div class="mt-3" id="post-content"></div></div><script>inputMap()</script>`);
-            break;
-    }
-})
-
-
-$('#post-filters').on('change', () => {
-    let filter = $('#post-filters input:checked').val();
-    showPosts(filter,LastCall.offset = 0,LastCall.limit);
-})
-
 
 $('#changeReactionsButton').on('click',() => {
 
@@ -348,6 +233,44 @@ $('#changeReactionsButton').on('click',() => {
 })
 
 
+$('#block-button').on('click', () => {
+    $.ajax({
+        url: '/db/channel/block',
+        data: {user: User, channel: ChannelName},
+        type: 'put',
+        success: (data) => {
+            location.reload();
+        }
+    })
+})
+
+
+const blockButton = () => {
+    $.ajax({
+        url: '/db/channel/block',
+        data: {user: User, channel: ChannelName},
+        type: 'put',
+        success: (data) => {
+            location.reload();
+        }
+    })
+}
+
+$('#post-filters').on('change', () => {
+    let filter = $('#post-filters input:checked').val();
+    showPosts(filter,LastCall.offset = 0,LastCall.limit);
+})
+
+const deletePost = async (id) => {
+    $.ajax({
+        url:'/db/post/delete',
+        data: {destination: ChannelName, postID: id},
+        type: 'post',
+        success: (post) => {
+            location.reload()
+        }
+    })
+}
 
 $(document).ready(() => {
     showChannel(ChannelName);

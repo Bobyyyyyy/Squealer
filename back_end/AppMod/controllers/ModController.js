@@ -1,4 +1,7 @@
-const {getChannels, searchByChannelName} = require("../../mongo/models/officialChannelsMethods");
+const {searchByChannelName} = require("../../mongo/models/officialChannelsMethods");
+const {getSingleChannel} = require("../../mongo/models/ChannelMethods");
+const {mongoCredentials} = require("../../mongo/models/utils");
+const {mongo} = require("mongoose");
 
 const homepageView = (req, res) => {
     res.render('modHomepage',{locals: {user: req.session.user}});
@@ -13,8 +16,8 @@ const officialChannelsView = (req,res) => {
     res.render('officialChannels',{locals: {user: req.session.user}});
 }
 
-const privateChannelsView = (req,res) => {
-    res.render('officialChannels',{locals: {user: req.session.user}})
+const userChannelsView = (req,res) => {
+    res.render('userChannels',{locals: {user: req.session.user}})
 }
 
 const postsListView = (req,res) => {
@@ -24,7 +27,7 @@ const postsListView = (req,res) => {
 const displayChannel = async (req,res) => {
     try {
         let ChannelName = req.path.split('/')[2];
-        let channel = await searchByChannelName({name: ChannelName});
+        let channel = await searchByChannelName({name: ChannelName},mongoCredentials);
         res.render('officialChannelProfile',{locals : {user: req.session.user, name: channel.name}});
     }
     catch (error) {
@@ -32,11 +35,23 @@ const displayChannel = async (req,res) => {
     }
 }
 
+const displayUserChannel = async (req,res) => {
+    try {
+        let ChannelName = req.params.name;
+        let channel = await getSingleChannel(ChannelName,mongoCredentials);
+        res.render('userChannelProfile',{locals: {user: req.session.user, name: channel.name}});
+    }
+    catch (error) {
+        res.send('opppopppo');
+    }
+}
+
 module.exports = {
     homepageView,
     userDashboardView,
     officialChannelsView,
-    privateChannelsView,
+    userChannelsView,
     postsListView,
-    displayChannel
+    displayChannel,
+    displayUserChannel
 }

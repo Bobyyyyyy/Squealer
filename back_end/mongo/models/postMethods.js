@@ -3,9 +3,10 @@ const Post = require("../schemas/Post");
 const User = require("../schemas/User");
 const Channel = require("../schemas/Channel")
 const ReservedChannel = require("../schemas/officialChannels");
-const {connectdb, createError, mongoCredentials,find_remove} = require("./utils");
+const {connectdb, createError, mongoCredentials,find_remove, CRITICAL_MASS_MULTIPLIER} = require("./utils");
 const {scheduledPostArr, getNextTick} = require("../controllers/utils");
 const nodeCron = require("node-cron");
+const {changePopularity} = require("./userMethods");
 
 /**
  *
@@ -192,14 +193,13 @@ const addTimedPost = async (postId, credentials) => {
 const addPost = async (post,quota,credentials) => {
     try{
         await connectdb(credentials)
-        let destinations = (post.destinations instanceof String) ? JSON.parse(post.destinations) : post.destinations;
+        let destinations = ((typeof post.destinations) === 'string') ? JSON.parse(post.destinations) : post.destinations;
         let postCategory = 'private';
         let officialChannels = [];
         let creatorType = (await User.findOne({username: post.creator}, 'typeUser')).typeUser;
         for (const destination of destinations) {
             let destinationType = destination.destType;
             let channel = await Channel.findOne({name: destination.name});
-
             /* ERROR HANDLING */
             /* utente non esiste  */
             if (destinationType === 'user' && !(await User.findOne({username: destination.name}))) {
@@ -228,10 +228,15 @@ const addPost = async (post,quota,credentials) => {
                 officialChannels.push(destination.name);
                 destinations.pop(destination);
             }
-            else if (channel) {             //null se la findOne non trova nulla
-                if (channel.isPublic) {
+            else if (channel) {
+                if(channel.isBlocked) {
+                    throw createError('Il canale è bloccato',400);
+                }
+                if (channel.type === 'public') {
                     postCategory = 'public';
                 }
+                //update post number in channel schema
+                await Channel.findOneAndUpdate({'name': channel.name}, {'postNumber': channel.postNumber+1})
             }
         }
 
@@ -242,21 +247,25 @@ const addPost = async (post,quota,credentials) => {
             contentType: post.contentType,
             content: (post.timed && post.contentType === 'text') ? parseText(post.content, 1) : post.content,
             reactions: [],
+            views: [],
             officialChannelsArray: officialChannels,
             category: postCategory,
+            popularity: 'neutral',
             dateOfCreation: post.dateOfCreation,
         })
 
         await newPost.save();
 
-        /* QUOTA UPDATE */
-        await User.findOneAndUpdate({username: post.creator}, {
-            characters:{
-                daily: quota.daily,
-                weekly: quota.weekly,
-                monthly: quota.monthly,
-            }
-        } );
+        if (creatorType !== 'mod' ) {
+            /* QUOTA UPDATE */
+            await User.findOneAndUpdate({username: post.creator}, {
+                characters:{
+                    daily: quota.daily,
+                    weekly: quota.weekly,
+                    monthly: quota.monthly,
+                }
+            } );
+        }
 
         await mongoose.connection.close();
 
@@ -268,10 +277,12 @@ const addPost = async (post,quota,credentials) => {
 /**
  *
  * @param {Object} query
+ * @param {String} sessionUser
  * @param {String} query.name - name of user requesting
  * @param {String} query.channel - name of channel
  * @param {Boolean} query.smm - is SMM requesting
  * @param {String} query.destType - only if destType activated
+ * @param {String} query.popularity - only if popularity is activated
  * @param {String} query.typeFilter - only if type post filter activated
  * @param {Number} query.offset - offset to skip
  * @param {String} query.limit - max number of post to return
@@ -279,25 +290,27 @@ const addPost = async (post,quota,credentials) => {
  * @param credentials
  * @returns {Promise<*>}
  */
-const getAllPost = async (query,credentials) =>{
+const getAllPost = async (query,sessionUser,credentials) =>{
     try{
-
-        await connectdb(credentials)
-
+        await connectdb(credentials);
         let filter = {
                 /* Per i canali non mi serve l'id dell'utente che fa la richiesta, a meno che non sia SMM*/
-            ...(query.smm || !query.channel) && {'owner':  query.name},
+            ...((query.smm || !query.channel) && query.name) && {'owner':  {$regex: query.name , $options: 'i'}},
                 /* FILTRO PER TIPO DI POST */
             ... (query.typeFilter && query.typeFilter !== 'all') && {'contentType': query.typeFilter},
 
                 /* PER LA PAGINA DEL PROFILO : */
             ... (query.destType && query.destType !== 'all') && {'destinationArray.destType':  query.destType === 'user' ? 'user' : 'channel'},
             ... (query.destType && query.destType !== 'all' && query.destType !== 'user') && {'category': query.destType},
+            ... (query.popularity && query.popularity !== 'neutral') && {'popularity': query.popularity},
+
 
                 /* PER IL CANALE SINGOLO */
-            $or: [{...(query.channel) && {'destinationArray.name': query.channel}},
-                 {...(query.channel) && {'officialChannelsArray': query.channel}}]
+            ... (query.channel) && {$or: [{'destinationArray.name': {$regex: query.channel , $options: 'i'}},
+                 {'officialChannelsArray': {$regex: query.channel , $options: 'i'}}]
+            }
         }
+
 
 
         let posts = await Post.find(filter)
@@ -306,10 +319,25 @@ const getAllPost = async (query,credentials) =>{
             .sort(sorts[query.sort ?  query.sort : 'più recente'])
             .lean();
 
-        for (const post of posts) {
-            let views = post.views
-            await Post.findByIdAndUpdate(post._id,{'views': ++post.views});
+        // Update delle views e della categoria se necessario
+        let user = await User.findOne({username: sessionUser});
+
+        if(user.typeUser !== 'mod') {
+            for (const post of posts) {
+                let filteredArray = post.views.filter(user => {return user.name === sessionUser})
+                if(filteredArray.length === 0) {
+                    let NumberofViews = ++post.views.length;
+                    let CriticalMass = post.criticalMass + (NumberofViews * CRITICAL_MASS_MULTIPLIER)
+                    let view = {
+                        name: sessionUser,
+                        date: new Date(),
+                    }
+                    let postToUpdate = await Post.findByIdAndUpdate(post._id,{$push: {'views': view} , 'criticalMass': parseInt(CriticalMass)});
+                    await UpdateCategory(postToUpdate,user._id);
+                }
+            }
         }
+
 
         await mongoose.connection.close()
         return posts;
@@ -320,26 +348,40 @@ const getAllPost = async (query,credentials) =>{
     }
 }
 
-const deletePost = async (body,credentials) => {
-    try{
+
+const removeDestination = async (destination,postID,credentials)=> {
+    try {
         await connectdb(credentials);
 
-        //controllo se sei il creatore e se esiste il post
-        if (!(await Post.findOne({_id: body.id, creator: body.name},'creator').lean())) {
-            // se non sei il creatore controlla se sei mod
-            if(body.type !== 'mod') {
-                let err = new Error("Rimozione non valida");
-                err.statusCode = 400;
-                throw err;
-            }
+        let channel = await Channel.findOne({name: destination});
+
+        let checkArrayDestination = await Post.findByIdAndUpdate(postID, {$pull: { destinationArray: {name: destination}}}, {new: true});
+
+        let checkOfficialDestination = await Post.findByIdAndUpdate(postID, {$pull: { officialChannelsArray: destination}}, {new: true});
+
+        if(!checkArrayDestination && !checkOfficialDestination) {
+            throw createError("Destinazione non nel post", 422);
         }
 
-        let postToDelete = await Post.findByIdAndRemove(body.id).lean();
+        await Channel.findOneAndUpdate({'name': channel.name}, {'postNumber': channel.postNumber-1})
+
+        if(checkArrayDestination.destinationArray.length === 0 && checkOfficialDestination.officialChannelsArray.length === 0) {
+            await deletePost(postID);
+        }
+    }
+    catch (error) {
+        throw err;
+    }
+}
+
+const deletePost = async (postID,credentials) => {
+    try{
+        await connectdb(credentials)
+        let postToDelete = await Post.findByIdAndRemove(postID).lean();
         await mongoose.connection.close();
         return postToDelete;
     }
     catch(err){
-        console.log(err);
         throw err;
     }
 }
@@ -350,10 +392,13 @@ const deletePost = async (body,credentials) => {
 const updateReac = async (body,credentials) => {
     try{
         await connectdb(credentials);
-        let user = await User.findOne({username: body.user},'typeUser');
+
+        let user = await User.findOne({username: body.user});
 
         if(user.typeUser === 'mod') {
-            return await Post.findByIdAndUpdate(body.postId, {$push:{reactions: {$each: JSON.parse(body.reactions)}}});
+            let post = await Post.findByIdAndUpdate(body.postId, {$push:{reactions: {$each: JSON.parse(body.reactions)}}},{new: true});
+            await UpdateCategory(post,user._id);
+            return body;
         }
 
         let hasReacted = (await Post.findOne({_id : body.postId, reactions:{$elemMatch:{user: body.user}}}));
@@ -362,7 +407,9 @@ const updateReac = async (body,credentials) => {
             await Post.findByIdAndUpdate(body.postId, {$pull: {reactions: {user: body.user}}});
         }
 
-        await Post.findByIdAndUpdate(body.postId, {$push:{reactions: {rtype: body.reaction, user: body.user, date: new Date()}}});
+        let post = await Post.findByIdAndUpdate(body.postId, {$push:{reactions: {rtype: body.reaction, user: body.user, date: new Date()}}});
+        await UpdateCategory(post,user._id);
+
         await mongoose.connection.close();
 
         return body;
@@ -384,6 +431,83 @@ const deleteReac = async (body,credentials) => {
     catch (err){
         throw err;
     }
+};
+
+
+/**
+ * @param {Object} post
+ * @param {String} userID
+ * @returns {Promise<boolean>}
+ */
+const UpdateCategory = async (post, userID) => {
+    let criticalMass = post.criticalMass;
+    let positiveReactionsCount = 0;
+    let negativeReactionsCount = 0;
+
+     post.reactions.forEach((reaction) => {
+         if (reaction.rtype === 'thumbs-up') {
+             positiveReactionsCount ++;
+         }
+         else if (reaction.rtype === 'heart') {
+             positiveReactionsCount += 2;
+         }
+         else if (reaction.rtype === 'thumbs-down') {
+             negativeReactionsCount ++;
+         }
+         else if (reaction.rtype === 'heartbreak') {
+             negativeReactionsCount += 2;
+         }
+     })
+
+    if (positiveReactionsCount > criticalMass) {
+        if (negativeReactionsCount > criticalMass) {
+            await Post.findByIdAndUpdate(post._id, {popularity: 'controversial'});
+            if (post.popularity === 'popular') {
+                await changePopularity(userID, 'popularity',false);
+            }
+            else if (post.popularity === 'unpopular'){
+                await changePopularity(userID, 'unpopularity',false);
+            }
+        }
+        else {
+            await Post.findByIdAndUpdate(post._id, {popularity: 'popular'});
+            await changePopularity(userID, 'popularity',true);
+        }
+        return true;
+    }
+
+    if (negativeReactionsCount > criticalMass) {
+        if (positiveReactionsCount > criticalMass) {
+            await Post.findByIdAndUpdate(post._id, {popularity: 'controversial'});
+            if (post.popularity === 'popular') {
+                await changePopularity(userID, 'popularity',false);
+            }
+            else if (post.popularity === 'unpopular'){
+                await changePopularity(userID, 'unpopularity',false);
+            }
+        }
+        else {
+            await Post.findByIdAndUpdate(post._id, {popularity: 'unpopular'});
+            await changePopularity(userID,'unpopularity',true);
+
+        }
+        return true;
+    }
+
+    if (post.category !== 'neutral') {
+        await Post.findByIdAndUpdate(post._id, {popularity: 'neutral'});
+        if (post.popularity === 'popular') {
+            await changePopularity(userID, 'popularity' ,false);
+        }
+        else if (post.popularity === 'unpopular'){
+            await changePopularity(userID, 'unpopularity',true);
+        }
+        return true;
+    }
+
+
+
+    return false;
 }
 
 const getLastPostUser = async (query,credentials) => {
@@ -412,9 +536,6 @@ const postLength = async (filter,channel,credentials) => {
     try {
         await connectdb(credentials);
 
-        // controllo se il filtro che arriva è tra i valori dell'enum
-
-
         let posts = await Post.find(
             { ... (filter && filter !== '') && {contentType: filter},
                 '$or': [{'destinationArray.name': channel}, {'officialChannelsArray': channel}],
@@ -434,6 +555,7 @@ const postLength = async (filter,channel,credentials) => {
 module.exports = {
     addPost,
     getAllPost,
+    removeDestination,
     deletePost,
     updateReac,
     deleteReac,

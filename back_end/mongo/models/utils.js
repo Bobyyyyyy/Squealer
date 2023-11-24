@@ -7,6 +7,8 @@ const mongoCredentials = {
     site:"mongo_site222330"
 }
 
+const CRITICAL_MASS_MULTIPLIER = 0.25;
+
 
 /* Characters Quota */
 const baseQuota = 50;
@@ -51,6 +53,7 @@ const find_remove = (arr,id) => {
 
 
 module.exports = {
+    CRITICAL_MASS_MULTIPLIER,
     connectdb,
     saltRounds,
     mongoCredentials,
