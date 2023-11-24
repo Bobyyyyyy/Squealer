@@ -11,6 +11,11 @@ export const store = createStore({
                 daily: 0,
                 weekly: 0,
                 monthly: 0,
+            },
+            maxQuota: {
+                daily: 0,
+                weekly: 0,
+                monthly: 0,
             }
         }
     },
@@ -23,17 +28,29 @@ export const store = createStore({
             state.remainingQuota.daily = quota.daily;
             state.remainingQuota.weekly = quota.weekly;
             state.remainingQuota.monthly = quota.monthly;
+            console.log("SETTATA");
         },
         uploadQuota (state, used) {
             state.remainingQuota.daily -= used;
             state.remainingQuota.weekly -= used;
             state.remainingQuota.monthly -= used;
-        }
+        },
+        setMaxQuota (state, maxQuota) {
+            state.maxQuota.daily = maxQuota.daily;
+            state.maxQuota.weekly = maxQuota.weekly;
+            state.maxQuota.monthly = maxQuota.monthly;
+        },
     },
     getters:{
         getQuota(state){
             return state.remainingQuota;
+        },
+        /*
+        getMaxQuota(state){
+            return state.maxQuota;
         }
+
+         */
     }
 })
 

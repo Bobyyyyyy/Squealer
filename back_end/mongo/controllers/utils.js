@@ -9,7 +9,11 @@ const cast2millis = {
 }
 
 
-let scheduledPostArr = []
+let scheduledPostArr = [];
+/*
+    Scheduled function that runs only 1 time.
+ */
+let scheduledFnOne = [];
 
 /**
  *
@@ -38,4 +42,5 @@ module.exports = {
     resetDtimeout,
     resetWtimeout,
     resetMtimeout,
+    scheduledFnOne
 }

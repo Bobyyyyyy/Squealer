@@ -1,8 +1,7 @@
 const {mongoCredentials} = require("../models/utils");
 const nodeCron = require('node-cron')
 const UMM = require('../models/userMethods')
-const PMM = require('../models/postMethods')
-const {scheduledPostArr, getNextTick, cast2millis, } = require("./utils");
+const {scheduledFnOne,scheduledPostArr, getNextTick, cast2millis, } = require("./utils");
 const {addTimedPost} = require("../models/postMethods");
 
 
@@ -57,7 +56,28 @@ const createScheduledPost = async (postId, frequency, squealNumber, content, typ
     return {trash: 0};
 }
 
+const createMaxQuotaJob = async (timestamp, percentage,user) => {
+
+    // Need ID to select right update to remove. (user can be in array many times)
+
+    let ID = Math.max(scheduledFnOne.map(schedule => schedule.user === user ? schedule.id : 0)) + 1;
+
+    let schedule = {
+        user: user,
+        id: ID,
+        job: nodeCron.schedule(getNextTick(timestamp), async () => {
+          await UMM.updateMaxQuota(-percentage,user, ID);
+        }, {
+            scheduled: true,
+            timezone: 'Europe/Rome',
+        })
+    }
+    //TODO: con dizionario implementazinoe più efficiente (chiave il nome utente).
+    scheduledFnOne.push(schedule);
+}
+
 module.exports =  {
     resetQuota,
     createScheduledPost,
+    createMaxQuotaJob
 };

@@ -19,7 +19,9 @@ async function start(){
   });
   currentVip.value = (await res.json()).vip;
   if (currentVip.value){
-    store.commit('setQuota',await getUserQuota())
+    let quota = await getUserQuota();
+    store.commit('setQuota',quota.characters);
+    store.commit('setMaxQuota',quota.maxQuota);
   }
   ready.value = true;
 }
