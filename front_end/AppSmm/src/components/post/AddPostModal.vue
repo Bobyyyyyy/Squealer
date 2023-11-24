@@ -13,7 +13,7 @@
   /* TYPE and USER/CHANNEL */
   const postType = ref('Select type')
   const receivers = ref('')
-  const receiverArr = computed(()=> receivers.value.split(', '))
+  const receiverArr = computed(()=> receivers.value.replaceAll(" ","").split(','))
   const inChannel = computed(()=> {
     return !!receiverArr.value.find(el => el.startsWith('§'));
   });
@@ -56,6 +56,7 @@
  */
 
   function parseDestinations(){
+    console.log(receiverArr.value);
     let arr = [];
     receiverArr.value.forEach(receiver => {
       arr.push({
