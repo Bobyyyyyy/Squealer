@@ -292,12 +292,10 @@ const addPost = async (post,quota,credentials) => {
  */
 const getAllPost = async (query,sessionUser,credentials) =>{
     try{
-
-        await connectdb(credentials)
-
+        await connectdb(credentials);
         let filter = {
                 /* Per i canali non mi serve l'id dell'utente che fa la richiesta, a meno che non sia SMM*/
-            ...(query.smm || !query.channel) && {'owner':  query.name},
+            ...((query.smm || !query.channel) && query.name) && {'owner':  {$regex: query.name , $options: 'i'}},
                 /* FILTRO PER TIPO DI POST */
             ... (query.typeFilter && query.typeFilter !== 'all') && {'contentType': query.typeFilter},
 
@@ -308,9 +306,12 @@ const getAllPost = async (query,sessionUser,credentials) =>{
 
 
                 /* PER IL CANALE SINGOLO */
-            $or: [{...(query.channel) && {'destinationArray.name': query.channel}},
-                 {...(query.channel) && {'officialChannelsArray': query.channel}}]
+            ... (query.channel) && {$or: [{'destinationArray.name': {$regex: query.channel , $options: 'i'}},
+                 {'officialChannelsArray': {$regex: query.channel , $options: 'i'}}]
+            }
         }
+
+
 
         let posts = await Post.find(filter)
             .skip(parseInt(query.offset))
