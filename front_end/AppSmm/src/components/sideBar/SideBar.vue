@@ -1,25 +1,20 @@
 <script setup>
   import SideBarEL from "./SideBarEL.vue";
-  import NavBarWel from "../navbar/NavBar.vue";
+  import navBar from "../navbar/NavBar.vue";
   import AddPostModal from "../post/AddPostModal.vue";
   import {Modal} from 'bootstrap'
   import {computed, onMounted, onUnmounted, reactive, ref, watch} from "vue";
   import {getPage} from "../../utils/functions.js";
-  import {currentVip, sideBarElements, smm } from "../../utils/config.js"
+  import {currentVip, expanded, sideBarElements, smartPhone, smm} from "../../utils/config.js"
   import BuyQuotaModal from "../../quota/buyQuotaModal.vue";
 
-  const windowWidth = ref(window.innerWidth);
   const modalState = reactive({Modal: null,})
   const beforeModalPage = ref('');
   const quotaModal = ref();
 
-  const onWidthChange =  () => windowWidth.value = window.innerWidth
   onMounted(async () => {
-    window.addEventListener('resize', onWidthChange);
-
     modalState.Modal = new Modal('#AddPostModal',{});
   })
-  onUnmounted(() => window.removeEventListener('resize', onWidthChange))
 
   const activeBut = ref(getPage());
 
@@ -40,12 +35,6 @@
     beforeModalPage.value = getPage();
   }
 
-
-  const width = computed(() => windowWidth.value)
-  const expanded = computed(() => width.value > 1450 );
-  const smartPhone = computed(()=> width.value < 768);
-
-
   function getUrlPage(page){
     return "/SMM/"+ page.split(' ').join('');
   }
@@ -61,15 +50,16 @@
 <template>
   <div v-if="smartPhone">
     <!-- AGGIUNGERE NAVBAR NEL CASO SMARTPHONE -->
-    <NavBarWel center-text=''
-               class="setW100"
-
+    <navBar center-text=''
+            class="setW100"
+            :welcomingPage = "false"
+            centerText="Squealer"
     />
   </div>
 
   <nav id="sideBar"
-      class="d-flex justify-content-between position-fixed flex-shrink-0 border changeDirFlex setW100">
-
+      class="d-flex justify-content-between position-fixed flex-shrink-0 border changeDirFlex setW100"
+  >
     <div class="d-flex changeDirFlex setW100 setHeight">
       <div v-if="!smartPhone" class="">
         <router-link to="/SMM/Profile" class="d-flex justify-content-center mb-3" @click="activeBut='Profile'">
@@ -140,7 +130,8 @@
     padding-bottom: 2vh;
     padding-left: 1vh;
     width: 10vw;
-    z-index: 2000;
+    z-index: 1001;
+    background-color: #f5f5f5;
   }
   .nameUser{
     padding-left:16px ;
@@ -152,7 +143,6 @@
 
   @media screen and (max-width: 768px){
     #sideBar{
-      position: fixed;
       height: auto;
       display: flex;
       flex-direction: row !important;

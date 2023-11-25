@@ -19,17 +19,17 @@
 </script>
 
 <template>
-  <div class="d-flex flex-column justify-content-around vipCard">
-    <div class="d-flex flex-column justify-content-around">
-      <div class="d-flex justify-content-center">
-        <img :src=" srcImg " alt="immagine profilo" class="imgFluid" />
+  <div class="d-flex flex-column justify-content-around vipCard border-primary bg-body-secondary mt-3">
+    <div class="d-flex flex-column justify-content-around align-items-center">
+      <div class="d-flex justify-content-center" style="width: 35%">
+        <img :src=" srcImg " alt="immagine profilo" class="img-fluid rounded-circle" />
       </div>
       <div class="d-flex justify-content-center">
-        <h4 class="mb-0">{{ username }}</h4>
+        <h3 class="mb-0">{{ username }}</h3>
       </div>
     </div>
     <div class="d-flex flex-column postMargin">
-      <h5 class="mb-0">Last Post: </h5>
+      <h5 class="mb-0">Ultimo Post: </h5>
       <div v-if="!noPost" class="d-flex flex-row justify-content-center">
         <Post
             :user="post.owner"
@@ -55,16 +55,12 @@
 
 <style>
 
-  .imgFluid{
-    width: 15%;
-    margin-bottom: 0;
-  }
 
   .vipCard{
     width: 25rem;
     height: 45rem;
-    border: 0.15rem solid;
-    border-radius: 12%;
+    border: 0.2rem solid;
+    border-radius: 6%;
   }
 
   .postMargin{

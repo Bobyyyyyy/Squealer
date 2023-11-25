@@ -19,7 +19,7 @@ import {computed} from "vue";
 </script>
 
 <template>
-  <li class="nav-item butNav"  >
+  <li class="nav-item butNav sdBarEl" >
       <a
          class="nav-link d-flex flex-row align-items-center reducePad"
          :class= "isThisActive ? 'active': '',
@@ -44,6 +44,11 @@ import {computed} from "vue";
   .icon{
     width: 20px;
     height: 20px;
+  }
+
+  .sdBarEl:hover{
+    background-color: #ccbef9;
+    border: var(--bs-border-radius);
   }
 
   @media (max-width: 768px) {

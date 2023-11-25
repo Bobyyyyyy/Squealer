@@ -43,7 +43,7 @@
 </script>
 
 <template>
-  <NavBarWel center-text="Scegli account da gestire" />
+  <NavBarWel center-text="Scegli account da gestire" :welcomingPage="true" />
   <div class="d-flex flex-row align-items-center flex-wrap justify-content-evenly mt-lg-3" v-if="requestCompleted">
     <VipCard v-for="(vip,index) in vips"
             :key="index"

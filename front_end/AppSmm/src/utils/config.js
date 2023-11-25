@@ -1,4 +1,4 @@
-import {ref} from "vue";
+import {computed, ref} from "vue";
 
 
 const sideBarElements = [
@@ -94,10 +94,20 @@ const reactionsIcons = [
 const smm = ref('');
 const currentVip = ref('')
 
+const windowWidth = ref(window.innerWidth);
+const onWidthChange =  () => windowWidth.value = window.innerWidth
+window.addEventListener('resize', onWidthChange);
+//QUANDO LO CHIUDIAMO?
+// --> () => window.removeEventListener('resize', onWidthChange)
+
+const width = computed(() => windowWidth.value)
+const expanded = computed(() => width.value > 1450 );
+const smartPhone = computed(()=> width.value < 768);
+
 /* IMG compression */
 const QUALITY = 0.4;
 const MAX_HEIGHT = 800;
 const MAX_WIDTH = 800;
 
 
-export {smm, sideBarElements, currentVip, postType, sortPosts, filterValues, reactionsIcons, QUALITY, MAX_WIDTH, MAX_HEIGHT}
+export {smm, sideBarElements, currentVip, postType, sortPosts, filterValues, reactionsIcons, QUALITY, MAX_WIDTH, MAX_HEIGHT, smartPhone, expanded}

@@ -1,13 +1,15 @@
 <script setup>
 
+  import {smartPhone} from "../../utils/config.js";
+
   defineProps({
     centerText: String,
+    welcomingPage: Boolean,
   })
 
 
   //è una get la logout??
   async function logout(){
-
     let res = await fetch("/logout");
     window.location.href= res.url;
   }
@@ -15,17 +17,19 @@
 </script>
 
 <template>
-  <nav class="navbar navbar-expand-lg bg-body-tertiary maxHNav" >
-    <div class="d-flex flex-row justify-content-between navBar maxHNav">
-      <div class="d-flex">
-        <router-link to="/SMM/Profile" class="d-flex justify-content-center mb-3 h-100">
-            <img alt="logo" src="/img/logo.png" class="img-fluid object-fit-fill">
+  <nav class="navbar navbar-expand-lg bg-body-tertiary maxHNav navBar">
+    <div class="d-flex flex-row justify-content-between maxHNav">
+      <div class="maxHNav sameWidth">
+        <img v-if="welcomingPage" alt="logo" src="/img/logo.png" class="h-100 img-fluid object-fit-contain">
+        <router-link v-else to="/SMM/Profile" class="d-flex justify-content-center mb-3 h-100">
+          <img alt="logo" src="/img/logo.png" class="img-fluid">
         </router-link>
       </div>
-      <div class="d-flex align-items-center">
-        <h4 class="mb-0">{{centerText}}</h4>
+      <div class="sameWidth d-flex align-items-center justify-content-center" style="flex-grow: 2">
+        <h2 v-if="smartPhone" class="mb-0 text-center ">{{centerText}}</h2>
+        <h2 v-else class="mb-0 fw-bold text-center">{{centerText}}</h2>
       </div>
-      <div class="d-flex">
+      <div class="sameWidth align-items-center justify-content-end" >
         <button type="button"
                 class="btn btn-outline-danger"
                 @click="logout"
@@ -38,12 +42,13 @@
 <style>
 
 .navBar{
-  margin-left: 3vw;
-  margin-right: 3vw;
+  padding-right: 1vw;
+  padding-left: 1vw;
 }
 
 .maxHNav{
-  max-height: 13vh;
+  min-height: 6rem;
+  max-height: 10vh;
 }
 
 </style>

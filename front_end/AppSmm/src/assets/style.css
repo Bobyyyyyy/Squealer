@@ -1,3 +1,9 @@
+.principalDiv{
+    margin-left: 13vw;
+    margin-right: 13vw;
+    height: 100vh;
+}
+
 .centralDiv {
     height: 100vh;
     margin-left: 10vw !important;
@@ -13,10 +19,22 @@
         margin-left: 0;
         margin-bottom: 15%;
     }
+    .centralDiv{
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        width: 100vw;
+        height: 100vh;
+    }
 }
 
 @media screen and (max-width: 1450px) and (min-width:768px) {
     .allPage{
         margin-left: 7%;
     }
+}
+
+
+.sameWidth{
+    display: flex;
+    flex: 1 1 0px;
 }
