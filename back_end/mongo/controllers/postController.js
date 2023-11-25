@@ -1,6 +1,7 @@
 const {mongoCredentials} = require('../models/utils.js')
 const postModel = require("../models/postMethods");
 const {createScheduledPost} = require("./CronController");
+const {mongo} = require("mongoose");
 
 
 const createPost = async (req,res) => {
@@ -33,8 +34,8 @@ const updateReaction = async (req,res) => {
                 res.send('200');
         }
         else {
-            await postModel.updateReac({user: req.body.user, rtype: req.body.keys}, mongoCredentials)
-            res.send(await postModel.updateReac(req.body, mongoCredentials));
+            await postModel.updateReac(req.body,mongoCredentials);
+            res.send('200');
         }
     }
     catch(error) {

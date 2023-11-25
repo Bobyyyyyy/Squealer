@@ -44,8 +44,8 @@
     activeBut.value = window.location.pathname.split('/').slice(-1).join().split(/(?=[A-Z])/).join(' ');
   },false)
 
-
 </script>
+
 
 <template>
   <div v-if="smartPhone">
@@ -123,7 +123,7 @@
   <buyQuotaModal ref="quotaModal"/>
 </template>
 
-<style>
+<style scoped>
 
   #sideBar{
     height: 100vh;
