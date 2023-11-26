@@ -3,10 +3,13 @@ let User = $('#session-user').html();
 const urlRegex =/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
 
 let LastCall = {
-    limit : 3,
+    limit : 5,
     offset: 0,
     posts: 0,
-    filter: ''
+    filter: {
+        'typeFilter': '',
+        'channel': ChannelName
+    }
 }
 
 let post = ''
@@ -14,19 +17,19 @@ let post = ''
 function updateLastCall(limit,offset,filter) {
     LastCall.limit = limit;
     LastCall.offset = offset;
-    LastCall.filter = filter;
+    LastCall.filter.typeFilter = filter;
 }
 
 
  function getPostsNumber (filter) {
     $.ajax({
         url:'/db/post/number',
-        data: {filter: filter, channel: ChannelName},
+        data: {filter: filter},
         type: 'get',
         success: (data) => {
             LastCall.posts = data.length;
             $('#post-trovati').html(`${data.length}`);
-            showPosts(LastCall.filter,LastCall.offset,LastCall.limit);
+            showPosts(LastCall.filter.typeFilter,LastCall.offset = 0,LastCall.limit);
         }
     })
 }
@@ -66,11 +69,11 @@ const showPosts = (filter,offset,limit,append = false) => {
         success: (posts) => {
             if(posts.length === 0) {
                 $('#posts').empty().append(`<h4>Nessun Post Trovato</h4>`);
+                $('#under_posts').empty();
                 return;
             }
             let html = `${$.map(posts, (post) => {
                 let id = post._id;
-                id = id.substring(id.length - 10);
                 let reactions = {
                     heart: post.reactions.filter((reaction) => reaction.rtype === 'heart').length,
                     heartbreak : post.reactions.filter((reaction) => reaction.rtype === 'heartbreak').length,
@@ -145,10 +148,11 @@ const showPosts = (filter,offset,limit,append = false) => {
                     deletePost('${post._id}');
                 });
                 </script>`
-
-
+                
                 return Post
             }).join('\n')}`;
+
+
 
             if (offset + limit < LastCall.posts) {
                 $('#under_posts').html(`<div class="mx-auto"> <a id="load_posts" class="link-opacity-100 link-opacity-50-hover"> Carica altri post</a></div>`)
@@ -241,6 +245,7 @@ $('#addPostButton').on('click',(contentType, content) => {
 $('#type-select').on('change',() => {
     $('#preview').empty();
     let contentType = $('#type-select option:selected').val();
+    $('#preview').empty();
     switch (contentType) {
         case 'text':
             let textInput = `
@@ -274,12 +279,17 @@ $('#type-select').on('change',() => {
             $('#content').empty().replaceWith(imageInput);
             $('#content').append(preview);
             $('#preview-button').on('click', () => {
-                $('#preview').html(`<img src="${$('#post-content').val()}" class='img-fluid mt-3' alt="Image Preview">`)
+                $('#preview').empty().html(`<img src="${$('#post-content').val()}" class='img-fluid mt-3' alt="Image Preview">`)
             })
             break;
 
         case 'geolocation':
-            $('#content').empty().html(`<div class="d-flex flex-column" style=" height: 60vh"><div id="map" class="mx-auto ms-2 w-100 h-100"></div><div class="mt-3" id="post-content"></div></div><script>inputMap()</script>`);
+            let mapPreview = `<div id="content" class="mt-2" style="width: 100%">
+                                       <div class="d-flex flex-column" style=" height: 60vh"><div id="map" class="mx-auto ms-2 w-100 h-100"></div>
+                                       <div class="mt-3" id="post-content"></div>
+                                        </div><script>inputMap()</script>
+                                     </div>`
+            $('#content').empty().replaceWith(mapPreview);
             break;
     }
 })
@@ -287,9 +297,9 @@ $('#type-select').on('change',() => {
 
 $('#post-filters').on('change', () => {
     let filter = $('#post-filters input:checked').val();
-    showPosts(filter,LastCall.offset = 0,LastCall.limit);
+    LastCall.filter.typeFilter = filter
+    getPostsNumber(LastCall.filter);
 })
-
 
 $('#changeReactionsButton').on('click',() => {
 
@@ -346,6 +356,7 @@ $('#changeReactionsButton').on('click',() => {
         }
     })
 })
+
 
 
 

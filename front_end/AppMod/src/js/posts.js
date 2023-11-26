@@ -1,3 +1,6 @@
+let User = $('#session-user').html();
+let post = ''
+
 let LastCall = {
     posts: 0,
     filters: {
@@ -8,7 +11,7 @@ let LastCall = {
         'popularity': '',
         'sort': "",
         'offset': 0,
-        'limit' : 50,
+        'limit' : 5,
     }
 }
 
@@ -29,7 +32,8 @@ function getPostsNumber (filter) {
         type: 'get',
         success: (data) => {
             LastCall.posts = data.length;
-            $('#post-trovati').html(`${data.length}`);
+            console.log(LastCall.posts)
+            showPosts(LastCall.filters)
         }
     })
 }
@@ -43,6 +47,7 @@ const showPosts = (filters,append = false) => {
         success: (posts) => {
             if (posts.length === 0) {
                 $('#posts').empty().append(`<h4>Nessun Post Trovato</h4>`);
+                $('#under_posts').empty();
                 return;
             }
             let html = `${$.map(posts, (post) => {
@@ -58,8 +63,6 @@ const showPosts = (filters,append = false) => {
                     if (destination.destType === "user") {
                         destinationNames.push('@' + destination.name);
                     }
-
-
                 })
 
                 post.officialChannelsArray.forEach(destination => {
@@ -67,8 +70,7 @@ const showPosts = (filters,append = false) => {
                 })
 
 
-                let id = post._id;
-                id = id.substring(id.length - 10);
+                const id = post._id;
                 let reactions = {
                     heart: post.reactions.filter((reaction) => reaction.rtype === 'heart').length,
                     heartbreak: post.reactions.filter((reaction) => reaction.rtype === 'heartbreak').length,
@@ -156,7 +158,7 @@ const showPosts = (filters,append = false) => {
             }).join('\n')}`;
 
             if (filters.offset + filters.limit < LastCall.posts) {
-                $('#under_posts').html(`<div class="mx-auto"> <a id="load_posts" class="link-opacity-100 link-opacity-50-hover"> Carica altri post</a></div>`)
+                $('#under_posts').html(`<div class="mx-auto"> <a id="load_posts" class="link-opacity-100 link-opacity-50-hover"> Carica altri post </a></div>`)
             } else {
                 $('#under_posts').empty();
             }
@@ -169,13 +171,136 @@ const showPosts = (filters,append = false) => {
             }
 
             $('#load_posts').on('click', () => {
-                showPosts(filter, offset + limit, limit, true);
+                filters.offset = filters.offset + filters.limit;
+                showPosts(filters, true);
             })
         }
     })
 }
 
 
+
+$('#orderby').on('change',() => {
+
+    let orderBy = $('#orderby option:selected').val();
+
+    if(orderBy === 'publication') {
+        let options = `<label for="order"></label>
+                                <select class="select btn btn-success" id="order" autocomplete="off">
+                                    <option value="" disabled selected>Ordine</option>
+                                    <option value="più recente" >Piu' recenti</option>
+                                    <option value="meno recente">Meno recenti</option>
+                                </select>`
+        $('#options').empty().html(options);
+    }
+
+    else if(orderBy === 'visuals') {
+        let options = `<label for="order"></label><select class="select btn btn-success" id="order" autocomplete="off">
+                                  <option value="" selected disabled>Ordine</option>
+                                  <option value="più visual">Crescente</option>
+                                  <option value="meno visual">Descrescente</option>
+                              </select>`
+        $('#options').empty().html(options);
+    }
+
+    $('#order').on('change', () => {
+        LastCall.filters.sort = $('#order option:selected').val();
+        getPostsNumber(LastCall.filters)
+    })
+
+})
+
+
+
+
+$('#order').on('change', () => {
+    LastCall.filters.sort = $('#order option:selected').val();
+    getPostsNumber(LastCall.filters);
+})
+
+
+$('#channel-visual').on('change',() => {
+    LastCall.filters.popularity = $('#channel-visual input:checked').val();
+    getPostsNumber(LastCall.filters);
+})
+
+$('#filter').on("keyup", () => {
+    let value = $('#filter').val();
+    switch ($('#search-type option:selected').val()) {
+        case 'sender':
+            LastCall.filters.channel = '';
+            LastCall.filters.name = value;
+            break;
+
+        case 'receiver':
+            LastCall.filters.name = '';
+            LastCall.filters.channel = value;
+            break;
+    }
+
+    getPostsNumber(LastCall.filters);
+});
+
+
+$('#changeReactionsButton').on('click',() => {
+
+    let reactions = {
+        heart: $('#heart').val(),
+        heartbreak: $('#heartbreak').val(),
+        'thumbs-up': $('#thumbs-up').val(),
+        'thumbs-down': $('#thumbs-down').val(),
+    }
+
+    let allReactions = []
+    for (let i = 0; i < reactions.heart; i++) {
+        allReactions.push({
+            rtype: 'heart',
+            user: User,
+            date: new Date(),
+        })
+    }
+
+    for (let i = 0; i < reactions.heartbreak; i++) {
+        allReactions.push({
+            rtype: 'heartbreak',
+            user: User,
+            date: new Date(),
+        })
+    }
+
+    for (let i = 0; i < reactions["thumbs-up"]; i++) {
+        allReactions.push({
+            rtype: 'thumbs-up',
+            user: User,
+            date: new Date(),
+        })
+    }
+    for (let i = 0; i < reactions["thumbs-down"]; i++) {
+        allReactions.push({
+            rtype: 'thumbs-down',
+            user: User,
+            date: new Date(),
+        })
+    }
+
+    if(allReactions.length > 500) {
+        alert('Puoi aggiungere al massimo 500 reactions!!');
+        return;
+    }
+
+    $.ajax({
+        url: '/db/post/updateReaction',
+        data: {user: User, reactions: JSON.stringify(allReactions), postId: post},
+        type: 'put',
+        success: (data) => {
+            location.reload();
+        }
+    })
+})
+
+
+
+
 $(document).ready(() => {
-    showPosts(LastCall.filters,false);
+    getPostsNumber(LastCall.filters)
 })

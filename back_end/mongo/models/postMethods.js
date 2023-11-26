@@ -200,6 +200,7 @@ const addPost = async (post,quota,credentials) => {
         for (const destination of destinations) {
             let destinationType = destination.destType;
             let channel = await Channel.findOne({name: destination.name});
+
             /* ERROR HANDLING */
             /* utente non esiste  */
             if (destinationType === 'user' && !(await User.findOne({username: destination.name}))) {
@@ -271,7 +272,7 @@ const addPost = async (post,quota,credentials) => {
 
         return {postId: newPost._id};
     }
-    catch(err){ throw err; }
+    catch(err){throw err; }
 }
 
 /**
@@ -392,7 +393,7 @@ const deletePost = async (postID,credentials) => {
 const updateReac = async (body,credentials) => {
     try{
         await connectdb(credentials);
-
+        console.log(body)
         let user = await User.findOne({username: body.user});
 
         if(user.typeUser === 'mod') {
@@ -527,19 +528,33 @@ const getLastPostUser = async (query,credentials) => {
 
 /**
  *
- * @param {String} filter - filter for posts - ['all','image','text','geolocation']
- * @param {String} channel - channel filter for posts
+ * @param filters
  * @param credentials - mongo credentials
  * @returns {Promise<*>}
  */
-const postLength = async (filter,channel,credentials) => {
+const postLength = async (filters,credentials) => {
     try {
         await connectdb(credentials);
+        console.log(filters)
+        let filter = {
+            /* Per i canali non mi serve l'id dell'utente che fa la richiesta, a meno che non sia SMM*/
+            ...((filters.smm || !filters.channel) && filters.name) && {'owner':  {$regex: filters.name , $options: 'i'}},
+            /* FILTRO PER TIPO DI POST */
+            ... (filters.typeFilter && filters.typeFilter !== 'all') && {'contentType': filters.typeFilter},
 
-        let posts = await Post.find(
-            { ... (filter && filter !== '') && {contentType: filter},
-                '$or': [{'destinationArray.name': channel}, {'officialChannelsArray': channel}],
-                }).lean();
+            /* PER LA PAGINA DEL PROFILO : */
+            ... (filters.destType && filters.destType !== 'all') && {'destinationArray.destType':  filters.destType === 'user' ? 'user' : 'channel'},
+            ... (filters.destType && filters.destType !== 'all' && filters.destType !== 'user') && {'category': filters.destType},
+            ... (filters.popularity && filters.popularity !== 'neutral') && {'popularity': filters.popularity},
+
+
+            /* PER IL CANALE SINGOLO */
+            ... (filters.channel) && {$or: [{'destinationArray.name': {$regex: filters.channel , $options: 'i'}},
+                    {'officialChannelsArray': {$regex: filters.channel , $options: 'i'}}]
+            }
+        }
+
+        let posts = await Post.find(filter).lean();
 
 
         return {length: posts.length};

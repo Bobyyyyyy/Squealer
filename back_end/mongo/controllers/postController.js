@@ -80,7 +80,7 @@ const getReactionLast30days = async (req,res) => {
 
 const postLength = async (req,res) => {
     try {
-        res.send(await postModel.postLength(req.query.filter,req.query.channel,mongoCredentials))
+        res.send(await postModel.postLength(req.query.filter,mongoCredentials))
     }
     catch (error) {
         res.send(error);
