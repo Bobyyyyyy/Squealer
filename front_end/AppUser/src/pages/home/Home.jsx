@@ -38,7 +38,11 @@ function Home() {
     //const getCurrent
 
     useEffect(() => {
-        fetchAllPosts();
+        fetchAllPosts()
+            .then((res)=> {
+            console.log(res);
+        })
+
     }, []);
     console.log(posts);
 

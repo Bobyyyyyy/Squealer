@@ -28,6 +28,14 @@ const getUserProfilePic = async (req,res) => {
     res.send(await userModel.getUserProfilePicture(req.session.user, mongoCredentials));
 }
 
+const updateUserProfilePic = async (req, res) => {
+    try {
+        res.send(await userModel.updateProfilePicture(req.session.user, req.body.newProfilePic, mongoCredentials));
+    } catch (err) {
+        res.status(400).send("errore nel cambiamento dell'immagine");
+    }
+}
+
 const updateSessionVip = async (req,res) => {
     try{
         req.session.vip = req.body.vipName;
@@ -137,5 +145,6 @@ module.exports = {
     getFollnPosts,
     getLastPost,
     updateMaxQuota,
-    getUserProfilePic
+    getUserProfilePic,
+    updateUserProfilePic
 }

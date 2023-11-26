@@ -9,6 +9,7 @@ router.post('/',userController.addUser,(req,res) => {
 });
 router.put('/',userController.modifyUser);
 router.get('/profilePic', userController.getUserProfilePic);
+router.put('/profilePic', userController.updateUserProfilePic);
 router.get('/session',userController.getSessionUser);
 router.get('/number',userController.getUsersNumber);
 router.get('/all',userController.getAllUsers);
