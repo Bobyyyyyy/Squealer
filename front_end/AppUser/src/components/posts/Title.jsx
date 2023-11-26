@@ -1,11 +1,16 @@
 import {ProfilePic} from "../assets/index.jsx"
+import {parseTime} from "../utils/usefulFunctions.js";
+
 
 function Title({post, profilePic}) {
 
     let allDest = post.destinationArray.map((dest) => {
         return dest.name;
     })
-    //{post.dateOfCreation}
+
+    const tempo = parseTime(post);
+    console.log('sus',tempo)
+
     return (
         <>
             <div className="flex justify-between items-center px-4 py-2">
@@ -20,7 +25,7 @@ function Title({post, profilePic}) {
                         </h2>
                     </div>
                 </div>
-                    <span className="min-w-fit">9h fa</span>
+                    <span className="min-w-fit">{tempo}</span>
             </div>
         </>
     );

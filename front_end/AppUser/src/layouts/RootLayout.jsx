@@ -53,12 +53,12 @@ export default function RootLayout() {
     return (
         <div>
             <header>
-                <nav className={"fixed bottom-0 flex w-full flex-wrap items-center justify-between bg-[#FBFBFB] py-2 text-black-500 shadow-lg focus:text-neutral-700 dark:bg-neutral-600 lg:py-4 z-10"}>
+                <nav className={"fixed bottom-0 flex w-full flex-wrap items-center justify-between bg-[#FBFBFB] py-2 text-black-500 shadow-lg focus:text-neutral-700  lg:py-4 z-10"}>
                     <div className={"flex w-full flex-wrap items-center justify-around px-3 content-around"}>
                         {navigationButtons.map( (item) => (
                             <NavLink
                                 to={item.route}
-                                className={({isActive}) => `navBtn ${isActive && 'selected'}`}
+                                className={({isActive}) => `w-8 h-8 ${isActive && ' '}`}
                                 key={item.name}
                             >
                                 {({isActive}) => {
