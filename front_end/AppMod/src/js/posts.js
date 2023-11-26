@@ -1,58 +1,61 @@
-let ChannelName = $('#channel-name').html();
-let User = $('#session-user').html();
+let LastCall = {
+    posts: 0,
+    filters: {
+        'name': '',
+        'typeFilter': '',
+        'destType': '',
+        'channel': '',
+        'popularity': '',
+        'sort': "",
+        'offset': 0,
+        'limit' : 50,
+    }
+}
+
 const urlRegex =/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
 
-let LastCall = {
-    limit : 3,
-    offset: 0,
-    posts: 0,
-    filter: ''
+
+function updateLastCall(filters) {
+    LastCall.limit  = filters.limit;
+    LastCall.offset = filters.offset;
+    LastCall.filter = filters.filter;
 }
 
 
-function updateLastCall(limit,offset,filter) {
-    LastCall.limit = limit;
-    LastCall.offset = offset;
-    LastCall.filter = filter;
-}
-
-
-const showChannel = (name) => {
+function getPostsNumber (filter) {
     $.ajax({
-        url:`/db/channel/${name}`,
+        url:'/db/post/number',
+        data: {filter: filter},
         type: 'get',
-        success: (channel) => {
-            $('#channel-description').html(channel.description);
-            $('#channel-creator').html(channel.creator);
-            $('#posts-number').html(channel.postNumber);
-            $('#followers').html(channel.followerNumber);
-            showPosts(LastCall.filter,LastCall.offset,LastCall.limit);
+        success: (data) => {
+            LastCall.posts = data.length;
+            $('#post-trovati').html(`${data.length}`);
         }
     })
 }
 
-const showPosts = (filter,offset,limit,append = false) => {
-    updateLastCall(limit,offset,filter);
+const showPosts = (filters,append = false) => {
+    updateLastCall(filters);
     $.ajax({
-        url:'/db/post/all',
-        data: {channel: ChannelName, typeFilter: filter , offset: offset, limit: limit},
+        url: '/db/post/all',
+        data: filters,
         type: 'get',
         success: (posts) => {
-            if(posts.length === 0) {
+            if (posts.length === 0) {
                 $('#posts').empty().append(`<h4>Nessun Post Trovato</h4>`);
                 return;
             }
             let html = `${$.map(posts, (post) => {
-                
+
                 let destinationNames = []
                 let officialChannelNames = [];
-                
+
                 post.destinationArray.forEach(destination => {
-                    if(destination.destType === "channel") {
+                    if (destination.destType === "channel") {
                         destinationNames.push('§' + destination.name + '');
                     }
 
-                    if(destination.destType === "user") {
+                    if (destination.destType === "user") {
                         destinationNames.push('@' + destination.name);
                     }
 
@@ -62,13 +65,13 @@ const showPosts = (filter,offset,limit,append = false) => {
                 post.officialChannelsArray.forEach(destination => {
                     officialChannelNames.push('§' + destination);
                 })
-                
-                
+
+
                 let id = post._id;
                 id = id.substring(id.length - 10);
                 let reactions = {
                     heart: post.reactions.filter((reaction) => reaction.rtype === 'heart').length,
-                    heartbreak : post.reactions.filter((reaction) => reaction.rtype === 'heartbreak').length,
+                    heartbreak: post.reactions.filter((reaction) => reaction.rtype === 'heartbreak').length,
                     'thumbs-up': post.reactions.filter((reaction) => reaction.rtype === 'thumbs-up').length,
                     'thumbs-down': post.reactions.filter((reaction) => reaction.rtype === 'thumbs-down').length,
                 }
@@ -107,7 +110,7 @@ const showPosts = (filter,offset,limit,append = false) => {
 
                 switch (`${post.contentType}`) {
                     case 'text':
-                        let parsedText = `${post.content}`.replace(urlRegex, function(url) {
+                        let parsedText = `${post.content}`.replace(urlRegex, function (url) {
                             return `<a class="fw-bold"  href="${url}" target="_blank">${url}</a>`;
                         })
                         Post = Post + `<span><p class='card-text lead' > ${parsedText} </p></span>`
@@ -123,7 +126,7 @@ const showPosts = (filter,offset,limit,append = false) => {
                         break;
                 }
 
-                Post = Post +`</div>
+                Post = Post + `</div>
                     <div class="card-footer text-muted" style="background-color: #ECEAF5">
                         <div class="d-flex flex-row">
                             <div id="reactions-${id}" class="me-auto d-inline-flex"> 
@@ -152,126 +155,27 @@ const showPosts = (filter,offset,limit,append = false) => {
                 return Post
             }).join('\n')}`;
 
-            if (offset + limit < LastCall.posts) {
+            if (filters.offset + filters.limit < LastCall.posts) {
                 $('#under_posts').html(`<div class="mx-auto"> <a id="load_posts" class="link-opacity-100 link-opacity-50-hover"> Carica altri post</a></div>`)
-            }
-            else {
+            } else {
                 $('#under_posts').empty();
             }
 
 
-
             if (append) {
                 $('#posts').append(html);
-            }
-            else {
+            } else {
                 $('#posts').empty().append(html);
             }
 
-            $('#load_posts').on('click',() => {
-                showPosts(filter,offset+limit,limit,true);
+            $('#load_posts').on('click', () => {
+                showPosts(filter, offset + limit, limit, true);
             })
-
         }
     })
 }
 
-$('#changeReactionsButton').on('click',() => {
-
-    let reactions = {
-        heart: $('#heart').val(),
-        heartbreak: $('#heartbreak').val(),
-        'thumbs-up': $('#thumbs-up').val(),
-        'thumbs-down': $('#thumbs-down').val(),
-    }
-
-    let allReactions = []
-    for (let i = 0; i < reactions.heart; i++) {
-        allReactions.push({
-            rtype: 'heart',
-            user: User,
-            date: new Date(),
-        })
-    }
-
-    for (let i = 0; i < reactions.heartbreak; i++) {
-        allReactions.push({
-            rtype: 'heartbreak',
-            user: User,
-            date: new Date(),
-        })
-    }
-
-    for (let i = 0; i < reactions["thumbs-up"]; i++) {
-        allReactions.push({
-            rtype: 'thumbs-up',
-            user: User,
-            date: new Date(),
-        })
-    }
-    for (let i = 0; i < reactions["thumbs-down"]; i++) {
-        allReactions.push({
-            rtype: 'thumbs-down',
-            user: User,
-            date: new Date(),
-        })
-    }
-
-    if(allReactions.length > 500) {
-        alert('Puoi aggiungere al massimo 500 reactions!!');
-        return;
-    }
-
-    $.ajax({
-        url: '/db/post/updateReaction',
-        data: {user: User, reactions: JSON.stringify(allReactions), postId: post},
-        type: 'put',
-        success: (data) => {
-            location.reload();
-        }
-    })
-})
-
-
-$('#block-button').on('click', () => {
-    $.ajax({
-        url: '/db/channel/block',
-        data: {user: User, channel: ChannelName},
-        type: 'put',
-        success: (data) => {
-            location.reload();
-        }
-    })
-})
-
-
-const blockButton = () => {
-    $.ajax({
-        url: '/db/channel/block',
-        data: {user: User, channel: ChannelName},
-        type: 'put',
-        success: (data) => {
-            location.reload();
-        }
-    })
-}
-
-$('#post-filters').on('change', () => {
-    let filter = $('#post-filters input:checked').val();
-    showPosts(filter,LastCall.offset = 0,LastCall.limit);
-})
-
-const deletePost = async (id) => {
-    $.ajax({
-        url:'/db/post/delete',
-        data: {destination: ChannelName, postID: id},
-        type: 'post',
-        success: (post) => {
-            location.reload()
-        }
-    })
-}
 
 $(document).ready(() => {
-    showChannel(ChannelName);
+    showPosts(LastCall.filters,false);
 })

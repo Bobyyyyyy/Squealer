@@ -19,7 +19,7 @@
   function parseTime(){
     let now = new Date().getTime()
 
-    let timePassed = (now - (props.dateCreation)?.getTime()) / 1000
+    let timePassed = (now - new Date(props.dateCreation).getTime()) / 1000
 
     return timePassed < 60 ? `${Math.floor(timePassed)} s.` :
               timePassed < 60*60 ? `${Math.floor(timePassed/60)} m.` :
@@ -38,7 +38,8 @@
       <img :src=" srcImg " alt="immagine profilo" class="imgFluid" />
       <div class="d-flex flex-column flex-fill">
         <h3 class="mb-0 setMargin"> {{ name }} </h3>
-        <h5 v-if="getPage() !=='Channels'" @click="go2Channel" type="button" class="mb-0" id="ChannelName"> {{dest}} </h5>
+        <!--<h5 v-if="getPage() !=='Channels'" @click="go2Channel" type="button" class="mb-0" id="ChannelName"> {{dest}} </h5>-->
+        <h5 @click="go2Channel" type="button" class="mb-0" id="ChannelName"> {{dest}} </h5>
 
 
       </div>

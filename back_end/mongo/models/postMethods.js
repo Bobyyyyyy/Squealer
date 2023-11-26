@@ -11,12 +11,21 @@ const {changePopularity} = require("./userMethods");
 /**
  *
  * @param {String} username
+ * @param {Object} channel  -   channel Name. Used for stats
  * @returns {Promise<[{reaction}]>}
  */
-const getReactionLast30days = async(username) => {
+const getReactionLast30days = async(username, channel = undefined) => {
     try{
+
+        let filter = {
+            owner: username,
+            ...(!!channel) && {'destinationArray.name': { $in: [channel] }},
+        }
+
         await connectdb(mongoCredentials);
-        let posts_id_reactions = await Post.find({owner: username, 'destination.destType': {$not: {$eq:'user'}}},'reactions');
+
+        let posts_id_reactions = await Post.find(filter,'reactions');
+
         await mongoose.connection.close();
 
         let now = new Date();
@@ -220,7 +229,10 @@ const addPost = async (post,quota,credentials) => {
                 officialChannels.push(destination.name);
                 destinations.pop(destination);
             }
-            else if (channel) {             //null se la findOne non trova nulla
+            else if (channel) {
+                if(channel.isBlocked) {
+                    throw createError('Il canale è bloccato',400);
+                }
                 if (channel.type === 'public') {
                     postCategory = 'public';
                 }
@@ -281,11 +293,10 @@ const addPost = async (post,quota,credentials) => {
  */
 const getAllPost = async (query,sessionUser,credentials) =>{
     try{
-        await connectdb(credentials)
-
+        await connectdb(credentials);
         let filter = {
                 /* Per i canali non mi serve l'id dell'utente che fa la richiesta, a meno che non sia SMM*/
-            ...(query.smm || !query.channel) && {'owner':  query.name},
+            ...((query.smm || !query.channel) && query.name) && {'owner':  {$regex: query.name , $options: 'i'}},
                 /* FILTRO PER TIPO DI POST */
             ... (query.typeFilter && query.typeFilter !== 'all') && {'contentType': query.typeFilter},
 
@@ -296,8 +307,9 @@ const getAllPost = async (query,sessionUser,credentials) =>{
 
 
                 /* PER IL CANALE SINGOLO */
-            $or: [{...(query.channel) && {'destinationArray.name': query.channel}},
-                 {...(query.channel) && {'officialChannelsArray': query.channel}}]
+            ... (query.channel) && {$or: [{'destinationArray.name': {$regex: query.channel , $options: 'i'}},
+                 {'officialChannelsArray': {$regex: query.channel , $options: 'i'}}]
+            }
         }
 
         let posts = await Post.find(filter)
@@ -335,26 +347,40 @@ const getAllPost = async (query,sessionUser,credentials) =>{
     }
 }
 
-const deletePost = async (body,credentials) => {
-    try{
+
+const removeDestination = async (destination,postID,credentials)=> {
+    try {
         await connectdb(credentials);
 
-        //controllo se sei il creatore e se esiste il post
-        if (!(await Post.findOne({_id: body.id, creator: body.name},'creator').lean())) {
-            // se non sei il creatore controlla se sei mod
-            if(body.type !== 'mod') {
-                let err = new Error("Rimozione non valida");
-                err.statusCode = 400;
-                throw err;
-            }
+        let channel = await Channel.findOne({name: destination});
+
+        let checkArrayDestination = await Post.findByIdAndUpdate(postID, {$pull: { destinationArray: {name: destination}}}, {new: true});
+
+        let checkOfficialDestination = await Post.findByIdAndUpdate(postID, {$pull: { officialChannelsArray: destination}}, {new: true});
+
+        if(!checkArrayDestination && !checkOfficialDestination) {
+            throw createError("Destinazione non nel post", 422);
         }
 
-        let postToDelete = await Post.findByIdAndRemove(body.id).lean();
+        await Channel.findOneAndUpdate({'name': channel.name}, {'postNumber': channel.postNumber-1})
+
+        if(checkArrayDestination.destinationArray.length === 0 && checkOfficialDestination.officialChannelsArray.length === 0) {
+            await deletePost(postID);
+        }
+    }
+    catch (error) {
+        throw err;
+    }
+}
+
+const deletePost = async (postID,credentials) => {
+    try{
+        await connectdb(credentials)
+        let postToDelete = await Post.findByIdAndRemove(postID).lean();
         await mongoose.connection.close();
         return postToDelete;
     }
     catch(err){
-        console.log(err);
         throw err;
     }
 }
@@ -529,6 +555,7 @@ const postLength = async (filter,channel,credentials) => {
 module.exports = {
     addPost,
     getAllPost,
+    removeDestination,
     deletePost,
     updateReac,
     deleteReac,

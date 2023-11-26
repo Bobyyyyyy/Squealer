@@ -1,6 +1,7 @@
 const {mongoCredentials} = require('../models/utils.js')
 const userModel = require('../models/userMethods');
 const postModel = require("../models/postMethods");
+const {createError} = require("../models/utils");
 
 
 const addUser = async (req, res, next) => {
@@ -78,10 +79,28 @@ const getVips = async (req,res) => {
 
 const getQuota = async (req,res) => {
     try {
-        res.send(await userModel.getUserQuota(req.query,mongoCredentials));
+        let username = req.query.user;
+        res.send(await userModel.getUserQuota(userName));
     }
     catch (error) {
         res.send(error);
+    }
+}
+
+const updateMaxQuota = async(req,res) => {
+
+    try{
+        let percentage = 0.1; //req.body.percentage;
+
+        if (isNaN(percentage)) throw createError('percentage not number', 404);  //cambiare
+
+        let user = "FVVIP"//req.body.user;
+
+        res.send(await userModel.updateMaxQuota(percentage,user));
+
+    }
+    catch(err){
+        res.send(err)
     }
 }
 
@@ -96,7 +115,8 @@ const getFollnPosts = async(req,res)=> {
 
 const getLastPost = async(req,res)=> {
     try {
-        res.send(await postModel.getLastPostUser(req.query, mongoCredentials));
+        let response = await postModel.getLastPostUser(req.query, mongoCredentials)
+        res.send({post: response});
     } catch (error) {
         res.send(error);
     }
@@ -116,5 +136,6 @@ module.exports = {
     getQuota,
     getFollnPosts,
     getLastPost,
+    updateMaxQuota,
     getUserProfilePic
 }

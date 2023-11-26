@@ -59,6 +59,8 @@ app.use('/img',express.static(rootDir + '/back_end/assets/img'))
 app.use('/icons/reactionIcons',express.static(rootDir + '/back_end/assets/icons/reactionIcons'))
 app.use('/icons/navbarIcons',express.static(rootDir + '/back_end/assets/icons/navbarIcons'))
 app.use('/icons/settingsIcons',express.static(rootDir + '/back_end/assets/icons/settingsIcons'))
+app.use('/scss',express.static(rootDir + '/public/assets'))
+
 
 /* CRON */
 const nodeCron = require('node-cron')

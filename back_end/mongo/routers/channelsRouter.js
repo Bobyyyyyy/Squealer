@@ -8,5 +8,6 @@ router.get('/list',channelsController.getChannelList);
 router.get('/check',channelsController.checkUserInChannel);
 router.get('/number',channelsController.getChannelsNumber);
 router.get('/:name',channelsController.getSingleChannel);
+router.put('/block',channelsController.blockChannel);
 
 module.exports = router

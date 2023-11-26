@@ -86,6 +86,12 @@ function userTable (limit,offset,filter) {
         type: 'get',
         success: (data) => {
             $('#pages').empty();
+
+            if(data.length === 0) {
+                $('#table1').empty().append(`<h4 class="text-white">Nessun Utente trovato</h4>`);
+                return;
+            }
+
             let header = `<table class="table table-dark table-striped table-hover table-bordered" style="vertical-align: middle; text-align: center;">
                         <!-- Header Tabella -->
                         <thead>

@@ -3,7 +3,7 @@
   import Post from "../post/Post.vue";
   import Dropdown from "../Dropdown.vue";
   import {currentVip, postType, sortPosts} from "../../utils/config.js";
-  import {getPosts} from "../../utils/functions.js";
+  import {getPosts, parseDestinations} from "../../utils/functions.js";
   import {useStore} from "vuex";
 
   const store = useStore();
@@ -76,15 +76,15 @@
         />
       </div>
       <div v-if="readyPosts" class="d-flex flex-row flex-wrap justify-content-around mt-3">
-        <Post v-for="post in curPosts" :key="post._id"
+        <Post v-for="(post,i) in curPosts" :key="post._id"
               :user="post.owner"
-              :dest= "post.destination.destType === 'channel'? `§${post.destination.name}`:`@${post.destination.name}`"
+              :dest= "parseDestinations(post.destinationArray)"
               :content="post.content"
               :creationDate="post.dateOfCreation"
               :reactions = "post.reactions"
               :contentType = "post.contentType"
-              :destType = "post.destination.destType"
               :postId = "post._id"
+              :numberOfPost="i"
               picProfile = "/img/defaultUser.jpeg"
         />
       </div>

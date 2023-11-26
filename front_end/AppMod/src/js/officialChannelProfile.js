@@ -1,5 +1,6 @@
 let ChannelName = $('#channel-name').html();
 let User = $('#session-user').html();
+const urlRegex =/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
 
 let LastCall = {
     limit : 3,
@@ -31,13 +32,11 @@ function updateLastCall(limit,offset,filter) {
 }
 
 
-// regular expression for link in text
-const urlRegex =/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
 
 const deletePost = async (id) => {
     $.ajax({
         url:'/db/post/delete',
-        data: {id: id},
+        data: {destination: ChannelName, postID: id},
         type: 'post',
         success: (post) => {
             location.reload()
@@ -65,7 +64,10 @@ const showPosts = (filter,offset,limit,append = false) => {
         data: {channel: ChannelName, typeFilter: filter , offset: offset, limit: limit},
         type: 'get',
         success: (posts) => {
-            console.log(posts)
+            if(posts.length === 0) {
+                $('#posts').empty().append(`<h4>Nessun Post Trovato</h4>`);
+                return;
+            }
             let html = `${$.map(posts, (post) => {
                 let id = post._id;
                 id = id.substring(id.length - 10);
@@ -82,7 +84,7 @@ const showPosts = (filter,offset,limit,append = false) => {
                         <div class="d-flex flex-row align-items-center justify-content-center">
                             <div class="fw-bold">@${post.owner}</div>
                             <div class="ms-2 fw-light">${post.category}</div>
-                            <div class="ms-2 fw-light">/${post.popularity}</div>  
+                            <div class="ms-2 fw-light">/${post.popularity}</div>
                         </div>
                         
                         <div class="d-flex flex-row ms-auto">

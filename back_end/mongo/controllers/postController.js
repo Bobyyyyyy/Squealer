@@ -53,8 +53,7 @@ const deleteReaction = async (req,res) => {
 
 const removePost = async (req,res) => {
     try {
-        let body = {id: req.body.id, name: req.session.user, type: req.session.type}
-        res.send(await postModel.deletePost(body,mongoCredentials))
+        res.send(await postModel.removeDestination(req.body.destination,req.body.postID,mongoCredentials))
     }
     catch(error) {
         res.send(error);
@@ -72,7 +71,7 @@ const getPostsDate = async (req,res) => {
 
 const getReactionLast30days = async (req,res) => {
     try{
-        await res.send(await postModel.getReactionLast30days(req.query.user));
+        await res.send(await postModel.getReactionLast30days(req.query.user, req.query?.channel));
     }
     catch (e) {
         throw e;

@@ -50,7 +50,6 @@ const getChannelsNumber = async (req,res) => {
 const getSingleChannel = async (req,res) => {
     try {
         let name = req.params.name;
-        console.log(name);
         res.send(await channelsModel.getSingleChannel(name,mongoCredentials));
     }
     catch (error) {
@@ -58,7 +57,17 @@ const getSingleChannel = async (req,res) => {
     }
 }
 
+const blockChannel = async (req,res) => {
+    try {
+        let user = req.body.user;
+        let channel = req.body.channel;
 
+        res.send(await channelsModel.blockChannel(user,channel,mongoCredentials))
+    }
+    catch (error) {
+        res.sendStatus(400);
+    }
+}
 
 module.exports = {
     createChannel,
@@ -66,5 +75,6 @@ module.exports = {
     checkUserInChannel,
     getChannels,
     getChannelsNumber,
-    getSingleChannel
+    getSingleChannel,
+    blockChannel
 }

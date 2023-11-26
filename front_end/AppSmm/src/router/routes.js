@@ -63,15 +63,15 @@ export const routes =[
             SbOn: Messages,
         },
     },
+
+     */
     {
-        path: "/SMM/:user/:vip/BuyQuota",
-        name:"Channels",
+        path:  "/SMM/BuyQuota",
+        name:"Quota",
         components: {
             sideBar: SideBar,
-            SbOn: ChannelList
         },
     },
-    */
     {
         path: "/SMM/AddPost",
         name:"Post",

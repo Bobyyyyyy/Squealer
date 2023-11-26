@@ -2,9 +2,10 @@ const mongoose = require('mongoose');
 const bcrypt = require("bcryptjs");
 
 const User = require("../schemas/User");
-const {connectdb,saltRounds,quota} = require("./utils");
+const {connectdb,saltRounds,quota, mongoCredentials} = require("./utils");
 const {json} = require("express");
 const Post = require("../schemas/Post");
+const {start} = require("@popperjs/core");
 
 
 //POST
@@ -149,30 +150,6 @@ const changePwsd = async(body,credentials) =>{
     }
 }
 
-const changeProfilePic = async(body,credentials) => {
-    try{
-        await connectdb(credentials);
-        let user = await User.find({username: body.username});    //query o body??
-
-        if (user.length === 0) {
-            let err = new Error("User non esite");
-            err.statusCode = 400;
-            console.log(err);
-            await mongoose.connection.close();
-            return err;
-        }
-        user.profilePicture = await body.newProfilePic;
-
-        await user.save();
-        await mongoose.connection.close()
-    }
-    catch (err) {
-        await mongoose.connection.close();
-        console.log(err);
-        throw err;
-    }
-}
-
 const getUsers = async (query,credentials) =>{
     try {
         await connectdb(credentials);
@@ -205,8 +182,7 @@ const altUser = async (body,credentials) => {
             {blocked: body.blocked,
             'characters.daily':  parseInt(body.characters.daily),
             'characters.weekly':  parseInt(body.characters.weekly),
-            'characters.monthly':  parseInt(body.characters.monthly),
-            },
+            'characters.monthly':  parseInt(body.characters.monthly)},
             {new: true}).lean();
         await mongoose.connection.close();
         return user;
@@ -233,12 +209,13 @@ const getHandledVip = async (query,credentials) => {
 
 const getUserQuota = async (query,credentials) => {
     try {
-        await connectdb(credentials);
-        let quota = (await User.findOne({username: query.user},'characters maxQuota')).lean();
+        await connectdb(mongoCredentials);
+        let quota = await User.findOne({username: user},'characters maxQuota').lean();
+
         await mongoose.connection.close();
 
         delete quota._id;
-        console.log("quota", quota);
+
         return quota;
     }
     catch (Error){
@@ -261,7 +238,12 @@ const get_n_FollnPosts = async(body,credentials) => {
     }
 }
 
-
+/**
+ *
+ * @param {String} type - ['D','W','M']
+ * @param credentials
+ * @return {Promise<void>}
+ */
 const resetQuota = async (type, credentials) => {
     try{
         await connectdb(credentials);
@@ -281,7 +263,7 @@ const resetQuota = async (type, credentials) => {
         await mongoose.connection.close();
 
     }catch (e) {
-        console.log(e)
+        throw(e)
     }
 }
 
@@ -319,12 +301,80 @@ const changePopularity = async (userID, valueToModify, increaseValue) => {
             await User.findByIdAndUpdate(userID, {'unpopularity': unpopularity});
         }
     }
-
-
-
 }
 
-//manca un delete per provare le principali API
+
+/**
+ *
+ * @param {Number} percentage - [0, 1]
+ * @param {String} user - username
+ * @return {Promise<void>}
+ */
+const updateMaxQuota = async (percentage, user) => {
+    try{
+        console.log(percentage, user);
+        await connectdb(mongoCredentials);
+
+        let res = await User.findOneAndUpdate({username: user},
+            [{$set:{
+                'maxQuota.daily': {
+                    $trunc:[
+                        {
+                            $multiply:[
+                                {
+                                    $add:[1.,percentage]
+                                },
+                                "$maxQuota.daily"]
+                        }
+                    ]
+                },
+                'maxQuota.weekly': {
+                    $trunc:[
+                        {
+                            $multiply:[
+                                {
+                                    $add:[1.,percentage]
+                                },
+                                "$maxQuota.weekly"]
+                        }
+                    ]
+                },
+                'maxQuota.monthly': {
+                    $trunc:[
+                        {
+                            $multiply:[
+                                {
+                                    $add:[1.,percentage]
+                                },
+                                "$maxQuota.monthly"]
+                        }
+                    ]
+                },
+            }
+        }]).lean();
+        await mongoose.connection.close();
+        /*
+            COSA SUS: COME RIMUOVERE? ESEMPIO DEL 10 % + 1 %
+            esempio:
+            parto da 100
+            compro 10% --> arrivo a 110
+            popolarità : +5% --> arrivo a 115 (115.5)
+
+            --- scade l'anno ---
+            devo rimuovere il 10% acquistato l'anno prima
+            come faccio?
+            Se rimuovo il 10%, il 5% guadagnato per popolarità sarà di meno
+            devo ricalcolare le percentuali della popolarità? BOH
+         */
+
+        //USARE RES PER CALCOLARE QUANTO TOGLIERE DOPO LA FINE DELL'ANNO
+
+    }catch (e) {
+        throw(e);
+    }
+}
+
+
 
 module.exports = {
     addUser,
@@ -338,6 +388,7 @@ module.exports = {
     getUserQuota,
     get_n_FollnPosts,
     resetQuota,
+    updateMaxQuota,
     changePopularity,
     getUserProfilePicture
 }

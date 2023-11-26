@@ -1,11 +1,19 @@
 <script setup>
   import Post from "../post/Post.vue";
+  import {parseDestinations} from "../../utils/functions.js";
+  import {computed, onMounted} from "vue";
   let srcImg="/img/profilePicture.png";
 
-  defineProps({
+  defineEmits(['setModal']);
+
+  const props = defineProps({
     username: String,
     followers: Number,
     post: Object,
+  })
+
+  const noPost = computed(()=> {
+    return Object.keys(props.post).length === 0
   })
 
 </script>
@@ -22,18 +30,17 @@
     </div>
     <div class="d-flex flex-column postMargin">
       <h5 class="mb-0">Last Post: </h5>
-      <div v-if="Object.keys(post).length !== 0" class="d-flex flex-row justify-content-center">
+      <div v-if="!noPost" class="d-flex flex-row justify-content-center">
         <Post
-              :user="post.owner"
-              :dest= "post.destination.destType === 'channel'? `§${post.destination.name}`:`@${post.destination.name}`"
-              :content="post.content"
-              :creationDate="new Date(post.dateOfCreation)"
-              :reactions = "post.reactions"
-              :contentType = "post.contentType"
-              :destType = "post.destination.destType"
-              :postId = "post._id"
-              :numberOfPost="1"
-              picProfile = "/img/defaultUser.jpeg"
+            :user="post.owner"
+            :dest= "parseDestinations(post.destinationArray)"
+            :content="post.content"
+            :creationDate="new Date(post.dateOfCreation)"
+            :reactions = "post.reactions"
+            :contentType = "post.contentType"
+            :postId = "post._id"
+            :numberOfPost="i"
+            picProfile = "/img/defaultUser.jpeg"
         />
       </div>
       <div v-else>

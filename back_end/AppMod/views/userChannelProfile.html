@@ -58,16 +58,33 @@
         <h6 class="fw-light"> creato da @<span id="channel-creator"></span></h6>
         <div class="d-inline-flex flex-row align-items-center pt-3">
             <div id="channel-description" class="p-2 rounded d-inline bg-white text-dark"></div>
-            <i id="modify-description" class="p-2 bi bi-pencil-fill"> Modifica </i>
             <button id="modify-button" type="button" class="btn btn-success ms-2" style="display: none">
                 Fatto
             </button>
         </div>
-        <!-- Modal Button -->
-        <div class="d-flex flex-row align-items-center">
-            <div class="mt-2">Followers:  <span class="fw-bold" id="followers"></span></div>
-            <div class="ms-2 mt-2">Numero di post: <span class="fw-bold" id="posts-number"></span></div>
+
+        <div class="d-flex flex-column">
+            <div class="d-flex flex-row align-items-center mt-2">
+                <div class="mt-2">Followers:  <span class="fw-bold" id="followers"></span></div>
+                <div class="ms-2 mt-2">Numero di post: <span class="fw-bold" id="posts-number"></span></div>
+            </div>
+            <div class="mt-3">Filters:
+            <div id="post-filters" class="btn-group" role="group" aria-label="Radio toggle button for type of posts">
+                <input type="radio" class="btn-check" name="filters" id="filter-all" value="" checked>
+                <label class="btn btn-light" for="filter-all">Mostra tutti</label>
+
+                <input type="radio" class="btn-check" name="filters" id="filter-text" value="text">
+                <label class="btn btn-light" for="filter-text">Testo</label>
+
+                <input type="radio" class="btn-check" name="filters" id="filter-image" value="image">
+                <label class="btn btn-light" for="filter-image">Immagini</label>
+
+                <input type="radio" class="btn-check" name="filters" id="filter-geo" value="geolocation">
+                <label class="btn btn-light" for="filter-geo">Geolocalizzazione</label>
+            </div>
+            </div>
         </div>
+
 
 
         <div id="posts" class="d-flex flex-column align-items-center">
@@ -76,6 +93,40 @@
         <div id="under_posts" class="d-flex align-items-center mt-5">
         </div>
 
+    </div>
+</div>
+
+
+<div class="modal fade" id="changeReactions" tabindex="-1" aria-labelledby="changeReactionsModal" aria-hidden="true" style="top:25%">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-body d-flex flex-row">
+                <div class="d-flex flex-column align-items-center">
+                    <label for="heart" class="form-label w-75"> <i class="bi bi-heart-fill"></i> Heart
+                        <input type="number" class="form-control" name="heart" id="heart" min="0" value="0">
+                    </label>
+                </div>
+                <div class="d-flex flex-column align-items-center">
+                    <label for="heartbreak" class="form-label w-75"> <i class="bi bi-heartbreak"></i> Heartbreak
+                        <input type="number" class="form-control" name="heartbreak" id="heartbreak" min="0" value="0">
+                    </label>
+                </div>
+                <div class="d-flex flex-column align-items-center">
+                    <label for="thumbs-up" class="form-label w-75"> <i class="bi bi-hand-thumbs-up-fill"></i> Thumbs-Up
+                        <input type="number" class="form-control" name="thumbs-up" id="thumbs-up" min="0"  value="0">
+                    </label>
+                </div>
+                <div class="d-flex flex-column align-items-center">
+                    <label for="thumbs-down" class="form-label w-75"> <i class="bi bi-hand-thumbs-down"></i> Thumbs-Down
+                        <input type="number" class="form-control" name="thumbs-down" id="thumbs-down" min="0" pattern="[0-9]{10}" value="0">
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
+                <button class="btn btn-primary" id="changeReactionsButton">Modifica</button>
+            </div>
+        </div>
     </div>
 </div>
 
