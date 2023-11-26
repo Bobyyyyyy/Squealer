@@ -12,13 +12,19 @@
 
 body {
     --sfondo: #ADD9F4;
-  --lineaSeparazione: #F3F4F3;
-  --activeBtn: #227ACC;
-  --normalBtn: rgba(35, 87, 137, 0.52);
-  margin: 0;
-  /*
-  background: var(--sfondo);
-  */
+    --lineaSeparazione: #F3F4F3;
+    --activeBtn: #227ACC;
+    --normalBtn: rgba(35, 87, 137, 0.52);
+    margin: 0;
+      /*
+      background: var(--sfondo);
+      */
+}
+
+.leaflet-container {
+    height: 100%;
+    width: 100%;
+    z-index: 1;
 }
 
 .imageIcon {

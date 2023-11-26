@@ -23,6 +23,10 @@ const getSessionUser = async (req,res) => {
     res.send({username: req.session.user});
 }
 
+const getUserProfilePic = async (req,res) => {
+    res.send(await userModel.getUserProfilePicture(req.session.user, mongoCredentials));
+}
+
 const updateSessionVip = async (req,res) => {
     try{
         req.session.vip = req.body.vipName;
@@ -112,4 +116,5 @@ module.exports = {
     getQuota,
     getFollnPosts,
     getLastPost,
+    getUserProfilePic
 }

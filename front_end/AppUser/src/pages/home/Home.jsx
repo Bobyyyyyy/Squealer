@@ -1,5 +1,4 @@
 import Post from "../../components/posts/Post.jsx";
-import "./styleHome.css"
 import {useEffect, useState} from "react";
 import {getAllPostFrontend, getUsernameFromLocStor} from "../../components/utils/usefulFunctions.js";
 import {useFetch} from "../../components/utils/useFetch.js";
@@ -12,6 +11,8 @@ function Home() {
     console.log("isLoading", isLoading)
     console.log("data", data);
      */
+
+
     const fetchAllPosts = async () => {
         try {
             let currentUser = getUsernameFromLocStor();
@@ -24,9 +25,9 @@ function Home() {
             }
 
             let allPosts = await res.json();
-            console.log(allPosts)
+            //console.log(allPosts)
             setPosts(allPosts);
-            console.log("num of post", allPosts.length)
+            //console.log("num of post", allPosts.length)
             setIsLoading(false)
 
         } catch (e) {
@@ -34,17 +35,19 @@ function Home() {
         }
     };
 
+    //const getCurrent
+
     useEffect(() => {
         fetchAllPosts();
     }, []);
-
+    console.log(posts);
 
     return (
         <>
             {isLoading && <h1>Caricamento...</h1>}
-            <div className={"flex flex-wrap gap-8 items-center justify-center "}>
-                {posts.map((post)=> {
-                    console.log("id",post._id)
+            <div className={"flex flex-wrap w-full gap-8 items-center justify-center h-screen pb-20 overflow-y-scroll"}>
+                {posts!==null && posts.map((post)=> {
+                    //console.log("id",post._id)
                     return(
                         <Post
                             key={post._id}

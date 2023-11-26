@@ -1,12 +1,11 @@
 import {ProfilePic} from "../assets/index.jsx"
 
-function Title({post}) {
+function Title({post, profilePic}) {
 
     let allDest = post.destinationArray.map((dest) => {
         return dest.name;
     })
     //{post.dateOfCreation}
-    console.log("title", ProfilePic);
     return (
         <>
             <div className="flex justify-between items-center px-4 py-2">

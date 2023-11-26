@@ -30,6 +30,11 @@ const UserSchema = new mongoose.Schema({
         }
     },
 
+    profilePicture: {
+        type: String,
+        required: true,
+    },
+
     characters: {
         type:{
             daily:{

@@ -1,5 +1,9 @@
-function Body({post}) {
+import MappaPost from "../../pages/addPost/MappaPost.jsx";
 
+function Body({post}) {
+    if (post.contentType === "geolocation") {
+     //   console.log(post)
+    }
     return (
         <div className={"flex justify-center"}>
             {post.contentType === "text" &&
@@ -7,6 +11,11 @@ function Body({post}) {
             }
             {post.contentType === "image" &&
                 <img className={"aspect-auto w-full"} src={post.content} alt={"image"}/>
+            }
+            {post.contentType === "geolocation" &&
+                <div className="border border-red-500 w-full h-96">
+                    <MappaPost stringCoor={post.content} />
+                </div>
             }
         </div>
     );

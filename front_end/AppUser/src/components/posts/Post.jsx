@@ -24,7 +24,7 @@ function Post({post}) {
 
     return(
     <>
-        <div className="w-96 border border-gray-200">
+        <div className="w-full border border-gray-200">
             <Title post={post} />
             <div>
 

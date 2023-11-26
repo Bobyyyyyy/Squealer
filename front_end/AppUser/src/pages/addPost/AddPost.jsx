@@ -1,17 +1,21 @@
 import {Field, Formik, Form, useFormikContext} from 'formik';
 import * as Yup from "yup";
 import {alert, Button} from "@material-tailwind/react";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {getUsernameFromLocStor} from "../../components/utils/usefulFunctions.js"
+
+import { MapContainer, TileLayer, Marker, Popup  } from 'react-leaflet'
+import Mappa from "./Mappa.jsx";
+
 
 const MAX_HEIGHT = 1200;
 const MAX_WIDTH = 1200;
 const QUALITY = 0.7;
 let imageObj = null;
+let geoPos = null;
 
 
 function AddPost () {
-
     const initialValues = {
         contentType: "text",
         destinatari: "",
@@ -31,6 +35,12 @@ function AddPost () {
             is: "image",
             then: () => Yup.string().required("Inserisci una foto")
         }),
+        /*
+        geolocation: Yup.string().when("contentType",{
+            is: "geolocation",
+            then: () => Yup.string().required("Inserisci la posizione")
+        }),
+         */
     });
 
 
@@ -51,14 +61,28 @@ function AddPost () {
          switch (values.contentType) {
              case "text":
                  content = values.testo;
-                 break
+                 break;
              case "image":
                  content = await blob2base64(await compressBlob(imageObj));
+                 console.log("imgObj",content);
+                 console.log("value",values.foto);
+                 break;
+             case "geolocation":
+                 content = JSON.stringify({
+                     lat : geoPos[0],
+                     lng: geoPos[1]
+                 });
+                 console.log("pos", content);
                  break
          }
 
          let destinations = parseDestinations(values.destinatari);
          let currUser = getUsernameFromLocStor();
+         console.log("dest", destinations)
+         console.log("currUser", currUser)
+         if (destinations.some((dest) => dest.name === currUser)) {
+             throw new Error("NON PUOI INIVIARE MESSAGGI A TE STESSO");
+         }
 
          return (
              {
@@ -71,40 +95,44 @@ function AddPost () {
          );
      }
     const onSubmit = async (values) => {
-
         console.log("form submitted" ,values);
-
         try {
             let post = await createPost(values);
-
             console.log("post", post);
-
             let res = await fetch("/db/post", {
                 method: "POST",
                 body: JSON.stringify({
                     post: post,
-                    // inserire quota
+                    quota: {
+                        daily: 300,
+                        weekly: 2100,
+                        monthly: 6000,
+                    }
                 }),
                 headers: {
                     "Content-Type": "application/json"
                 },
             });
-
             let response = await res.json();
             console.log("post inviato", response);
             /* DA SISTEMARE IL CONTROLLO DEL CORRETTO INVIO DEL POST */
-
-            if (JSON.stringify(response) === '{}') {
-                // quando invio il post correttamente ritorna {}, perché ?
+            if (response.statusCode === 422 ) {
+                window.alert("l'utente non esiste");
+            } else if (response.name) {
+                window.alert("errore nell'invio del post, controlla di aver inserito i destinatari corretti");
+            } else {
                 window.alert("hai inviato correttamente il post");
-            }
-            else {
-                window.alert("il destinatario non esiste");
             }
         } catch (e) {
             console.log("errore:", e);
+            setErrorDestinatari(true);
+            setTimeout(() => {
+                setErrorDestinatari(false);
+            }, 2000)
         }
     }
+
+    const [errorDestinatari, setErrorDestinatari] = useState(false);
 
 
     return (
@@ -132,11 +160,14 @@ function AddPost () {
                             >
                                 {errors.destinatari && touched.destinatari ? (
                                     <div className={"text-red-600"}>{errors.destinatari}</div>
+                                    ) : ((errorDestinatari) ? (
+                                        <div className={"text-red-600"}>Non puoi inviare un messaggio a te stesso</div>
                                     ) :
                                     <div className={"flex justify-between w-full"}>
                                         <span>Destinatari</span>
                                         <span className={"text-blue-400"}>(@utente, §canale)</span>
                                     </div>
+                                    )
                                 }
                             </label>
                             <Field
@@ -191,11 +222,24 @@ function AddPost () {
 const Content = ({errors, touched, ...formikProps}) => {
     const {values ,submitForm} = useFormikContext();
     const [isPreview, setIsPreview] = useState(false);
+    const [position, setPosition] = useState(null);
+
+    useEffect(() => {
+        /* const loadPos = async () =>{
+            await formikProps.setFieldValue("geolocation", position);
+            console.log("pos", position.toString())
+        }
+        loadPos();
+
+         */
+        geoPos = position;
+    }, [position]);
 
 
     return (
         <div className={"mt-4"}>
-            {values.contentType === "text" &&
+            {/* TESTO */
+                values.contentType === "text" &&
                 <>
                     <label
                         className={"block font-latoBold text-xl mb-2"}
@@ -217,7 +261,8 @@ const Content = ({errors, touched, ...formikProps}) => {
                     </Field>
                 </>
             }
-            {values.contentType === "image" &&
+            {/* IMMAGINE */
+                values.contentType === "image" &&
                 <>
                     <label
                         className={"block font-latoBold text-xl mb-2"}
@@ -259,6 +304,23 @@ const Content = ({errors, touched, ...formikProps}) => {
                         </>
                     }
                 </>
+            }
+            {/* POSIZIONE */
+                values.contentType === "geolocation" &&
+                <>
+                    <label
+                        className={"block font-latoBold text-xl mb-2"}
+                    >
+                        {errors.geolocation && touched.geolocation ? (
+                            <div className={"text-red-600"}>{errors.geolocation}</div>
+                        ) : <span>Contenuto</span>
+                        }
+                    </label>
+                    <div className="border border-red-500 w-full h-96">
+                        <Mappa setPosition={setPosition} position={position} />
+                    </div>
+                </>
+
             }
         </div>
     );

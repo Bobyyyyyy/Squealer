@@ -1,3 +1,4 @@
+import Mappa from "../addPost/Mappa.jsx";
 
 function Search ()  {
     return (
