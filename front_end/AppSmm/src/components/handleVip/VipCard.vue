@@ -53,19 +53,18 @@
   </div>
 </template>
 
-<style>
+<style scoped>
 
-
-  .vipCard{
-    width: 25rem;
-    height: 45rem;
-    border: 0.2rem solid;
-    border-radius: 6%;
-  }
 
   .postMargin{
     margin-left: 0.5rem;
     margin-right: 0.5rem;
+  }
+
+  @media screen and (max-width: 768px){
+    .vipCard{
+      width: 100vw;
+    }
   }
 
 </style>

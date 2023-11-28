@@ -109,5 +109,7 @@ const QUALITY = 0.4;
 const MAX_HEIGHT = 800;
 const MAX_WIDTH = 800;
 
+const URLHTTPREGEX = /(http|ftp|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-])/g
 
-export {smm, sideBarElements, currentVip, postType, sortPosts, filterValues, reactionsIcons, QUALITY, MAX_WIDTH, MAX_HEIGHT, smartPhone, expanded}
+
+export {smm, sideBarElements, currentVip, postType, sortPosts, filterValues, reactionsIcons, QUALITY, MAX_WIDTH, MAX_HEIGHT, smartPhone, expanded, URLHTTPREGEX}

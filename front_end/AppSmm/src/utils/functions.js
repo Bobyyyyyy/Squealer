@@ -1,6 +1,6 @@
 
-import {smm, currentVip, QUALITY, MAX_HEIGHT, MAX_WIDTH} from './config.js'
-import {useStore} from "vuex";
+import {currentVip, QUALITY, MAX_HEIGHT, MAX_WIDTH, URLHTTPREGEX} from './config.js'
+
 function getPage(){
     return window.location.pathname.split('/')[2];
 }
@@ -168,6 +168,27 @@ function parseReactionType(reactions){
     return reactionType;
 }
 
+const parseContentText = (content, tag) => {
+    console.log(typeof content);
+    let links = content.match(URLHTTPREGEX);
+
+    if(links){
+        let content_noLink = '';
+        links.forEach(link => {content_noLink = content.replace(link,'__SPLIT__').split('__SPLIT__')});
+
+        let html = "";
+        //str_no_links.length > links.length SEMPRE
+        for (let i = 0; i < content_noLink.length; i++){
+            html += `<${tag}> ${content_noLink[i]}`
+            if(typeof links[i] !== 'undefined')
+                html += `<a href=${links[i]} target=”_blank”>${links[i]}</a>`
+            html += `</${tag}>`
+        }
+        return html;
+    }
+    else return `<${tag}>${content}</${tag}>`;
+}
+
 export{
     getPage,
     getPosts,
@@ -181,5 +202,6 @@ export{
     parseReactionDate,
     parseReactionType,
     getLength,
-    getLast30Days
+    getLast30Days,
+    parseContentText
 }

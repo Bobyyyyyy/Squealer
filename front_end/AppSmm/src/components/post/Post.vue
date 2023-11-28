@@ -2,7 +2,8 @@
   import HeaderPost from "./HeaderPost.vue"
   import FooterPost from "./FooterPost.vue"
   import PostMap from "./PostMap.vue";
-  import {computed, onMounted} from "vue";
+  import {computed} from "vue";
+  import {parseContentText} from "../../utils/functions.js";
 
   const props = defineProps({
     user: String,
@@ -27,11 +28,13 @@
     }
     return true;
   })
+
+  const htmlContent = computed(() => parseContentText(props.content,'h4'))
 </script>
 
 
 <template>
-  <div class="card mb-4 d-flex flex-column justify-content-between mt-1 setDim">
+  <div class="card mb-4 d-flex flex-column justify-content-between mt-1 postDim">
     <div class="justify-content-center h-100">
       <HeaderPost
           :name= "user"
@@ -40,15 +43,13 @@
           :dateCreation="creationDate"
       />
       <div class="d-flex flex-row justify-content-center text-center align-items-center">
-        <!-- SI devono poter inserire anche altre cose, non solo immagini! Swtich in base al tipo di messaggio? -->
         <img v-if="contentType==='image'" :src="content"  alt="silly cat" class="img-fluid w-100 h-100 object-fit-fill" />
         <postMap v-if="contentType==='geolocation'"
                  :latlng = "JSON.parse(content)"
                  :mapID = "getIdMap()"
         />
-        <p v-if="contentType === 'text'" class="mb-0">
-          {{content}}
-        </p>
+        <div v-if="contentType === 'text'" class="mb-0 text-center m-2 mb-2 align-self-center" v-html="htmlContent">
+        </div>
       </div>
     </div>
     <div v-if="!onlyUser">
@@ -64,14 +65,14 @@
 
 <style>
 
-  .setDim{
+  .postDim{
     width: 40rem;
     height: auto;
   }
 
   @media screen and (max-width: 768px) {
-    .setDim{
-      max-width: 100%;
+    .postDim{
+      width: 100%;
     }
   }
 

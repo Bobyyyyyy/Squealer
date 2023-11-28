@@ -2,7 +2,7 @@
   import {computed, ref} from "vue";
   import Map from "./Map.vue";
   import Dropdown from "../Dropdown.vue";
-  import {blob2base64,compressBlob} from "../../utils/functions.js";
+  import {blob2base64, compressBlob, parseContentText} from "../../utils/functions.js";
   import {currentVip} from "../../utils/config.js";
   import {useStore} from "vuex";
 
@@ -26,6 +26,7 @@
 
   /* TEXT */
   const textSqueal = ref('')          //get text of squeal. Only in text squeal.
+  const html = computed(() => parseContentText(textSqueal.value,'h3'))
 
   /* IMAGE */
   const imgPath = ref('')             //live change of input value in URL insert.
@@ -33,6 +34,11 @@
   const showImg = ref(false)          //show preview photo of inserted URL
   const fileUploaded = ref({});       //get info of file uploaded (NOT URL).
   const canUploadFile = computed(() => imgPath.value === '' || currentImgPath.value === '');
+
+  /* VIDEO */
+  const videoPath = ref('');
+  const currentVideoPath = ref('');
+  const showVideo = ref(false);
 
   /* MAP */
   const mapLocationLatLng = ref({});  //get [lat,lon] of current position.
@@ -46,14 +52,6 @@
   const getLiveWQuota = computed(()=> (store.getters.getQuota.weekly - (inChannel.value ? quota2remove.value : 0)));
   const getLiveMQuota = computed(()=> (store.getters.getQuota.monthly - (inChannel.value ? quota2remove.value : 0)));
 
-/*
-  async function getCamera(){
-    navigator?.mediaDevices.getUserMedia({video: true})
-        .then((success) => {
-          console.log(success);
-        })
-  }
- */
 
   function parseDestinations(){
     console.log(receiverArr.value);
@@ -140,11 +138,7 @@
     currentImgPath.value = URL.createObjectURL(fileUploaded.value[0]);
     showImg.value = true
   }
-/*
-  onUpdated(()=> {
-    if (postType.value === 'image') getCamera()
-  })
- */
+
 </script>
 
 <template>
@@ -179,13 +173,18 @@
                       <li class="dropdown-item" role="button" @click="postType = 'text'"> text </li>
                       <li class="dropdown-item" role="button" @click="postType = 'geolocation'"> geolocation </li>
                       <li class="dropdown-item" role="button" @click="postType = 'image'"> image </li>
+                      <li class="dropdown-item" role="button" @click="postType = 'video'"> video </li>
                     </ul>
                   </div>
                 </div>
-                <div class="m-1">
+                <div class="m-1 w-100">
 
                   <textarea v-if=" postType==='text'" rows="6" v-model="textSqueal"  class="form-control"></textarea>
-
+                  <div v-if="textSqueal.length > 0" class="w-75 align-items-center">
+                    <span v-html="html"></span>
+                    <br>
+                    <h5>E' stato rilevato un link. Preferisci crearne uno breve? </h5>
+                  </div>
                   <div v-if="postType === 'image'"  class="d-flex flex-column">
                     <div class="d-flex flex-row justify-content-between flex-wrap">
                       <div class="d-flex flex-column">
@@ -210,10 +209,28 @@
                       <img class="img-fluid object-fit-contain" :src="currentImgPath" alt="Path non trovato">
                     </div>
                   </div>
+
                   <Map v-if="postType === 'geolocation'"
                        class="map"
                        :currentlatlng="mapLocationLatLng"
                   />
+
+                  <div v-if="postType === 'video'" class="w-100 d-flex flex-column">
+                    <div class="d-flex flex-column">
+                      <label for="pathImgForm" class="form-label">Insert video URL</label>
+                      <div class="input-group d-flex flex-row">
+                        <input type="text" placeholder="insert URL" id="pathVideoForm" v-model="videoPath" >
+                        <button type="button" class="btn btn-secondary" @click=" currentVideoPath = videoPath; showVideo = true">
+                          Preview
+                        </button>
+                      </div>
+                    </div>
+
+                    <div v-if="showVideo" id="videoAddPost" class=" d-flex flex-row justify-content-center">
+                      <iframe :src="currentVideoPath" title="preview video" width="100%" height="100%"></iframe>
+                    </div>
+                  </div>
+
                 </div>
                 <div :class="getLiveDQuota < 0 || getLiveWQuota < 0 ? 'justify-content-evenly':'justify-content-center'" class="d-flex flex-row">
                   <h6 v-if="getLiveDQuota < 0">extra daily quota: {{-getLiveDQuota}}</h6>

@@ -1,6 +1,6 @@
 <script setup>
   import {onMounted, onUnmounted, reactive, ref} from "vue";
-  import {currentVip, filterValues, postType, sortPosts} from "../utils/config.js"
+  import {currentVip, filterValues, postType, smartPhone, sortPosts} from "../utils/config.js"
   import {getPosts, getUserInfo, getUserQuota, parseDestinations} from "../utils/functions.js";
   import Post from "../components/post/Post.vue";
   import Dropdown from "../components/Dropdown.vue";
@@ -71,23 +71,23 @@
 
   let scrollendHandler = async () => await(updatePost())
 
-onMounted(async ()=> {
-    readyPosts.value = false
+  onMounted(async ()=> {
+      readyPosts.value = false
 
-    n_post.value = (await getUserInfo()).nposts;
+      n_post.value = (await getUserInfo()).nposts;
 
-    window.addEventListener("scrollend", scrollendHandler);
+      window.addEventListener("scrollend", scrollendHandler);
 
-    let quota = await getUserQuota();
+      let quota = await getUserQuota();
 
-    store.commit('setQuota', quota.characters);
+      store.commit('setQuota', quota.characters);
 
-    query = `name=${currentVip.value}`
+      query = `name=${currentVip.value}`
 
-    curPosts.push(...(await getPosts(query, 0)));
+      curPosts.push(...(await getPosts(query, 0)));
 
-    readyPosts.value = true
-  })
+      readyPosts.value = true
+    })
 
   onUnmounted(() => {
     window.removeEventListener("scrollend",scrollendHandler);
@@ -102,53 +102,43 @@ onMounted(async ()=> {
     <div class="marginCD">
       <div class="d-flex flex-row justify-content-center  profileDim">
         <div class="aspect-ratio object-fit-fill profileDim">
-          <img :src= "profilePicturePath" alt="pippo" class="img-fluid" />
+          <img :src= "profilePicturePath" alt="pippo" class="img-fluid rounded-circle" />
         </div>
       </div>
-      <div class="d-flex flex-row w-100 justify-content-between">
-        <div class="d-flex flex-column ">
-          <div>
-            <p class="m-0">{{follower}} Followers</p>
-          </div>
-          <div>
-            <p class="m-0">{{n_post}} Posts</p>
-          </div>
-        </div>
-        <div>
-          <p class="m-0 fs-3 text-center">{{ currentVip }}</p>
-        </div>
-        <div>
-          <p class="m-0">Quota rimanente:</p>
-            <p>{{[store.getters.getQuota.daily,store.getters.getQuota.weekly,store.getters.getQuota.monthly].join('/')}}</p>
-        </div>
-      </div>
-      <div class="d-flex flex-row justify-content-between">
-        <div class="d-flex flex-row justify-content-around align-items-center setFlexDirection">
-          <Dropdown
-              :filterRef="destFilter"
-              :dropItems="filterValues"
-              updateRef = 'updateDestFilter'
-              @updateDestFilter = updateDestFilter
-          />
-          <div v-if="keyWordFilter" class="ms-1">
-            <input type="text" placeholder="Keyword..." />
-          </div>
-        </div>
 
-        <div class="d-flex flex-row justify-content-evenly setFlexDirection">
+    <h2 class="m-0 text-center fw-bold">{{'@'+currentVip }}</h2>
+    <h6 class="mt-1 text-center mb-0">{{[store.getters.getQuota.daily,store.getters.getQuota.weekly,store.getters.getQuota.monthly].join(' | ')}}</h6>
+     <p class="m-0 text-center mt-1 mb-0">{{n_post}} Squeal </p>
 
+      <div class="d-flex flex-column align-items-start">
+        <div class="d-flex flex-row justify-content-around align-items-center">
           <Dropdown class="buttonDropDown"
+                    :filterRef="destFilter"
+                    :dropItems="filterValues"
+                    classButton="btn btn-secondary"
+                    updateRef = 'updateDestFilter'
+                    @updateDestFilter = updateDestFilter
+          />
+          <Dropdown class="ms-1 buttonDropDown"
+                    classButton="btn btn-secondary"
                     :filterRef="typePostFilter"
                     :dropItems="postType"
                     updateRef = 'updatePostType'
                     @updatePostType = updatePostType
           />
           <Dropdown  class="ms-1 buttonDropDown"
+                     classButton="btn btn-secondary"
                      :filterRef="sortFilter"
                      :dropItems="sortPosts"
                      updateRef = 'updateSort'
                      @updateSort = updateSortFilter
           />
+          <div v-if="keyWordFilter && !smartPhone" class="ms-1">
+            <input type="text" placeholder="Keyword..." />
+          </div>
+        </div>
+        <div v-if="smartPhone && keyWordFilter" class="ms-1">
+          <input type="text" placeholder="BOH..." />
         </div>
       </div>
       <div id="postContainer" v-if="readyPosts" class="d-flex flex-row flex-wrap justify-content-around mt-3">
@@ -171,18 +161,13 @@ onMounted(async ()=> {
 <style>
 
   .profileDim{
-    height: 20vh;
+    max-height: 30vh;
   }
 
   @media screen and (max-width: 768px) {
 
     .profileDim{
-      max-height: 10vh;
-    }
-
-    .setFlexDirection{
-      margin-bottom: 0;
-      flex-direction: column !important;
+      max-height: 15vh;
     }
 
     .buttonDropDown{

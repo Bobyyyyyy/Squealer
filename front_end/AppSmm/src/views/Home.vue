@@ -1,14 +1,19 @@
 <script setup>
   import NavBar from "../components/navbar/NavBar.vue";
   import {smartPhone, smm} from "../utils/config.js"
+  import {ref} from "vue";
+  import Spinner from "../components/post/Spinner.vue";
+
+  const ready = ref(false);
 
 </script>
 
 <template>
-  <NavBar center-text="SMM Dashboard" :welcomingPage="true"/>
-  <div class="d-flex flex-row justify-content-around principalDiv flex-wrap" style="max-height: 90vh">
+  <Spinner v-if="!ready" />
+  <NavBar v-show="ready" center-text="SMM Dashboard" :welcomingPage="true"/>
+  <div v-show="ready" class="d-flex flex-row justify-content-around principalDiv flex-wrap" style="max-height: 90vh">
     <div class="d-flex flex-column align-self-center sameWidth" >
-      <div class="d-flex flex-row w-100 justify-content-center" style="max-width: 40rem; ">
+      <div class="d-flex flex-row w-100 justify-content-center">
         <div class="d-flex flex-column">
           <h1 class="text-center">Benvenuto, {{smm}} </h1>
           <h1 class="text-center">Scegli come accedere!</h1>
@@ -27,7 +32,7 @@
       </div>
     </div>
     <div class=" d-flex" :class="smartPhone ?'align-items-start' : 'sameWidth align-items-center'"  style="max-width: 40rem">
-      <img src="/img/logo.png" alt="silly cat" class="img-fluid object-fit-contain" />
+      <img src="/img/logo.png" alt="silly cat" class="img-fluid object-fit-contain" @load="ready = true" />
     </div>
   </div>
 
@@ -38,7 +43,5 @@
   .topMargin{
     margin-top: 5vh;
   }
-  .botMargin{
-    margin-bottom: 4vh
-  }
+
 </style>

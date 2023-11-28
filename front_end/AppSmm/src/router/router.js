@@ -28,4 +28,8 @@ router.beforeEach(async (to)=> {
     return true;
 })
 
+router.afterEach(() => {
+    window.scrollTo(0,0);
+})
+
 export {router};

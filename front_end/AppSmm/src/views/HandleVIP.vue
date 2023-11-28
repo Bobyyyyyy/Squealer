@@ -1,11 +1,12 @@
 <script setup>
-  import NavBarWel from "../components/navbar/NavBar.vue";
+  import NavBar from "../components/navbar/NavBar.vue";
   import VipCard from "../components/handleVip/VipCard.vue";
   import VipModal from "../components/handleVip/VipModal.vue";
   import {Modal} from 'bootstrap'
   import {onMounted, reactive, ref} from "vue";
   import {getLastPost} from "../utils/functions.js";
   import {smm} from "../utils/config.js";
+  import Spinner from "../components/post/Spinner.vue";
 
   let vips = [];
   let lastVipsPost = [];
@@ -14,6 +15,7 @@
 
   const name2Use = ref('')
   const requestCompleted = ref(false);
+  const readyPage = ref(false);
 
   onMounted(async ()=>{
     modalState.myModal = new Modal('#choiceModal',{});
@@ -23,8 +25,7 @@
     })
     vips = await res.json()
     for (let i = 0; i < vips.length; i++) {
-      let lastPost =  (await getLastPost(vips[i])).post;
-      lastVipsPost[i] =lastPost
+      lastVipsPost[i] = (await getLastPost(vips[i])).post;
     }
 
     requestCompleted.value=true;
@@ -43,8 +44,12 @@
 </script>
 
 <template>
-  <NavBarWel center-text="Scegli account da gestire" :welcomingPage="true" />
-  <div class="d-flex flex-row align-items-center flex-wrap justify-content-evenly mt-lg-3" v-if="requestCompleted">
+  <Spinner v-if="!readyPage" />
+  <NavBar v-show="readyPage"
+          center-text="Scegli account da gestire"
+          :welcomingPage="true"
+          @imgLoaded="console.log('ENTRO');readyPage = true"/>
+  <div v-show="readyPage"  class="d-flex flex-row flex-wrap justify-content-evenly" v-if="requestCompleted">
     <VipCard v-for="(vip,index) in vips"
             :key="index"
             :followers="100"

@@ -15,7 +15,7 @@
 
 @media screen and (max-width: 768px){
     .allPage{
-        width: 100%;
+        width: 100vw;
         margin-left: 0;
         margin-bottom: 15%;
     }
@@ -24,6 +24,10 @@
         margin-right: 0 !important;
         width: 100vw;
         height: 100vh;
+    }
+    .marginCD{
+        margin-left: 2%;
+        margin-right: 2%;
     }
 }
 

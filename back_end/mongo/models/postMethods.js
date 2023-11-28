@@ -192,6 +192,7 @@ const addTimedPost = async (postId, credentials) => {
  */
 const addPost = async (post,quota,credentials) => {
     try{
+        console.log(post);
         await connectdb(credentials)
         let destinations = ((typeof post.destinations) === 'string') ? JSON.parse(post.destinations) : post.destinations;
         let postCategory = 'private';
@@ -207,7 +208,7 @@ const addPost = async (post,quota,credentials) => {
                 throw createError("utente non esistente!", 422);
             }
             /* canale non esiste  */
-            else if (destinationType === 'channel' && channel.length === 0) {
+            else if (destinationType === 'channel' && channel?.length === 0) {
                 await mongoose.connection.close();
                 throw createError("canale non esistente!", 422);
             }

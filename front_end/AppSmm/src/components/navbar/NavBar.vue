@@ -1,15 +1,16 @@
 <script setup>
 
   import {smartPhone} from "../../utils/config.js";
+  import Dropdown from "../Dropdown.vue";
 
   defineProps({
     centerText: String,
     welcomingPage: Boolean,
+
   })
 
-
-  //è una get la logout??
   async function logout(){
+    //TODO : DA GET A PUT --> modifica sessione
     let res = await fetch("/logout");
     window.location.href= res.url;
   }
@@ -18,11 +19,11 @@
 
 <template>
   <nav class="navbar navbar-expand-lg bg-body-tertiary maxHNav navBar">
-    <div class="d-flex flex-row justify-content-between maxHNav">
+    <div class="d-flex flex-row justify-content-start maxHNav">
       <div class="maxHNav sameWidth">
-        <img v-if="welcomingPage" alt="logo" src="/img/logo.png" class="h-100 img-fluid object-fit-contain">
+        <img v-if="welcomingPage" alt="logo" src="/img/logo.png" class="h-100 img-fluid object-fit-contain"  @load="this.$emit('imgLoaded')">
         <router-link v-else to="/SMM/Profile" class="d-flex justify-content-center mb-3 h-100">
-          <img alt="logo" src="/img/logo.png" class="img-fluid">
+          <img alt="logo" src="/img/logo.png" class="img-fluid" @load="this.$emit('imgLoaded')">
         </router-link>
       </div>
       <div class="sameWidth d-flex align-items-center justify-content-center" style="flex-grow: 2">
@@ -30,25 +31,42 @@
         <h2 v-else class="mb-0 fw-bold text-center">{{centerText}}</h2>
       </div>
       <div class="sameWidth align-items-center justify-content-end" >
-        <button type="button"
+        <button v-if="welcomingPage" type="button"
                 class="btn btn-outline-danger"
                 @click="logout"
         >LOGOUT</button>
+        <Dropdown v-else-if="smartPhone"
+                  classButton="btn btn-outline-danger"
+                  classDropDown="dropstart"
+                  updateRef="updatePage"
+                  :dropItems="['Logout', 'cambia VIP']"
+                  @updatePage="async (el) => {
+                    if (el === 'cambia VIP') this.$router.push('/SMM/handlevip');
+                    else await logout();
+                  }"
+        />
       </div>
     </div>
   </nav>
 </template>
 
-<style>
+<style scoped>
 
 .navBar{
-  padding-right: 1vw;
-  padding-left: 1vw;
+  padding-right: 2vw;
+  padding-left: 2vw;
 }
 
 .maxHNav{
   min-height: 6rem;
   max-height: 10vh;
+}
+
+@media screen and (max-width: 768px)  {
+  .maxHNav{
+    min-height: 4rem;
+    max-height: 6vh;
+  }
 }
 
 </style>
