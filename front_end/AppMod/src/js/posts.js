@@ -1,4 +1,4 @@
-let User = $('#session-user').html();
+const User = $('#session-user').html();
 let post = ''
 
 let LastCall = {
@@ -101,6 +101,7 @@ const showPosts = (filters,append = false) => {
                                 </button>
                                 <ul class="dropdown-menu">
                                     <li onclick = "post = '${post._id}'" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#changeReactions"> Modifica Reazioni</li>
+                                     <li onclick = "post = '${post._id}'" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#changeDestination"> Modifica Destinatari</li>
                                 </ul>
                             </div>
                             
@@ -298,7 +299,25 @@ $('#changeReactionsButton').on('click',() => {
     })
 })
 
+$('#addDestinationButton').on('click',() => {
+    let destination = {
+        destType: $('#type-select option:selected').val(),
+        name: $('#destination-name').val(),
+    }
 
+    $.ajax({
+        url: '/db/post/destination',
+        data: { destination: destination, postID: post},
+        type: 'put',
+        success: (data) => {
+            location.reload();
+        },
+        error: (error) => {
+            alert(error.responseJSON.mes);
+        }
+    })
+
+})
 
 
 $(document).ready(() => {

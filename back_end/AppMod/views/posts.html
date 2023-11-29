@@ -43,7 +43,7 @@
 
         <div class="navbar-collapse collapse dual-collapse2" style="flex-basis: 100%">
             <div class="ms-auto"></div>
-            <span class="navbar-text text-white ms-auto me-2"> @ <span id="session-user">${user}</span>
+            <span class="navbar-text text-white ms-auto me-2"> @<span id="session-user">${user}</span>
             </span>
             <button class="btn btn-light btn-outline-danger" onclick="window.location.href = '/logout'">Logout</button>
         </div>
@@ -69,7 +69,7 @@
 
             <div class="d-flex flex-row ms-auto">
                 <div id="channel-visual" class="btn-group ms-3 btn-group" role="group" aria-label="Basic radio toggle button group">
-                    <input type="radio" class="btn-check" name="filters" id="filter-all" value="" autocomplete="off">
+                    <input type="radio" class="btn-check" name="filters" id="filter-all" value="" autocomplete="off" checked>
                     <label class="btn btn-success" for="filter-all">All</label>
 
                     <input type="radio" class="btn-check" name="filters" id="filter-popular" value="popular" autocomplete="off">
@@ -142,6 +142,39 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="changeDestination" tabindex="-1" aria-labelledby="changeDestinationModal" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-info">
+                <h1 class="modal-title fs-5 fw-bold">Aggiungi destinatario</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div>
+                    <select id="type-select" class="form-select" aria-label="Post type select" autocomplete="off">
+                        <option value="user" selected>Utente</option>
+                        <option value="channel">Canale</option>
+                        <option value="official">Canale Ufficiale</option>
+                    </select>
+                </div>
+
+                <div class="form-group d-flex align-items-center flex-column">
+                    <div id="content" class="mt-2" style="width: 100%">
+                        <label for="destination-name" class="form-label w-100" style>
+                            <textarea class="form-control" name="destination-name" id="destination-name" rows="1" placeholder="Inserisci nome della destinazione" style="resize: none" data-role="none" autocomplete="off"></textarea>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
+                <button type="submit" id="addDestinationButton" class="btn btn-primary">Inserisci</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>

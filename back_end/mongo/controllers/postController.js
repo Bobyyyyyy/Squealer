@@ -1,6 +1,7 @@
 const {mongoCredentials} = require('../models/utils.js')
 const postModel = require("../models/postMethods");
 const {createScheduledPost} = require("./CronController");
+const {mongo} = require("mongoose");
 
 
 const createPost = async (req,res) => {
@@ -85,7 +86,15 @@ const postLength = async (req,res) => {
     catch (error) {
         res.send(error);
     }
+}
 
+const addDestination = async(req,res) => {
+    try {
+        res.send(await postModel.addDestination(req.body.destination, req.body.postID, mongoCredentials));
+    }
+    catch (error) {
+        res.status(400).send(error);
+    }
 }
 
 module.exports = {
@@ -96,5 +105,6 @@ module.exports = {
     removePost,
     getPostsDate,
     getReactionLast30days,
-    postLength
+    postLength,
+    addDestination
 }

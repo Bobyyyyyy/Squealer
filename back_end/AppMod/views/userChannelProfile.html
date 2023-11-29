@@ -68,20 +68,21 @@
                 <div class="mt-2">Followers:  <span class="fw-bold" id="followers"></span></div>
                 <div class="ms-2 mt-2">Numero di post: <span class="fw-bold" id="posts-number"></span></div>
             </div>
-            <div class="mt-3 flex-row d-flex">Filters:
-            <div id="post-filters" class="btn-group" role="group" aria-label="Radio toggle button for type of posts">
-                <input type="radio" class="btn-check" name="filters" id="filter-all" value="" checked>
-                <label class="btn btn-light" for="filter-all">Mostra tutti</label>
+            <div class="d-flex flex-row align-items-center pt-4">
+                <div class="me-2">Filters: </div>
+                <div id="post-filters" class="btn-group" role="group" aria-label="Radio toggle button for type of posts">
+                    <input type="radio" class="btn-check" name="filters" id="filter-all" value="" checked>
+                    <label class="btn btn-light" for="filter-all">Mostra tutti</label>
 
-                <input type="radio" class="btn-check" name="filters" id="filter-text" value="text">
-                <label class="btn btn-light" for="filter-text">Testo</label>
+                    <input type="radio" class="btn-check" name="filters" id="filter-text" value="text">
+                    <label class="btn btn-light" for="filter-text">Testo</label>
 
-                <input type="radio" class="btn-check" name="filters" id="filter-image" value="image">
-                <label class="btn btn-light" for="filter-image">Immagini</label>
+                    <input type="radio" class="btn-check" name="filters" id="filter-image" value="image">
+                    <label class="btn btn-light" for="filter-image">Immagini</label>
 
-                <input type="radio" class="btn-check" name="filters" id="filter-geo" value="geolocation">
-                <label class="btn btn-light" for="filter-geo">Geolocalizzazione</label>
-            </div>
+                    <input type="radio" class="btn-check" name="filters" id="filter-geo" value="geolocation">
+                    <label class="btn btn-light" for="filter-geo">Geolocalizzazione</label>
+                </div>
 
                 <div class="ms-auto">
                     <div class="btn btn-danger" id="block-button"> Blocca </div>

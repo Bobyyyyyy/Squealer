@@ -354,7 +354,7 @@ const removeDestination = async (destination,postID,credentials)=> {
     try {
         await connectdb(credentials);
 
-        let channel = await Channel.findOne({name: destination});
+
 
         let checkArrayDestination = await Post.findByIdAndUpdate(postID, {$pull: { destinationArray: {name: destination}}}, {new: true});
 
@@ -372,6 +372,51 @@ const removeDestination = async (destination,postID,credentials)=> {
     }
     catch (error) {
         throw err;
+    }
+}
+
+/**
+ * @param destination
+ * @param postID
+ * @param credentials
+ * @returns {Promise<void>}
+ * Aggiunge una destinazione a un post
+ */
+
+const addDestination = async (destination,postID,credentials) => {
+    try {
+        await connectdb(credentials);
+        console.log(destination,postID);
+        switch (destination.destType) {
+            case 'user':
+                let user = await User.findOne({username: destination.name})
+                if(!user) {
+                    throw createError('Utente non esiste',400);
+                }
+                break;
+
+            case 'channel':
+                let channel = await Channel.findOne({name: destination.name});
+                if(!channel) {
+                    throw createError('Canale Non esiste',400);
+                }
+                await Channel.findOneAndUpdate({'name': destination.name}, {'postNumber': channel.postNumber+1})
+                break;
+
+            case 'official':
+                let officialChannel = await ReservedChannel.findOne({name: destination.name});
+                if(!officialChannel) {
+                    throw createError('Canale Non esiste',400);
+                }
+
+                break;
+        }
+
+        await Post.findByIdAndUpdate(postID,{$push: {destinationArray: destination}},{new : true});
+
+    }
+    catch (error) {
+        throw error
     }
 }
 
@@ -393,7 +438,6 @@ const deletePost = async (postID,credentials) => {
 const updateReac = async (body,credentials) => {
     try{
         await connectdb(credentials);
-        console.log(body)
         let user = await User.findOne({username: body.user});
 
         if(user.typeUser === 'mod') {
@@ -535,7 +579,6 @@ const getLastPostUser = async (query,credentials) => {
 const postLength = async (filters,credentials) => {
     try {
         await connectdb(credentials);
-        console.log(filters)
         let filter = {
             /* Per i canali non mi serve l'id dell'utente che fa la richiesta, a meno che non sia SMM*/
             ...((filters.smm || !filters.channel) && filters.name) && {'owner':  {$regex: filters.name , $options: 'i'}},
@@ -578,5 +621,6 @@ module.exports = {
     addTimedPost,
     getPostsDate,
     getReactionLast30days,
-    postLength
+    postLength,
+    addDestination
 }

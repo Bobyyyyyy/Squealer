@@ -5,6 +5,7 @@ const router = express.Router();
 
 /* Post Methods */
 router.post('/',postController.createPost);
+router.put('/destination',postController.addDestination);
 router.post('/delete',postController.removePost);
 router.get('/all',postController.getPosts);
 router.put('/updateReaction', postController.updateReaction);
