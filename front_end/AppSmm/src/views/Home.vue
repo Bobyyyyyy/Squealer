@@ -26,7 +26,7 @@
         <div class="d-flex align-items-center">
           <button type="button"
                   class="btn btn-primary btn-lg"
-                  @click=" this.$router.push('/SMM/handlevip')"
+                  @click=" this.$router.push('/SMM/sceltavip')"
                   >SMM</button>
         </div>
       </div>

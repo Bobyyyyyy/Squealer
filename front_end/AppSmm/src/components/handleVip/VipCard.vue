@@ -1,6 +1,6 @@
 <script setup>
   import Post from "../post/Post.vue";
-  import {parseDestinations} from "../../utils/functions.js";
+  import {parseDestinationsViewPost} from "../../utils/functions.js";
   import {computed, onMounted} from "vue";
   let srcImg="/img/profilePicture.png";
 
@@ -33,7 +33,7 @@
       <div v-if="!noPost" class="d-flex flex-row justify-content-center">
         <Post
             :user="post.owner"
-            :dest= "parseDestinations(post.destinationArray)"
+            :dest= "parseDestinationsViewPost(post.destinationArray, post.tags)"
             :content="post.content"
             :creationDate="new Date(post.dateOfCreation)"
             :reactions = "post.reactions"

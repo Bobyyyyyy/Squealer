@@ -185,14 +185,13 @@ const addTimedPost = async (postId, credentials) => {
 
 /**
  * @param {Object} post
- * {creator: String, destination: array of objects{name: String, destType: String}, contentType: String, content: String, dateOfCreation: Date }
+ * {creator: String, destination: array of objects{name: String, destType: String}, contentType: String, content: String, dateOfCreation: Date , tags: Array<String>}
  * @param {Object} quota - {daily,weekly-monthly} - remaining updated
  * @param credentials - mongo credentials
  * @returns {Promise<{postId: *}>}
  */
 const addPost = async (post,quota,credentials) => {
     try{
-        console.log(post);
         await connectdb(credentials)
         let destinations = ((typeof post.destinations) === 'string') ? JSON.parse(post.destinations) : post.destinations;
         let postCategory = 'private';
@@ -253,6 +252,7 @@ const addPost = async (post,quota,credentials) => {
             category: postCategory,
             popularity: 'neutral',
             dateOfCreation: post.dateOfCreation,
+            tags: post.tags
         })
 
         await newPost.save();

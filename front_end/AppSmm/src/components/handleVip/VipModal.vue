@@ -42,8 +42,8 @@ import {currentVip} from "../../utils/config.js";
                       "
                       async ()=>{
                       await updateSes();
-                      this.$router.push('/SMM/Profile');
                       $emit('closeModal');
+                      this.$router.push('/SMM/Profilo');
                       }
                       ">
           Si, continua</button>

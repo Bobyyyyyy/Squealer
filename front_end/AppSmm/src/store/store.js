@@ -28,7 +28,6 @@ export const store = createStore({
             state.remainingQuota.daily = quota.daily;
             state.remainingQuota.weekly = quota.weekly;
             state.remainingQuota.monthly = quota.monthly;
-            console.log("SETTATA");
         },
         uploadQuota (state, used) {
             state.remainingQuota.daily -= used;

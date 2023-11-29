@@ -82,10 +82,11 @@ const PostSchema = new mongoose.Schema({
     }],
 
 
-    //TODO
-    tag: {
-        type: String,
-    },
+    tags: [
+        {
+            type: String,
+        }
+    ],
 
 })
 

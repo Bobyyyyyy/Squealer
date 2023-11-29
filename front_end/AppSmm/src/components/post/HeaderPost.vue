@@ -4,7 +4,7 @@
     name: String,
     dest: String,
     srcImg: String,
-    dateCreation: Date,
+    dateCreation: Date
   })
 
   function parseTime(){
@@ -27,7 +27,7 @@
   <div class="card-header d-flex justify-content-between header_post w-100">
     <div class="d-flex justify-content-start align-items-center w-100">
       <img :src=" srcImg " alt="immagine profilo" class="imgFluid rounded-circle" />
-      <div class="d-flex flex-column dimOverflowText">
+      <div class="d-flex flex-column dimOverflowText flex-fill">
         <h3 class="mb-0 setMargin"> {{ name }} </h3>
         <!--<h5 v-if="getPage() !=='Channels'" @click="go2Channel" type="button" class="mb-0" id="ChannelName"> {{dest}} </h5>-->
         <p v-tooltip="dest" type="text" class="mb-0 overflow-hidden" id="ChannelName" style="white-space: nowrap; text-overflow: ellipsis"> {{dest}} </p>

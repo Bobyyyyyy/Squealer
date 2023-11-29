@@ -1,7 +1,7 @@
 <script setup>
   import {computed, ref} from "vue";
   import Map from "./Map.vue";
-  import Dropdown from "../Dropdown.vue";
+  import Dropdown from "../Select.vue";
   import {blob2base64, compressBlob, parseContentText} from "../../utils/functions.js";
   import {currentVip} from "../../utils/config.js";
   import {useStore} from "vuex";
@@ -39,6 +39,17 @@
   const videoPath = ref('');
   const currentVideoPath = ref('');
   const showVideo = ref(false);
+  function getEmbed(url) {
+    let regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    let match = url.match(regExp);
+
+    if (match && match[2].length === 11) {
+      return match[2];
+    } else {
+      return 'error';
+    }
+  }
+  const youtubePath = computed(() => `//www.youtube.com/embed/${getEmbed(currentVideoPath.value)}`)
 
   /* MAP */
   const mapLocationLatLng = ref({});  //get [lat,lon] of current position.
@@ -54,39 +65,46 @@
 
 
   function parseDestinations(){
-    console.log(receiverArr.value);
-    let arr = [];
+    let dest = [];
+    let tags = []
     receiverArr.value.forEach(receiver => {
-      arr.push({
-        name: receiver.substring(1),
-        destType: receiver.startsWith('§') ? 'channel' : receiver.startsWith('@') ? 'user' : 'errore',
-      })
+      if(receiver.startsWith('#')){
+        tags.push(receiver.substring(1));
+      }
+      else{
+        dest.push({
+          name: receiver.substring(1),
+          destType: receiver.startsWith('§') ? 'channel' : receiver.startsWith('@') ? 'user' : 'errore',
+        })
+      }
+
     })
-    return arr;
+    return [dest, tags];
   }
 
   async function createPost() {
     try{
 
-      /* #, to create channel by hashtag */
-      /*
       let tags = [];
       if (postType.value === 'text'){
         tags = textSqueal.value.match(/\#\w+/g)
+        tags = tags.map(el => el.substring(1));
       }
-       */
 
+      let [tmpDest, tmpTags] = parseDestinations(receiverArr.value);
+      tags = tags.concat(tmpTags);
 
       let post = {
         creator: currentVip.value,
         contentType: postType.value,
         dateOfCreation: Date.now(),
-        destinations: parseDestinations(receiverArr.value),
+        destinations: tmpDest,
         timed: timed.value,
         ... (timed) && {
           squealNumber: numberOfRepetitions.value,
           frequency: [numFrequency.value.toString(),typeFrequency.value].join(' ')
-        }
+        },
+        tags: tags
       }
 
 
@@ -150,7 +168,7 @@
             <h4 class="mb-0 text-center">Add Squeal</h4>
           </div>
           <div class="modal-body">
-            <form id="addPostForm">
+            <form id="addPostForm" >
               <div class="d-flex flex-column">
                 <div class="d-flex flex-row justify-content-between align-items-end">
                   <div class="d-flex flex-row align-items-end" style="flex:1">
@@ -177,7 +195,7 @@
                     </ul>
                   </div>
                 </div>
-                <div class="m-1 w-100">
+                <div class="m-1 w-100" style="max-height: 60vh">
 
                   <textarea v-if=" postType==='text'" rows="6" v-model="textSqueal"  class="form-control"></textarea>
                   <div v-if="textSqueal.length > 0" class="w-75 align-items-center">
@@ -216,18 +234,16 @@
                   />
 
                   <div v-if="postType === 'video'" class="w-100 d-flex flex-column">
-                    <div class="d-flex flex-column">
-                      <label for="pathImgForm" class="form-label">Insert video URL</label>
+                    <label for="pathImgForm" class="form-label">Insert youtube URL</label>
                       <div class="input-group d-flex flex-row">
-                        <input type="text" placeholder="insert URL" id="pathVideoForm" v-model="videoPath" >
-                        <button type="button" class="btn btn-secondary" @click=" currentVideoPath = videoPath; showVideo = true">
-                          Preview
-                        </button>
-                      </div>
+                      <input type="text" placeholder="insert URL" id="pathVideoForm" v-model="videoPath" >
+                      <button type="button" class="btn btn-secondary" @click=" currentVideoPath = videoPath; showVideo = true">
+                        Preview
+                      </button>
                     </div>
 
-                    <div v-if="showVideo" id="videoAddPost" class=" d-flex flex-row justify-content-center">
-                      <iframe :src="currentVideoPath" title="preview video" width="100%" height="100%"></iframe>
+                    <div v-if="showVideo" id="videoAddPost" class=" d-flex flex-row justify-content-center" style="height: 50vh">
+                      <iframe :src="youtubePath"  title="preview video" width="100%" height="100%" allowfullscreen></iframe>
                     </div>
                   </div>
 

@@ -10,7 +10,7 @@ const router = createRouter({
 
 router.beforeEach(async (to)=> {
     if(to.name === 'channelView'){
-        let query = `/db/channel/check?channel=${to.params.channelName}&user=${currentVip.value}`;
+        let query = `/db/channel/check?channel=${to.params.nomeCanale}&user=${currentVip.value}`;
         let res = await fetch(query,{
             method: "GET"
         })

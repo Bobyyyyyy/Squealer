@@ -23,31 +23,31 @@ export const routes =[
         },
     },
     {
-        path:"/SMM/handlevip",
+        path:"/SMM/sceltavip",
         name:'HandleVIP',
         components: {
             welcomingPage: HandleVIP
         },
     },
     {
-        path: "/SMM/Profile",
-        name: "Profile",
+        path: "/SMM/Profilo",
+        name: "Profilo",
         components: {
             sideBar: SideBar,
             SbOn: VipProfile,
         },
     },
     {
-        path: "/SMM/Channels",
-        name:"Channels",
+        path: "/SMM/Canali",
+        name:"Canali",
         components: {
             sideBar: SideBar,
             SbOn: ChannelList
         },
     },
     {
-        path: "/SMM/Channels/:channelName" ,
-        name:"channelView",
+        path: "/SMM/Canali/:nomeCanale" ,
+        name:"listaCanali",
         components: {
             sideBar: SideBar,
             SbOn: ChannelProfile
@@ -66,15 +66,15 @@ export const routes =[
 
      */
     {
-        path:  "/SMM/BuyQuota",
+        path:  "/SMM/CompraQuota",
         name:"Quota",
         components: {
             sideBar: SideBar,
         },
     },
     {
-        path: "/SMM/AddPost",
-        name:"Post",
+        path: "/SMM/AggiungiSqueal",
+        name:"Squeal",
         components: {
             sideBar: SideBar,
         },
@@ -84,8 +84,8 @@ export const routes =[
         redirect:  { name: "Home" }
     },
     {
-        path: "/SMM/Stats",
-        name:"Stats",
+        path: "/SMM/Statistiche",
+        name:"Statistiche",
         components: {
             sideBar: SideBar,
             SbOn: statsPage

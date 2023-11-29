@@ -1,9 +1,17 @@
 <script setup>
   import {onMounted, onUnmounted, reactive, ref} from "vue";
-  import {currentVip, filterValues, postType, smartPhone, sortPosts} from "../utils/config.js"
-  import {getPosts, getUserInfo, getUserQuota, parseDestinations} from "../utils/functions.js";
+  import {
+    currentVip,
+    filterValues,
+    filterValuesITAS,
+    postType,
+    postTypeITAS,
+    smartPhone,
+    sortPosts
+  } from "../utils/config.js"
+  import {getPosts, getUserInfo, getUserQuota, parseDestinationsViewPost} from "../utils/functions.js";
   import Post from "../components/post/Post.vue";
-  import Dropdown from "../components/Dropdown.vue";
+  import Select from "../components/Select.vue";
   import {useStore} from "vuex";
 
   const store = useStore();
@@ -69,6 +77,10 @@
     curPosts.push(...(await getPosts(query,offset.value)));
   }
 
+  async function updateTagPosts(){
+    //TODO: PRENDERE SOLO POST CON QUEL TAG
+  }
+
   let scrollendHandler = async () => await(updatePost())
 
   onMounted(async ()=> {
@@ -111,40 +123,51 @@
      <p class="m-0 text-center mt-1 mb-0">{{n_post}} Squeal </p>
 
       <div class="d-flex flex-column align-items-start">
-        <div class="d-flex flex-row justify-content-around align-items-center">
-          <Dropdown class="buttonDropDown"
-                    :filterRef="destFilter"
+        <div class="d-flex flex-row justify-content-around align-items-end">
+
+          <Select class="buttonDropDown"
                     :dropItems="filterValues"
+                    :dropItemsName="filterValuesITAS"
                     classButton="btn btn-secondary"
                     updateRef = 'updateDestFilter'
+                    label="destinazione"
+                    def="all"
                     @updateDestFilter = updateDestFilter
           />
-          <Dropdown class="ms-1 buttonDropDown"
+
+          <Select class="ms-1 buttonDropDown"
                     classButton="btn btn-secondary"
-                    :filterRef="typePostFilter"
                     :dropItems="postType"
+                    :dropItemsName="postTypeITAS"
                     updateRef = 'updatePostType'
+                    label= 'contenuto'
+                    def = 'all'
                     @updatePostType = updatePostType
           />
-          <Dropdown  class="ms-1 buttonDropDown"
+
+          <Select  class="ms-1 buttonDropDown"
                      classButton="btn btn-secondary"
-                     :filterRef="sortFilter"
                      :dropItems="sortPosts"
+                     :dropItemsName="sortPosts"
                      updateRef = 'updateSort'
+                     label="ordina per"
+                     :def="sortPosts[0]"
                      @updateSort = updateSortFilter
           />
-          <div v-if="keyWordFilter && !smartPhone" class="ms-1">
-            <input type="text" placeholder="Keyword..." />
+          <div v-if="keyWordFilter && !smartPhone" class="input-group ms-3">
+            <input type="text" class="form-control" placeholder="Keyword" aria-label="Keyword's search" aria-describedby="button-addon2">
+            <button class="btn btn-secondary" type="button" id="button-addon2" @click="updateTagPosts">Cerca</button>
           </div>
         </div>
-        <div v-if="smartPhone && keyWordFilter" class="ms-1">
-          <input type="text" placeholder="BOH..." />
+        <div v-if="keyWordFilter && smartPhone" class="input-group ms-3">
+          <input type="text" class="form-control" placeholder="Keyword" aria-label="Keyword's search" aria-describedby="button-addon2">
+          <button class="btn btn-secondary" type="button" id="button-addon2" @click="updateTagPosts">Cerca</button>
         </div>
       </div>
       <div id="postContainer" v-if="readyPosts" class="d-flex flex-row flex-wrap justify-content-around mt-3">
         <Post v-for="(post,i) in curPosts" :key="post._id"
               :user="post.owner"
-              :dest= "parseDestinations(post.destinationArray)"
+              :dest= "parseDestinationsViewPost(post.destinationArray, post.tags)"
               :content="post.content"
               :creationDate="post.dateOfCreation"
               :reactions = "post.reactions"

@@ -1,9 +1,9 @@
 <script setup>
   import {computed, onMounted, ref} from "vue";
   import Post from "../post/Post.vue";
-  import Dropdown from "../Dropdown.vue";
-  import {currentVip, postType, sortPosts} from "../../utils/config.js";
-  import {getPosts, parseDestinations} from "../../utils/functions.js";
+  import Select from "../Select.vue";
+  import {currentVip, postType, postTypeITAS, sortPosts} from "../../utils/config.js";
+  import {getPosts, parseDestinationsViewPost} from "../../utils/functions.js";
   import {useStore} from "vuex";
 
   const store = useStore();
@@ -55,30 +55,37 @@
       <div class="d-flex flex-column">
         <div class="d-flex flex-row justify-content-center w-100">
           <div class="maxWidth">
-            <img src="https://picsum.photos/id/1/300/300" class="img-fluid" alt="gatto che ormai ha stufato">
+            <img src="https://picsum.photos/id/1/300/300" class="img-fluid rounded-circle" alt="gatto che ormai ha stufato">
           </div>
         </div>
         <h2 class="m-1 text-center">{{ chInfo.chName }}</h2>
         <h5 class="m-1 text-center">{{ chInfo.chDescription }}</h5>
       </div>
       <div class="d-flex flex-row justify-content-end">
-        <Dropdown class="buttonDropDown"
-                  :filterRef="typePostFilter"
-                  :dropItems="postType"
-                  updateRef = 'updatePostType'
-                  @updatePostType = updatePostType
+        <Select class="ms-1 buttonDropDown"
+                classButton="btn btn-secondary"
+                :dropItems="postType"
+                :dropItemsName="postTypeITAS"
+                updateRef = 'updatePostType'
+                label= 'contenuto'
+                def = 'all'
+                @updatePostType = updatePostType
         />
-        <Dropdown  class="ms-1 buttonDropDown"
-                   :filterRef="sortFilter"
-                   :dropItems="sortPosts"
-                   updateRef = 'updateSort'
-                   @updateSort = updateSortFilter
+
+        <Select  class="ms-1 buttonDropDown"
+                 classButton="btn btn-secondary"
+                 :dropItems="sortPosts"
+                 :dropItemsName="sortPosts"
+                 updateRef = 'updateSort'
+                 label="ordina per"
+                 :def="sortPosts[0]"
+                 @updateSort = updateSortFilter
         />
       </div>
       <div v-if="readyPosts" class="d-flex flex-row flex-wrap justify-content-around mt-3">
         <Post v-for="(post,i) in curPosts" :key="post._id"
               :user="post.owner"
-              :dest= "parseDestinations(post.destinationArray)"
+              :dest= "parseDestinationsViewPost(post.destinationArray, post.tags)"
               :content="post.content"
               :creationDate="post.dateOfCreation"
               :reactions = "post.reactions"

@@ -44,7 +44,7 @@ const readyData = ref(false);
 <template>
   <div class="d-flex flex-row justify-content-between align-items-center lineDim">
     <div class="text-start bordEl">
-      <router-link :to="{path: `/SMM/Channels/${name.split(' ').join('')}`}"
+      <router-link :to="{path: `/SMM/Canali/${name.split(' ').join('')}`}"
                    class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"
                    @click="changeChannel()"
       >

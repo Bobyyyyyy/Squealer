@@ -10,8 +10,7 @@ async function getPosts(query,offset){
         let res = await fetch(`/db/post/all?${query}&offset=${offset}`,{
             method:"GET",
         });
-        let posts =  (await res.json()).map(post => { return {...post, dateOfCreation: new Date(Date.parse(post.dateOfCreation))} });
-        return posts;
+        return (await res.json()).map(post => { return {...post, dateOfCreation: new Date(Date.parse(post.dateOfCreation))} });
     }catch (e) {
         throw e
     }
@@ -113,13 +112,15 @@ const compressBlob = (file) => new Promise((resolve) => {
 /**
  *
  * @param {Array<{name:String,destType:String}>} destinations
+ * @param {Array<String>} tags - #
  * @return {String} - '@francesco, §popi_ma_buoni,'
  */
-const parseDestinations = (destinations) => {
+const parseDestinationsViewPost = (destinations, tags) => {
     let arr = [];
     destinations.forEach(dest => {
         arr.push(dest.destType === 'channel' ? `§${dest.name}` : `@${dest.name}`)
     })
+    if(tags) arr = arr.concat(tags.map(tag => `#${tag}`))
     return arr.join(', ');
 }
 
@@ -169,7 +170,6 @@ function parseReactionType(reactions){
 }
 
 const parseContentText = (content, tag) => {
-    console.log(typeof content);
     let links = content.match(URLHTTPREGEX);
 
     if(links){
@@ -189,6 +189,13 @@ const parseContentText = (content, tag) => {
     else return `<${tag}>${content}</${tag}>`;
 }
 
+async function logout(){
+    //TODO : DA GET A PUT --> modifica sessione
+    let res = await fetch("/logout");
+    window.location.href= res.url;
+}
+
+
 export{
     getPage,
     getPosts,
@@ -198,10 +205,11 @@ export{
     blob2base64,
     compressBlob,
     getPostsDate,
-    parseDestinations,
+    parseDestinationsViewPost,
     parseReactionDate,
     parseReactionType,
     getLength,
     getLast30Days,
-    parseContentText
+    parseContentText,
+    logout
 }

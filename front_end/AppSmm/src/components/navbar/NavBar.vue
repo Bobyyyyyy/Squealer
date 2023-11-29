@@ -2,19 +2,13 @@
 
   import {smartPhone} from "../../utils/config.js";
   import Dropdown from "../Dropdown.vue";
+  import {logout} from "../../utils/functions.js";
 
   defineProps({
     centerText: String,
     welcomingPage: Boolean,
 
   })
-
-  async function logout(){
-    //TODO : DA GET A PUT --> modifica sessione
-    let res = await fetch("/logout");
-    window.location.href= res.url;
-  }
-
 </script>
 
 <template>
