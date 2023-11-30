@@ -145,7 +145,7 @@
 
   @media screen and (max-width: 768px){
     #sideBar{
-      height: auto;
+      height: 4rem;
       display: flex;
       flex-direction: row !important;
       justify-content: space-evenly !important;
@@ -162,7 +162,7 @@
       width: 100% !important;
     }
     .setHeight{
-      height: auto;
+      height: 100%;
     }
   }
   

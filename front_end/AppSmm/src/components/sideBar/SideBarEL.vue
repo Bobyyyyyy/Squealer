@@ -53,18 +53,18 @@ import {computed} from "vue";
 
   @media (max-width: 768px) {
     .icon {
-      max-width: 20px;
-      max-height: 20px;
-      width: 100%;
-      height: 100%;
-      aspect-ratio: 1;
+      max-height: 50%;
+      height: 50%;
+      aspect-ratio: 1/1;
     }
     .butNav{
-      width: 15%;
+      width: calc(100% / 6);
+      height: auto;
+      aspect-ratio: 1/1;
     }
     .reducePad{
       padding: 20%;
-      aspect-ratio: 1/1;
+      aspect-ratio: 1;
     }
   }
 </style>

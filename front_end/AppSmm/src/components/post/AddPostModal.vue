@@ -92,7 +92,7 @@
       }
 
       let [tmpDest, tmpTags] = parseDestinations(receiverArr.value);
-      tags = tags.concat(tmpTags);
+      if (tmpTags.length > 0 ) tags = tags.concat(tmpTags);
 
       let post = {
         creator: currentVip.value,
@@ -111,8 +111,9 @@
       /* content based on squeal type */
       let content = postType.value === 'geolocation' ? JSON.stringify(mapLocationLatLng.value.value) :
                       postType.value === 'text' ? textSqueal.value :
-                        fileUploaded.value.length === 0 ? imgPath.value :
-                            await blob2base64(await compressBlob(fileUploaded.value.item(0)));
+                          postType.value === 'video' ? youtubePath.value :
+                            fileUploaded.value.length === 0 ? currentImgPath.value :
+                              await blob2base64(await compressBlob(fileUploaded.value.item(0)));
 
       post = {...post, content: content};
 

@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const {ObjectId} = require("mongodb");
-const contentTypes = ['geolocation','text','image']
+const contentTypes = ['geolocation','text','image','video']
 const destTypes = ['channel', 'user','official']
 const reactionTypes = ['heart','thumbs-up','thumbs-down','heartbreak']
 const categories = ['private','public'];

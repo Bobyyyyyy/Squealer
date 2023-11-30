@@ -32,6 +32,7 @@
   let query = ''
 
   let curPosts = reactive([]);
+  let lastRequestLength = 12;
 
   async function updatePostType(newText){
     readyPosts.value=false
@@ -74,23 +75,34 @@
 
   async function updatePost(){
     offset.value += 12;
-    curPosts.push(...(await getPosts(query,offset.value)));
+    let posts = await getPosts(query,offset.value);
+    curPosts.push(...posts);
+    return posts.length;
   }
 
   async function updateTagPosts(){
     //TODO: PRENDERE SOLO POST CON QUEL TAG
   }
 
-  let scrollendHandler = async () => await(updatePost())
+  let scrollendHandler = async () => {
+      lastRequestLength = await(updatePost());
+  }
 
   onMounted(async ()=> {
       readyPosts.value = false
 
       n_post.value = (await getUserInfo()).nposts;
 
-      window.addEventListener("scrollend", scrollendHandler);
+      //window.addEventListener("scrollend", scrollendHandler);
+    document.addEventListener('scroll', () => {
+      if (window.innerHeight + window.pageYOffset >= document.getElementById("bodyDiv").offsetHeight && lastRequestLength === 12) {
+        console.log("bottom reached");
+        scrollendHandler();
+      }
+    });
 
-      let quota = await getUserQuota();
+
+    let quota = await getUserQuota();
 
       store.commit('setQuota', quota.characters);
 
@@ -102,7 +114,13 @@
     })
 
   onUnmounted(() => {
-    window.removeEventListener("scrollend",scrollendHandler);
+    //window.removeEventListener("scrollend",scrollendHandler);
+    document.removeEventListener("scroll",() => {
+      if (window.innerHeight + window.pageYOffset >= document.getElementById("bodyDiv").offsetHeight && lastRequestLength === 12) {
+        console.log("bottom reached");
+        scrollendHandler();
+      }
+    })
     offset.value = 0;
   })
 

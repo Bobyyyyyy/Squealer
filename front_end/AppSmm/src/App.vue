@@ -31,6 +31,6 @@ start();
 
 <template>
   <router-view v-if="ready" name="sideBar"/>
-  <router-view v-if="ready" name="SbOn"/>
+  <router-view v-if="ready" name="SbOn" class="h-100"/>
   <router-view v-if="ready" name="welcomingPage"/>
 </template>
