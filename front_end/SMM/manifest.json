@@ -1,0 +1,21 @@
+{
+  "img/logo.png": {
+    "file": "dist/assets/logo-fbaac3ca.png",
+    "src": "img/logo.png"
+  },
+  "src/main.css": {
+    "file": "dist/assets/main-7395860a.css",
+    "src": "src/main.css"
+  },
+  "src/main.js": {
+    "assets": [
+      "dist/assets/logo-fbaac3ca.png"
+    ],
+    "css": [
+      "dist/assets/main-7395860a.css"
+    ],
+    "file": "dist/assets/main-01369275.js",
+    "isEntry": true,
+    "src": "src/main.js"
+  }
+}

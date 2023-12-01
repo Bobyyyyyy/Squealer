@@ -3,7 +3,8 @@ TODO:
     - grafica !!!
     - comprare quota
     - pagina dei messaggi
-    - mettere tutti i model con il <Teleport /> (?)
+    - nell'aggiunta dei destinatari, anche # vale come pubblico
+    - risposte ai post
 
 - MOD:
     - canali privati
@@ -14,3 +15,30 @@ TODO:
 
 
 - BIG REFACTORING
+
+
+- 01/12
+
+OBBLIGATORI:
+    - '@' menzioni cliccabili
+    - notifiche
+        - nuovo post per destinarati
+    - Canali silenziabili TUTTI tranne definiti su slide
+    - Geolocalizzazione che segue mappa
+        - aggiungere TPER
+    - Reset password con domanda
+    - Senza Login
+    - Risposte:
+        - NO reaction ?
+        - condivide i destinatari pubblici
+    - MESSAGGI TEMPORIZZATI: bip acustico ad ogni invio (copiare a frontend node-cron)
+    - risposte ai post visibili (SMM), mettere anche nei grafici
+
+    - LOGIN
+
+
+ARANCIONI:
+    - pagare quota se messaggio va oltre
+    - aggiunta admin nel canale proprietario
+    - foto anche dal cellulare
+    - Regola che attribuisce post ad un canale ufficiale automaticamente.

@@ -1,6 +1,7 @@
 const {mongoCredentials} = require('../models/utils.js')
 const postModel = require("../models/postMethods");
 const {createScheduledPost} = require("./CronController");
+const {mongo} = require("mongoose");
 
 
 const createPost = async (req,res) => {
@@ -33,8 +34,8 @@ const updateReaction = async (req,res) => {
                 res.send('200');
         }
         else {
-            await postModel.updateReac({user: req.body.user, rtype: req.body.keys}, mongoCredentials)
-            res.send(await postModel.updateReac(req.body, mongoCredentials));
+            await postModel.updateReac(req.body,mongoCredentials);
+            res.send('200');
         }
     }
     catch(error) {
@@ -80,12 +81,20 @@ const getReactionLast30days = async (req,res) => {
 
 const postLength = async (req,res) => {
     try {
-        res.send(await postModel.postLength(req.query.filter,req.query.channel,mongoCredentials))
+        res.send(await postModel.postLength(req.query.filter,mongoCredentials))
     }
     catch (error) {
         res.send(error);
     }
+}
 
+const addDestination = async(req,res) => {
+    try {
+        res.send(await postModel.addDestination(req.body.destination, req.body.postID, mongoCredentials));
+    }
+    catch (error) {
+        res.status(400).send(error);
+    }
 }
 
 module.exports = {
@@ -96,5 +105,6 @@ module.exports = {
     removePost,
     getPostsDate,
     getReactionLast30days,
-    postLength
+    postLength,
+    addDestination
 }

@@ -43,7 +43,7 @@
 
         <div class="navbar-collapse collapse dual-collapse2" style="flex-basis: 100%">
             <div class="ms-auto"></div>
-            <span class="navbar-text text-white ms-auto me-2"> @${user}
+            <span class="navbar-text text-white ms-auto me-2"> @<span id="session-user">${user}</span>
             </span>
             <button class="btn btn-light btn-outline-danger" onclick="window.location.href = '/logout'">Logout</button>
         </div>
@@ -55,10 +55,126 @@
 <div class="d-flex flex-column">
 
     <div class="p-5 flex-column" id="div1" style="height: 100%; width: 100%">
+
+        <div class="d-flex flex-row align-items-center p-3 pe-0">
+
+            <div class="input-group w-25">
+                <span class="input-group-text " id="basic-addon1"><select class="select btn" id='search-type' autocomplete="off">
+                        <option value="sender" selected>Mittente</option>
+                        <option value="receiver">Destinatario</option>
+                    </select></span>
+                <label for="filter" class="sr-only"></label><input class="form-control" id="filter" type="text" style="width: 15%; background-color: lightgray" placeholder="Cerca.." autocomplete="off">
+            </div>
+
+
+            <div class="d-flex flex-row ms-auto">
+                <div id="channel-visual" class="btn-group ms-3 btn-group" role="group" aria-label="Basic radio toggle button group">
+                    <input type="radio" class="btn-check" name="filters" id="filter-all" value="" autocomplete="off" checked>
+                    <label class="btn btn-success" for="filter-all">All</label>
+
+                    <input type="radio" class="btn-check" name="filters" id="filter-popular" value="popular" autocomplete="off">
+                    <label class="btn btn-success" for="filter-popular">Popular</label>
+
+                    <input type="radio" class="btn-check" name="filters" id="filter-unpopular" value="unpopular" autocomplete="off">
+                    <label class="btn btn-success" for="filter-unpopular">Unpopular</label>
+
+                    <input type="radio" class="btn-check" name="filters" id="filter-controversial" value="controversial" autocomplete="off">
+                    <label class="btn btn-success" for="filter-controversial">Controversial</label>
+                </div>
+
+                <div class="ms-3 d-flex flex-row justify-content-center align-self-center">
+                    <label class="text-white fw-normal"> Ordina Per:
+                        <select class="select btn btn-success ms-2" id="orderby" autocomplete="off">
+                            <option value="" disabled>Ordinamento</option>
+                            <option value="publication" selected>Data di pubblicazione</option>
+                            <option value="visuals">Numero di visualizzazioni</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="ms-3 d-flex flex-row justify-content-center align-self-center me-2" id="options">
+                    <label for="order"></label>
+                    <select class="select btn btn-success" id="order" autocomplete="off">
+                        <option value="" disabled >Ordine</option>
+                        <option value="più recente" selected>Piu' recenti</option>
+                        <option value="meno recente">Meno recenti</option>
+                    </select>
+                </div>
+        </div>
+        </div>
+
         <div id="posts" class="d-flex flex-column align-items-center">
+        </div>
+
+        <div id="under_posts" class="d-flex align-items-center mt-5">
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="changeReactions" tabindex="-1" aria-labelledby="changeReactionsModal" aria-hidden="true" style="top:25%">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-body d-flex flex-row">
+                <div class="d-flex flex-column align-items-center">
+                    <label for="heart" class="form-label w-75"> <i class="bi bi-heart-fill"></i> Heart
+                        <input type="number" class="form-control" name="heart" id="heart" min="0" value="0">
+                    </label>
+                </div>
+                <div class="d-flex flex-column align-items-center">
+                    <label for="heartbreak" class="form-label w-75"> <i class="bi bi-heartbreak"></i> Heartbreak
+                        <input type="number" class="form-control" name="heartbreak" id="heartbreak" min="0" value="0">
+                    </label>
+                </div>
+                <div class="d-flex flex-column align-items-center">
+                    <label for="thumbs-up" class="form-label w-75"> <i class="bi bi-hand-thumbs-up-fill"></i> Thumbs-Up
+                        <input type="number" class="form-control" name="thumbs-up" id="thumbs-up" min="0"  value="0">
+                    </label>
+                </div>
+                <div class="d-flex flex-column align-items-center">
+                    <label for="thumbs-down" class="form-label w-75"> <i class="bi bi-hand-thumbs-down"></i> Thumbs-Down
+                        <input type="number" class="form-control" name="thumbs-down" id="thumbs-down" min="0" pattern="[0-9]{10}" value="0">
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
+                <button class="btn btn-primary" id="changeReactionsButton">Modifica</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="changeDestination" tabindex="-1" aria-labelledby="changeDestinationModal" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-info">
+                <h1 class="modal-title fs-5 fw-bold">Aggiungi destinatario</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div>
+                    <select id="type-select" class="form-select" aria-label="Post type select" autocomplete="off">
+                        <option value="user" selected>Utente</option>
+                        <option value="channel">Canale</option>
+                        <option value="official">Canale Ufficiale</option>
+                    </select>
+                </div>
+
+                <div class="form-group d-flex align-items-center flex-column">
+                    <div id="content" class="mt-2" style="width: 100%">
+                        <label for="destination-name" class="form-label w-100" style>
+                            <textarea class="form-control" name="destination-name" id="destination-name" rows="1" placeholder="Inserisci nome della destinazione" style="resize: none" data-role="none" autocomplete="off"></textarea>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
+                <button type="submit" id="addDestinationButton" class="btn btn-primary">Inserisci</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>

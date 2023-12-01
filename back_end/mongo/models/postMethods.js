@@ -185,7 +185,7 @@ const addTimedPost = async (postId, credentials) => {
 
 /**
  * @param {Object} post
- * {creator: String, destination: array of objects{name: String, destType: String}, contentType: String, content: String, dateOfCreation: Date }
+ * {creator: String, destination: array of objects{name: String, destType: String}, contentType: String, content: String, dateOfCreation: Date , tags: Array<String>}
  * @param {Object} quota - {daily,weekly-monthly} - remaining updated
  * @param credentials - mongo credentials
  * @returns {Promise<{postId: *}>}
@@ -208,7 +208,7 @@ const addPost = async (post,quota,credentials) => {
                 throw createError("utente non esistente!", 422);
             }
             /* canale non esiste  */
-            else if (destinationType === 'channel' && channel.length === 0) {
+            else if (destinationType === 'channel' && channel?.length === 0) {
                 await mongoose.connection.close();
                 throw createError("canale non esistente!", 422);
             }
@@ -253,6 +253,7 @@ const addPost = async (post,quota,credentials) => {
             category: postCategory,
             popularity: 'neutral',
             dateOfCreation: post.dateOfCreation,
+            tags: post.tags
         })
 
         await newPost.save();
@@ -272,7 +273,7 @@ const addPost = async (post,quota,credentials) => {
 
         return {postId: newPost._id};
     }
-    catch(err){ throw err; }
+    catch(err){throw err; }
 }
 
 /**
@@ -352,7 +353,7 @@ const removeDestination = async (destination,postID,credentials)=> {
     try {
         await connectdb(credentials);
 
-        let channel = await Channel.findOne({name: destination});
+
 
         let checkArrayDestination = await Post.findByIdAndUpdate(postID, {$pull: { destinationArray: {name: destination}}}, {new: true});
 
@@ -370,6 +371,51 @@ const removeDestination = async (destination,postID,credentials)=> {
     }
     catch (error) {
         throw err;
+    }
+}
+
+/**
+ * @param destination
+ * @param postID
+ * @param credentials
+ * @returns {Promise<void>}
+ * Aggiunge una destinazione a un post
+ */
+
+const addDestination = async (destination,postID,credentials) => {
+    try {
+        await connectdb(credentials);
+        console.log(destination,postID);
+        switch (destination.destType) {
+            case 'user':
+                let user = await User.findOne({username: destination.name})
+                if(!user) {
+                    throw createError('Utente non esiste',400);
+                }
+                break;
+
+            case 'channel':
+                let channel = await Channel.findOne({name: destination.name});
+                if(!channel) {
+                    throw createError('Canale Non esiste',400);
+                }
+                await Channel.findOneAndUpdate({'name': destination.name}, {'postNumber': channel.postNumber+1})
+                break;
+
+            case 'official':
+                let officialChannel = await ReservedChannel.findOne({name: destination.name});
+                if(!officialChannel) {
+                    throw createError('Canale Non esiste',400);
+                }
+
+                break;
+        }
+
+        await Post.findByIdAndUpdate(postID,{$push: {destinationArray: destination}},{new : true});
+
+    }
+    catch (error) {
+        throw error
     }
 }
 
@@ -391,7 +437,6 @@ const deletePost = async (postID,credentials) => {
 const updateReac = async (body,credentials) => {
     try{
         await connectdb(credentials);
-
         let user = await User.findOne({username: body.user});
 
         if(user.typeUser === 'mod') {
@@ -527,19 +572,32 @@ const getLastPostUser = async (query,credentials) => {
 
 /**
  *
- * @param {String} filter - filter for posts - ['all','image','text','geolocation']
- * @param {String} channel - channel filter for posts
+ * @param filters
  * @param credentials - mongo credentials
  * @returns {Promise<*>}
  */
-const postLength = async (filter,channel,credentials) => {
+const postLength = async (filters,credentials) => {
     try {
         await connectdb(credentials);
+        let filter = {
+            /* Per i canali non mi serve l'id dell'utente che fa la richiesta, a meno che non sia SMM*/
+            ...((filters.smm || !filters.channel) && filters.name) && {'owner':  {$regex: filters.name , $options: 'i'}},
+            /* FILTRO PER TIPO DI POST */
+            ... (filters.typeFilter && filters.typeFilter !== 'all') && {'contentType': filters.typeFilter},
 
-        let posts = await Post.find(
-            { ... (filter && filter !== '') && {contentType: filter},
-                '$or': [{'destinationArray.name': channel}, {'officialChannelsArray': channel}],
-                }).lean();
+            /* PER LA PAGINA DEL PROFILO : */
+            ... (filters.destType && filters.destType !== 'all') && {'destinationArray.destType':  filters.destType === 'user' ? 'user' : 'channel'},
+            ... (filters.destType && filters.destType !== 'all' && filters.destType !== 'user') && {'category': filters.destType},
+            ... (filters.popularity && filters.popularity !== 'neutral') && {'popularity': filters.popularity},
+
+
+            /* PER IL CANALE SINGOLO */
+            ... (filters.channel) && {$or: [{'destinationArray.name': {$regex: filters.channel , $options: 'i'}},
+                    {'officialChannelsArray': {$regex: filters.channel , $options: 'i'}}]
+            }
+        }
+
+        let posts = await Post.find(filter).lean();
 
 
         return {length: posts.length};
@@ -563,5 +621,6 @@ module.exports = {
     addTimedPost,
     getPostsDate,
     getReactionLast30days,
-    postLength
+    postLength,
+    addDestination
 }
