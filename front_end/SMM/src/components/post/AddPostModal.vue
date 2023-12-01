@@ -3,8 +3,9 @@
   import Map from "./Map.vue";
   import Dropdown from "../Select.vue";
   import {blob2base64, compressBlob, parseContentText} from "../../utils/functions.js";
-  import {currentVip} from "../../utils/config.js";
+  import {currentVip, URLHTTPREGEX} from "../../utils/config.js";
   import {useStore} from "vuex";
+  import Select from "../Select.vue";
 
   const store = useStore();
 
@@ -26,7 +27,9 @@
 
   /* TEXT */
   const textSqueal = ref('')          //get text of squeal. Only in text squeal.
-  const html = computed(() => parseContentText(textSqueal.value,'h3'))
+  const link = computed(() => textSqueal.value.match(URLHTTPREGEX) );
+  const linkShorter = ref('');
+  const activeChoiceLink = ref(true)
 
   /* IMAGE */
   const imgPath = ref('')             //live change of input value in URL insert.
@@ -86,9 +89,11 @@
     try{
 
       let tags = [];
+
+
       if (postType.value === 'text'){
         tags = textSqueal.value.match(/\#\w+/g)
-        tags = tags.map(el => el.substring(1));
+        if (tags) tags = tags.map(el => el.substring(1));
       }
 
       let [tmpDest, tmpTags] = parseDestinations(receiverArr.value);
@@ -104,10 +109,9 @@
           squealNumber: numberOfRepetitions.value,
           frequency: [numFrequency.value.toString(),typeFrequency.value].join(' ')
         },
-        tags: tags
+        ...(tags !== []) && {tags: tags}
       }
 
-t
       /* content based on squeal type */
       let content = postType.value === 'geolocation' ? JSON.stringify(mapLocationLatLng.value.value) :
                       postType.value === 'text' ? textSqueal.value :
@@ -158,6 +162,13 @@ t
     showImg.value = true
   }
 
+  async function insertShorter() {
+    let oldLink = link.value[0];
+    let res = await fetch(`https://csclub.uwaterloo.ca/~phthakka/1pt/addURL.php?url=${oldLink}`);
+    linkShorter.value = `https://1pt.co/${(await res.json()).short}`
+    textSqueal.value = textSqueal.value.replace(oldLink,linkShorter.value);
+  }
+
 </script>
 
 <template>
@@ -179,31 +190,43 @@ t
                     </div>
 
                   </div>
-                  <div class="d-flex justify-content-center" style="flex:1">
+                  <div class="d-flex justify-content-center" style="flex:1 1 0">
                     <input type="checkbox" class="btn-check" id="btn-check-outlined" v-model="timed" autocomplete="off">
                     <label class="btn btn-outline-primary" for="btn-check-outlined">Timed</label><br>
                   </div>
-
-                  <div class="btn-group d-flex" style="flex:1">
-                    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                      {{ postType }}
-                    </button>
-                    <ul class="dropdown-menu">
-                      <li class="dropdown-item" role="button" @click="postType = 'text'"> text </li>
-                      <li class="dropdown-item" role="button" @click="postType = 'geolocation'"> geolocation </li>
-                      <li class="dropdown-item" role="button" @click="postType = 'image'"> image </li>
-                      <li class="dropdown-item" role="button" @click="postType = 'video'"> video </li>
-                    </ul>
+                  <div class="d-flex flex-row justify-content-end" style="flex: 1 1 0">
+                    <Select
+                        updateRef="updatePostType"
+                        :dropItems="['text','geolocation','image','video']"
+                        :dropItemsName="['testo','geolocazione','immagine','video']"
+                        classButton="btn btn-secondary"
+                        label="tipo squeal"
+                        def="inserisci tipo squeal"
+                        @updatePostType="(el) => postType = el"
+                    />
                   </div>
-                </div>
+
+                  </div>
                 <div class="m-1 w-100" style="max-height: 60vh">
 
                   <textarea v-if=" postType==='text'" rows="6" v-model="textSqueal"  class="form-control"></textarea>
-                  <div v-if="textSqueal.length > 0" class="w-75 align-items-center">
-                    <span v-html="html"></span>
-                    <br>
-                    <h5>E' stato rilevato un link. Preferisci crearne uno breve? </h5>
+                  <div v-if="!!link && activeChoiceLink" class="d-flex flex-row mt-3 mb-2 align-items-center">
+                    <h5 class="fw-light m-0">E' stato rilevato un link. Preferisci crearne uno breve? </h5>
+                    <button type="button" class="btn btn-outline-success ms-3 btn-sm " style="width: 5%"
+                            @click="async () => {
+                              await insertShorter();
+                              activeChoiceLink = false;
+                            }">si</button>
+                    <button type="button" class="btn btn-outline-danger ms-3 btn-sm" style="width: 5%" @click="() => activeChoiceLink = false">no</button>
                   </div>
+                  <div v-if="linkShorter !== ''" class="d-flex flex-row mt-3 mb-2 align-items-center">
+                    <h5 class="fw-light m-0">Ecco la preview del link:</h5>
+                    <a :href="linkShorter" target=”_blank”>
+                      <h5 class="mb-0 ms-3">{{linkShorter}}</h5>
+                    </a>
+                  </div>
+
+
                   <div v-if="postType === 'image'"  class="d-flex flex-column">
                     <div class="d-flex flex-row justify-content-between flex-wrap">
                       <div class="d-flex flex-column">

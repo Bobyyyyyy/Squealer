@@ -176,14 +176,15 @@ const parseContentText = (content, tag) => {
         let content_noLink = '';
         links.forEach(link => {content_noLink = content.replace(link,'__SPLIT__').split('__SPLIT__')});
 
-        let html = "";
+        let html = '<div class="w-100">';
         //str_no_links.length > links.length SEMPRE
         for (let i = 0; i < content_noLink.length; i++){
-            html += `<${tag}> ${content_noLink[i]}`
+            html += `<${tag} > ${content_noLink[i]}`
             if(typeof links[i] !== 'undefined')
                 html += `<a href=${links[i]} target=”_blank”>${links[i]}</a>`
             html += `</${tag}>`
         }
+        html+= '</div>';
         return html;
     }
     else return `<${tag}>${content}</${tag}>`;

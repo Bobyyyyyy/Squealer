@@ -253,7 +253,7 @@ const addPost = async (post,quota,credentials) => {
             category: postCategory,
             popularity: 'neutral',
             dateOfCreation: post.dateOfCreation,
-            tags: post.tags
+            ...(post.tags && post.tags !== []) && {tags: post.tags}
         })
 
         await newPost.save();
