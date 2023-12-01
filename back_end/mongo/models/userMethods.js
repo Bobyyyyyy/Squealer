@@ -6,6 +6,7 @@ const {connectdb,saltRounds,quota, mongoCredentials} = require("./utils");
 const {json} = require("express");
 const Post = require("../schemas/Post");
 const {start} = require("@popperjs/core");
+const {scheduledFnOne} = require("../controllers/utils");
 
 
 //POST
@@ -319,69 +320,65 @@ const changePopularity = async (userID, valueToModify, increaseValue) => {
 
 /**
  *
- * @param {Number} percentage - [0, 1]
+ * @param {Number} percentage - {0,...}
  * @param {String} user - username
+ * @param {Number} ID - for cron jobs - default -1
  * @return {Promise<void>}
  */
-const updateMaxQuota = async (percentage, user) => {
+const updateMaxQuota = async (percentage, user, ID = -1) => {
     try{
-        console.log(percentage, user);
+        let updateQuota = {};
+        Object.keys(quota).forEach((key)=> {
+            updateQuota[key] = percentage* (quota[key]);
+        })
+
         await connectdb(mongoCredentials);
 
-        let res = await User.findOneAndUpdate({username: user},
-            [{$set:{
-                'maxQuota.daily': {
-                    $trunc:[
-                        {
-                            $multiply:[
-                                {
-                                    $add:[1.,percentage]
-                                },
-                                "$maxQuota.daily"]
-                        }
-                    ]
-                },
-                'maxQuota.weekly': {
-                    $trunc:[
-                        {
-                            $multiply:[
-                                {
-                                    $add:[1.,percentage]
-                                },
-                                "$maxQuota.weekly"]
-                        }
-                    ]
-                },
-                'maxQuota.monthly': {
-                    $trunc:[
-                        {
-                            $multiply:[
-                                {
-                                    $add:[1.,percentage]
-                                },
-                                "$maxQuota.monthly"]
-                        }
-                    ]
-                },
-            }
-        }]).lean();
+        let res = await User.findOneAndUpdate({username:user},
+            [{ $set:{
+                  'maxQuota.daily': {
+                      $trunc:[
+                          {
+                              $add:[
+                                  "$maxQuota.daily",
+                                  updateQuota.daily,
+                              ]
+                          }
+                      ]
+                  },
+                  'maxQuota.weekly': {
+                      $trunc:[
+                          {
+                              $add:[
+                                  "$maxQuota.weekly",
+                                  updateQuota.weekly,
+                              ]
+                          }
+                      ]
+                  },
+                  'maxQuota.mohtly': {
+                      $trunc:[
+                          {
+                              $add:[
+                                  "$maxQuota.monthly",
+                                  updateQuota.monthly,
+                              ]
+                          }
+                      ]
+                  }
+              }
+            }]).lean()
+
         await mongoose.connection.close();
-        /*
-            COSA SUS: COME RIMUOVERE? ESEMPIO DEL 10 % + 1 %
-            esempio:
-            parto da 100
-            compro 10% --> arrivo a 110
-            popolarità : +5% --> arrivo a 115 (115.5)
 
-            --- scade l'anno ---
-            devo rimuovere il 10% acquistato l'anno prima
-            come faccio?
-            Se rimuovo il 10%, il 5% guadagnato per popolarità sarà di meno
-            devo ricalcolare le percentuali della popolarità? BOH
-         */
+        //called by cron:
+        if (ID !== -1) {
+            let idx = scheduledFnOne.findIndex(job => job.user === user && job.id ===ID);
+            scheduledFnOne[idx].job.stop();
+            scheduledFnOne.splice(idx,1);
+        }
 
-        //USARE RES PER CALCOLARE QUANTO TOGLIERE DOPO LA FINE DELL'ANNO
-
+        return res;
     }catch (e) {
         throw(e);
     }

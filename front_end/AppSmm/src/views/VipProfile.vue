@@ -78,7 +78,9 @@ onMounted(async ()=> {
 
     window.addEventListener("scrollend", scrollendHandler);
 
-    store.commit('setQuota', await getUserQuota())
+    let quota = await getUserQuota();
+
+    store.commit('setQuota', quota.characters);
 
     query = `name=${currentVip.value}`
 

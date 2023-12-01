@@ -2,6 +2,7 @@ const {mongoCredentials} = require('../models/utils.js')
 const userModel = require('../models/userMethods');
 const postModel = require("../models/postMethods");
 const {createError} = require("../models/utils");
+const {createMaxQuotaJob} = require("./CronController");
 
 
 const addUser = async (req, res, next) => {
@@ -88,7 +89,7 @@ const getVips = async (req,res) => {
 const getQuota = async (req,res) => {
     try {
         let username = req.query.user;
-        res.send(await userModel.getUserQuota(userName));
+        res.send(await userModel.getUserQuota(username));
     }
     catch (error) {
         res.send(error);
@@ -98,11 +99,19 @@ const getQuota = async (req,res) => {
 const updateMaxQuota = async(req,res) => {
 
     try{
-        let percentage = 0.1; //req.body.percentage;
+        let percentage= req.body.percentage;
 
         if (isNaN(percentage)) throw createError('percentage not number', 404);  //cambiare
 
-        let user = "FVVIP"//req.body.user;
+        let res = await userModel.updateMaxQuota(percentage,req.body.user)
+
+        //caso di errore -> preso dal catch;
+        let tsyear = new Date(new Date().setFullYear(new Date().getFullYear() + 1)).getTime();
+
+        /*
+        TODO: PER POPI, in caso di altri utilizzi, bisogna creare funzione che calcola il timestamp desiderato
+         */
+        createMaxQuotaJob(tsyear,percentage,req.body.user);
 
         res.send(await userModel.updateMaxQuota(percentage,user));
 
