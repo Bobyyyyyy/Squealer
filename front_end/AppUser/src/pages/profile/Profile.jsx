@@ -1,7 +1,9 @@
-import {getUsernameFromLocStor, getQuotaInLocStor, getAllPostFrontend ,getProfilePic} from "../../components/utils/usefulFunctions.js";
+import {getUsernameFromLocStor, getQuotaInLocStor, getAllPostFrontend ,getProfilePic, compressBlob, blob2base64} from "../../components/utils/usefulFunctions.js";
 import {useEffect, useState} from "react";
 import {ProfilePic} from "../../components/assets/index.jsx"
 import Post from "../../components/posts/Post.jsx";
+
+let imageObj = null;
 
 function Profile () {
     const [posts, setPosts] = useState([]);
@@ -19,7 +21,7 @@ function Profile () {
 
             if (res.ok) {
                 let allPosts = await res.json();
-                console.log("allPosts", allPosts)
+                //console.log("allPosts", allPosts)
                 setPosts(allPosts);
                 //console.log("num of post", allPosts.length)
                 setIsLoading(false)
@@ -35,10 +37,10 @@ function Profile () {
     const prendiProfilo = async () => {
         try {
             let res = await fetch("/db/user/profilePic");
-            console.log("risposta", res);
+            //console.log("risposta", res);
             if (res.ok) {
                 let profilePic = await res.json();
-                console.log("pic diocane", profilePic.profilePic);
+                //console.log("pic diocane", profilePic.profilePic);
                 setPic(profilePic.profilePic)
                 return profilePic;
             }
@@ -50,17 +52,26 @@ function Profile () {
 
     const changePic = async () => {
         try {
-            let res = await fetch("/db/user/profilePic", {
-                method: 'PUT',
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    newProfilePic: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAADEElEQVRYR+2XWahOURTH3VwKUWQK6RqiDJklUjfyRogXpG4eKHLFG6WQeJGEZMiQwovZ61UyJDJlTuISIi5JKEP8fnV2fff0nckXT3b9+s7Ze+21/2edvddZX1WLfK07ZhtgGnTOmPKO8dOwCt5kua/KMmC8K1yBGvgOL+BXwjz99YJW0Ahj4W3aGnkEbMfBEjgOdfApQ3QHxg/ATNgG9ZUKeBI9vZEwvHlaF4wM/1PoV6mAD5GDjnlWLrHJNS/rFbjhnkFrOFdQQC3236A3NCXNTRPgmJtvTMGF4+ZX6RgHZTdumoCBTHoI92B29DRFtBi1ozAY9PWo3OQ0AaOYcA2ORQKKLB5sFTALRsP1/wKKRmBkFLZT/M5IiL9Zz2Z2LNdO0jkdfJ03igroxITX4FHaB19iDtxcU6O+M/zej4235X4BmJb9loS80MwsKw+swHoTJNm9jLz1TIiAR08fWxLGEx2X2odUPJfOnzFHF6L7ibH+au4PQSP0TVrc/qwIaHMWJsEwuJ3mrGRsONc3oQGmVCpgOQ42R2H0Ok/bitFS0D4x/Hkj4FfQLNYGxkPZhFKiytR9CT7DAKi4HtD3ItgJfmL9zl9OCMME+q0bFO2c3VnhyrMH2uPETbUxcupGdIMdgbvRAkP5nQNu1JawC1bCD0gtYMoJ8Pyr3uQzBDzPlTTzxx0wKSmsWT6IC6jDwA0Xig/fX0hG5US42223EhT6RTQJWSHZ3oMb82CwLxWwjs7VYOGp0h3wIOPRc1U9+BgEi2EhmBnXwFp9BwHzI1VWLob+YsbCYTivgGBvwvJV+JrnwWEFWMU+BsM+Gc7nXFyzogKcUwsmKB+2vwKWgcliDxiiIu1PBOh/L/ihqldASLUmECsgm+nTc78f1qcoyiNAP/rzyxn2lH9YrDcbFPAKDL/HLRSO7oMTUWTS0m8eAfrR3wgIp8V1v0KTFyYLRVg+h/a3BbjOc+ihAJ+6Efr8YwH+a6oJAoyCikJrx0U3+GiYSvrjlzVRhw+Q1PSjP8s2q6vQjHh1EJAy/+8O/QaNqqk0M1e3UgAAAABJRU5ErkJggg=="
-                }),
-            });
-            console.log("risposta", res);
-
+            console.log("img", imageObj);
+            if (imageObj !== null) {
+                setImgEmpty(false);
+                let content = await blob2base64(await compressBlob(imageObj));
+                //setPic(content);
+                setPic(URL.createObjectURL(imageObj));
+                let res = await fetch("/db/user/profilePic", {
+                    method: 'PUT',
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        newProfilePic: content
+                    }),
+                });
+                //console.log("risposta", res);
+                setBtnChangePic(false)
+            } else {
+                setImgEmpty(true);
+            }
         }
         catch (e) {
             console.log(e)
@@ -70,15 +81,21 @@ function Profile () {
     useEffect(() => {
         fetchAllPosts()
             .then((res) => {
-                console.log(res);
                 prendiProfilo()
-                    .then((res2)=>{
-                        console.log(res2);
-                        changePic()
-                            .then()
-                    })
+                    .then()
             })
     }, []);
+
+
+    const handleLogout = async () => {
+        let res = await fetch("/logout");
+        window.location.href= res.url;
+        localStorage.clear();
+    }
+
+    const [btnChangePic, setBtnChangePic] = useState(false);
+    const [imgEmpty, setImgEmpty] = useState(false);
+
 
     return (
         <>
@@ -99,6 +116,55 @@ function Profile () {
                     <p className={"text-xl"}>Caratteri rimasti: {posts.length}</p>
                 </div>
             </div>
+            <div className="flex justify-between px-6 py-2">
+                <button
+                    className="bg-primary px-4 py-2  text-lg rounded"
+                    onClick={handleLogout}
+                >
+                    disconettiti
+                </button>
+                <button
+                    className="bg-primary px-4 py-2  text-lg rounded"
+                    onClick={()=>setBtnChangePic(!btnChangePic)}
+                >
+                    cambia foto profilo
+                </button>
+            </div>
+            {btnChangePic &&
+                <>
+                    <div className="border border-red-500 px-4">
+                        {imgEmpty &&
+                            <div>
+                                Inserisci una foto
+                            </div>
+                        }
+                        <input
+                            type={"file"}
+                            className="relative m-0 block w-full min-w-0 flex-auto rounded border border-solid border-neutral-300 bg-clip-padding px-3 py-[0.32rem] text-base font-normal text-neutral-700 transition duration-300 ease-in-out file:-mx-3 file:-my-[0.32rem] file:overflow-hidden file:rounded-none file:border-0 file:border-solid file:border-inherit file:bg-neutral-100 file:px-3 file:py-[0.32rem] file:text-neutral-700 file:transition file:duration-150 file:ease-in-out file:[border-inline-end-width:1px] file:[margin-inline-end:0.75rem] hover:file:bg-neutral-200 focus:border-primary focus:text-neutral-700 focus:shadow-te-primary focus:outline-none dark:border-neutral-600 dark:text-neutral-200 dark:file:bg-neutral-700 dark:file:text-neutral-100 dark:focus:border-primary"
+                            accept={"image/png, image/jpeg"}
+                            onChange={async (e)=> {
+                                let imageURL = (URL.createObjectURL(e.target.files[0]));
+                                imageObj = e.target.files[0];
+                                setImgEmpty(false);
+                            }}
+                         />
+                    </div>
+                    <div className="flex justify-evenly px-4 py-2">
+                        <button
+                            className="bg-primary px-4 py-2  text-lg rounded"
+                            onClick={changePic}
+                        >
+                            invia
+                        </button>
+                        <button
+                            className="bg-primary px-4 py-2  text-lg rounded"
+                            onClick={()=>setBtnChangePic(false)}
+                        >
+                            annulla
+                        </button>
+                    </div>
+                </>
+            }
             {isLoading && <h1>Caricamento...</h1>}
             {posts.map((post)=> {
                 //console.log("id",post._id)
@@ -108,7 +174,7 @@ function Profile () {
                         post={post}
                     />
                 )})}
-        </>
+            </>
     );
 }
 

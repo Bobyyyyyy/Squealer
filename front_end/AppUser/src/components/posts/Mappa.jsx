@@ -1,6 +1,6 @@
 import {MapContainer, Marker, Popup, TileLayer, useMap, useMapEvents} from "react-leaflet";
 import {useEffect, useState} from "react";
-import {MarkerPosition} from "../../components/assets/index.jsx"
+import {MarkerPosition} from "../assets/index.jsx"
 import {Icon} from "leaflet"
 import "leaflet/dist/leaflet.css"
 

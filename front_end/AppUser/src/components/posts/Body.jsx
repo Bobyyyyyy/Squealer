@@ -1,4 +1,4 @@
-import MappaPost from "../../pages/addPost/MappaPost.jsx";
+import MappaPost from "./MappaPost.jsx";
 
 function Body({post}) {
     if (post.contentType === "geolocation") {
@@ -13,7 +13,7 @@ function Body({post}) {
                 <img className={"aspect-auto w-full"} src={post.content} alt={"image"}/>
             }
             {post.contentType === "geolocation" &&
-                <div className="border border-red-500 w-full h-96">
+                <div className=" w-full h-96">
                     <MappaPost stringCoor={post.content} />
                 </div>
             }

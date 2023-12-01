@@ -2,20 +2,19 @@ import {Field, Formik, Form, useFormikContext} from 'formik';
 import * as Yup from "yup";
 import {alert, Button} from "@material-tailwind/react";
 import {useEffect, useState} from "react";
-import {getUsernameFromLocStor} from "../../components/utils/usefulFunctions.js"
+import {getUsernameFromLocStor, compressBlob, blob2base64} from "../../components/utils/usefulFunctions.js"
 
 import { MapContainer, TileLayer, Marker, Popup  } from 'react-leaflet'
-import Mappa from "./Mappa.jsx";
+import Mappa from "../../components/posts/Mappa.jsx";
 
 
-const MAX_HEIGHT = 1200;
-const MAX_WIDTH = 1200;
-const QUALITY = 0.7;
 let imageObj = null;
 let geoPos = null;
 
 
 function AddPost () {
+    const [imgAslink, setImgAsLink] = useState(false);
+
     const initialValues = {
         contentType: "text",
         destinatari: "",
@@ -63,7 +62,11 @@ function AddPost () {
                  content = values.testo;
                  break;
              case "image":
-                 content = await blob2base64(await compressBlob(imageObj));
+                 if (imgAslink) {
+                    content = values.foto;
+                 } else {
+                    content = await blob2base64(await compressBlob(imageObj));
+                 }
                  console.log("imgObj",content);
                  console.log("value",values.foto);
                  break;
@@ -121,7 +124,7 @@ function AddPost () {
             } else if (response.name) {
                 window.alert("errore nell'invio del post, controlla di aver inserito i destinatari corretti");
             } else {
-                window.alert("hai inviato correttamente il post");
+                window.location.href = "/user/"
             }
         } catch (e) {
             console.log("errore:", e);
@@ -198,7 +201,7 @@ function AddPost () {
 
                         {/* CONTENUTO DEL POST */}
                         <div>
-                            <Content errors={errors} touched={touched} {...formikProps} />
+                            <Content errors={errors} touched={touched} {...formikProps} setImgAsLink={setImgAsLink} />
                         </div>
                     </div>
                         <Button
@@ -219,10 +222,11 @@ function AddPost () {
 
 }
 
-const Content = ({errors, touched, ...formikProps}) => {
+const Content = ({errors, touched, setImgAsLink, ...formikProps}) => {
     const {values ,submitForm} = useFormikContext();
     const [isPreview, setIsPreview] = useState(false);
     const [position, setPosition] = useState(null);
+    const [isLink, setIsLink] = useState(false);
 
     useEffect(() => {
         /* const loadPos = async () =>{
@@ -272,18 +276,46 @@ const Content = ({errors, touched, ...formikProps}) => {
                         ) : <span>Contenuto</span>
                         }
                     </label>
-                    <input
-                        type={"file"}
-                        className="relative m-0 block w-full min-w-0 flex-auto rounded border border-solid border-neutral-300 bg-clip-padding px-3 py-[0.32rem] text-base font-normal text-neutral-700 transition duration-300 ease-in-out file:-mx-3 file:-my-[0.32rem] file:overflow-hidden file:rounded-none file:border-0 file:border-solid file:border-inherit file:bg-neutral-100 file:px-3 file:py-[0.32rem] file:text-neutral-700 file:transition file:duration-150 file:ease-in-out file:[border-inline-end-width:1px] file:[margin-inline-end:0.75rem] hover:file:bg-neutral-200 focus:border-primary focus:text-neutral-700 focus:shadow-te-primary focus:outline-none dark:border-neutral-600 dark:text-neutral-200 dark:file:bg-neutral-700 dark:file:text-neutral-100 dark:focus:border-primary"
-                        id={"foto"}
-                        accept={"image/png, image/jpeg"}
-                        onChange={async (e)=> {
-                            let imageURL = (URL.createObjectURL(e.target.files[0]));
-                            imageObj = e.target.files[0];
-                            await formikProps.setFieldValue("foto", imageURL);
-                    }}
-                    />
 
+                    <label className="relative inline-flex items-center cursor-pointer mt-2">
+                        <input
+                            type="checkbox"
+                            value=""
+                            className="sr-only peer"
+                            onClick={()=> setIsLink(!isLink) }
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                        <span className="ms-3 text-sm font-medium">Link o Galleria</span>
+                    </label>
+                    {isLink &&
+                    <input
+                            type="file"
+                            className="relative m-0 block w-full min-w-0 flex-auto rounded border border-solid border-neutral-300 bg-clip-padding px-3 py-[0.32rem] text-base font-normal text-neutral-700 transition duration-300 ease-in-out file:-mx-3 file:-my-[0.32rem] file:overflow-hidden file:rounded-none file:border-0 file:border-solid file:border-inherit file:bg-neutral-100 file:px-3 file:py-[0.32rem] file:text-neutral-700 file:transition file:duration-150 file:ease-in-out file:[border-inline-end-width:1px] file:[margin-inline-end:0.75rem] hover:file:bg-neutral-200 focus:border-primary focus:text-neutral-700 focus:shadow-te-primary focus:outline-none"
+                            id="foto"
+                            accept={"image/png, image/jpeg"}
+                            onChange={async (e)=> {
+                                setImgAsLink(false);
+                                let imageURL = (URL.createObjectURL(e.target.files[0]));
+                                imageObj = e.target.files[0];
+                                await formikProps.setFieldValue("foto", imageURL);
+                        }}
+                        />
+                    }
+                    {!isLink &&
+                        <input
+                            type="url"
+                            placeholder="url video"
+                            className="relative m-0 block w-full min-w-0 flex-auto rounded border border-solid border-neutral-300 bg-clip-padding px-3 py-[0.32rem] text-base font-normal text-neutral-700 transition duration-300 ease-in-out file:-mx-3 file:-my-[0.32rem] file:overflow-hidden file:rounded-none file:border-0 file:border-solid file:border-inherit file:bg-neutral-100 file:px-3 file:py-[0.32rem] file:text-neutral-700 file:transition file:duration-150 file:ease-in-out file:[border-inline-end-width:1px] file:[margin-inline-end:0.75rem] hover:file:bg-neutral-200 focus:border-primary focus:text-neutral-700 focus:shadow-te-primary focus:outline-none"
+                            id={"foto"}
+                            onChange={async (e)=> {
+                                setImgAsLink(true);
+                                //let imageURL = (URL.createObjectURL(e.target.files[0]));
+                                //imageObj = e.target.files[0];
+                                await formikProps.setFieldValue("foto", e.target.value);
+                                console.log(e.target.value)
+                            }}
+                        />
+                    }
                     {values.foto !== "" &&
                         <>
                             <label className="relative inline-flex items-center cursor-pointer mt-2">
@@ -294,7 +326,7 @@ const Content = ({errors, touched, ...formikProps}) => {
                                 onClick={()=> setIsPreview(!isPreview) }
                             />
                                 <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                                <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">Visualizza foto</span>
+                                <span className="ms-3 text-sm font-medium">Visualizza foto</span>
                             </label>
                             {isPreview && <img
                                 className={"h-auto w-auto mx-auto mt-2 "}
@@ -325,49 +357,6 @@ const Content = ({errors, touched, ...formikProps}) => {
         </div>
     );
 }
-
-
-function calculateSize(img, maxWidth, maxHeight) {
-    let width = img.width;
-    let height = img.height;
-
-    // calculate the width and height, constraining the proportions
-    if (width > height) {
-        if (width > maxWidth) {
-            height = Math.round((height * maxWidth) / width);
-            width = maxWidth;
-        }
-    } else {
-        if (height > maxHeight) {
-            width = Math.round((width * maxHeight) / height);
-            height = maxHeight;
-        }
-    }
-    return [width, height];
-}
-
-const blob2base64 = (blob) => new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.onloadend = () => resolve(reader.result);
-    reader.readAsDataURL(blob);
-});
-
-const compressBlob = (file) => new Promise((resolve) => {
-    let blobURL = URL.createObjectURL(file);
-    let compressedImg = new Image();
-    compressedImg.src = blobURL;
-    compressedImg.onload = () => {
-        const [newWidth, newHeight] = calculateSize(compressedImg, MAX_WIDTH, MAX_HEIGHT);
-        const canvas = document.createElement('canvas');
-        canvas.height = newHeight;
-        canvas.width = newWidth;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(compressedImg, 0, 0, newWidth, newHeight);
-        return ( canvas.toBlob(blob => {
-            resolve(blob);
-        },file.type, QUALITY));
-    };
-})
 
 
 export default AddPost;

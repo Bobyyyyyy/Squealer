@@ -93,7 +93,6 @@ const getUserProfilePicture = async (username, credentials) => {
     try {
         await connectdb(credentials);
         let user = await User.findOne({username: username}).lean();
-        console.log("user da getUserProfPic", user.profilePicture);
         await mongoose.connection.close();
         return {profilePic: user.profilePicture};
     } catch (err) {

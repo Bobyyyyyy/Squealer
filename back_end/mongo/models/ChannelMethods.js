@@ -92,9 +92,10 @@ const getChannels = async (query,credentials) => {
         await connectdb(credentials);
         let offset = parseInt(query.offset);
         let limit = parseInt(query.limit);
+
         let sort = sorts["Populars"];
 
-        query.filters = JSON.parse(query.filters);
+        query.filters = query.filters ? JSON.parse(query.filters) : {};
 
         let filter = {
                 //filtrare canale per nome
@@ -128,6 +129,8 @@ const getChannels = async (query,credentials) => {
 
 
         let channels = await Channel.find(filter).skip(offset).limit(limit).sort(sort).lean();
+
+        console.log(channels);
         return channels;
 }
 

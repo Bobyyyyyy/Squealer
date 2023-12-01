@@ -33,6 +33,7 @@ const getChannels = async (req,res) => {
         res.send(await channelsModel.getChannels(req.query,mongoCredentials))
     }
     catch (error){
+        console.log(error);
         res.sendStatus(400);
     }
 }
