@@ -1,15 +1,14 @@
 <script setup>
   import {computed, ref} from "vue";
   import Map from "./Map.vue";
-  import Dropdown from "../Select.vue";
-  import {blob2base64, compressBlob, parseContentText} from "../../utils/functions.js";
+  import {blob2base64, compressBlob, setupBeep} from "../../utils/functions.js";
   import {currentVip, URLHTTPREGEX} from "../../utils/config.js";
   import {useStore} from "vuex";
   import Select from "../Select.vue";
 
   const store = useStore();
 
-  const infoTimed = `Squeal syntax:<br>{NUM} to get the number of squeal post<br>{TIME} to get time of squeal post<br>{DATE} to get date of squeal post`
+  const infoTimed = `sintassi Squeal:<br>{NUM} per avere il numero corrente dello squeal<br>{TIME} per avere il tempo di pubblicazione dello squeal<br>{DATE} per avere la data di pubblicazione dello squeal`
 
   /* TYPE and USER/CHANNEL */
   const postType = ref('Select type')
@@ -90,7 +89,6 @@
 
       let tags = [];
 
-
       if (postType.value === 'text'){
         tags = textSqueal.value.match(/\#\w+/g)
         if (tags) tags = tags.map(el => el.substring(1));
@@ -137,10 +135,16 @@
         }
       })
       let response = await res.json()
+
+
       if(response.statusCode === 422){
         throw response;
       }
+      else if(timed.value){
+        setupBeep(numberOfRepetitions.value,numFrequency.value,typeFrequency.value);
+      }
     }
+
     catch (err){
       alert(err)
     }
@@ -177,7 +181,7 @@
       <div class="modal-dialog modal-dialog-centered ">
         <div class="modal-content">
           <div class="modal-header d-flex justify-content-center">
-            <h4 class="mb-0 text-center">Add Squeal</h4>
+            <h4 class="mb-0 text-center">Crea Squeal</h4>
           </div>
           <div class="modal-body">
             <form id="addPostForm" >
@@ -185,14 +189,14 @@
                 <div class="d-flex flex-row justify-content-between align-items-end">
                   <div class="d-flex flex-row align-items-end" style="flex:1">
                     <div class="d-flex flex-column">
-                      <label for="destPost" class="form-label">Receiver</label>
+                      <label for="destPost" class="form-label fw-light">Destinatario/i</label>
                       <input type="text" class="form-control" id="destPost"  v-model="receivers" required>
                     </div>
 
                   </div>
                   <div class="d-flex justify-content-center" style="flex:1 1 0">
                     <input type="checkbox" class="btn-check" id="btn-check-outlined" v-model="timed" autocomplete="off">
-                    <label class="btn btn-outline-primary" for="btn-check-outlined">Timed</label><br>
+                    <label class="btn btn-outline-primary" for="btn-check-outlined">Temporizzato</label><br>
                   </div>
                   <div class="d-flex flex-row justify-content-end" style="flex: 1 1 0">
                     <Select
@@ -220,7 +224,7 @@
                     <button type="button" class="btn btn-outline-danger ms-3 btn-sm" style="width: 5%" @click="() => activeChoiceLink = false">no</button>
                   </div>
                   <div v-if="linkShorter !== ''" class="d-flex flex-row mt-3 mb-2 align-items-center">
-                    <h5 class="fw-light m-0">Ecco la preview del link:</h5>
+                    <h5 class="fw-light m-0">Ecco un'anteprima del link:</h5>
                     <a :href="linkShorter" target=”_blank”>
                       <h5 class="mb-0 ms-3">{{linkShorter}}</h5>
                     </a>
@@ -228,21 +232,19 @@
 
 
                   <div v-if="postType === 'image'"  class="d-flex flex-column">
-                    <div class="d-flex flex-row justify-content-between flex-wrap">
-                      <div class="d-flex flex-column">
-                        <label for="pathImgForm" class="form-label">Insert photo URL</label>
+                    <div class="d-flex flex-column w-100 mt-3">
+                      <div class="d-flex flex-row align-items-center">
+                        <label for="pathImgForm" class="form-label flex-shrink-0 mb-0 me-2">inserisci URL foto</label>
                         <div class="input-group d-flex flex-row">
-                          <input :disabled="Object.keys(fileUploaded).length !== 0"  type="text" placeholder="insert URL" id="pathImgForm" v-model="imgPath" >
+                          <input class="form-control" :disabled="Object.keys(fileUploaded).length !== 0"  type="text" placeholder="inserisci URL" id="pathImgForm" v-model="imgPath" >
                           <button :disabled="Object.keys(fileUploaded).length !== 0" type="button" class="btn btn-secondary" @click=" currentImgPath = imgPath; showImg = true">
-                            Preview
+                            Anteprima
                           </button>
                         </div>
                       </div>
-                      <div>
-                        <p class="m-0"> or </p>
-                      </div>
-                      <div>
-                        <label  for="formFile" class="form-label">upload Photo</label>
+                      <h6 class="m-0 mt-2 text-center">oppure</h6>
+                      <div class="d-flex flex-row align-items-center">
+                        <label for="formFile" class="form-label flex-shrink-0 mb-0 me-2">carica una foto</label>
                         <input :disabled="!canUploadFile" class="form-control" type="file" id="formFile" accept="image/png, image/jpeg"
                                @change="(event) => showPreviewUploaded(event)">
                       </div>
@@ -257,17 +259,20 @@
                        :currentlatlng="mapLocationLatLng"
                   />
 
-                  <div v-if="postType === 'video'" class="w-100 d-flex flex-column">
-                    <label for="pathImgForm" class="form-label">Insert youtube URL</label>
-                      <div class="input-group d-flex flex-row">
-                      <input type="text" placeholder="insert URL" id="pathVideoForm" v-model="videoPath" >
-                      <button type="button" class="btn btn-secondary" @click=" currentVideoPath = videoPath; showVideo = true">
-                        Preview
-                      </button>
-                    </div>
-
-                    <div v-if="showVideo" id="videoAddPost" class=" d-flex flex-row justify-content-center" style="height: 50vh">
-                      <iframe :src="youtubePath"  title="preview video" width="100%" height="100%" allowfullscreen></iframe>
+                  <div v-if="postType === 'video'" class="d-flex flex-column">
+                    <div class="d-flex flex-column w-100 mt-3">
+                      <div class="d-flex flex-row align-items-center">
+                        <label for="pathVideoForm" class="form-label flex-shrink-0 mb-0 me-2 fw-light">inserisci URL youtube</label>
+                        <div class="input-group d-flex flex-row">
+                          <input class="form-control" type="text" placeholder="inserisci URL" id="pathVideoForm" v-model="videoPath" >
+                          <button type="button" class="btn btn-secondary" @click=" currentVideoPath = videoPath; showVideo = true">
+                            Anteprima
+                          </button>
+                        </div>
+                      </div>
+                      <div v-if="showVideo" id="videoAddPost" class=" d-flex flex-row justify-content-center" style="height: 50vh">
+                        <iframe :src="youtubePath"  title="preview video" width="100%" height="100%" allowfullscreen></iframe>
+                      </div>
                     </div>
                   </div>
 
@@ -282,23 +287,26 @@
                   </div>
                 </div>
                 <div class="d-flex flex-row justify-content-between">
-                  <div v-if="timed" class="d-flex flex-row flex-fill">
+                  <div v-if="timed" class="d-flex flex-row flex-fill align-items-end">
                     <div class="d-flex flex-column">
-                      <label for="numTimed" class="form-label">Squeal Number</label>
+                      <label for="numTimed" class="form-label">Numero di Squeal</label>
                       <input type="number" class="form-control" id="numTimed" v-model="numberOfRepetitions">
                     </div>
-                    <div class="d-flex flex-column ms-2">
-                      <label for="repFrequency" class="form-label">Frequency</label>
-                      <div class="input-group" id="repFrequency">
+                      <div class="d-flex flex-column">
+                        <label for="numFrequency" class=" form-label fw-light">Intervallo</label>
                         <input type="number" class="form-control" id="numFrequency" v-model="numFrequency">
-                        <Dropdown :filterRef="typeFrequency"
-                                  updateRef="updateTypeF"
-                                  @updateTypeF="(el) => typeFrequency=el"
-                                  :dropItems="['seconds','minutes', 'days']"
-                                  classButton="btn-outline-secondary"
-                        />
                       </div>
-                    </div>
+                      <Select
+                          :dropItems="['seconds','minutes', 'days']"
+                          :dropItemsName="['secondi','minuti', 'giorni']"
+                          updateRef="updateTypeF"
+                          classButton="btn-secondary form-select-lg "
+                          @updateTypeF="(el) => typeFrequency=el"
+                          label="frequenza"
+                          def="secondi"
+                          labelClass="form-label fw-light"
+                      />
+
                     <div class="d-flex ms-3">
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16" v-tooltip="infoTimed">
                         <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
@@ -309,8 +317,8 @@
                   <div class="d-flex flex-row justify-content-end flex-fill align-items-end">
                     <button type="button" class="btn btn-danger m-1"
                             @click="$emit('closeAppModal'); reset()"
-                    >back</button>
-                    <button class="btn btn-primary m-1" type="button" @click="createPost(); reset(); $emit('closeAppModal')"> add Squeal </button>
+                    >Indietro</button>
+                    <button class="btn btn-primary m-1" type="button" @click="createPost(); reset(); $emit('closeAppModal')"> Crea Squeal </button>
                   </div>
                 </div>
 
