@@ -6,7 +6,7 @@
   import {onMounted, reactive, ref} from "vue";
   import {getLastPost} from "../utils/functions.js";
   import {smm} from "../utils/config.js";
-  import Spinner from "../components/post/Spinner.vue";
+  import Spinner from "../components/Spinner.vue";
 
   let vips = [];
   let lastVipsPost = [];

@@ -2,15 +2,15 @@
   import NavBar from "../components/navbar/NavBar.vue";
   import {smartPhone, smm} from "../utils/config.js"
   import {ref} from "vue";
-  import Spinner from "../components/post/Spinner.vue";
+  import Spinner from "../components/Spinner.vue";
 
   const ready = ref(false);
 
 </script>
 
 <template>
-  <Spinner v-if="!ready" />
-  <NavBar v-show="ready" center-text="SMM Dashboard" :welcomingPage="true"/>
+  <Spinner v-if="false && !ready" />
+  <NavBar v-show="true || ready" center-text="SMM Dashboard" :welcomingPage="true"/>
   <div v-show="ready" class="d-flex flex-row justify-content-around principalDiv flex-wrap" style="max-height: 90vh">
     <div class="d-flex flex-column align-self-center sameWidth" >
       <div class="d-flex flex-row w-100 justify-content-center">
@@ -26,7 +26,7 @@
         <div class="d-flex align-items-center">
           <button type="button"
                   class="btn btn-primary btn-lg"
-                  @click=" this.$router.push('/SMM/sceltavip')"
+                  @click=" $router.push('/SMM/sceltavip')"
                   >SMM</button>
         </div>
       </div>

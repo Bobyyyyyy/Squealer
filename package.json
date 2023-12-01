@@ -1,11 +1,13 @@
 {
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.js",
-    "dev:frontend_VUE": "cd front_end/AppSmm && npm run dev",
+    "start": "NODE_ENV=production nodemon ./index.js",
+    "dev:frontend_VUE": "cd front_end/SMM && npm run dev",
     "dev:frontend_REACT": "cd front_end/AppUser && npm run dev",
     "dev:backend": "nodemon server/index.js",
-    "dev": "concurrently  'npm:dev:frontend_REACT' 'npm:dev:frontend_VUE' 'npm:dev:backend'"
+    "dev": "concurrently  'npm:dev:frontend_REACT' 'npm:dev:frontend_VUE' 'npm:dev:backend'",
+    "build:frontend_VUE": "cd ./front_end/SMM && npm run build",
+    "build": "npm run build:frontend_VUE"
   },
   "dependencies": {
     "@popperjs/core": "^2.11.8",
@@ -28,6 +30,7 @@
     "vite": "^4.5.0"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^4.4.0"
+    "@vitejs/plugin-vue": "^4.4.0",
+    "sass": "^1.69.5"
   }
 }

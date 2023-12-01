@@ -107,7 +107,7 @@
         tags: tags
       }
 
-
+t
       /* content based on squeal type */
       let content = postType.value === 'geolocation' ? JSON.stringify(mapLocationLatLng.value.value) :
                       postType.value === 'text' ? textSqueal.value :

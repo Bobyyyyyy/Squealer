@@ -4,20 +4,22 @@
   import Dropdown from "../Dropdown.vue";
   import {logout} from "../../utils/functions.js";
 
+
   defineProps({
     centerText: String,
     welcomingPage: Boolean,
-
   })
+
+
 </script>
 
 <template>
   <nav class="navbar navbar-expand-lg bg-body-tertiary maxHNav navBar">
     <div class="d-flex flex-row justify-content-start maxHNav">
       <div class="maxHNav sameWidth">
-        <img v-if="welcomingPage" alt="logo" src="/img/logo.png" class="h-100 img-fluid object-fit-contain"  @load="this.$emit('imgLoaded')">
+        <img v-if="welcomingPage" alt="logo" src="/img/logo.png" class="h-100 img-fluid object-fit-contain"  @load=" $emit('imgLoaded')">
         <router-link v-else to="/SMM/Profile" class="d-flex justify-content-center mb-3 h-100">
-          <img alt="logo" src="/img/logo.png" class="img-fluid" @load="this.$emit('imgLoaded')">
+          <img alt="logo" src="/img/logo.png" class="img-fluid" @load=" $emit('imgLoaded')">
         </router-link>
       </div>
       <div class="sameWidth d-flex align-items-center justify-content-center" style="flex-grow: 2">
@@ -35,7 +37,7 @@
                   updateRef="updatePage"
                   :dropItems="['Logout', 'cambia VIP']"
                   @updatePage="async (el) => {
-                    if (el === 'cambia VIP') this.$router.push('/SMM/handlevip');
+                    if (el === 'cambia VIP')  $router.push('/SMM/handlevip');
                     else await logout();
                   }"
         />
