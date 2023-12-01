@@ -3,18 +3,36 @@ let User = $('#session-user').html();
 const urlRegex =/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
 
 let LastCall = {
-    limit : 3,
+    limit : 5,
     offset: 0,
     posts: 0,
-    filter: ''
+    filter: {
+        'typeFilter': '',
+        'channel': ChannelName
+    }
 }
 
 
 function updateLastCall(limit,offset,filter) {
     LastCall.limit = limit;
     LastCall.offset = offset;
-    LastCall.filter = filter;
+    LastCall.filter.typeFilter = filter;
 }
+
+
+function getPostsNumber (filter) {
+    $.ajax({
+        url:'/db/post/number',
+        data: {filter: filter},
+        type: 'get',
+        success: (data) => {
+            LastCall.posts = data.length;
+            $('#post-trovati').html(`${data.length}`);
+            showPosts(LastCall.filter.typeFilter,LastCall.offset = 0,LastCall.limit);
+        }
+    })
+}
+
 
 
 const showChannel = (name) => {
@@ -26,7 +44,8 @@ const showChannel = (name) => {
             $('#channel-creator').html(channel.creator);
             $('#posts-number').html(channel.postNumber);
             $('#followers').html(channel.followerNumber);
-            showPosts(LastCall.filter,LastCall.offset,LastCall.limit);
+            channel.isBlocked ? $('#block-button').html(`Sblocca canale`) : $('#block-button').html(`Blocca canale`)
+            getPostsNumber(LastCall.filter)
         }
     })
 }
@@ -40,6 +59,7 @@ const showPosts = (filter,offset,limit,append = false) => {
         success: (posts) => {
             if(posts.length === 0) {
                 $('#posts').empty().append(`<h4>Nessun Post Trovato</h4>`);
+                $('#under_posts').empty();
                 return;
             }
             let html = `${$.map(posts, (post) => {
@@ -51,7 +71,7 @@ const showPosts = (filter,offset,limit,append = false) => {
                     if(destination.destType === "channel") {
                         destinationNames.push('§' + destination.name + '');
                     }
-
+    
                     if(destination.destType === "user") {
                         destinationNames.push('@' + destination.name);
                     }
@@ -65,7 +85,6 @@ const showPosts = (filter,offset,limit,append = false) => {
                 
                 
                 let id = post._id;
-                id = id.substring(id.length - 10);
                 let reactions = {
                     heart: post.reactions.filter((reaction) => reaction.rtype === 'heart').length,
                     heartbreak : post.reactions.filter((reaction) => reaction.rtype === 'heartbreak').length,
@@ -230,6 +249,7 @@ $('#changeReactionsButton').on('click',() => {
             location.reload();
         }
     })
+
 })
 
 
@@ -245,20 +265,9 @@ $('#block-button').on('click', () => {
 })
 
 
-const blockButton = () => {
-    $.ajax({
-        url: '/db/channel/block',
-        data: {user: User, channel: ChannelName},
-        type: 'put',
-        success: (data) => {
-            location.reload();
-        }
-    })
-}
-
 $('#post-filters').on('change', () => {
-    let filter = $('#post-filters input:checked').val();
-    showPosts(filter,LastCall.offset = 0,LastCall.limit);
+    LastCall.filter.typeFilter = $('#post-filters input:checked').val();
+    getPostsNumber(LastCall.filter)
 })
 
 const deletePost = async (id) => {
