@@ -1,6 +1,10 @@
 import Post from "../../components/posts/Post.jsx";
 import {useEffect, useState} from "react";
-import {getAllPostFrontend, getUsernameFromLocStor} from "../../components/utils/usefulFunctions.js";
+import {
+    getAllPostFrontend,
+    getUsernameFromLocStor,
+    setUsernameInLocStor
+} from "../../components/utils/usefulFunctions.js";
 import {useFetch} from "../../components/utils/useFetch.js";
 
 function Home() {
@@ -15,16 +19,18 @@ function Home() {
 
     const fetchAllPosts = async () => {
         try {
-            let currentUser = getUsernameFromLocStor();
+            //let currentUser = getUsernameFromLocStor();
+            let currentUser = localStorage.getItem("username");
             console.log("name user:", currentUser);
 
             let res = await fetch(`/db/post/all?name=${currentUser}&offset=0`);
-
+            console.log(res);
             if (!res.ok) {
                console.log("errore nel fetching dei post");
             }
 
             let allPosts = await res.json();
+            console.log(allPosts);
             //console.log(allPosts)
             setPosts(allPosts);
             //console.log("num of post", allPosts.length)
@@ -35,20 +41,18 @@ function Home() {
         }
     };
 
-    //const getCurrent
-
     useEffect(() => {
-        fetchAllPosts()
-            .then((res)=> {
-            console.log(res);
-        })
-
+        setUsernameInLocStor()
+            .then((res) => {
+                fetchAllPosts()
+                    .then()
+            })
     }, []);
-    console.log(posts);
 
     return (
         <>
             {isLoading && <h1>Caricamento...</h1>}
+            {!isLoading &&
             <div className={"flex flex-wrap w-full gap-8 items-center justify-center h-screen pb-20 overflow-y-scroll"}>
                 {posts!==null && posts.map((post)=> {
                     //console.log("id",post._id)
@@ -59,6 +63,7 @@ function Home() {
                         />
                 )})}
             </div>
+            }
          </>
     );
 }

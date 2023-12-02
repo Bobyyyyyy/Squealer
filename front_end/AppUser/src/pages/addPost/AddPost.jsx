@@ -11,7 +11,6 @@ import Mappa from "../../components/posts/Mappa.jsx";
 let imageObj = null;
 let geoPos = null;
 
-
 function AddPost () {
     const [imgAslink, setImgAsLink] = useState(false);
 
@@ -20,8 +19,11 @@ function AddPost () {
         destinatari: "",
         testo: "",
         foto: "",
+        video: "",
         geolocation: ""
     };
+
+    const URL = /((https?):\/\/)?(www.)?[a-z0-9]+(\.[a-z]{2,}){1,3}(#?\/?[a-zA-Z0-9#]+)*\/?(\?[a-zA-Z0-9-_]+=[a-zA-Z0-9-%]+&?)?$/
 
     const validationSchema = Yup.object().shape({
         destinatari: Yup.string()
@@ -34,12 +36,12 @@ function AddPost () {
             is: "image",
             then: () => Yup.string().required("Inserisci una foto")
         }),
-        /*
-        geolocation: Yup.string().when("contentType",{
-            is: "geolocation",
-            then: () => Yup.string().required("Inserisci la posizione")
+        video: Yup.mixed().when("contentType",{
+            is: "video",
+            then: () => Yup.string()
+                .required("Inserisci un video")
+                //.matches(URL, "Inserisci un url valido")
         }),
-         */
     });
 
 
@@ -77,6 +79,9 @@ function AddPost () {
                  });
                  console.log("pos", content);
                  break
+             case "video":
+                 console.log(values.video);
+                 content = values.video;
          }
 
          let destinations = parseDestinations(values.destinatari);
@@ -196,6 +201,7 @@ function AddPost () {
                                 <option value="text">Testo</option>
                                 <option value="image">Immagine</option>
                                 <option value="geolocation">Posizione</option>
+                                <option value="video">Video</option>
                             </Field>
                         </div>
 
@@ -227,6 +233,25 @@ const Content = ({errors, touched, setImgAsLink, ...formikProps}) => {
     const [isPreview, setIsPreview] = useState(false);
     const [position, setPosition] = useState(null);
     const [isLink, setIsLink] = useState(false);
+
+/*
+    const videoPath = ref('');
+    const currentVideoPath = ref('');
+    const showVideo = ref(false);
+    const getEmbed = (url) => {
+        let regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    /*
+            let match = url.match(regExp);
+
+            if (match && match[2].length === 11) {
+                return match[2];
+            } else {
+                return 'error';
+            }
+        }
+        const youtubePath = computed(() => `//www.youtube.com/embed/${getEmbed(currentVideoPath.value)}`)
+    */
+
 
     useEffect(() => {
         /* const loadPos = async () =>{
@@ -304,7 +329,7 @@ const Content = ({errors, touched, setImgAsLink, ...formikProps}) => {
                     {!isLink &&
                         <input
                             type="url"
-                            placeholder="url video"
+                            placeholder="link immagine"
                             className="relative m-0 block w-full min-w-0 flex-auto rounded border border-solid border-neutral-300 bg-clip-padding px-3 py-[0.32rem] text-base font-normal text-neutral-700 transition duration-300 ease-in-out file:-mx-3 file:-my-[0.32rem] file:overflow-hidden file:rounded-none file:border-0 file:border-solid file:border-inherit file:bg-neutral-100 file:px-3 file:py-[0.32rem] file:text-neutral-700 file:transition file:duration-150 file:ease-in-out file:[border-inline-end-width:1px] file:[margin-inline-end:0.75rem] hover:file:bg-neutral-200 focus:border-primary focus:text-neutral-700 focus:shadow-te-primary focus:outline-none"
                             id={"foto"}
                             onChange={async (e)=> {
@@ -354,7 +379,31 @@ const Content = ({errors, touched, setImgAsLink, ...formikProps}) => {
                 </>
 
             }
+            {/* VIDEO */
+                values.contentType === "video" &&
+                <>
+                    <label
+                        className={"block font-latoBold text-xl mb-2"}
+                    >
+                        {errors.video && touched.video ? (
+                            <div className={"text-red-600"}>{errors.video}</div>
+                        ) : <span>Contenuto</span>
+                        }
+                    </label>
+                    <Field
+                        as={"input"}
+                        accept={"url"}
+                        id={"video"}
+                        name={"video"}
+                        className="border-2 border-gray-500  rounded-md w-full focus:border-teal-500 focus:ring-teal-500 "
+                        placeholder="Url video"
+                    >
+                    </Field>
+                </>
+            }
+
         </div>
+
     );
 }
 

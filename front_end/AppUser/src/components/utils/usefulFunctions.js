@@ -15,9 +15,9 @@ async function setUsernameInLocStor() {
 }
 
 async function setQuotaInLocStor() {
-    localStorage.clear();
     try {
         let res = await fetch("/db/user/quota");
+        console.log("quota res", res);
         let quota = await res.json();
         console.log("quota",quota);
         localStorage.setItem("quota", quota);

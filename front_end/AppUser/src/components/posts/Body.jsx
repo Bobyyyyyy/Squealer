@@ -4,6 +4,8 @@ function Body({post}) {
     if (post.contentType === "geolocation") {
      //   console.log(post)
     }
+    if (post.contentType === "video") {
+    }
     return (
         <div className={"flex justify-center"}>
             {post.contentType === "text" &&
@@ -16,6 +18,14 @@ function Body({post}) {
                 <div className=" w-full h-96">
                     <MappaPost stringCoor={post.content} />
                 </div>
+            }
+            {post.contentType === "video" &&
+                <video>
+                    <source src={post.content} type="video/webm" />
+                    <source src={post.content} type="video/mp4" />
+                    Sorry, your browser doesn't support videos.
+                </video>
+
             }
         </div>
     );

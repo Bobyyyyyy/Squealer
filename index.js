@@ -10,6 +10,7 @@ const express = require('express');
 const cors = require('cors');
 const {dbname} = require("./back_end/mongo/models/utils");
 const path = require('path');
+const {isUser} = require("./back_end/Frontpage/controllers/FrontPageController");
 
 const storeSession = MongoStore.create({
     mongoUrl: 'mongodb://localhost:27017',
