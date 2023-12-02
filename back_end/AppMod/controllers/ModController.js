@@ -42,7 +42,7 @@ const displayUserChannel = async (req,res) => {
         res.render('userChannelProfile',{locals: {user: req.session.user, name: channel.name}});
     }
     catch (error) {
-        res.send('opppopppo');
+        res.status(400).send('No');
     }
 }
 

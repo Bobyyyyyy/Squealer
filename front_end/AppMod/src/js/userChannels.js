@@ -43,7 +43,7 @@ function getChannels (limit,offset,filters) {
             console.log(filters);
             $('#pages').empty();
             let html = `${$.map(data,(channel,index) => `
-            <div class="mt-3 mx-auto rounded d-flex flex-row align-items-center text-center channeldiv" onclick="window.location.href = 'userChannels/${channel.name}'" style="height:5vh; width: 90vw;">
+            <div class="mt-3 mx-auto rounded d-flex flex-row align-items-center text-center channeldiv" onclick="window.location.replace(window.location.href + '/${channel.name}')" style="height:5vh; width: 90vw;">
                 <div style="width: 50%;"> §${channel.name}</> </div>
                 <div style="width: 50%;"> @${channel.creator}</> </div>
                 <div style="width: 50%;"> ${channel.postNumber}</> </div> 

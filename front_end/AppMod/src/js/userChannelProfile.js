@@ -281,6 +281,25 @@ const deletePost = async (id) => {
     })
 }
 
+
+$('#change-name').on('click', () => {
+    let newName = $('#channel-newName').val().toLowerCase();
+    $.ajax({
+        url:'/db/channel/name',
+        data: {channelName: ChannelName, newName: newName },
+        type: 'put',
+        success: (post) => {
+            let url = window.location.href;
+            newurl = url.replace(ChannelName,newName);
+            console.log(newurl);
+            window.location.replace(newurl);
+        },
+        error: (error) => {
+            alert(error.responseJSON.mes);
+        }
+    })
+})
+
 $(document).ready(() => {
     showChannel(ChannelName);
 })

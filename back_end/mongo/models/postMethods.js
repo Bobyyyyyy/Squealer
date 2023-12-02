@@ -281,7 +281,9 @@ const addPost = async (post,quota,credentials) => {
  * @param {Object} query
  * @param {String} sessionUser
  * @param {String} query.name - name of user requesting
- * @param {String} query.channel - name of channel
+ * @param {String} query.channel - name of channel destination
+ * @param {String} query.official - name of official channel destination
+ * @param {String} query.user - name of user destination
  * @param {Boolean} query.smm - is SMM requesting
  * @param {String} query.destType - only if destType activated
  * @param {String} query.popularity - only if popularity is activated
@@ -308,9 +310,13 @@ const getAllPost = async (query,sessionUser,credentials) =>{
 
 
                 /* PER IL CANALE SINGOLO */
-            ... (query.channel) && {$or: [{'destinationArray.name': {$regex: query.channel , $options: 'i'}},
-                 {'officialChannelsArray': {$regex: query.channel , $options: 'i'}}]
-            }
+            ... (query.channel) && {'destinationArray.name': {$regex: query.channel , $options: 'i'}},
+
+                /* PER IL CANALE UFFICIALE */
+            ...(query.official) && {'officialChannelsArray': {$regex: query.official , $options: 'i'}},
+
+            ... (query.user) && {$or: [{'destinationArray.name': {$regex: query.user , $options: 'i'}}]}
+
         }
 
 
@@ -355,8 +361,6 @@ const removeDestination = async (destination,postID,credentials)=> {
     try {
         await connectdb(credentials);
 
-
-
         let checkArrayDestination = await Post.findByIdAndUpdate(postID, {$pull: { destinationArray: {name: destination}}}, {new: true});
 
         let checkOfficialDestination = await Post.findByIdAndUpdate(postID, {$pull: { officialChannelsArray: destination}}, {new: true});
@@ -365,7 +369,9 @@ const removeDestination = async (destination,postID,credentials)=> {
             throw createError("Destinazione non nel post", 422);
         }
 
-        await Channel.findOneAndUpdate({'name': channel.name}, {'postNumber': channel.postNumber-1})
+        if(checkArrayDestination) {
+            await Channel.findOneAndUpdate({name: destination},[{$set: {'postNumber': {$subtract: ['$postNumber',1]}}}]);
+        }
 
         if(checkArrayDestination.destinationArray.length === 0 && checkOfficialDestination.officialChannelsArray.length === 0) {
             await deletePost(postID);
@@ -387,13 +393,18 @@ const removeDestination = async (destination,postID,credentials)=> {
 const addDestination = async (destination,postID,credentials) => {
     try {
         await connectdb(credentials);
-        console.log(destination,postID);
+
+        let checkDestination = await Post.findOne({$and: [{'destinationArray.name': destination.name}, {_id: postID}]});
+        if (checkDestination) {
+            throw createError('Destinazione gia nel post',400);
+        }
         switch (destination.destType) {
             case 'user':
                 let user = await User.findOne({username: destination.name})
                 if(!user) {
                     throw createError('Utente non esiste',400);
                 }
+                await Post.findByIdAndUpdate(postID,{$push: {destinationArray: destination}},{new : true});
                 break;
 
             case 'channel':
@@ -401,7 +412,11 @@ const addDestination = async (destination,postID,credentials) => {
                 if(!channel) {
                     throw createError('Canale Non esiste',400);
                 }
-                await Channel.findOneAndUpdate({'name': destination.name}, {'postNumber': channel.postNumber+1})
+                if(channel.isBlocked) {
+                    throw createError('Canale bloccato',400);
+                }
+                await Channel.findByIdAndUpdate(channel._id,[{$set: {'postNumber': {$add: ['$postNumber',1]}}}]);
+                await Post.findByIdAndUpdate(postID,{$push: {destinationArray: destination}},{new : true});
                 break;
 
             case 'official':
@@ -409,12 +424,9 @@ const addDestination = async (destination,postID,credentials) => {
                 if(!officialChannel) {
                     throw createError('Canale Non esiste',400);
                 }
-
+                await Post.findByIdAndUpdate(postID,{$push: {officialChannelsArray: destination}},{new : true});
                 break;
         }
-
-        await Post.findByIdAndUpdate(postID,{$push: {destinationArray: destination}},{new : true});
-
     }
     catch (error) {
         throw error

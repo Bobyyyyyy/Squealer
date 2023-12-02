@@ -52,9 +52,12 @@
 
 
 <div class="d-flex flex-column">
-
     <div class="p-5 flex-column text-white" id="div1" style="height: 100%; width: 100%">
-        <h1> §<span id="channel-name" class="fw-bold">${name}</span> </h1>
+        <div class="d-flex flex-row align-items-center">
+            <h1> §<span id="channel-name" class="fw-bold">${name}</span></h1>
+            <button class="btn btn-success h-25 ms-2" data-bs-toggle="modal" data-bs-target="#changeName" > Rinomina </button>
+        </div>
+
         <h6 class="fw-light"> creato da @<span id="channel-creator"></span></h6>
         <div class="d-inline-flex flex-row align-items-center pt-3">
             <div id="channel-description" class="p-2 rounded d-inline bg-white text-dark"></div>
@@ -104,8 +107,8 @@
 </div>
 
 
-<div class="modal fade" id="changeReactions" tabindex="-1" aria-labelledby="changeReactionsModal" aria-hidden="true" style="top:25%">
-    <div class="modal-dialog modal-lg">
+<div class="modal fade modal-lg" id="changeReactions" tabindex="-1" aria-labelledby="changeReactionsModal" aria-hidden="true" style="top:25%">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-body d-flex flex-row">
                 <div class="d-flex flex-column align-items-center">
@@ -137,6 +140,30 @@
     </div>
 </div>
 
+
+<div class="modal fade " id="changeName" tabindex="-1" aria-labelledby="changeNameModal" aria-hidden="true">
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header bg-info">
+            <h1 class="modal-title fs-5 fw-bold">Rinomina canale</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group d-flex align-items-center flex-column">
+                <div id="content" class="mt-2" style="width: 100%">
+                    <label for="channel-newName" class="form-label w-100" style>
+                        <textarea class="form-control" name="channel-newName" id="channel-newName" rows="1" placeholder="Inserisci nuovo nome del canale" style="resize: none" data-role="none" autocomplete="off"></textarea>
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
+            <button type="submit" id="change-name" class="btn btn-primary">Conferma</button>
+        </div>
+    </div>
+</div>
+</div>
 
 
 
