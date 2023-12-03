@@ -113,5 +113,15 @@ const MAX_WIDTH = 800;
 
 const URLHTTPREGEX = /(http|ftp|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-])/g
 
+const cast2millis = {
+    'seconds': 1000,
+    'minutes': 1000*60,
+    'hours': 1000*60*60,
+}
 
-export {smm, sideBarElements, currentVip, postType, sortPosts, filterValues, reactionsIcons, QUALITY, MAX_WIDTH, MAX_HEIGHT, smartPhone, expanded, URLHTTPREGEX, postTypeITAS, filterValuesITAS}
+
+export {smm, sideBarElements, currentVip,
+    postType, sortPosts, filterValues,
+    reactionsIcons, QUALITY, MAX_WIDTH, MAX_HEIGHT,
+    smartPhone, expanded, URLHTTPREGEX,
+    postTypeITAS, filterValuesITAS, cast2millis}

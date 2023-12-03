@@ -8,7 +8,8 @@ global.startDate = null;
 
 const express = require('express');
 const cors = require('cors');
-const {dbname} = require("./back_end/mongo/models/utils");
+const {dbname, mongoCredentials} = require("./back_end/mongo/models/utils");
+const mongoose = require('mongoose');
 const path = require('path');
 const {isUser} = require("./back_end/Frontpage/controllers/FrontPageController");
 
@@ -79,8 +80,9 @@ nodeCron.schedule(resetMtimeout, async () => {await CC.resetQuota('M')}).start()
 
 
 // avvio di node
-app.listen(8000,function() {
+app.listen(8000,async function() {
+
     global.startDate = new Date();
-    console.log(path.join(distPath,"assets/"));
     console.log('App listening on port 8000 started' + ' ' + startDate.toLocaleString());
+
 });

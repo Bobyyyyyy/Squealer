@@ -84,46 +84,38 @@
     //TODO: PRENDERE SOLO POST CON QUEL TAG
   }
 
-  let scrollendHandler = async () => {
+
+  const scrollEndDetector = async () => {
+    if (window.innerHeight + window.pageYOffset >= document.getElementById("bodyDiv").offsetHeight && lastRequestLength === 12) {
       lastRequestLength = await(updatePost());
+
+    }
   }
+
 
   onMounted(async ()=> {
       readyPosts.value = false
 
       n_post.value = (await getUserInfo()).nposts;
 
-      //window.addEventListener("scrollend", scrollendHandler);
-    document.addEventListener('scroll', () => {
-      if (window.innerHeight + window.pageYOffset >= document.getElementById("bodyDiv").offsetHeight && lastRequestLength === 12) {
-        console.log("bottom reached");
-        scrollendHandler();
-      }
-    });
+    document.addEventListener('scroll', scrollEndDetector, true);
 
 
     let quota = await getUserQuota();
 
-      store.commit('setQuota', quota.characters);
+    store.commit('setQuota', quota.characters);
 
-      query = `name=${currentVip.value}`
+    query = `name=${currentVip.value}`
 
-      curPosts.push(...(await getPosts(query, 0)));
+    curPosts.push(...(await getPosts(query, 0)));
 
-      readyPosts.value = true
+    readyPosts.value = true
     })
 
   onUnmounted(() => {
-    //window.removeEventListener("scrollend",scrollendHandler);
-    document.removeEventListener("scroll",() => {
-      if (window.innerHeight + window.pageYOffset >= document.getElementById("bodyDiv").offsetHeight && lastRequestLength === 12) {
-        console.log("bottom reached");
-        scrollendHandler();
-      }
-    })
+    document.removeEventListener('scroll', scrollEndDetector, true);
     offset.value = 0;
   })
-
 
 </script>
 

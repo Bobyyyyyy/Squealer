@@ -9,5 +9,6 @@ router.get('/check',channelsController.checkUserInChannel);
 router.get('/number',channelsController.getChannelsNumber);
 router.get('/:name',channelsController.getSingleChannel);
 router.put('/block',channelsController.blockChannel);
+router.put('/name',channelsController.changeChannelName);
 
 module.exports = router

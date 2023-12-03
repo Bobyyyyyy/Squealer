@@ -8,6 +8,10 @@
     classButton: String,
     label: String,
     def: String,
+    labelClass:{
+      type:String,
+      default: '',
+    }
   })
 
   const selected = ref(props.def);
@@ -18,7 +22,7 @@
 
 <template>
   <div class="d-flex flex-column align-items-center">
-    <label :for=getID(label) class="fw-light" >{{label}}</label>
+    <label :for=getID(label) :class="labelClass" class="fw-light" >{{label}}</label>
     <select :id=getID(label) :class="classButton" v-model="selected" class="select btn ms-2" role="button" @change="$emit(updateRef, selected)" aria-expanded="false">
       <option v-for="(el,i) in dropItems" :key="i" :value="el" :selected="el === def ? 'selected': ''">{{dropItemsName[i]}}</option>
     </select>

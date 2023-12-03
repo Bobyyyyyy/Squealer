@@ -1,14 +1,14 @@
 const mongoose = require('mongoose');
 const ReservedChannel = require("../schemas/officialChannels");
 const Post = require("../schemas/Post");
-const {connectdb} = require("./utils");
 const User = require("../schemas/User");
+const connection = require('../ConnectionSingle');
 
 
 //POST
-const addOfficialChannel = async (body,credentials,creator) => {
+const addOfficialChannel = async (body,creator) => {
     try{
-        await connectdb(credentials);
+        await connection.get();
         // trasformare il nome in una forma ragionevole
         let name = body.name.toUpperCase();
         name = name.trim();
@@ -20,7 +20,7 @@ const addOfficialChannel = async (body,credentials,creator) => {
             let err = new Error("Canale Già esistente");
             err.statusCode = 400;
             console.log(err);
-            await mongoose.connection.close();
+            
             throw err;
         }
         let newChannel = new ReservedChannel({
@@ -30,28 +30,26 @@ const addOfficialChannel = async (body,credentials,creator) => {
         });
         //save new reserved channel in DB
         await newChannel.save();
-        await mongoose.connection.close();
+        
         return newChannel;
     }
     catch(err){
-        await mongoose.connection.close();
         console.log(err);
         throw err;
     }
 }
 
-const deleteChannel = async (body,credentials) => {
+const deleteChannel = async (body) => {
     try{
-        await connectdb(credentials);
+        await connection.get();
         let findName = await ReservedChannel.findOneAndDelete({name: body.name}).lean();
         if (!findName) {
             let err = new Error("Nessun Canale Con questo nome");
             err.statusCode = 400;
             throw err;
         }
-
         await Post.deleteMany({'officialChannelsArray': body.name});
-        await mongoose.connection.close();
+        
     }
     catch(err){
         console.log(err);
@@ -59,9 +57,9 @@ const deleteChannel = async (body,credentials) => {
     }
 }
 
-const getChannels = async (query,credentials) =>{
+const getChannels = async (query) =>{
     try {
-        await connectdb(credentials);
+        await connection.get();
         let offset = parseInt(query.offset);
         let limit = parseInt(query.limit);
         return await ReservedChannel.find({$or : [{name: {$regex: query.filter , $options: 'i'}}]}).skip(offset).limit(limit).lean();
@@ -71,11 +69,10 @@ const getChannels = async (query,credentials) =>{
     }
 }
 
-const channelsLength = async (query,credentials) => {
+const channelsLength = async (query) => {
     try {
-        await connectdb(credentials);
+        await connection.get();
         let channels = await ReservedChannel.find({name: {$regex: query.filter , $options: 'i'}}).lean();
-        await mongoose.connection.close();
         return {length: channels.length};
     }
     catch (Error){
@@ -83,15 +80,14 @@ const channelsLength = async (query,credentials) => {
     }
 }
 
-const searchByChannelName = async (query, credentials) =>{
+const searchByChannelName = async (query) =>{
     try {
-        await connectdb(credentials);
+        await connection.get();
         let ChannelName = query.name.trim().toUpperCase();
         let channel = await ReservedChannel.findOne({name: ChannelName}).lean();
         if (!channel) {
             let err = new Error("Nessun canale trovato!");
             err.statusCode = 400;       // 400 ??;
-            await mongoose.connection.close();
             throw err;
         }
         return channel;
@@ -101,9 +97,9 @@ const searchByChannelName = async (query, credentials) =>{
     }
 }
 
-const modifyDescription = async (body, credentials) => {
+const modifyDescription = async (body) => {
     try {
-        await connectdb(credentials);
+        await connection.get();
         let channel = await ReservedChannel.findOneAndUpdate({name: body.channel},
             {description : body.description},{new: true}).lean();
 
@@ -112,9 +108,8 @@ const modifyDescription = async (body, credentials) => {
             err.statusCode = 400;       // 400 ??
             throw err;
         }
-        await mongoose.connection.close();
+        
     }
-
     catch (err) {
         throw err;
     }

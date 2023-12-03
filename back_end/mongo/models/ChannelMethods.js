@@ -1,9 +1,12 @@
 const {connectdb, createError} = require("./utils");
 const Channel = require("../schemas/Channel");
 const User = require("../schemas/User");
+const Post = require("../schemas/Post");
 const mongoose = require("mongoose");
+const connection = require('../ConnectionSingle');
 const {ObjectId} = require("mongodb");
 const {create} = require("connect-mongo");
+const {channel} = require("../controllers/officialChannelsController");
 
 const sorts = {
     'Populars': {
@@ -22,9 +25,9 @@ const sorts = {
     }
 }
 
-const addChannel = async (body,credentials) => {
+const addChannel = async (body) => {
     try{
-        await connectdb(credentials);
+        await connection.get()
         // trasformare il nome in una forma ragionevole
         let name = body.name.toLowerCase();
         name = name.trim();
@@ -32,22 +35,14 @@ const addChannel = async (body,credentials) => {
         name = name.replace('/','_');
         //check if channel exists already
         let findName = await Channel.findOne({name: name}).lean();
-        if (findName) {
-            let err = new Error("Canale Già esistente");
-            err.statusCode = 400;
-            err.message = "Canale Già esistente";
-            console.log(err);
-            await mongoose.connection.close();
-            throw err;
+        let findUser = await User.findOne({name:name}).lean();
+        if (findName || findUser) {
+            throw createError('Nome non utilizzabile',400)
         }
 
         let user = await User.findOne({username: body.creator});
         if (!user) {
-            let err = new Error("Utente non esiste");
-            err.statusCode = 400;
-            err.message = "Utente non esiste";
-            await mongoose.connection.close();
-            throw err;
+            throw createError('Utente non esistente',400);
         }
 
         const newChannel = new Channel({
@@ -62,7 +57,7 @@ const addChannel = async (body,credentials) => {
 
         //save new channel in DB
         await newChannel.save();
-        await mongoose.connection.close();
+
         return newChannel;
     }
     catch(err){
@@ -71,25 +66,21 @@ const addChannel = async (body,credentials) => {
     }
 }
 
-const channelVipList = async (query,credentials) => {
+const channelVipList = async (query) => {
     try{
-        await connectdb(credentials);
-        let channels = await Channel.find({ $or: [{ creator: query.vipName },{admins: {$in: [query.vipName] }}]})
-        await mongoose.connection.close();
-        return channels;
+        await connection.get()
+        return await Channel.find({ $or: [{ creator: query.vipName },{admins: {$in: [query.vipName] }}]});
     }catch (e) {
-        await mongoose.connection.close();
-        console.log(e)
+        throw(e);
     }
 }
 
 /**
  * @param query
- * @param credentials
  * Returns list of channels filtered by the query
  * */
-const getChannels = async (query,credentials) => {
-        await connectdb(credentials);
+const getChannels = async (query) => {
+        await connection.get()
         let offset = parseInt(query.offset);
         let limit = parseInt(query.limit);
 
@@ -134,10 +125,44 @@ const getChannels = async (query,credentials) => {
         return channels;
 }
 
-
-const getChannelsNumber = async (filters,credentials) => {
+const changeChannelName = async (channelName,newName,username) => {
     try {
-        await connectdb(credentials);
+        await connection.get()
+        let channel;
+        newName = newName.toLowerCase().trim();
+
+        let checkName = await Channel.findOne({name: newName}).lean();
+        let checkUser = await User.findOne({'username': newName}).lean();
+
+        if (checkName || checkUser) {
+            throw createError('Nome gia utilizzato',400);
+        }
+
+        let user = await User.findOne({'username': username}).lean();
+        if(user.typeUser === 'mod') {
+            channel = await Channel.findOneAndUpdate({name: channelName},{name: newName}).lean();
+        }
+        else {
+            channel = await Channel.findOneAndUpdate({$and: [{name: channelName},{$or: [{'admins': {$in: [username]}},{'creator': username}]}]},{name: newName}).lean();
+        }
+
+        if (!channel) {
+            throw createError('Canale non esiste o permessi non necessari per modificare nome',400);
+        }
+
+        await Post.updateMany({'destinationArray.name': channelName},{$push : {'destinationArray': {destType: 'channel',name: newName}}});
+        await Post.updateMany({'destinationArray.name': channelName},{$pull: {'destinationArray': {destType: 'channel', name:channelName}}});
+
+    }
+    catch (error) {
+        console.log(error);
+        throw error
+    }
+}
+
+const getChannelsNumber = async (filters) => {
+    try {
+        await connection.get()
         let filter = {
             //filtrare canale per nome
             ...(filters.name) && {'name': filters.name},
@@ -153,7 +178,7 @@ const getChannelsNumber = async (filters,credentials) => {
 
         let channels = await Channel.find(filter).lean();
 
-        await mongoose.connection.close();
+
         return {length: channels.length};
     }
     catch (Error){
@@ -162,15 +187,14 @@ const getChannelsNumber = async (filters,credentials) => {
 }
 
 
-const getSingleChannel = async(name,credentials) => {
+const getSingleChannel = async(name) => {
     try{
-        await connectdb(credentials);
+        await connection.get()
         let ChannelName = name.trim().toLowerCase();
         let channel = await Channel.findOne({name: ChannelName}).lean();
         if (!channel) {
             let err = new Error("Nessun canale trovato!");
             err.statusCode = 400;       // 400 ??;
-            await mongoose.connection.close();
             throw err;
         }
         return channel;
@@ -183,9 +207,9 @@ const getSingleChannel = async(name,credentials) => {
 
 
 
-const checkUserChannel = async (query,credentials) => {
+const checkUserChannel = async (query) => {
     try{
-        await connectdb(credentials);
+        await connection.get()
 
         let channel = await Channel.findOne({name:query.channel, $or:[
             {creator:query.user},
@@ -201,25 +225,20 @@ const checkUserChannel = async (query,credentials) => {
             else if (channel.admins.find(el => el === query.user)) userInChannel = 'admin';
             else if (channel.followers.find(el => el.user === query.user)) userInChannel = 'follower';
         }
-
-        await mongoose.connection.close();
-
         return {canAccessAs: userInChannel}
 
     } catch (e) {
-        await mongoose.connection.close();
-        console.log(e)
+        throw e;
     }
 }
 
 
-const blockChannel = async (user,channelName,credentials) => {
+const blockChannel = async (user,channelName) => {
     try {
-        await connectdb(credentials);
+        await connection.get();
 
         let name = await User.findOne({username: user});
 
-        console.log(name);
         if(!name || name.typeUser !== 'mod') {
             throw createError('User not found or not moderator',400)
         }
@@ -247,5 +266,6 @@ module.exports = {
     getChannels,
     getChannelsNumber,
     getSingleChannel,
-    blockChannel
+    blockChannel,
+    changeChannelName
 }

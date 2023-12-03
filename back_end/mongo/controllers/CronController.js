@@ -1,4 +1,3 @@
-const {mongoCredentials} = require("../models/utils");
 const nodeCron = require('node-cron')
 const UMM = require('../models/userMethods')
 const {scheduledFnOne,scheduledPostArr, getNextTick, cast2millis, } = require("./utils");
@@ -23,7 +22,7 @@ const parse2timestamp = (frequency) => {
 const resetQuota = async (type) => {
     try{
         //AGGIUNERE CASI DI ERROR
-        await UMM.resetQuota(type,mongoCredentials)
+        await UMM.resetQuota(type)
 
     }catch (err){
         throw err;
@@ -47,7 +46,7 @@ const createScheduledPost = async (postId, frequency, squealNumber, content, typ
         id : postId,
         ...(typeC === 'text') && {content: content},
         timestamp2next: timestamp,
-        job :  nodeCron.schedule(getNextTick(timestamp), async () => await addTimedPost(postId,mongoCredentials),{
+        job :  nodeCron.schedule(getNextTick(timestamp), async () => await addTimedPost(postId),{
             scheduled: true,
             timezone: 'Europe/Rome',
         })

@@ -64,7 +64,7 @@ const showPosts = (filter,offset,limit,append = false) => {
     updateLastCall(limit,offset,filter);
     $.ajax({
         url:'/db/post/all',
-        data: {channel: ChannelName, typeFilter: filter , offset: offset, limit: limit},
+        data: {official: ChannelName, typeFilter: filter , offset: offset, limit: limit},
         type: 'get',
         success: (posts) => {
             if(posts.length === 0) {
