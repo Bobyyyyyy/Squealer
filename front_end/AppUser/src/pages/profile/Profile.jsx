@@ -36,7 +36,7 @@ function Profile () {
 
     const prendiProfilo = async () => {
         try {
-            let res = await fetch("/db/user/profilePic");
+            let res = await fetch(`/db/user/profilePic?name=${getUsernameFromLocStor()}`);
             //console.log("risposta", res);
             if (res.ok) {
                 let profilePic = await res.json();

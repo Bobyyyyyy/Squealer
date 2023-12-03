@@ -1,34 +1,70 @@
 import Body from "./Body.jsx";
-import React, {useState} from "react";
+import React, {Suspense, useEffect, useState} from "react";
 import Title from "./Title.jsx";
 
 import {
     Dislike, Like, Heart, MadIcon, ProfilePic
 } from "../assets/index.jsx"
+import {getUsernameFromLocStor} from "../utils/usefulFunctions.js";
 
 function Post({post}) {
 
     const buttonsReaction = [
-        {id: 0, icon: Heart},
-        {id: 1, icon: Like},
-        {id: 2, icon: Dislike},
-        {id: 3, icon: MadIcon}
+        {id: 'heart', icon: Heart},
+        {id: 'thumbs-up', icon: Like},
+        {id: 'thumbs-down', icon: Dislike},
+        {id: 'heartbreak', icon: MadIcon}
     ];
 
-    // controllo bottoni
-    const [activeButton, setActiveButton] = useState();
 
-    function changeActiveButton({id}) {
+    // controllo bottoni
+    const lastReaction = post.reactions.find((reaction)=> reaction.user === getUsernameFromLocStor());
+    const [activeButton, setActiveButton] = useState(lastReaction ? lastReaction.rtype : null);
+
+    async function changeActiveButton({id}) {
         setActiveButton((id === activeButton) ? undefined : id);
+        // si può fare perché lo stato activeButton cambia
+        // effettivamente quando il componente viene renderizzato
+        const user = getUsernameFromLocStor();
+        if (id !== activeButton) {
+            const newReaction = {
+                rtype: id,
+                user: user,
+                date: new Date().toISOString(),
+            }
+            await fetch(`/db/post/updateReaction`,{
+                method:"PUT",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body:JSON.stringify({
+                    postId: post._id,
+                    user: user,
+                    reaction: id,
+                })
+            })
+        } else {
+            await fetch(`/db/post/deleteReaction`,{
+                method:"PUT",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body:JSON.stringify({
+                    postId: post._id,
+                    user: user,
+                })
+            })
+        }
     }
 
     return(
     <>
         <div className="w-full md:w-[32rem] border border-gray-200">
-            <Title post={post} />
+            <Suspense fallback={<Caricamento />}>
+                <Title post={post} />
+            </Suspense>
             <div>
-
-            <Body post={post} />
+                <Body post={post} />
             </div>
             <div className="flex w-full justify-evenly py-2 px-4" >
                 {buttonsReaction.map( (item) => (
@@ -43,6 +79,14 @@ function Post({post}) {
             </div>
         </div>
     </>
+    );
+
+}
+function Caricamento () {
+    return (
+        <h1>
+            caricamento
+        </h1>
     );
 }
 

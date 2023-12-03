@@ -8,7 +8,7 @@ router.post('/',userController.addUser,(req,res) => {
     res.redirect('/mod/users');
 });
 router.put('/',userController.modifyUser);
-router.get('/profilePic', userController.getUserProfilePic);
+router.get('/profilePic', userController.getUserProfileByName);
 router.put('/profilePic', userController.updateUserProfilePic);
 router.get('/session',userController.getSessionUser);
 router.get('/number',userController.getUsersNumber);

@@ -1,21 +1,53 @@
 import {ProfilePic} from "../assets/index.jsx"
-import {parseTime} from "../utils/usefulFunctions.js";
+import {getUsernameFromLocStor, parseTime} from "../utils/usefulFunctions.js";
+import React, {Suspense, useEffect, useState} from "react";
 
 
-function Title({post, profilePic}) {
+function Title({post}) {
 
     let allDest = post.destinationArray.map((dest) => {
         return dest.name;
     })
 
     const tempo = parseTime(post);
-    console.log('sus',tempo)
+
+    const [profilePic, setProfilePic] = useState();
+    const prendiProfilo = async () => {
+        try {
+            let res = await fetch(`/db/user/profilePic?name=${post.owner}`);
+            console.log("risposta", res);
+            if (res.ok) {
+                let profilePic = await res.json();
+                //console.log("pic diocane", profilePic.profilePic);
+                setProfilePic(profilePic.profilePic)
+                return profilePic;
+            }
+        }
+        catch (e) {
+            console.log(e)
+        }
+    }
+
+    useEffect(()=> {
+        prendiProfilo()
+            .then()
+    }, [])
+
+    function Caricamento () {
+        return (
+            <h1>
+                caricamento
+            </h1>
+        );
+    }
 
     return (
         <>
             <div className="flex justify-between items-center px-4 py-2">
                 <div className="flex w-full items-center" >
-                    <img className="w-14 h-14 rounded-full" alt="foto profilo" src={ProfilePic} />
+                    <Suspense fallback={<Caricamento />}>
+                        <img className="w-14 h-14 rounded-full" alt="foto profilo" src={profilePic} />
+                    </Suspense>
                     <div className="flex flex-col ml-4 gap-2">
                         <h3 className="text-primary w-fit h-fit">
                             {post.owner}

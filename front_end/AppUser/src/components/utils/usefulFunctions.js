@@ -117,6 +117,16 @@ const compressBlob = (file) => new Promise((resolve) => {
     };
 })
 
+const getEmbed = (url) => {
+    let regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    let match = url.match(regExp);
+
+    if (match && match[2].length === 11) {
+        return match[2];
+    } else {
+        return 'error';
+    }
+}
 
 export {
     getUsernameFromLocStor,
@@ -126,5 +136,5 @@ export {
     getAllPostFrontend,
     getProfilePic,
     parseTime,
-    blob2base64, compressBlob
+    blob2base64, compressBlob,getEmbed
 }

@@ -2,7 +2,7 @@ import {Field, Formik, Form, useFormikContext} from 'formik';
 import * as Yup from "yup";
 import {alert, Button} from "@material-tailwind/react";
 import {useEffect, useState} from "react";
-import {getUsernameFromLocStor, compressBlob, blob2base64} from "../../components/utils/usefulFunctions.js"
+import {getUsernameFromLocStor, compressBlob, blob2base64, getEmbed} from "../../components/utils/usefulFunctions.js"
 
 import { MapContainer, TileLayer, Marker, Popup  } from 'react-leaflet'
 import Mappa from "../../components/posts/Mappa.jsx";
@@ -81,7 +81,11 @@ function AddPost () {
                  break
              case "video":
                  console.log(values.video);
-                 content = values.video;
+                 const youtubepath = `//www.youtube.com/embed/${getEmbed(values.video)}`
+                 //content = values.video;
+                 console.log(youtubepath)
+                 content = youtubepath;
+
          }
 
          let destinations = parseDestinations(values.destinatari);
@@ -234,33 +238,8 @@ const Content = ({errors, touched, setImgAsLink, ...formikProps}) => {
     const [position, setPosition] = useState(null);
     const [isLink, setIsLink] = useState(false);
 
-/*
-    const videoPath = ref('');
-    const currentVideoPath = ref('');
-    const showVideo = ref(false);
-    const getEmbed = (url) => {
-        let regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-    /*
-            let match = url.match(regExp);
-
-            if (match && match[2].length === 11) {
-                return match[2];
-            } else {
-                return 'error';
-            }
-        }
-        const youtubePath = computed(() => `//www.youtube.com/embed/${getEmbed(currentVideoPath.value)}`)
-    */
-
 
     useEffect(() => {
-        /* const loadPos = async () =>{
-            await formikProps.setFieldValue("geolocation", position);
-            console.log("pos", position.toString())
-        }
-        loadPos();
-
-         */
         geoPos = position;
     }, [position]);
 

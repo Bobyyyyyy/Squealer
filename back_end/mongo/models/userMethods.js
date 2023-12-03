@@ -92,9 +92,13 @@ const loginUser = async (query,credentials) =>{
  */
 const getUserProfilePicture = async (username, credentials) => {
     try {
-        await connectdb(credentials);
+        console.log("active connections: ", mongoose.connection.base.connections.length);
+        console.log("active connections arr: ", mongoose.connection.base.connections);
+        let con = await connectdb(credentials);
         let user = await User.findOne({username: username}).lean();
-        await mongoose.connection.close();
+        //if (mongoose.connection.base.connections.length === 0) {
+        await con.disconnect();
+
         return {profilePic: user.profilePicture};
     } catch (err) {
         console.log(err);

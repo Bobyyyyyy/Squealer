@@ -1,5 +1,5 @@
 import Post from "../../components/posts/Post.jsx";
-import {useEffect, useState} from "react";
+import React, {Suspense, useEffect, useState} from "react";
 import {
     getAllPostFrontend,
     getUsernameFromLocStor,
@@ -23,7 +23,7 @@ function Home() {
             let currentUser = localStorage.getItem("username");
             console.log("name user:", currentUser);
 
-            let res = await fetch(`/db/post/all?name=${currentUser}&offset=0`);
+            let res = await fetch(`/db/post/all?offset=0&limit=10`);
             console.log(res);
             if (!res.ok) {
                console.log("errore nel fetching dei post");
@@ -49,6 +49,15 @@ function Home() {
             })
     }, []);
 
+
+    function Caricamento () {
+        return (
+            <h1>
+                caricamento
+            </h1>
+        );
+    }
+
     return (
         <>
             {isLoading && <h1>Caricamento...</h1>}
@@ -57,10 +66,12 @@ function Home() {
                 {posts!==null && posts.map((post)=> {
                     //console.log("id",post._id)
                     return(
-                        <Post
-                            key={post._id}
-                            post={post}
-                        />
+                        <Suspense fallback={<Caricamento />} >
+                            <Post
+                                key={post._id}
+                                post={post}
+                            />
+                        </Suspense>
                 )})}
             </div>
             }

@@ -25,8 +25,9 @@ const getSessionUser = async (req,res) => {
     res.send({username: req.session.user});
 }
 
-const getUserProfilePic = async (req,res) => {
-    res.send(await userModel.getUserProfilePicture(req.session.user, mongoCredentials));
+const getUserProfileByName = async (req,res) => {
+    console.log(req.query)
+    res.send(await userModel.getUserProfilePicture(req.query.name, mongoCredentials));
 }
 
 const updateUserProfilePic = async (req, res) => {
@@ -154,6 +155,6 @@ module.exports = {
     getFollnPosts,
     getLastPost,
     updateMaxQuota,
-    getUserProfilePic,
+    getUserProfileByName,
     updateUserProfilePic
 }

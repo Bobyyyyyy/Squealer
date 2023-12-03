@@ -20,11 +20,11 @@ function Body({post}) {
                 </div>
             }
             {post.contentType === "video" &&
-                <video>
-                    <source src={post.content} type="video/webm" />
-                    <source src={post.content} type="video/mp4" />
-                    Sorry, your browser doesn't support videos.
-                </video>
+                <iframe
+                    className="w-full h-full"
+                    src={post.content}
+                >
+                </iframe>
 
             }
         </div>
