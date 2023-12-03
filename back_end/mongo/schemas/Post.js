@@ -88,6 +88,23 @@ const PostSchema = new mongoose.Schema({
         }
     ],
 
+    reply: {
+        type: {
+            isReply: {
+                type: Boolean,
+                default: false,
+            },
+
+            repliedPost: {
+                type: String, //id post
+                required: function() {
+                    return this.isReply === true;
+                }
+            }
+        },
+        required: false
+    },
+
 })
 
 const Post = mongoose.model("Post", PostSchema);

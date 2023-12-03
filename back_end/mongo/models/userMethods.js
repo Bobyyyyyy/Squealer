@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require("bcryptjs");
-
+const Channel = require("../schemas/Channel")
 const User = require("../schemas/User");
 const {saltRounds,quota} = require("./utils");
 const {json} = require("express");
@@ -15,10 +15,10 @@ const addUser = async (body) => {
     try{
         await connection.get();
         //GET user using email and name
-        let findName = await User.find({username: body.name}).lean();
-
-        if (findName.length !== 0) {
-            let err = new Error("Utente già registrato!");
+        let findName = await User.findOne({username: body.name}).lean();
+        let findChannel = await User.findOne({name: body.name}).lean();
+        if (findName || findChannel) {
+            let err = new Error("Nome non disponibile");
             err.statusCode = 400;
             console.log(err);
             
@@ -122,7 +122,6 @@ const changePwsd = async(body) =>{
         user.password = await bcrypt.hash(body.password,saltRounds);
 
         await user.save();
-        await mongoose.connection.close()
     }
     catch (err) {
         

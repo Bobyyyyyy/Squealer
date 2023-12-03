@@ -80,7 +80,7 @@ const channelsLength = async (query) => {
     }
 }
 
-const searchByChannelName = async (query, credentials) =>{
+const searchByChannelName = async (query) =>{
     try {
         await connection.get();
         let ChannelName = query.name.trim().toUpperCase();
@@ -97,7 +97,7 @@ const searchByChannelName = async (query, credentials) =>{
     }
 }
 
-const modifyDescription = async (body, credentials) => {
+const modifyDescription = async (body) => {
     try {
         await connection.get();
         let channel = await ReservedChannel.findOneAndUpdate({name: body.channel},

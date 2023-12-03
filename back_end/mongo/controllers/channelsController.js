@@ -45,6 +45,14 @@ const getChannelsNumber = async (req,res) => {
     }
 }
 
+const changeChannelName = async (req,res) => {
+    try {
+        res.send(await channelsModel.changeChannelName(req.body.channelName,req.body.newName,req.session.user));
+    }
+    catch (error) {
+        res.status(400).send(error)
+    }
+}
 
 const getSingleChannel = async (req,res) => {
     try {
@@ -75,5 +83,6 @@ module.exports = {
     getChannels,
     getChannelsNumber,
     getSingleChannel,
-    blockChannel
+    blockChannel,
+    changeChannelName
 }

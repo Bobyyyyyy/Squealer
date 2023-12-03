@@ -32,7 +32,6 @@ function getPostsNumber (filter) {
         type: 'get',
         success: (data) => {
             LastCall.posts = data.length;
-            console.log(LastCall.posts)
             showPosts(LastCall.filters)
         }
     })

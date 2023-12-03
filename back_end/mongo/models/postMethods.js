@@ -1,8 +1,9 @@
 const Post = require("../schemas/Post");
 const User = require("../schemas/User");
 const Channel = require("../schemas/Channel")
+const Notification = require("../schemas/Notification")
 const ReservedChannel = require("../schemas/officialChannels");
-const {createError,find_remove, CRITICAL_MASS_MULTIPLIER, getConnection} = require("./utils");
+const {connectdb, createError, mongoCredentials,find_remove, CRITICAL_MASS_MULTIPLIER} = require("./utils");
 const {scheduledPostArr, getNextTick} = require("../controllers/utils");
 const nodeCron = require("node-cron");
 const {changePopularity} = require("./userMethods");
@@ -24,8 +25,6 @@ const getReactionLast30days = async(username, channel = undefined) => {
         await connection.get()
 
         let posts_id_reactions = await Post.find(filter,'reactions');
-
-        
 
         let now = new Date();
         let last30daysTS = (new Date(now.setDate(now.getDate() - 30))).getTime();
@@ -56,8 +55,6 @@ const getPostsDate = async (username, onlyThisMonth ) => {
         await connection.get()
 
         let postsId_Date = await Post.find({owner: username},'dateOfCreation');
-
-        
 
         let postsDate = []
         let thisMonth = new Date().getMonth();
@@ -148,8 +145,6 @@ const addTimedPost = async (postId) => {
         let post = await Post.findById(postId);
         let userQuota = (await User.findOne({username: post.owner})).characters;
 
-        
-
         let timedInfo = scheduledPostArr.find(el => el['id']===postId);
 
 
@@ -185,7 +180,6 @@ const addTimedPost = async (postId) => {
  * @param {Object} post
  * {creator: String, destination: array of objects{name: String, destType: String}, contentType: String, content: String, dateOfCreation: Date , tags: Array<String>}
  * @param {Object} quota - {daily,weekly-monthly} - remaining updated
- * @param credentials - mongo credentials
  * @returns {Promise<{postId: *}>}
  */
 const addPost = async (post,quota) => {
@@ -194,7 +188,7 @@ const addPost = async (post,quota) => {
         let destinations = ((typeof post.destinations) === 'string') ? JSON.parse(post.destinations) : post.destinations;
         let postCategory = 'private';
         let officialChannels = [];
-        let creatorType = (await User.findOne({username: post.creator}, 'typeUser')).typeUser;
+        let creator = await User.findOne({username: post.creator});
         for (const destination of destinations) {
             let destinationType = destination.destType;
             let channel = await Channel.findOne({name: destination.name});
@@ -210,7 +204,7 @@ const addPost = async (post,quota) => {
             }
             /* canale ufficiale non esiste e l'utente non mod*/
             else if (destinationType === 'official' && (!(await ReservedChannel.findOne({name: destination.name}))
-                || creatorType !== 'mod')) {
+                || creator.typeUser !== 'mod')) {
                 throw createError("canale ufficiale non esistente o utente non moderatore!", 422);
             }
             /* tipo di destinatario non inserito */
@@ -231,7 +225,13 @@ const addPost = async (post,quota) => {
                     postCategory = 'public';
                 }
                 //update post number in channel schema
-                await Channel.findOneAndUpdate({'name': channel.name}, {'postNumber': channel.postNumber+1})
+                channel = await Channel.findOneAndUpdate({'name': channel.name}, {'postNumber': channel.postNumber+1})
+
+                let newNotification = channel.followers.filter((follower) => follower.user !== creator.username).map((follower) => {
+                    return {user: follower.user, sender: creator.username, channel: channel.name};
+                });
+
+               await Notification.insertMany(newNotification);
             }
         }
 
@@ -247,12 +247,13 @@ const addPost = async (post,quota) => {
             category: postCategory,
             popularity: 'neutral',
             dateOfCreation: post.dateOfCreation,
-            ...(post.tags && post.tags !== []) && {tags: post.tags}
+            ...(post.tags && post.tags !== []) && {tags: post.tags},
+            ... ({'reply.isReply': !!post.reply, ...(!!post.reply) && {'reply.repliedPost': post.reply.repliedPost}}),
         })
 
         await newPost.save();
 
-        if (creatorType !== 'mod' ) {
+        if (creator !== 'mod' ) {
             /* QUOTA UPDATE */
             await User.findOneAndUpdate({username: post.creator}, {
                 characters:{
@@ -263,7 +264,7 @@ const addPost = async (post,quota) => {
             } );
         }
 
-        
+
 
         return {postId: newPost._id};
     }
@@ -275,7 +276,9 @@ const addPost = async (post,quota) => {
  * @param {Object} query
  * @param {String} sessionUser
  * @param {String} query.name - name of user requesting
- * @param {String} query.channel - name of channel
+ * @param {String} query.channel - name of channel destination
+ * @param {String} query.official - name of official channel destination
+ * @param {String} query.user - name of user destination
  * @param {Boolean} query.smm - is SMM requesting
  * @param {String} query.destType - only if destType activated
  * @param {String} query.popularity - only if popularity is activated
@@ -283,12 +286,15 @@ const addPost = async (post,quota) => {
  * @param {Number} query.offset - offset to skip
  * @param {String} query.limit - max number of post to return
  * @param {String} query.sort - only if Sort activated -- more recent by default
- * @param credentials
+ * @param {Boolean} query.reply - if you want replies of a given post
+ * @param {String} query.repliedPost - father id
  * @returns {Promise<*>}
  */
 const getAllPost = async (query,sessionUser) =>{
     try{
         await connection.get()
+        let reply = !!query?.reply;
+
         let filter = {
                 /* Per i canali non mi serve l'id dell'utente che fa la richiesta, a meno che non sia SMM*/
             ...((query.smm || !query.channel) && query.name) && {'owner':  {$regex: query.name , $options: 'i'}},
@@ -302,13 +308,17 @@ const getAllPost = async (query,sessionUser) =>{
 
 
                 /* PER IL CANALE SINGOLO */
-            ... (query.channel) && {$or: [{'destinationArray.name': {$regex: query.channel , $options: 'i'}},
-                 {'officialChannelsArray': {$regex: query.channel , $options: 'i'}}]
-            }
+            ... (query.channel) && {'destinationArray.name': {$regex: query.channel , $options: 'i'}},
+
+                /* PER IL CANALE UFFICIALE */
+            ...(query.official) && {'officialChannelsArray': {$regex: query.official , $options: 'i'}},
+
+            ... (query.user) && {$or: [{'destinationArray.name': {$regex: query.user , $options: 'i'}}]},
+
+            ... {'reply.isReply': reply, ... (reply) && {'reply.repliedPost': query.reply.repliedPost}},
         }
 
-
-
+        await connection.get();
         let posts = await Post.find(filter)
             .skip(parseInt(query.offset))
             .limit(parseInt(query.limit))
@@ -355,7 +365,9 @@ const removeDestination = async (destination,postID)=> {
             throw createError("Destinazione non nel post", 422);
         }
 
-        await Channel.findOneAndUpdate({'name': channel.name}, {'postNumber': channel.postNumber-1})
+        if(checkArrayDestination) {
+            await Channel.findOneAndUpdate({name: destination},[{$set: {'postNumber': {$subtract: ['$postNumber',1]}}}]);
+        }
 
         if(checkArrayDestination.destinationArray.length === 0 && checkOfficialDestination.officialChannelsArray.length === 0) {
             await deletePost(postID);
@@ -376,13 +388,18 @@ const removeDestination = async (destination,postID)=> {
 const addDestination = async (destination,postID) => {
     try {
         await connection.get()
-        console.log(destination,postID);
+
+        let checkDestination = await Post.findOne({$and: [{'destinationArray.name': destination.name}, {_id: postID}]});
+        if (checkDestination) {
+            throw createError('Destinazione gia nel post',400);
+        }
         switch (destination.destType) {
             case 'user':
                 let user = await User.findOne({username: destination.name})
                 if(!user) {
                     throw createError('Utente non esiste',400);
                 }
+                await Post.findByIdAndUpdate(postID,{$push: {destinationArray: destination}},{new : true});
                 break;
 
             case 'channel':
@@ -390,7 +407,11 @@ const addDestination = async (destination,postID) => {
                 if(!channel) {
                     throw createError('Canale Non esiste',400);
                 }
-                await Channel.findOneAndUpdate({'name': destination.name}, {'postNumber': channel.postNumber+1})
+                if(channel.isBlocked) {
+                    throw createError('Canale bloccato',400);
+                }
+                await Channel.findByIdAndUpdate(channel._id,[{$set: {'postNumber': {$add: ['$postNumber',1]}}}]);
+                await Post.findByIdAndUpdate(postID,{$push: {destinationArray: destination}},{new : true});
                 break;
 
             case 'official':
@@ -398,12 +419,9 @@ const addDestination = async (destination,postID) => {
                 if(!officialChannel) {
                     throw createError('Canale Non esiste',400);
                 }
-
+                await Post.findByIdAndUpdate(postID,{$push: {officialChannelsArray: destination}},{new : true});
                 break;
         }
-
-        await Post.findByIdAndUpdate(postID,{$push: {destinationArray: destination}},{new : true});
-
     }
     catch (error) {
         throw error
@@ -545,7 +563,7 @@ const getLastPostUser = async (query) => {
         await connection.get()
 
         let posts = await Post.find({owner: query.user}).sort(sorts['più recente']).limit(1);
-        
+
         return posts[0];
     }
     catch (err){
@@ -562,6 +580,8 @@ const getLastPostUser = async (query) => {
 const postLength = async (filters) => {
     try {
         await connection.get()
+        let reply = !!filters?.reply;
+
         let filter = {
             /* Per i canali non mi serve l'id dell'utente che fa la richiesta, a meno che non sia SMM*/
             ...((filters.smm || !filters.channel) && filters.name) && {'owner':  {$regex: filters.name , $options: 'i'}},
@@ -574,9 +594,14 @@ const postLength = async (filters) => {
             ... (filters.popularity && filters.popularity !== 'neutral') && {'popularity': filters.popularity},
 
             /* PER IL CANALE SINGOLO */
-            ... (filters.channel) && {$or: [{'destinationArray.name': {$regex: filters.channel , $options: 'i'}},
-                    {'officialChannelsArray': {$regex: filters.channel , $options: 'i'}}]
-            }
+            ... (filters.channel) && {'destinationArray.name': {$regex: filters.channel , $options: 'i'}},
+
+            /* PER IL CANALE UFFICIALE */
+            ...(filters.official) && {'officialChannelsArray': {$regex: filters.official , $options: 'i'}},
+
+            ... (filters.user) && {$or: [{'destinationArray.name': {$regex: filters.user , $options: 'i'}}]},
+
+            ... {'reply.isReply': reply, ... (reply) && {'reply.repliedPost': filters.reply.repliedPost}},
         }
 
         let posts = await Post.find(filter).lean();
