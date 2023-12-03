@@ -1,4 +1,3 @@
-const {mongoCredentials} = require('../models/utils.js')
 const postModel = require("../models/postMethods");
 const {createScheduledPost} = require("./CronController");
 const {mongo} = require("mongoose");
@@ -6,7 +5,7 @@ const {mongo} = require("mongoose");
 
 const createPost = async (req,res) => {
     try{
-        let postSavedId = await postModel.addPost(req.body.post, req.body.quota,mongoCredentials)
+        let postSavedId = await postModel.addPost(req.body.post, req.body.quota)
         if (req.body.post?.timed) {
             await createScheduledPost(postSavedId.postId, req.body.post.frequency, req.body.post.squealNumber, req.body.post.content, req.body.post.contentType);
         }
@@ -20,7 +19,7 @@ const createPost = async (req,res) => {
 
 const getPosts = async (req,res) => {
     try {
-        res.send(await postModel.getAllPost(req.query,req.session.user,mongoCredentials))
+        res.send(await postModel.getAllPost(req.query,req.session.user))
     }
     catch(error) {
         res.send(error);
@@ -30,11 +29,11 @@ const getPosts = async (req,res) => {
 const updateReaction = async (req,res) => {
     try {
         if(req.session.type === 'mod') {
-                await postModel.updateReac(req.body, mongoCredentials);
+                await postModel.updateReac(req.body);
                 res.send('200');
         }
         else {
-            await postModel.updateReac(req.body,mongoCredentials);
+            await postModel.updateReac(req.body);
             res.send('200');
         }
     }
@@ -45,7 +44,7 @@ const updateReaction = async (req,res) => {
 
 const deleteReaction = async (req,res) => {
     try {
-        res.send(await postModel.deleteReac(req.body,mongoCredentials))
+        res.send(await postModel.deleteReac(req.body))
     }
     catch(error) {
         res.send(error);
@@ -54,7 +53,7 @@ const deleteReaction = async (req,res) => {
 
 const removePost = async (req,res) => {
     try {
-        res.send(await postModel.removeDestination(req.body.destination,req.body.postID,mongoCredentials))
+        res.send(await postModel.removeDestination(req.body.destination,req.body.postID))
     }
     catch(error) {
         res.send(error);
@@ -81,7 +80,7 @@ const getReactionLast30days = async (req,res) => {
 
 const postLength = async (req,res) => {
     try {
-        res.send(await postModel.postLength(req.query.filter,mongoCredentials))
+        res.send(await postModel.postLength(req.query.filter))
     }
     catch (error) {
         res.send(error);
@@ -90,7 +89,7 @@ const postLength = async (req,res) => {
 
 const addDestination = async(req,res) => {
     try {
-        res.send(await postModel.addDestination(req.body.destination, req.body.postID, mongoCredentials));
+        res.send(await postModel.addDestination(req.body.destination, req.body.postID));
     }
     catch (error) {
         res.status(400).send(error);

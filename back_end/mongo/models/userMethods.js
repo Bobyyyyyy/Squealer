@@ -2,17 +2,18 @@ const mongoose = require('mongoose');
 const bcrypt = require("bcryptjs");
 
 const User = require("../schemas/User");
-const {connectdb,saltRounds,quota, mongoCredentials} = require("./utils");
+const {saltRounds,quota} = require("./utils");
 const {json} = require("express");
 const Post = require("../schemas/Post");
 const {start} = require("@popperjs/core");
 const {scheduledFnOne} = require("../controllers/utils");
+const connection = require('../ConnectionSingle');
 
 
 //POST
-const addUser = async (body,credentials) => {
+const addUser = async (body) => {
     try{
-        await connectdb(credentials);
+        await connection.get();
         //GET user using email and name
         let findName = await User.find({username: body.name}).lean();
 
@@ -20,7 +21,7 @@ const addUser = async (body,credentials) => {
             let err = new Error("Utente già registrato!");
             err.statusCode = 400;
             console.log(err);
-            await mongoose.connection.close();
+            
             throw err;
         }
 
@@ -39,20 +40,20 @@ const addUser = async (body,credentials) => {
         //save new user in DB
         await newUser.save();
 
-        await mongoose.connection.close();
+        
 
         return newUser;
     }
     catch(err){
-        await mongoose.connection.close();
+        
         console.log(err);
         throw err;
     }
 }
 
-const loginUser = async (query,credentials) =>{
+const loginUser = async (query) =>{
     try{
-        await connectdb(credentials);
+        await connection.get();
         //get user by username
         let user = await User.findOne({username: query.user}).lean();
         //check if user exists
@@ -60,7 +61,7 @@ const loginUser = async (query,credentials) =>{
             let err = new Error("Nessun utente trovato!");
             err.statusCode = 400;       // 400 ??
             console.log(err);
-            await mongoose.connection.close();
+            
             throw err;
         }
 
@@ -71,30 +72,30 @@ const loginUser = async (query,credentials) =>{
             let err = new Error("Password Sbagliata!");
             err.statusCode = 400;       // 400 ??
             console.log(err);
-            await mongoose.connection.close();
+            
             throw err;
         }
 
-        await mongoose.connection.close();
+        
         return user;
     }
     catch (err){
-        await mongoose.connection.close();
+        
         throw err;
     }
 }
 
 //GET
-const searchByUsername = async (query, credentials) =>{
+const searchByUsername = async (query) =>{
     try {
 
-        await connectdb(credentials);
+        await connection.get();
         let user = await User.findOne({username: query.username}).lean();
         if (!user) {
             let err = new Error("Nessun utente trovato!");
             err.statusCode = 400;       // 400 ??
             console.log(err);
-            await mongoose.connection.close();
+            
             throw err;
         }
         return user;
@@ -106,16 +107,16 @@ const searchByUsername = async (query, credentials) =>{
 }
 
 //PUT
-const changePwsd = async(body,credentials) =>{
+const changePwsd = async(body) =>{
     try{
-        await connectdb(credentials);
+        await connection.get();
         let user = await User.find({email: body.email});    //query o body??
 
         if (user.length === 0) {
             let err = new Error("Mail inesistente");
             err.statusCode = 400;
             console.log(err);
-            await mongoose.connection.close();
+            
             return err;
         }
         user.password = await bcrypt.hash(body.password,saltRounds);
@@ -124,15 +125,15 @@ const changePwsd = async(body,credentials) =>{
         await mongoose.connection.close()
     }
     catch (err) {
-        await mongoose.connection.close();
+        
         console.log(err);
         throw err;
     }
 }
 
-const getUsers = async (query,credentials) =>{
+const getUsers = async (query) =>{
     try {
-        await connectdb(credentials);
+        await connection.get();
         let offset = parseInt(query.offset);
         let limit = parseInt(query.limit);
         return await User.find({$or : [{username: {$regex: query.filter , $options: 'i'}},{email: {$regex: query.filter , $options: 'i'}},{typeUser: {$regex: query.filter , $options: 'i'}}, ] } ).skip(offset).limit(limit).lean();
@@ -142,11 +143,11 @@ const getUsers = async (query,credentials) =>{
     }
 }
 
-const usersLength = async (query,credentials) => {
+const usersLength = async (query) => {
     try {
-        await connectdb(credentials);
+        await connection.get();
         let users = await User.find({$or : [{username: {$regex: query.filter , $options: 'i'}},{email: {$regex: query.filter , $options: 'i'}},{typeUser: {$regex: query.filter , $options: 'i'}},]}).lean();
-        await mongoose.connection.close();
+        
         return {length: users.length};
     }
     catch (Error){
@@ -154,9 +155,9 @@ const usersLength = async (query,credentials) => {
     }
 }
 
-const altUser = async (body,credentials) => {
+const altUser = async (body) => {
     try {
-        await connectdb(credentials);
+        await connection.get();
         let user = await User.findOneAndUpdate(
             {username: {$regex: body.filter , $options: 'i'}},
             {blocked: body.blocked,
@@ -164,7 +165,7 @@ const altUser = async (body,credentials) => {
             'characters.weekly':  parseInt(body.characters.weekly),
             'characters.monthly':  parseInt(body.characters.monthly)},
             {new: true}).lean();
-        await mongoose.connection.close();
+        
         return user;
     }
     catch (Error){
@@ -173,12 +174,12 @@ const altUser = async (body,credentials) => {
 }
 
 //GET
-const getHandledVip = async (query,credentials) => {
+const getHandledVip = async (query) => {
     try {
-        await connectdb(credentials);
+        await connection.get();
         let vipHandled = (await User.findOne({username: query.SMMname},'vipHandled')).vipHandled;
 
-        await mongoose.connection.close();
+        
 
         return vipHandled
     }
@@ -194,10 +195,8 @@ const getHandledVip = async (query,credentials) => {
  */
 const getUserQuota = async (user) => {
     try {
-        await connectdb(mongoCredentials);
+        await connection.get()
         let quota = await User.findOne({username: user},'characters maxQuota').lean();
-
-        await mongoose.connection.close();
 
         delete quota._id;
 
@@ -208,13 +207,13 @@ const getUserQuota = async (user) => {
     }
 }
 
-const get_n_FollnPosts = async(body,credentials) => {
+const get_n_FollnPosts = async(body) => {
     try{
-        await connectdb(credentials);
+        await connection.get();
 
         let posts = await Post.find({owner: body.user});
 
-        await mongoose.connection.close();
+        
 
         return {nposts: posts.length};
     }
@@ -226,12 +225,11 @@ const get_n_FollnPosts = async(body,credentials) => {
 /**
  *
  * @param {String} type - ['D','W','M']
- * @param credentials
  * @return {Promise<void>}
  */
-const resetQuota = async (type, credentials) => {
+const resetQuota = async (type) => {
     try{
-        await connectdb(credentials);
+        await connection.get();
 
         switch (type){
             case 'D':
@@ -245,7 +243,7 @@ const resetQuota = async (type, credentials) => {
                 break;
         }
 
-        await mongoose.connection.close();
+        
 
     }catch (e) {
         throw(e)
@@ -303,7 +301,7 @@ const updateMaxQuota = async (percentage, user, ID = -1) => {
             updateQuota[key] = percentage* (quota[key]);
         })
 
-        await connectdb(mongoCredentials);
+        await connection.get();
 
         let res = await User.findOneAndUpdate({username:user},
             [{ $set:{
@@ -340,7 +338,7 @@ const updateMaxQuota = async (percentage, user, ID = -1) => {
               }
             }]).lean()
 
-        await mongoose.connection.close();
+        
 
         //called by cron:
         if (ID !== -1) {

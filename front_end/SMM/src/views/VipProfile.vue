@@ -103,13 +103,13 @@
 
     let quota = await getUserQuota();
 
-      store.commit('setQuota', quota.characters);
+    store.commit('setQuota', quota.characters);
 
-      query = `name=${currentVip.value}`
+    query = `name=${currentVip.value}`
 
-      curPosts.push(...(await getPosts(query, 0)));
+    curPosts.push(...(await getPosts(query, 0)));
 
-      readyPosts.value = true
+    readyPosts.value = true
     })
 
   onUnmounted(() => {

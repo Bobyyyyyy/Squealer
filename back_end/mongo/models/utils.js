@@ -20,23 +20,6 @@ const quota ={
 
 
 
-
-const connectdb = async (credentials) => {
-    try {
-        //const mongouri = `mongodb://${credentials.user}:${credentials.pwd}@${credentials.site}/${dbname}`;
-        const mongouri = `mongodb://localhost:27017/${dbname}`;
-            await mongoose.connect(mongouri, {
-                useUnifiedTopology: true,
-                useNewUrlParser: true
-            })
-    }
-    catch(err){
-        console.log(err);
-    }
-}
-
-
-
 function createError (message,statusCodeError){
     let err = new Error(message);
     err.statusCode = statusCodeError;
@@ -54,7 +37,6 @@ const find_remove = (arr,id) => {
 
 module.exports = {
     CRITICAL_MASS_MULTIPLIER,
-    connectdb,
     saltRounds,
     mongoCredentials,
     dbname,

@@ -1,4 +1,3 @@
-const {mongoCredentials} = require('../models/utils.js')
 const userModel = require('../models/userMethods');
 const postModel = require("../models/postMethods");
 const {createError} = require("../models/utils");
@@ -7,18 +6,18 @@ const {createMaxQuotaJob} = require("./CronController");
 
 const addUser = async (req, res, next) => {
     try {
-        req.response = await userModel.addUser(req.body, mongoCredentials);
+        req.response = await userModel.addUser(req.body);
         next();
     } catch (Error) {
         res.redirect('/register');
     }
 }
 const searchUser = async (req,res) => {
-    res.send(await userModel.searchByUsername(req.body,mongoCredentials));
+    res.send(await userModel.searchByUsername(req.body));
 }
 
 const changePassword = async (req,res) => {
-    res.send(await userModel.changePwsd(req.body,mongoCredentials));
+    res.send(await userModel.changePwsd(req.body));
 }
 
 const getSessionUser = async (req,res) => {
@@ -40,7 +39,7 @@ const getSessionVip = async (req,res) => {
 
 const modifyUser = async(req,res) => {
     try{
-        res.send(await userModel.altUser(req.body,mongoCredentials));
+        res.send(await userModel.altUser(req.body));
     }
     catch(error) {
         res.send(error);
@@ -49,7 +48,7 @@ const modifyUser = async(req,res) => {
 
 const getAllUsers = async (req,res) => {
     try {
-        res.send(await userModel.getUsers(req.query,mongoCredentials));
+        res.send(await userModel.getUsers(req.query));
     }
     catch (error) {
         res.send(error);
@@ -58,7 +57,7 @@ const getAllUsers = async (req,res) => {
 
 const getUsersNumber = async (req,res) => {
     try {
-        res.send(await userModel.usersLength(req.query,mongoCredentials));
+        res.send(await userModel.usersLength(req.query));
     }
     catch (error) {
         res.send(error);
@@ -67,7 +66,7 @@ const getUsersNumber = async (req,res) => {
 
 const getVips = async (req,res) => {
     try {
-        res.send(await userModel.getHandledVip(req.query,mongoCredentials));
+        res.send(await userModel.getHandledVip(req.query));
     }
     catch (error) {
         res.send(error);
@@ -111,7 +110,7 @@ const updateMaxQuota = async(req,res) => {
 
 const getFollnPosts = async(req,res)=> {
     try {
-        res.send(await userModel.get_n_FollnPosts(req.query,mongoCredentials));
+        res.send(await userModel.get_n_FollnPosts(req.query));
     }
     catch (error) {
         res.send(error);
@@ -120,7 +119,7 @@ const getFollnPosts = async(req,res)=> {
 
 const getLastPost = async(req,res)=> {
     try {
-        let response = await postModel.getLastPostUser(req.query, mongoCredentials)
+        let response = await postModel.getLastPostUser(req.query)
         res.send({post: response});
     } catch (error) {
         res.send(error);
