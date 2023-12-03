@@ -131,7 +131,7 @@ function userTable (limit,offset,filter) {
                                  <td> ${user.unpopularity}</td>
                              <script>
                              $('#user-'+${index}).on('click', () => {
-                                showUserModal(${user.username},${JSON.stringify(remainingQuota)},${JSON.stringify(maxQuota)});
+                                showUserModal('${user.username}',${JSON.stringify(remainingQuota)},${JSON.stringify(maxQuota)});
                              })
                              </script>`
                 }
