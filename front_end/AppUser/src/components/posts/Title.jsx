@@ -1,7 +1,6 @@
 import {ProfilePic} from "../assets/index.jsx"
-import {getUsernameFromLocStor, parseTime} from "../utils/usefulFunctions.js";
+import {getProfilePicture, getUsernameFromLocStor, parseTime} from "../utils/usefulFunctions.js";
 import React, {Suspense, useEffect, useState} from "react";
-
 
 function Title({post}) {
 
@@ -29,8 +28,15 @@ function Title({post}) {
     }
 
     useEffect(()=> {
-        prendiProfilo()
-            .then()
+        /*
+        getProfilePicture(post.owner)
+            .then((res)=> {
+                console.log("res",res);
+                setProfilePic(res)
+            })
+
+         */
+        prendiProfilo().then()
     }, [])
 
     function Caricamento () {

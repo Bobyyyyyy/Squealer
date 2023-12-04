@@ -128,6 +128,20 @@ const getEmbed = (url) => {
     }
 }
 
+const getProfilePicture = async (username) => {
+    try {
+        console.log(`/db/user/profilePic?name=${username}`)
+        let res = await fetch(`/db/user/profilePic?name=${username}`);
+        console.log("risposta", res);
+        if (res.ok) {
+            return await res.json();
+        }
+    }
+    catch (e) {
+        console.log(e)
+    }
+}
+
 export {
     getUsernameFromLocStor,
     setUsernameInLocStor,
@@ -136,5 +150,7 @@ export {
     getAllPostFrontend,
     getProfilePic,
     parseTime,
-    blob2base64, compressBlob,getEmbed
+    blob2base64, compressBlob,
+    getEmbed,
+    getProfilePicture
 }

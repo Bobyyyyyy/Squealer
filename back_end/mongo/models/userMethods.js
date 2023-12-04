@@ -86,7 +86,7 @@ const loginUser = async (query) =>{
     }
 }
 
-const updateProfilePicture = async (username, newProfilePic, credentials) => {
+const updateProfilePicture = async (username, newProfilePic) => {
     try {
         await connection.get();
         let user = await User.findOneAndUpdate({username: username}, {profilePicture: newProfilePic});
@@ -95,7 +95,6 @@ const updateProfilePicture = async (username, newProfilePic, credentials) => {
         }
         return true;
     } catch (err) {
-        await mongoose.connection.close();
         throw err;
     }
 }
@@ -105,10 +104,8 @@ const updateProfilePicture = async (username, newProfilePic, credentials) => {
  * @param credentials
  * @returns {Promise<void>}
  */
-const getUserProfilePicture = async (username, credentials) => {
+const getUserProfilePicture = async (username) => {
     try {
-        console.log("active connections: ", mongoose.connection.base.connections.length);
-        console.log("active connections arr: ", mongoose.connection.base.connections);
         await connection.get();
         let user = await User.findOne({username: username}).lean();
         //if (mongoose.connection.base.connections.length === 0) {
@@ -123,7 +120,6 @@ const getUserProfilePicture = async (username, credentials) => {
 //GET
 const searchByUsername = async (query) =>{
     try {
-
         await connection.get();
         let user = await User.findOne({username: query.username}).lean();
         if (!user) {

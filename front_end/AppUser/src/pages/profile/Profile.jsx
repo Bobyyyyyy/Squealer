@@ -82,7 +82,7 @@ function Profile () {
         fetchAllPosts()
             .then((res) => {
                 prendiProfilo()
-                    .then()
+                  .then()
             })
     }, []);
 

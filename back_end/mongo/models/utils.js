@@ -37,7 +37,6 @@ const find_remove = (arr,id) => {
 
 module.exports = {
     CRITICAL_MASS_MULTIPLIER,
-    connectdb,
     saltRounds,
     mongoCredentials,
     dbname,

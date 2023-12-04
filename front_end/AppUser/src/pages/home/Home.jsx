@@ -66,9 +66,8 @@ function Home() {
                 {posts!==null && posts.map((post)=> {
                     //console.log("id",post._id)
                     return(
-                        <Suspense fallback={<Caricamento />} >
+                        <Suspense fallback={<Caricamento />} key={post._id}>
                             <Post
-                                key={post._id}
                                 post={post}
                             />
                         </Suspense>
