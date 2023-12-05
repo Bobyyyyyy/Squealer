@@ -19,9 +19,6 @@ function Home() {
 
     const fetchAllPosts = async () => {
         try {
-            //let currentUser = getUsernameFromLocStor();
-            let currentUser = localStorage.getItem("username");
-            console.log("name user:", currentUser);
 
             let res = await fetch(`/db/post/all?offset=0&limit=10`);
             console.log(res);

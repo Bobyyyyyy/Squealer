@@ -7,10 +7,11 @@ import AddPost from "./pages/addPost/AddPost.jsx";
 import Profile from "./pages/profile/Profile.jsx";
 import Search from "./pages/search/Search.jsx";
 import Settings from "./pages/settings/Settings.jsx";
-import {Routes, Route, BrowserRouter} from "react-router-dom";
+import {Routes, Route, BrowserRouter, useParams} from "react-router-dom";
 import React, {useEffect, useRef, useState} from "react";
 import RootLayout from "./layouts/RootLayout.jsx";
 import {setQuotaInLocStor, setUsernameInLocStor} from "./components/utils/usefulFunctions.js";
+import SinglePageChannel from "./pages/channels/SinglePageChannel.jsx";
 
 function App() {
     const [user, setUser] = useState(null);
@@ -24,6 +25,7 @@ function App() {
                     <Route  path="profile" element={<Profile />} />
                     <Route  path="search" element={<Search />} />
                     <Route  path="channels" element={<Channels />} />
+                    <Route path="channels/:nome" element={<SinglePageChannel />} />
                     <Route  path="settings" element={<Settings />} />
                     <Route  path="addpost" element={<AddPost />} />
                     <Route path="*" element={<NotFound />} />
