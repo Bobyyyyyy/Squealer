@@ -306,7 +306,7 @@ $('#addDestinationButton').on('click',() => {
 
     $.ajax({
         url: '/db/post/destination',
-        data: { destination: destination, postID: post},
+        data: {destination: destination, postID: post},
         type: 'put',
         success: (data) => {
             location.reload();

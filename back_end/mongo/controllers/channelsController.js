@@ -58,7 +58,7 @@ const changeChannelName = async (req,res) => {
 const getSingleChannel = async (req,res) => {
     try {
         let name = req.params.name;
-        res.send(await channelsModel.getSingleChannel(name));
+        res.send(await channelsModel.getSingleChannel(name,req.session.user));
     }
     catch (error) {
         res.sendStatus(400);

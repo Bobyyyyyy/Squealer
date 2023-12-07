@@ -38,7 +38,7 @@ const displayChannel = async (req,res) => {
 const displayUserChannel = async (req,res) => {
     try {
         let ChannelName = req.params.name;
-        let channel = await getSingleChannel(ChannelName,mongoCredentials);
+        let channel = await getSingleChannel(ChannelName,req.session.user);
         res.render('userChannelProfile',{locals: {user: req.session.user, name: channel.name}});
     }
     catch (error) {

@@ -387,8 +387,9 @@ const removeDestination = async (destination,postID)=> {
 
 const addDestination = async (destination,postID) => {
     try {
-        await connection.get()
-
+        await connection.get();
+        let tipo = typeof destination;
+        console.log(tipo);
         let checkDestination = await Post.findOne({$and: [{'destinationArray.name': destination.name}, {_id: postID}]});
         if (checkDestination) {
             throw createError('Destinazione gia nel post',400);
@@ -420,7 +421,7 @@ const addDestination = async (destination,postID) => {
                 if(!officialChannel) {
                     throw createError('Canale Non esiste',400);
                 }
-                await Post.findByIdAndUpdate(postID,{$push: {officialChannelsArray: destination}},{new : true});
+                await Post.findByIdAndUpdate(postID,{$push: {officialChannelsArray: destination.name}},{new : true});
                 break;
         }
     }
@@ -511,6 +512,7 @@ const UpdateCategory = async (post, userID) => {
     if (positiveReactionsCount > criticalMass) {
         if (negativeReactionsCount > criticalMass) {
             await Post.findByIdAndUpdate(post._id, {popularity: 'controversial'});
+            await addDestination({name: 'CONTROVERSIAL', destType: 'official'},post._id);
             if (post.popularity === 'popular') {
                 await changePopularity(userID, 'popularity',false);
             }
@@ -528,6 +530,7 @@ const UpdateCategory = async (post, userID) => {
     if (negativeReactionsCount > criticalMass) {
         if (positiveReactionsCount > criticalMass) {
             await Post.findByIdAndUpdate(post._id, {popularity: 'controversial'});
+            await addDestination({name: 'CONTROVERSIAL', destType: 'official'},post._id);
             if (post.popularity === 'popular') {
                 await changePopularity(userID, 'popularity',false);
             }

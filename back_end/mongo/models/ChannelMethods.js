@@ -8,6 +8,15 @@ const {ObjectId} = require("mongodb");
 const {create} = require("connect-mongo");
 const {channel} = require("../controllers/officialChannelsController");
 
+const channelRoles = {
+    '0': 'Creator',
+    '1': 'Admin',
+    '2': 'Not Follower',
+    '3': 'Writer',
+    '4': 'Follower',
+}
+
+
 const sorts = {
     'Populars': {
         followerNumber : -1
@@ -52,7 +61,8 @@ const addChannel = async (body) => {
             posts: [],
             creator: body.creator,
             admins: [],
-            followers: []
+            followers: [],
+            requests: body.type === 'private' ? [] : null,
         })
 
         //save new channel in DB
@@ -187,22 +197,44 @@ const getChannelsNumber = async (filters) => {
 }
 
 
-const getSingleChannel = async(name) => {
+const getSingleChannel = async(name,user) => {
     try{
         await connection.get()
         let ChannelName = name.trim().toLowerCase();
         let channel = await Channel.findOne({name: ChannelName}).lean();
+        let findUser = await User.findOne({username: user}).lean();
+        let userRole;
+
+        let isCreator = channel.creator === findUser.username
+        if(isCreator)
+            userRole = 0; //creator
+        else  {
+            let isAdmin = channel.admins.filter((admin) => {return admin === findUser.username});
+            if(isAdmin.length !== 0)
+                userRole = 1; //admin
+            else {
+                let isFollower = channel.followers.filter((follower) => {return follower.user === findUser.username});
+                if(isFollower.length === 0)
+                    userRole = 2; //not a follower
+                else if (isFollower[0].canWrite)
+                    userRole = 3; //follower who can write
+                else
+                    userRole = 4; //follower who cannot write
+            }
+        }
+
         if (!channel) {
             let err = new Error("Nessun canale trovato!");
             err.statusCode = 400;       // 400 ??;
             throw err;
         }
+
+        channel.role = channelRoles[userRole];
         return channel;
     }
     catch (error) {
         throw error;
     }
-
 }
 
 
