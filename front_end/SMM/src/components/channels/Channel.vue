@@ -15,6 +15,8 @@ const readyData = ref(false);
     isPublic: Boolean,
     name: String,
     description: String,
+    creator: String,
+    admins: Array,
   })
 
 
@@ -43,7 +45,7 @@ const readyData = ref(false);
 
 <template>
   <div class="d-flex flex-row justify-content-between align-items-center lineDim">
-    <div class="text-start bordEl">
+    <div class="text-start bordEl" >
       <router-link :to="{path: `/SMM/Canali/${name.split(' ').join('')}`}"
                    class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"
                    @click="changeChannel()"
@@ -51,11 +53,18 @@ const readyData = ref(false);
         {{ name }}
       </router-link>
     </div>
-    <div class="text-center bordEl ">
-      <span v-if="isPublic" class="badge text-bg-success"> public </span>
-      <span v-else class="badge text-bg-danger"> private </span>
+    <div class="d-flex flex-column">
+      <div class="text-center bordEl" >
+        <span v-if="creator === currentVip" class="badge rounded-pill text-bg-success"> creatore </span>
+        <span v-else-if="admins.includes(currentVip)" class="badge rounded-pill text-bg-warning"> admin </span>
+      </div>
+      <div class="text-center bordEl ">
+        <span v-if="isPublic" class="badge rounded-pill text-bg-success"> pubblico </span>
+        <span v-else class="badge rounded-pill text-bg-danger"> privato </span>
+      </div>
     </div>
-    <div class="text-end bordEl ">
+
+    <div class="text-end bordEl flex-fill">
       <button class="btn btn-primary" @click="getDataOpenModal()">Stats</button>
     </div>
   </div>
@@ -69,11 +78,12 @@ const readyData = ref(false);
     margin-right: 1%;
     margin-left: 1%;
     height: 4rem;
+    width: 98%;
   }
 
   .bordEl{
     margin-left: 0.5%;
     margin-right: 0.5%;
-    min-width: 20vw;
+    min-width: 10rem;
   }
 </style>

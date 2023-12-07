@@ -316,9 +316,9 @@
                   </div>
                   <div class="d-flex flex-row justify-content-end flex-fill align-items-end">
                     <button type="button" class="btn btn-danger m-1"
-                            @click="$emit('closeAppModal'); reset()"
+                            @click="$emit('closeAppModal', false); reset()"
                     >Indietro</button>
-                    <button class="btn btn-primary m-1" type="button" @click="createPost(); reset(); $emit('closeAppModal')"> Crea Squeal </button>
+                    <button class="btn btn-primary m-1" type="button" @click="createPost(); reset(); $emit('closeAppModal', true)"> Crea Squeal </button>
                   </div>
                 </div>
 

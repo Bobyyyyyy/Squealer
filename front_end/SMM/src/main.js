@@ -2,9 +2,8 @@ import {createApp} from 'vue'
 import App from './App.vue'
 
 import '../public/assets/custom.scss'
-
-
 import './assets/style.css'
+
 import tooltips from "./directives/tooltips.js";
 import {router} from './router/router.js'
 import {store} from "./store/store.js";

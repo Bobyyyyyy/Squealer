@@ -9,6 +9,7 @@
   import BuyQuotaModal from "../../quota/buyQuotaModal.vue";
   import Dropdown from "../Dropdown.vue";
   import {logout} from "../../utils/functions.js";
+  import NotificationBadge from "../notification/NotificationBadge.vue";
 
   const modalState = reactive({Modal: null,})
   const beforeModalPage = ref('');
@@ -23,9 +24,10 @@
   function openAppModal() {
     modalState.Modal.show()
   }
-  function closeAppModal() {
+  function closeAppModal(addedPost) {
     modalState.Modal.hide()
     activeBut.value = beforeModalPage.value
+    if(addedPost && activeBut.value === 'Profilo') location.reload();
   }
 
   function setUpModal() {
@@ -92,8 +94,10 @@
     </div>
     <div v-if="!smartPhone" class="d-flex flex-column align-items-center">
       <ul class="nav nav-pills flex-column mb-auto">
-        <li class="nameUser p-0 text-center fw-bold fs-5" >
-          {{currentVip}}
+        <li>
+          <NotificationBadge :text="currentVip"
+                             :class="'nameUser p-0 text-center fw-bold fs-5'"
+                              />
         </li>
         <li>
           <button type="button" class="btn text-danger d-flex flex-row align-items-center"
@@ -132,8 +136,8 @@
     padding-bottom: 2vh;
     padding-left: 1vh;
     width: 12vw;
-    z-index: 1001;
     background-color: #f5f5f5;
+    z-index: 1;
   }
   .nameUser{
     padding-left:16px ;
@@ -153,6 +157,7 @@
       align-items: end;
       padding-top: 0;
       padding-bottom: 0;
+      z-index: 1001;
     }
     .changeDirFlex{
       flex-direction: row !important;

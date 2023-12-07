@@ -35,23 +35,22 @@
 
 <template>
   <div class="card mb-4 d-flex flex-column justify-content-between mt-1 postDim">
-    <div class="justify-content-center h-100">
+
       <HeaderPost
           :name= "user"
           :dest="dest"
           :srcImg="picProfile"
           :dateCreation="creationDate"
       />
-      <div class="d-flex flex-row justify-content-center text-center align-items-center">
-        <img v-if="contentType==='image'" :src="content"  alt="silly cat" class="img-fluid w-100 h-100 object-fit-fill" />
+      <div class="d-flex flex-row justify-content-center text-center align-items-center h-100">
+        <img v-if="contentType==='image'" :src="content"  alt="silly cat" class="img-fluid" />
         <postMap v-if="contentType==='geolocation'"
                  :latlng = "JSON.parse(content)"
                  :mapID = "getIdMap()"
         />
-        <div v-if="contentType === 'text'" class="mb-0 text-center m-2 mb-2 align-self-center" v-html="htmlContent"></div>
+        <div v-if="contentType === 'text'" class="mb-0 m-2 mb-2 align-self-center w-100" v-html="htmlContent"></div>
         <iframe v-if="contentType ==='video'" :src="content" width="100%" height="100%" allowfullscreen></iframe>
       </div>
-    </div>
     <div v-if="!onlyUser">
       <FooterPost
           :reactions="reactions"
@@ -59,7 +58,6 @@
           :idx = "numberOfPost"
       />
     </div>
-
   </div>
 </template>
 
@@ -67,7 +65,7 @@
 
   .postDim{
     width: 40rem;
-    height: auto;
+    height: 40rem;
   }
 
   @media screen and (max-width: 768px) {

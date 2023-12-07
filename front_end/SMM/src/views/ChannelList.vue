@@ -17,6 +17,7 @@ onMounted(async () => {
     method:"GET"
   });
   channels = await res.json();
+  console.log(channels);
   channelsReady.value = true;
 })
 
@@ -46,12 +47,14 @@ function closeChannelModal() {
           <button class="btn btn-secondary ms-2" @click="openChannelModal">Add</button>
         </div>
       </div>
-      <div v-if="channelsReady" class="d-flex justify-content-center flex-column shadow-sm">
+      <div v-if="channelsReady" class="d-flex justify-content-center flex-column shadow-sm w-100">
         <Channel v-for="(ch,i) in channels"
                  :key="i"
                  :name="ch.name"
                  :description="ch.description"
                  :isPublic="ch.isPublic"
+                 :creator="ch.creator"
+                 :admins="ch.admins"
         />
       </div>
     </div>
