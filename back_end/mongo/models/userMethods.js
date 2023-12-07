@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const bcrypt = require("bcryptjs");
 const Channel = require("../schemas/Channel")
 const User = require("../schemas/User");
-const {saltRounds,quota} = require("./utils");
+const {saltRounds,quota, createError} = require("./utils");
 const {json} = require("express");
 const Post = require("../schemas/Post");
 const {start} = require("@popperjs/core");
@@ -14,6 +14,12 @@ const connection = require('../ConnectionSingle');
 const addUser = async (body) => {
     try{
         await connection.get();
+        body.name = body.name.trim();
+
+        if(!isNaN(parseInt(body.name))) {
+            throw createError('Nome non valido',400);
+        }
+
         //GET user using email and name
         let findName = await User.findOne({username: body.name}).lean();
         let findChannel = await User.findOne({name: body.name}).lean();

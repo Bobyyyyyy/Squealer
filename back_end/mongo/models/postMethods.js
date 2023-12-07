@@ -410,8 +410,9 @@ const addDestination = async (destination,postID) => {
                 if(channel.isBlocked) {
                     throw createError('Canale bloccato',400);
                 }
-                await Channel.findByIdAndUpdate(channel._id,[{$set: {'postNumber': {$add: ['$postNumber',1]}}}]);
-                await Post.findByIdAndUpdate(postID,{$push: {destinationArray: destination}},{new : true});
+                await Channel.findByIdAndUpdate(channel._id,[{$set: {'postNumber': {$add: ['$postNumber',1]}}}]).lean();
+                await Post.findByIdAndUpdate(postID,{$push: {destinationArray: destination}},{new : true}).lean();
+                await Post.updateMany({'reply.repliedPost': postID}, {$push: {destinationArray: destination}}).lean();
                 break;
 
             case 'official':
