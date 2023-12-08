@@ -10,31 +10,36 @@
   import Dropdown from "../Dropdown.vue";
   import {logout} from "../../utils/functions.js";
   import NotificationBadge from "../notification/NotificationBadge.vue";
+  import NotificationModal from "../notification/notificationModal.vue";
 
-  const modalState = reactive({Modal: null,})
+  const modalState = reactive({addPostModal: null})
   const beforeModalPage = ref('');
   const quotaModal = ref();
+  const notificationModal = ref()
 
   onMounted(async () => {
-    modalState.Modal = new Modal('#AddPostModal',{});
+    modalState.addPostModal = new Modal('#AddPostModal',{});
+    modalState.notificationModal = new Modal('#notModal',{});
   })
 
   const activeBut = ref(getPage());
 
   function openAppModal() {
-    modalState.Modal.show()
+    modalState.addPostModal.show()
   }
   function closeAppModal(addedPost) {
-    modalState.Modal.hide()
+    modalState.addPostModal.hide()
     activeBut.value = beforeModalPage.value
     if(addedPost && activeBut.value === 'Profilo') location.reload();
   }
 
-  function setUpModal() {
+  function openNotificationModal () {notificationModal.value.openModal()}
+
+  function setupAppModal() {
     openAppModal();
     beforeModalPage.value = getPage();
   }
-  function setUpQuotaModal() {
+  function setupQuotaModal() {
     quotaModal.value.openModal();
     beforeModalPage.value = getPage();
   }
@@ -85,8 +90,8 @@
                    }"
 
                    @pushTo = "(name) => {
-                     if(name === 'Aggiungi Squeal') setUpModal()
-                     else if (name === 'Compra Quota') setUpQuotaModal();
+                     if(name === 'Aggiungi Squeal') setupAppModal()
+                     else if (name === 'Compra Quota') setupQuotaModal();
                      else  $router.push(getUrlPage(name))
                    }"
         />
@@ -97,6 +102,7 @@
         <li>
           <NotificationBadge :text="currentVip"
                              :class="'nameUser p-0 text-center fw-bold fs-5'"
+                             @openNotificationModal="openNotificationModal"
                               />
         </li>
         <li>
@@ -119,14 +125,13 @@
             classButton="btn-outline-danger"
             @logout="async () => await logout()"
         />
-        <!-- TODO: SISTEMARE VISTA TABLET-->
+        <!-- TODO: SISTEMARE VISTA TABLET -->
       </ul>
     </div>
   </nav>
-  <AddPostModal
-    @closeAppModal = "closeAppModal"
-  />
-  <buyQuotaModal ref="quotaModal"/>
+  <AddPostModal @closeAppModal = "closeAppModal" />
+  <buyQuotaModal ref="quotaModal" />
+  <NotificationModal ref="notificationModal" />
 </template>
 
 <style scoped>
