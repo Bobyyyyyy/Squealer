@@ -8,29 +8,21 @@ import statsPage from "../views/statsPage.vue";
 
 export const routes =[
     {
-        path:"/SMM",
-        redirect:  { name: "Home" }
-    },
-    {
-        path:"/SMM/",
-        redirect:  { name: "Home" }
-    },
-    {
-        path:"/SMM/home",
+        path:"/AppSmm/home",
         name:'Home',
         components: {
             welcomingPage: Home
         },
     },
     {
-        path:"/SMM/sceltavip",
+        path:"/AppSmm/sceltavip",
         name:'HandleVIP',
         components: {
             welcomingPage: HandleVIP
         },
     },
     {
-        path: "/SMM/Profilo",
+        path: "/AppSmm/Profilo",
         name: "Profilo",
         components: {
             sideBar: SideBar,
@@ -38,7 +30,7 @@ export const routes =[
         },
     },
     {
-        path: "/SMM/Canali",
+        path: "/AppSmm/Canali",
         name:"Canali",
         components: {
             sideBar: SideBar,
@@ -46,7 +38,7 @@ export const routes =[
         },
     },
     {
-        path: "/SMM/Canali/:nomeCanale" ,
+        path: "/AppSmm/Canali/:nomeCanale" ,
         name:"listaCanali",
         components: {
             sideBar: SideBar,
@@ -56,7 +48,7 @@ export const routes =[
 
     /*
     {
-        path: "/SMM/:user/:vip/Messages",
+        path: "/AppSmm/:user/:vip/Messages",
         name:"Messages",
         components: {
             sideBar: SideBar,
@@ -66,31 +58,39 @@ export const routes =[
 
      */
     {
-        path:  "/SMM/CompraQuota",
+        path:  "/AppSmm/CompraQuota",
         name:"Quota",
         components: {
             sideBar: SideBar,
         },
     },
     {
-        path: "/SMM/AggiungiSqueal",
+        path: "/AppSmm/AggiungiSqueal",
         name:"Squeal",
         components: {
             sideBar: SideBar,
         },
     },
     {
-        path:"/SMM/*",
-        redirect:  { name: "Home" }
-    },
-    {
-        path: "/SMM/Statistiche",
+        path: "/AppSmm/Statistiche",
         name:"Statistiche",
         components: {
             sideBar: SideBar,
             SbOn: statsPage
         },
-    }
+    },
+    {
+        path:"/AppSmm/",
+        redirect:  { name: "Home" }
+    },
+    {
+        path: "/assets_vue/",
+        redirect:  { name: "Home" }
+    },
+    {
+        path: "/*",
+        redirect:  { name: "Home" }
+    },
 ]
 
 

@@ -11,26 +11,25 @@ router.post('/register',userController.addUser,frontPageController.createSession
 router.use('/mod',frontPageController.isMod,require('../../AppMod/routes/homepage'));
 router.get('/logout',frontPageController.logout);
 
-/* -------------------- FOR SMM BUILD -------------------- */
-const fs = require('fs/promises');
+/* -------------------- for AppSmm build -------------------- */
+
 const path = require('path');
-const environment = process.env.NODE_ENV;
 
-const parseManifest = async () => {
-    if(environment !== 'production') return {};
+const vueDir = path.join(rootDir ,'front_end','AppSmm','dist_vue/');
 
-    const manifestPath = path.join(rootDir,"front_end","SMM","manifest.json")
-    const manifestFile = await fs.readFile(manifestPath);
-
-    return JSON.parse(manifestFile)
+if(process.env.NODE_ENV === 'production') {
+    router.use(express.static(vueDir));
+    router.get(['/assets_vue*','/assets_vue/'], isSMM, async (req,res) => {
+        router.use(express.static(vueDir));
+        res.render(vueDir + 'index.html');
+    })
 }
-router.get(['/SMM/','/SMM/*'], isSMM, async(req,res) => {
-    const data = {
-        environment,
-        manifest: await parseManifest(),
-    }
-    res.render(rootDir + '/front_end/SMM/index.html.ejs', data)
-})
+else {
+    router.get(['/AppSmm/','/AppSmm/*'], isSMM, async(req,res) => {
+        res.render(rootDir + '/front_end/AppSmm/index.html')
+    })
+}
+
 
 /*------------------------------------------------*/
 

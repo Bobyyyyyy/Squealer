@@ -37,7 +37,7 @@
                   updateRef="updatePage"
                   :dropItems="['Logout', 'cambia VIP']"
                   @updatePage="async (el) => {
-                    if (el === 'cambia VIP')  $router.push('/SMM/handlevip');
+                    if (el === 'cambia VIP')  $router.push('/AppSmm/handlevip');
                     else await logout();
                   }"
         />

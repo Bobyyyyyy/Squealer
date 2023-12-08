@@ -279,7 +279,7 @@ const addPost = async (post,quota) => {
  * @param {String} query.channel - name of channel destination
  * @param {String} query.official - name of official channel destination
  * @param {String} query.user - name of user destination
- * @param {Boolean} query.smm - is SMM requesting
+ * @param {Boolean} query.smm - is AppSmm requesting
  * @param {String} query.destType - only if destType activated
  * @param {String} query.popularity - only if popularity is activated
  * @param {String} query.typeFilter - only if type post filter activated
@@ -296,7 +296,7 @@ const getAllPost = async (query,sessionUser) =>{
         let reply = !!query?.reply;
 
         let filter = {
-                /* Per i canali non mi serve l'id dell'utente che fa la richiesta, a meno che non sia SMM*/
+                /* Per i canali non mi serve l'id dell'utente che fa la richiesta, a meno che non sia AppSmm*/
             ...((query.smm || !query.channel) && query.name) && {'owner':  {$regex: query.name , $options: 'i'}},
                 /* FILTRO PER TIPO DI POST */
             ... (query.typeFilter && query.typeFilter !== 'all') && {'contentType': query.typeFilter},
@@ -583,7 +583,7 @@ const postLength = async (filters) => {
         let reply = !!filters?.reply;
 
         let filter = {
-            /* Per i canali non mi serve l'id dell'utente che fa la richiesta, a meno che non sia SMM*/
+            /* Per i canali non mi serve l'id dell'utente che fa la richiesta, a meno che non sia AppSmm*/
             ...((filters.smm || !filters.channel) && filters.name) && {'owner':  {$regex: filters.name , $options: 'i'}},
             /* FILTRO PER TIPO DI POST */
             ... (filters.typeFilter && filters.typeFilter !== 'all') && {'contentType': filters.typeFilter},

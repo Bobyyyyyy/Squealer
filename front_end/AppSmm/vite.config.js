@@ -6,15 +6,10 @@ export default defineConfig({
   plugins: [
     vue(),
   ],
-  build:{
-    manifest: true,
-    rollupOptions: {
-      input: './src/main.js',
-      external: 'img/logo.png'
-    },
-    outDir:"./",
-    assetsDir:"./dist/assets",
-    emptyOutDir: false,
+
+  build: {
+    outDir: "dist_vue",
+    assetsDir:"assets_vue"
   },
   server: {
     port: 5174,
