@@ -256,7 +256,7 @@ $('#changeReactionsButton').on('click',() => {
 $('#block-button').on('click', () => {
     $.ajax({
         url: '/db/channel/block',
-        data: {user: User, channel: ChannelName},
+        data: {channel: ChannelName},
         type: 'put',
         success: (data) => {
             location.reload();

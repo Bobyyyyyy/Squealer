@@ -218,15 +218,25 @@ const addPost = async (post,quota) => {
                 destinations.pop(destination);
             }
             else if (channel) {
+                let permissionToWrite;
                 if(channel.isBlocked) {
                     throw createError('Il canale è bloccato',400);
                 }
                 if (channel.type === 'public') {
+                    permissionToWrite = await Channel.findOne({$and: [{'name': channel.name}, {$or: [{'creator': creator.username}, {'followers.user': creator.username}, {'admins': creator.username}]}]});
+                    if(!permissionToWrite) {
+                        throw createError(`Non hai il permesso di scrivere in ${channel.name}`, 400);
+                    }
                     postCategory = 'public';
                 }
+                else {
+                    permissionToWrite = await Channel.findOne({$and: [{'name': channel.name}, {$or: [{'creator': creator.username}, {$and: [{'followers.user': creator.username},{'follower.canWrite': true}]},{'admins': creator.username}]}]});
+                    if(!permissionToWrite) {
+                        throw createError(`Non hai il permesso di scrivere in ${channel.name}`, 400);
+                    }
+                }
                 //update post number in channel schema
-                channel = await Channel.findOneAndUpdate({'name': channel.name}, {'postNumber': channel.postNumber+1})
-
+                channel = await Channel.findOneAndUpdate({'name': channel.name}, {'postNumber': channel.postNumber+1});
                 let newNotification = channel.followers.filter((follower) => follower.user !== creator.username).map((follower) => {
                     return {user: follower.user, sender: creator.username, channel: channel.name};
                 });
@@ -294,7 +304,6 @@ const getAllPost = async (query,sessionUser) =>{
     try{
         await connection.get()
         let reply = !!query?.reply;
-
         let filter = {
                 /* Per i canali non mi serve l'id dell'utente che fa la richiesta, a meno che non sia SMM*/
             ...((query.smm || !query.channel) && query.name) && {'owner':  {$regex: query.name , $options: 'i'}},

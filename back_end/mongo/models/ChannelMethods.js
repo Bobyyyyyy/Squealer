@@ -6,7 +6,7 @@ const mongoose = require("mongoose");
 const connection = require('../ConnectionSingle');
 const {ObjectId} = require("mongodb");
 const {create} = require("connect-mongo");
-const {channel} = require("../controllers/officialChannelsController");
+let {channel} = require("../controllers/officialChannelsController");
 
 const channelRoles = {
     '0': 'Creator',
@@ -196,6 +196,112 @@ const getChannelsNumber = async (filters) => {
     }
 }
 
+/**
+ * @param userName
+ * @param channelName
+ * @returns {Promise<void>}
+ * Se il canale e' privato crea una richiesta di follow, se e' pubblico aggiunge il follower
+ */
+const addFollower = async function (userName, channelName) {
+    try {
+        await connection.get();
+        channelName = channelName.trim().toLowerCase();
+
+        let channel = await Channel.findOne({name: channelName}).lean();
+        let user = await User.findOne({username: userName}).lean();
+
+        if (channel.type === 'public') {
+            // se sei gia' follower lo toglie
+            let checkFollow = await Channel.findOne({name: channelName, 'followers.user': userName});
+            if(checkFollow) {
+                await Channel.findOneAndUpdate({name: channelName}, {$pull: {'followers': {'user': userName}}});
+                return;
+            }
+            await Channel.findByIdAndUpdate(channel._id,{$push: {'followers': {user: user.username, canWrite: true}}});
+        }
+        else {
+
+
+            let checkRequest = await Channel.findOne({name: channelName, 'requests.user': userName});
+            if(checkRequest) {
+                await Channel.findOneAndUpdate({name: channelName}, {$pull: {'requests': {'user': userName}}});
+                return;
+            }
+
+            await Channel.findByIdAndUpdate(channel._id,{$push: {'requests': {user: user.username}}});
+        }
+    }
+    catch (error) {
+        throw error
+    }
+}
+
+/**
+ * @param username
+ * @param adminname
+ * @param channelName
+ * @returns {Promise<void>}
+ * Aggiunge admin in un canale
+ */
+const addAdmin = async function (username, adminName, channelName) {
+    try {
+        await connection.get();
+        channelName = channelName.trim().toLowerCase();
+        let admin = await User.findOne({username: adminName}).lean();
+        let user = await User.findOne({username: username}).lean();
+        if (!user) {
+            throw createError(`${user.username} non esiste`,500);
+        }
+        let channel;
+
+        if(admin.typeUser !== 'mod') {
+            channel = await Channel.findOneAndUpdate({$and: [{name: channelName},{$or: [{'admins': admin.username},{'creator': admin.username}]}]},{$push: {'admin': username}}).lean();
+        }
+        else {
+            channel = await Channel.findOneAndUpdate({name: channelName},{$push: {'admins': username}}).lean();
+        }
+
+        if(!channel)
+            throw createError(`${admin.username} non ha i permessi necessari`,500);
+    }
+    catch (error) {
+        throw error;
+    }
+}
+
+
+/**
+ * @param adminName
+ * @param userRequest
+ * @param channelName
+ * @param accepted
+ * @returns {Promise<void>}
+ * Accetta o rifiuta la richiesta di un utente per un canale privato
+ */
+const handleRequest = async function(adminName,userRequest,channelName,accepted) {
+    try {
+        await connection.get();
+        channelName = channelName.trim().toLowerCase();
+        let admin = await User.findOne({username: adminName}).lean();
+        let channel = await Channel.findOne({$and: [{name: channelName},{$or: [{'admins': adminName},{'creator': adminName}]}]}).lean();
+        if(!channel)
+            throw createError(`${admin.username} non ha i permessi necessari`,500);
+
+        let request = await Channel.findOne({$and: [{name: channelName}, {'requests.user': userRequest}]});
+        if (!request)
+            throw createError(`Non c'e' nessuna richiesta dell'utente ${userRequest}`,500);
+
+        if (accepted) {
+            await Channel.findOneAndUpdate({name: channelName}, {$push: {'followers': {'user': userRequest}}});
+        }
+
+        await Channel.findOneAndUpdate({name: channelName}, {$pull: {'requests': {'user': userRequest}}});
+    }
+    catch (error) {
+        throw error
+    }
+}
+
 
 const getSingleChannel = async(name,user) => {
     try{
@@ -207,19 +313,19 @@ const getSingleChannel = async(name,user) => {
 
         let isCreator = channel.creator === findUser.username
         if(isCreator)
-            userRole = 0; //creator
+            userRole = 0;
         else  {
             let isAdmin = channel.admins.filter((admin) => {return admin === findUser.username});
             if(isAdmin.length !== 0)
-                userRole = 1; //admin
+                userRole = 1;
             else {
                 let isFollower = channel.followers.filter((follower) => {return follower.user === findUser.username});
                 if(isFollower.length === 0)
-                    userRole = 2; //not a follower
+                    userRole = 2;
                 else if (isFollower[0].canWrite)
-                    userRole = 3; //follower who can write
+                    userRole = 3;
                 else
-                    userRole = 4; //follower who cannot write
+                    userRole = 4;
             }
         }
 
@@ -299,5 +405,8 @@ module.exports = {
     getChannelsNumber,
     getSingleChannel,
     blockChannel,
-    changeChannelName
+    changeChannelName,
+    addFollower,
+    handleRequest,
+    addAdmin,
 }
