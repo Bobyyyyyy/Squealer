@@ -69,7 +69,7 @@
       class="d-flex justify-content-between position-fixed flex-shrink-0 border changeDirFlex setW100">
     <div class="d-flex changeDirFlex setW100 setHeight">
       <div v-if="!smartPhone" class="">
-        <router-link to="/SMM/Profilo" class="d-flex justify-content-center mb-3" @click="activeBut='Profilo'">
+        <router-link to="/AppSmm/Profilo" class="d-flex justify-content-center mb-3" @click="activeBut='Profilo'">
           <div class="fs-4 w-50 d-flex align-self-center">
             <img alt="logo" src="/img/logo.png" class="img-fluid">
           </div>

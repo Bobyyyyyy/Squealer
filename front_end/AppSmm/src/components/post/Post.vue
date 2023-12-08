@@ -15,6 +15,7 @@
     postId: String,
     reactions: Array,
     numberOfPost: Number,
+    views: Number
   })
 
   function getIdMap(){
@@ -56,6 +57,7 @@
           :reactions="reactions"
           :postId = "postId"
           :idx = "numberOfPost"
+          :views = "views"
       />
     </div>
   </div>

@@ -46,17 +46,6 @@ export const routes =[
         },
     },
 
-    /*
-    {
-        path: "/AppSmm/:user/:vip/Messages",
-        name:"Messages",
-        components: {
-            sideBar: SideBar,
-            SbOn: Messages,
-        },
-    },
-
-     */
     {
         path:  "/AppSmm/CompraQuota",
         name:"Quota",

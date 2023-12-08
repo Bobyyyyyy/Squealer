@@ -26,6 +26,7 @@ const isNotification = computed(() => notification.value && Object.keys(notifica
     <button type="button"
             class="btn btn-lg btn-primary position-relative text-center"
             :class="classes"
+            :disabled="!isNotification"
             @click="$emit('openNotificationModal')"
             style="width: 6vw; height: 3vh">
       {{ text }}

@@ -92,6 +92,7 @@
               :contentType = "post.contentType"
               :postId = "post._id"
               :numberOfPost="i"
+              :views="post.views.length"
               picProfile = "/img/defaultUser.jpeg"
         />
       </div>

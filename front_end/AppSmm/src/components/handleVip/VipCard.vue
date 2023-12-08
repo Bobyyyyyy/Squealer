@@ -39,7 +39,7 @@
             :reactions = "post.reactions"
             :contentType = "post.contentType"
             :postId = "post._id"
-            :numberOfPost="i"
+            :numberOfPost="1"
             picProfile = "/img/defaultUser.jpeg"
         />
       </div>
