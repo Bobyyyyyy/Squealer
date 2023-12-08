@@ -10,5 +10,8 @@ router.get('/number',channelsController.getChannelsNumber);
 router.get('/:name',channelsController.getSingleChannel);
 router.put('/block',channelsController.blockChannel);
 router.put('/name',channelsController.changeChannelName);
+router.post('/follower',channelsController.addFollower);
+router.put('/requests',channelsController.handleRequest);
+router.post('/admin',channelsController.addAdmin);
 
 module.exports = router

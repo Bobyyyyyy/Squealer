@@ -2,10 +2,10 @@ const channelsModel = require('../models/ChannelMethods');
 const {mongo} = require("mongoose");
 const createChannel = async (req,res,next) => {
     try {
-        res.send(await channelsModel.addChannel(req.body))
+        res.status(200).send(await channelsModel.addChannel(req.body))
     }
     catch(error) {
-        res.send(error);
+        res.status(error.statusCode).send(error.message);
     }
 }
 
@@ -14,66 +14,100 @@ const getChannelList = async (req,res) => {
         res.send(await channelsModel.channelVipList(req.query))
     }
     catch(error) {
-        res.send(error);
+        res.status(error.statusCode).send(error.message);
     }
 }
 
 const checkUserInChannel = async (req,res) => {
     try {
-        res.send(await channelsModel.checkUserChannel(req.query))
+        res.status(200).send(await channelsModel.checkUserChannel(req.query))
     }
     catch(error) {
-        res.send(error);
+        res.status(error.statusCode).send(error.message);
     }
 }
 
 const getChannels = async (req,res) => {
     try {
-        res.send(await channelsModel.getChannels(req.query))
+        res.status(200).send(await channelsModel.getChannels(req.query))
     }
     catch (error){
-        console.log(error);
-        res.sendStatus(400);
+        res.status(error.statusCode).send(error.message);
     }
 }
 
 const getChannelsNumber = async (req,res) => {
     try {
-        res.send(await channelsModel.getChannelsNumber(req.query.filters))
+        res.status(200).send(await channelsModel.getChannelsNumber(req.query.filters))
     }
     catch (error) {
-        res.sendStatus(400);
+        res.status(error.statusCode).send(error.message);
     }
 }
 
 const changeChannelName = async (req,res) => {
     try {
-        res.send(await channelsModel.changeChannelName(req.body.channelName,req.body.newName,req.session.user));
+        res.status(200).send(await channelsModel.changeChannelName(req.body.channelName,req.body.newName,req.session.user));
     }
     catch (error) {
-        res.status(400).send(error)
+        res.status(error.statusCode).send(error.message);
     }
 }
 
 const getSingleChannel = async (req,res) => {
     try {
         let name = req.params.name;
-        res.send(await channelsModel.getSingleChannel(name));
+        res.status(200).send(await channelsModel.getSingleChannel(name,req.session.user));
     }
     catch (error) {
-        res.sendStatus(400);
+        res.status(error.statusCode).send(error.message);
     }
 }
 
 const blockChannel = async (req,res) => {
     try {
-        let user = req.body.user;
+        let user = req.session.user;
         let channel = req.body.channel;
-
-        res.send(await channelsModel.blockChannel(user,channel))
+        res.status(200).send(await channelsModel.blockChannel(user,channel))
     }
     catch (error) {
-        res.sendStatus(400);
+        res.status(error.statusCode).send(error.message);
+    }
+}
+
+const addFollower = async function (req,res){
+    try {
+        let user = req.body.user;
+        let channel = req.body.channel;
+        res.status(200).send(await channelsModel.addFollower(user,channel))
+    }
+    catch (error) {
+        res.status(error.statusCode).send(error.message);
+    }
+}
+
+const handleRequest = async function (req,res) {
+    try {
+        let admin = req.body.admin;
+        let user = req.body.user
+        let channel = req.body.channel;
+        let accepted = req.body.accepted;
+        res.status(200).send(await channelsModel.handleRequest(admin,user,channel,accepted))
+    }
+    catch (error) {
+        res.status(error.statusCode).send(error.message);
+    }
+}
+
+const addAdmin = async function (req,res) {
+    try {
+        let admin = req.body.admin;
+        let user = req.body.user
+        let channel = req.body.channel;
+        res.status(200).send(await channelsModel.addAdmin(user,admin,channel));
+    }
+    catch (error) {
+        res.status(error.statusCode).send(error.message);
     }
 }
 
@@ -85,5 +119,8 @@ module.exports = {
     getChannelsNumber,
     getSingleChannel,
     blockChannel,
-    changeChannelName
+    changeChannelName,
+    addFollower,
+    handleRequest,
+    addAdmin
 }

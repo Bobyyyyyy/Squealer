@@ -26,7 +26,9 @@ const addOfficialChannel = async (body,creator) => {
         let newChannel = new ReservedChannel({
             name: name,
             creator: creator.name,
-            description: body.description,
+            description: body.description.trim(),
+            silenceable: body.silenceable ? true : false,
+            silenced : body.silenceable ? [] : null,
         });
         //save new reserved channel in DB
         await newChannel.save();

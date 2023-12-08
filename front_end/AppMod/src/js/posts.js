@@ -306,17 +306,28 @@ $('#addDestinationButton').on('click',() => {
 
     $.ajax({
         url: '/db/post/destination',
-        data: { destination: destination, postID: post},
+        data: {destination: destination, postID: post},
         type: 'put',
         success: (data) => {
             location.reload();
         },
         error: (error) => {
-            alert(error.responseJSON.mes);
-        }
+            $('#toast-content').empty().html(error.responseJSON.mes);
+            let toastList = inizializeToast();
+            toastList.forEach(toast => toast.show()); // This show them
+            }
     })
 
 })
+
+
+function inizializeToast() {
+    let toastElList = [].slice.call(document.querySelectorAll('.toast'))
+    return toastList = toastElList.map(function(toastEl) {
+        // Creates an array of toasts (it only initializes them)
+        return new bootstrap.Toast(toastEl) // No need for options; use the default options
+    });
+}
 
 
 $(document).ready(() => {

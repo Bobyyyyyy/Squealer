@@ -15,6 +15,20 @@ const ReservedChannelSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+
+    silenceable: {
+        type: Boolean,
+        required: true,
+    },
+
+    silenced: [
+        {
+            type: String,
+            required: false,
+        }
+    ]
+
+
 })
 
 const OfficialChannels = mongoose.model("OfficialChannels", ReservedChannelSchema);
