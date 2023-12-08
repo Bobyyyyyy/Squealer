@@ -24,6 +24,19 @@ const getSessionUser = async (req,res) => {
     res.send({username: req.session.user});
 }
 
+const getUserProfileByName = async (req,res) => {
+    console.log(req.query)
+    res.send(await userModel.getUserProfilePicture(req.query.name));
+}
+
+const updateUserProfilePic = async (req, res) => {
+    try {
+        res.send(await userModel.updateProfilePicture(req.session.user, req.body.newProfilePic));
+    } catch (err) {
+        res.status(400).send("errore nel cambiamento dell'immagine");
+    }
+}
+
 const updateSessionVip = async (req,res) => {
     try{
         req.session.vip = req.body.vipName;
@@ -141,4 +154,6 @@ module.exports = {
     getFollnPosts,
     getLastPost,
     updateMaxQuota,
+    getUserProfileByName,
+    updateUserProfilePic
 }

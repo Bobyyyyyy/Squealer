@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const bcrypt = require("bcryptjs");
 const Channel = require("../schemas/Channel")
 const User = require("../schemas/User");
-const {saltRounds,quota} = require("./utils");
+const {saltRounds,quota, createError} = require("./utils");
 const {json} = require("express");
 const Post = require("../schemas/Post");
 const {start} = require("@popperjs/core");
@@ -14,6 +14,12 @@ const connection = require('../ConnectionSingle');
 const addUser = async (body) => {
     try{
         await connection.get();
+        body.name = body.name.trim();
+
+        if(!isNaN(parseInt(body.name))) {
+            throw createError('Nome non valido',400);
+        }
+
         //GET user using email and name
         let findName = await User.findOne({username: body.name}).lean();
         let findChannel = await User.findOne({name: body.name}).lean();
@@ -21,9 +27,10 @@ const addUser = async (body) => {
             let err = new Error("Nome non disponibile");
             err.statusCode = 400;
             console.log(err);
-            
+
             throw err;
         }
+
 
         let newUser = new User({
             username: body.name,
@@ -40,12 +47,12 @@ const addUser = async (body) => {
         //save new user in DB
         await newUser.save();
 
-        
+
 
         return newUser;
     }
     catch(err){
-        
+
         console.log(err);
         throw err;
     }
@@ -61,7 +68,7 @@ const loginUser = async (query) =>{
             let err = new Error("Nessun utente trovato!");
             err.statusCode = 400;       // 400 ??
             console.log(err);
-            
+
             throw err;
         }
 
@@ -72,15 +79,46 @@ const loginUser = async (query) =>{
             let err = new Error("Password Sbagliata!");
             err.statusCode = 400;       // 400 ??
             console.log(err);
-            
+
             throw err;
         }
 
-        
+
         return user;
     }
     catch (err){
-        
+
+        throw err;
+    }
+}
+
+const updateProfilePicture = async (username, newProfilePic) => {
+    try {
+        await connection.get();
+        let user = await User.findOneAndUpdate({username: username}, {profilePicture: newProfilePic});
+        if (!user) {
+            throw new Error("utente non trovato");
+        }
+        return true;
+    } catch (err) {
+        throw err;
+    }
+}
+
+/**
+ * @param {String} username
+ * @param credentials
+ * @returns {Promise<void>}
+ */
+const getUserProfilePicture = async (username) => {
+    try {
+        await connection.get();
+        let user = await User.findOne({username: username}).lean();
+        //if (mongoose.connection.base.connections.length === 0) {
+
+        return {profilePic: user.profilePicture};
+    } catch (err) {
+        console.log(err);
         throw err;
     }
 }
@@ -88,14 +126,13 @@ const loginUser = async (query) =>{
 //GET
 const searchByUsername = async (query) =>{
     try {
-
         await connection.get();
         let user = await User.findOne({username: query.username}).lean();
         if (!user) {
             let err = new Error("Nessun utente trovato!");
             err.statusCode = 400;       // 400 ??
             console.log(err);
-            
+
             throw err;
         }
         return user;
@@ -116,7 +153,7 @@ const changePwsd = async(body) =>{
             let err = new Error("Mail inesistente");
             err.statusCode = 400;
             console.log(err);
-            
+
             return err;
         }
         user.password = await bcrypt.hash(body.password,saltRounds);
@@ -124,7 +161,7 @@ const changePwsd = async(body) =>{
         await user.save();
     }
     catch (err) {
-        
+
         console.log(err);
         throw err;
     }
@@ -146,7 +183,7 @@ const usersLength = async (query) => {
     try {
         await connection.get();
         let users = await User.find({$or : [{username: {$regex: query.filter , $options: 'i'}},{email: {$regex: query.filter , $options: 'i'}},{typeUser: {$regex: query.filter , $options: 'i'}},]}).lean();
-        
+
         return {length: users.length};
     }
     catch (Error){
@@ -164,7 +201,7 @@ const altUser = async (body) => {
             'characters.weekly':  parseInt(body.characters.weekly),
             'characters.monthly':  parseInt(body.characters.monthly)},
             {new: true}).lean();
-        
+
         return user;
     }
     catch (Error){
@@ -178,7 +215,7 @@ const getHandledVip = async (query) => {
         await connection.get();
         let vipHandled = (await User.findOne({username: query.SMMname},'vipHandled')).vipHandled;
 
-        
+
 
         return vipHandled
     }
@@ -212,7 +249,7 @@ const get_n_FollnPosts = async(body) => {
 
         let posts = await Post.find({owner: body.user});
 
-        
+
 
         return {nposts: posts.length};
     }
@@ -242,7 +279,7 @@ const resetQuota = async (type) => {
                 break;
         }
 
-        
+
 
     }catch (e) {
         throw(e)
@@ -337,7 +374,7 @@ const updateMaxQuota = async (percentage, user, ID = -1) => {
               }
             }]).lean()
 
-        
+
 
         //called by cron:
         if (ID !== -1) {
@@ -368,4 +405,6 @@ module.exports = {
     resetQuota,
     updateMaxQuota,
     changePopularity,
+    getUserProfilePicture,
+    updateProfilePicture
 }

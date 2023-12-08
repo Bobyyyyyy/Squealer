@@ -45,6 +45,15 @@ const ChannelSchema = new mongoose.Schema({
         }
     ],
 
+    requests: [
+        {
+            user: {
+                type: String,
+                required: false,
+            }
+        },
+    ],
+
     followerNumber: {
         type: Number,
         default: 0

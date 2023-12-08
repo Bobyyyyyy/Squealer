@@ -218,15 +218,25 @@ const addPost = async (post,quota) => {
                 destinations.pop(destination);
             }
             else if (channel) {
+                let permissionToWrite;
                 if(channel.isBlocked) {
                     throw createError('Il canale è bloccato',400);
                 }
                 if (channel.type === 'public') {
+                    permissionToWrite = await Channel.findOne({$and: [{'name': channel.name}, {$or: [{'creator': creator.username}, {'followers.user': creator.username}, {'admins': creator.username}]}]});
+                    if(!permissionToWrite) {
+                        throw createError(`Non hai il permesso di scrivere in ${channel.name}`, 400);
+                    }
                     postCategory = 'public';
                 }
+                else {
+                    permissionToWrite = await Channel.findOne({$and: [{'name': channel.name}, {$or: [{'creator': creator.username}, {$and: [{'followers.user': creator.username},{'follower.canWrite': true}]},{'admins': creator.username}]}]});
+                    if(!permissionToWrite) {
+                        throw createError(`Non hai il permesso di scrivere in ${channel.name}`, 400);
+                    }
+                }
                 //update post number in channel schema
-                channel = await Channel.findOneAndUpdate({'name': channel.name}, {'postNumber': channel.postNumber+1})
-
+                channel = await Channel.findOneAndUpdate({'name': channel.name}, {'postNumber': channel.postNumber+1});
                 let newNotification = channel.followers.filter((follower) => follower.user !== creator.username).map((follower) => {
                     return {user: follower.user, sender: creator.username, channel: channel.name};
                 });
@@ -294,7 +304,6 @@ const getAllPost = async (query,sessionUser) =>{
     try{
         await connection.get()
         let reply = !!query?.reply;
-
         let filter = {
                 /* Per i canali non mi serve l'id dell'utente che fa la richiesta, a meno che non sia AppSmm*/
             ...((query.smm || !query.channel) && query.name) && {'owner':  {$regex: query.name , $options: 'i'}},
@@ -387,8 +396,9 @@ const removeDestination = async (destination,postID)=> {
 
 const addDestination = async (destination,postID) => {
     try {
-        await connection.get()
-
+        await connection.get();
+        let tipo = typeof destination;
+        console.log(tipo);
         let checkDestination = await Post.findOne({$and: [{'destinationArray.name': destination.name}, {_id: postID}]});
         if (checkDestination) {
             throw createError('Destinazione gia nel post',400);
@@ -410,8 +420,9 @@ const addDestination = async (destination,postID) => {
                 if(channel.isBlocked) {
                     throw createError('Canale bloccato',400);
                 }
-                await Channel.findByIdAndUpdate(channel._id,[{$set: {'postNumber': {$add: ['$postNumber',1]}}}]);
-                await Post.findByIdAndUpdate(postID,{$push: {destinationArray: destination}},{new : true});
+                await Channel.findByIdAndUpdate(channel._id,[{$set: {'postNumber': {$add: ['$postNumber',1]}}}]).lean();
+                await Post.findByIdAndUpdate(postID,{$push: {destinationArray: destination}},{new : true}).lean();
+                await Post.updateMany({'reply.repliedPost': postID}, {$push: {destinationArray: destination}}).lean();
                 break;
 
             case 'official':
@@ -419,7 +430,7 @@ const addDestination = async (destination,postID) => {
                 if(!officialChannel) {
                     throw createError('Canale Non esiste',400);
                 }
-                await Post.findByIdAndUpdate(postID,{$push: {officialChannelsArray: destination}},{new : true});
+                await Post.findByIdAndUpdate(postID,{$push: {officialChannelsArray: destination.name}},{new : true});
                 break;
         }
     }
@@ -510,6 +521,7 @@ const UpdateCategory = async (post, userID) => {
     if (positiveReactionsCount > criticalMass) {
         if (negativeReactionsCount > criticalMass) {
             await Post.findByIdAndUpdate(post._id, {popularity: 'controversial'});
+            await addDestination({name: 'CONTROVERSIAL', destType: 'official'},post._id);
             if (post.popularity === 'popular') {
                 await changePopularity(userID, 'popularity',false);
             }
@@ -527,6 +539,7 @@ const UpdateCategory = async (post, userID) => {
     if (negativeReactionsCount > criticalMass) {
         if (positiveReactionsCount > criticalMass) {
             await Post.findByIdAndUpdate(post._id, {popularity: 'controversial'});
+            await addDestination({name: 'CONTROVERSIAL', destType: 'official'},post._id);
             if (post.popularity === 'popular') {
                 await changePopularity(userID, 'popularity',false);
             }

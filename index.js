@@ -11,6 +11,7 @@ const cors = require('cors');
 const {dbname, mongoCredentials} = require("./back_end/mongo/models/utils");
 const mongoose = require('mongoose');
 const path = require('path');
+const {isUser} = require("./back_end/Frontpage/controllers/FrontPageController");
 
 const storeSession = MongoStore.create({
     mongoUrl: 'mongodb://localhost:27017',
@@ -48,12 +49,15 @@ app.use('/', require('./back_end/Frontpage/routes/frontpage'));
 app.use('/db',require('./back_end/mongo/routers/mongoRouter'));
 
 
-app.get(['/user','/user/*',],(req,res) => {
+app.get(['/user','/user/*'], isUser, (req,res) => {
     res.sendFile(rootDir + '/front_end/AppUser/index.html');
 })
 
 app.use('/js' ,express.static(rootDir + '/front_end/AppMod/src/js'));
 app.use('/css',express.static(rootDir + '/front_end/AppMod/src/css'));
+app.use('/icons/reactionIcons',express.static(rootDir + '/back_end/assets/icons/reactionIcons'))
+app.use('/icons/navbarIcons',express.static(rootDir + '/back_end/assets/icons/navbarIcons'))
+app.use('/icons/settingsIcons',express.static(rootDir + '/back_end/assets/icons/settingsIcons'))
 app.use('/img',express.static(rootDir + '/public/img'))
 app.use('/scss',express.static(rootDir + '/public/assets'))
 

@@ -1,63 +1,37 @@
-import './App.css'
+import './index.css'
 
-import NotFound from "./components/pages/notFound/NotFound.jsx";
-import Home from "./components/pages/home/Home.jsx";
-import Channels from "./components/pages/channels/Channels.jsx";
-import AddPost from "./components/pages/addPost/AddPost.jsx";
-import Profile from "./components/pages/profile/Profile.jsx";
-import Search from "./components/pages/search/Search.jsx";
-import Settings from "./components/pages/settings/Settings.jsx";
-import {Routes, Route} from "react-router-dom";
-import React, {useEffect, useState} from "react";
+import NotFound from "./pages/notFound/NotFound.jsx";
+import Home from "./pages/home/Home.jsx";
+import Channels from "./pages/channels/Channels.jsx";
+import AddPost from "./pages/addPost/AddPost.jsx";
+import Profile from "./pages/profile/Profile.jsx";
+import Search from "./pages/search/Search.jsx";
+import Settings from "./pages/settings/Settings.jsx";
+import {Routes, Route, BrowserRouter} from "react-router-dom";
+import React, {useEffect, useRef, useState} from "react";
+import RootLayout from "./layouts/RootLayout.jsx";
+import {setQuotaInLocStor, setUsernameInLocStor} from "./components/utils/usefulFunctions.js";
 
 function App() {
-    return (
-        <Routes>
-            <Route path="/" element={<Home />} >
-                <Route path="profile" element={<Profile />} />
-                <Route path="search" element={<Search />} />
-                <Route path="channels" element={<Channels />} />
-                <Route path="settings" element={<Settings />} />
-                <Route path="addpost" element={<AddPost />} />
-                <Route path="*" element={<NotFound />} />
-            </Route>
-        </Routes>
-    );
-}
-
-
-/*
-function App() {
-    const [items, setItems] = useState([]);
-
-    useEffect(() => {
-        axios.get("/api/items")
-            .then(response => setItems(response.data))
-            .catch(error => console.error(error));
-    }, []);
+    const [user, setUser] = useState(null);
+    const savedUser = useRef(false);
 
     return (
-        <div>
-            <h1>Items</h1>
-            <ul>
-                {items.map(item => (
-                    <li key={item._id}>
-                        <h3>{item.name}</h3>
-                        <p>{item.description}</p>
-                    </li>
-                ))}
-            </ul>
-        </div>
+        <BrowserRouter basename={"/user"}>
+            <Routes>
+                <Route path="/" element={<RootLayout />} >
+                    <Route index element={<Home />} />
+                    <Route  path="profile" element={<Profile />} />
+                    <Route  path="search" element={<Search />} />
+                    <Route  path="channels" element={<Channels />} />
+                    <Route  path="settings" element={<Settings />} />
+                    <Route  path="addpost" element={<AddPost />} />
+                    <Route path="*" element={<NotFound />} />
+                </Route>
+            </Routes>
+    </BrowserRouter>
     );
+
 }
-*/
+
 export default App;
-
-
-function Prova () {
-    return (
-        <div>
-            prova
-        </div>
-    );
-}
