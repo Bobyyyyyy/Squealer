@@ -1,41 +1,19 @@
-import {ProfilePic} from "../assets/index.jsx"
-import {getProfilePicture, getUsernameFromLocStor, parseTime} from "../utils/usefulFunctions.js";
+import {getProfilePicByUsername, getUsernameFromLocStor, parseTime} from "../utils/usefulFunctions.js";
 import React, {Suspense, useEffect, useState} from "react";
 
 function Title({post}) {
 
+    const [profilePic, setProfilePic] = useState();
+    const tempo = parseTime(post);
     const allDest = post.destinationArray.map((dest) => {
         return `${dest.destType === "user" ? "@" : "§"}${dest.name}`;
     })
 
-    const tempo = parseTime(post);
-
-    const [profilePic, setProfilePic] = useState();
-    const prendiProfilo = async () => {
-        try {
-            let res = await fetch(`/db/user/profilePic?name=${post.owner}`);
-            if (res.ok) {
-                let profilePic = await res.json();
-                //console.log("pic diocane", profilePic.profilePic);
-                setProfilePic(profilePic.profilePic)
-                return profilePic;
-            }
-        }
-        catch (e) {
-            console.log(e)
-        }
-    }
-
     useEffect(()=> {
-        /*
-        getProfilePicture(post.owner)
-            .then((res)=> {
-                console.log("res",res);
+        getProfilePicByUsername(post.owner)
+            .then((res)=>{
                 setProfilePic(res)
             })
-
-         */
-        prendiProfilo().then()
     }, [])
 
     function Caricamento () {

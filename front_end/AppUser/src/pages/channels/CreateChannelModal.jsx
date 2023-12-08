@@ -76,6 +76,7 @@ function CreateChannelModal({ isOpen, setIsOpen, setNuovoCanale}) {
                 </div>
                 <div className="flex items-center gap-2 mb-4">
                     <Radio
+                        name = "visibility"
                         value="private"
                         onChange={() => setVisibility('private')}
                     />
@@ -83,6 +84,7 @@ function CreateChannelModal({ isOpen, setIsOpen, setNuovoCanale}) {
                         Private
                     </Label>
                     <Radio
+                        name = "visibility"
                         value="public"
                         onChange={() => setVisibility('public')}
                     />

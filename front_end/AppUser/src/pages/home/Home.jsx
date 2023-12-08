@@ -1,7 +1,6 @@
 import Post from "../../components/posts/Post.jsx";
 import React, {Suspense, useEffect, useState} from "react";
 import {
-    getAllPostFrontend,
     getUsernameFromLocStor,
     setUsernameInLocStor
 } from "../../components/utils/usefulFunctions.js";

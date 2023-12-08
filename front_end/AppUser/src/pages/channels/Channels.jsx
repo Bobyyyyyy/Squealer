@@ -3,15 +3,22 @@ import {ProfilePic} from "../../components/assets/index.jsx"
 import Searchbar from "../../components/Searchbar.jsx";
 import {Link} from "react-router-dom";
 import CreateChannelModal from "./CreateChannelModal.jsx";
+import FiltersModal from "./FiltersModal.jsx";
 
 function Channels () {
 
     const [channels, setChannels] = useState([]);
-    const [showModal, setShowModal] = useState(false);
+    const [showCreateModal, setShowCreateModal] = useState(false);
+    const [showFilterModal, setShowFilterModal] = useState(false);
     const [nuovoCanale, setNuovoCanale] = useState(false)
+    const [channelName, setChannelName] = useState('');
+    const [visibility, setVisibility] = useState('');
+    const [isOwner, setIsOwner] = useState('');
+    const [queryFilter, setQueryFilter] = useState('');
 
     useEffect(() => {
-        fetch("/db/channel/?offset=0", {
+        console.log("query",queryFilter)
+        fetch(`/db/channel/?offset=0&&name=giovanni`, {
             method: 'GET'
         })
             .then((res) => {
@@ -24,18 +31,38 @@ function Channels () {
                         setChannels([])
                     })
             })
-    }, [nuovoCanale]);
+    }, [nuovoCanale, queryFilter]);
 
-    const [creaCanale, setCreaCanale] = useState(false);
-    const changeCreaCanale = () => {
-        setShowModal(true)
-        setCreaCanale(!creaCanale)
+    const handleFilters = () => {
+        //let type = (!!visibility) ? `&&type=${visibility}` : '';
+        //let creator = (isOwner);
+        //const query = name+type;
+        const filter = {
+            name: channelName,
+            type: visibility
+        }
+
+        setQueryFilter(JSON.stringify(filter))
+        //console.log(query)
+        setShowFilterModal(false)
     }
 
     return (
         <>
             <div className="flex flex-col p-4">
                 <h1 className="text-xl uppercase">Lista canali:</h1>
+                <button
+                    className="py-3 mt-4 bg-primary rounded text-lg font-medium"
+                    onClick={()=>setShowFilterModal(true)}
+                >
+                    Filtra canali
+                </button>
+                <FiltersModal
+                    isOpen={showFilterModal} setIsOpen={setShowFilterModal}
+                    channelName={channelName} setChannelName={setChannelName}
+                    isOwner={isOwner} setIsOwner={setIsOwner}
+                    setVisibility={setVisibility} handleSearch={handleFilters}
+                />
                 <div className="flex flex-wrap w-full h-fit max-h-[580px] overflow-y-scroll mt-2 gap-4">
                     {channels!==null && channels.map((channel) => {
                         return (
@@ -55,12 +82,11 @@ function Channels () {
                 </div>
                 <button
                     className="py-3 mt-4 bg-primary rounded text-lg font-medium"
-                    onClick={changeCreaCanale}
+                    onClick={()=> setShowCreateModal(true)}
                 >
                     Crea canale
                 </button>
-                {/*creaCanale && <CreateChannelForm />*/}
-                <CreateChannelModal isOpen={showModal} setIsOpen={setShowModal} setNuovoCanale={setNuovoCanale} />
+                <CreateChannelModal isOpen={showCreateModal} setIsOpen={setShowCreateModal} setNuovoCanale={setNuovoCanale} />
             </div>
         </>
     );
