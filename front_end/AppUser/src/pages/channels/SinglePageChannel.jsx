@@ -4,9 +4,11 @@ import {setUsernameInLocStor} from "../../components/utils/usefulFunctions.js";
 import Post from "../../components/posts/Post.jsx";
 
 function SinglePageChannel() {
-    let { nome } = useParams();
+    const { nome } = useParams();
     const [isLoading, setIsLoading] = useState(true);
     const [posts, setPosts] = useState([]);
+    const [description, setDescription] = useState("")
+
     const fetchAllPosts = async () => {
         try {
             let res = await fetch(`/db/post/all?offset=0&limit=10&channel=${nome}`);
@@ -31,15 +33,23 @@ function SinglePageChannel() {
         setUsernameInLocStor()
             .then((res) => {
                 fetchAllPosts()
-                    .then()
+                    .then(()=>{
+                        fetch(`/db/channel/${nome}`)
+                            .then((res)=>res.json())
+                            .then((res)=>{
+                                setDescription(res.description)
+                                console.log("canale", res)
+                            })
+                    })
             })
     }, []);
 
     console.log("entro qui", nome)
     return (
         <div>
-            <h3 className={"text-center text-2xl font-extrabold"}>{nome}</h3>
-            <div className={"flex flex-wrap w-full gap-8 items-center justify-center h-full pb-20 overflow-y-scroll"}>
+            <h3 className={"text-center text-2xl font-extrabold mt-4"}>§{nome}</h3>
+            <p>{description}</p>
+            <div className={"flex flex-wrap w-full gap-8 items-center justify-center h-full pb-20 mt-4 overflow-y-scroll"}>
                 {posts!==null && posts.map((post)=> {
                     //console.log("id",post._id)
                     return(
@@ -48,6 +58,9 @@ function SinglePageChannel() {
                                 post={post}
                             />
                     )})}
+                {posts.length===0 &&
+                    <p>Non ci sono ancora post indirizzati al canale {nome}</p>
+                }
             </div>
         </div>
     );

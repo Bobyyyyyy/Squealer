@@ -4,8 +4,8 @@ import React, {Suspense, useEffect, useState} from "react";
 
 function Title({post}) {
 
-    let allDest = post.destinationArray.map((dest) => {
-        return dest.name;
+    const allDest = post.destinationArray.map((dest) => {
+        return `${dest.destType === "user" ? "@" : "§"}${dest.name}`;
     })
 
     const tempo = parseTime(post);
@@ -14,7 +14,6 @@ function Title({post}) {
     const prendiProfilo = async () => {
         try {
             let res = await fetch(`/db/user/profilePic?name=${post.owner}`);
-            console.log("risposta", res);
             if (res.ok) {
                 let profilePic = await res.json();
                 //console.log("pic diocane", profilePic.profilePic);
