@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, Button, Radio, Label } from 'flowbite-react';
 import {getUsernameFromLocStor} from "../../components/utils/usefulFunctions.js";
-function CreateChannelModal({ isOpen, setIsOpen }) {
+function CreateChannelModal({ isOpen, setIsOpen, setNuovoCanale}) {
 
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
@@ -12,7 +12,7 @@ function CreateChannelModal({ isOpen, setIsOpen }) {
         setError('');
         setName('');
         setDescription('')
-        setVisibility('public')
+        setVisibility('')
     }
 
     const createChannel = async () => {
@@ -38,15 +38,16 @@ function CreateChannelModal({ isOpen, setIsOpen }) {
     }
 
     const handleSubmit = () => {
-        console.log(!!name, !!description)
-        if (!!name && !!description) {
+        console.log(!!name && !!description && !!visibility)
+        if (!!name && !!description && !!visibility) {
             createChannel()
                 .then(()=>{
                     cleanInput();
                     setIsOpen(false);
+                    setNuovoCanale(true);
                 })
         } else {
-            setError('Please provide both name and description.');
+            setError('Inserisci tutti i campi.');
         }
     };
 

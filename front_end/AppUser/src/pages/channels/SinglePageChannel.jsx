@@ -46,7 +46,7 @@ function SinglePageChannel() {
 
     console.log("entro qui", nome)
     return (
-        <div>
+        <div className="flex flex-col w-full justify-center items-center gap-4">
             <h3 className={"text-center text-2xl font-extrabold mt-4"}>§{nome}</h3>
             <p>{description}</p>
             <div className={"flex flex-wrap w-full gap-8 items-center justify-center h-full pb-20 mt-4 overflow-y-scroll"}>
