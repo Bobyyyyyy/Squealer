@@ -23,6 +23,7 @@
   const keyWordFilter = ref(false);
   const destFilter = ref('Filter');
   const typePostFilter = ref('Type');
+  const keyWord = ref('');
   const sortFilter = ref('Sort');
   const offset = ref(0);
 
@@ -31,7 +32,7 @@
 
   let query = ''
 
-  let curPosts = reactive([]);
+  let curPosts= ref([]);
   let lastRequestLength = 12;
 
   async function updatePostType(newText){
@@ -42,7 +43,7 @@
 
     typePostFilter.value=newText
 
-    curPosts = (await getPosts(query,0))
+    curPosts.value = (await getPosts(query,0))
     readyPosts.value=true
   }
   async function updateSortFilter(newText){
@@ -53,7 +54,7 @@
 
     sortFilter.value = newText
 
-    curPosts = (await getPosts(query,0))
+    curPosts.value = (await getPosts(query,0))
     readyPosts.value=true
   }
   async function updateDestFilter(newText){
@@ -69,19 +70,20 @@
 
     destFilter.value = newText;
 
-    curPosts = (await getPosts(query,0))
+    curPosts.value = (await getPosts(query,0))
     readyPosts.value=true
   }
 
   async function updatePost(){
     offset.value += 12;
     let posts = await getPosts(query,offset.value);
-    curPosts.push(...posts);
+    curPosts.value.push(...posts);
     return posts.length;
   }
 
   async function updateTagPosts(){
-    //TODO: PRENDERE SOLO POST CON QUEL TAG
+    offset.value = 12;
+    curPosts.value = await getPosts(`${query}&keyword=${keyWord.value}`);
   }
 
 
@@ -107,7 +109,7 @@
 
     query = `name=${currentVip.value}`
 
-    curPosts.push(...(await getPosts(query, 0)));
+    curPosts.value.push(...(await getPosts(query, 0)));
 
     readyPosts.value = true
     })
@@ -165,7 +167,7 @@
                      @updateSort = updateSortFilter
           />
           <div v-if="keyWordFilter && !smartPhone" class="input-group ms-3">
-            <input type="text" class="form-control" placeholder="Keyword" aria-label="Keyword's search" aria-describedby="button-addon2">
+            <input type="text" class="form-control" placeholder="Keyword" aria-label="Keyword's search" v-model="keyWord" aria-describedby="button-addon2">
             <button class="btn btn-secondary" type="button" id="button-addon2" @click="updateTagPosts">Cerca</button>
           </div>
         </div>

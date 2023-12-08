@@ -298,11 +298,11 @@ const addPost = async (post,quota) => {
  * @param {String} query.sort - only if Sort activated -- more recent by default
  * @param {Boolean} query.reply - if you want replies of a given post
  * @param {String} query.repliedPost - father id
+ * @param {String} query.keyword - keyword search
  * @returns {Promise<*>}
  */
 const getAllPost = async (query,sessionUser) =>{
     try{
-        await connection.get()
         let reply = !!query?.reply;
         let filter = {
                 /* Per i canali non mi serve l'id dell'utente che fa la richiesta, a meno che non sia AppSmm*/
@@ -325,6 +325,8 @@ const getAllPost = async (query,sessionUser) =>{
             ... (query.user) && {$or: [{'destinationArray.name': {$regex: query.user , $options: 'i'}}]},
 
             ... {'reply.isReply': reply, ... (reply) && {'reply.repliedPost': query.reply.repliedPost}},
+
+            ...(query?.keyword) && {tags: query.keyword}
         }
 
         await connection.get();
