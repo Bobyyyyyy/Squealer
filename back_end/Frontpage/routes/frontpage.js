@@ -19,7 +19,7 @@ const vueDir = path.join(rootDir ,'front_end','AppSmm','dist_vue/');
 
 if(process.env.NODE_ENV === 'production') {
     router.use(express.static(vueDir));
-    router.get(['/assets_vue*','/assets_vue/'], isSMM, async (req,res) => {
+    router.get(['/assets_vue*','/assets_vue/', '/AppSmm*'], isSMM, async (req,res) => {
         router.use(express.static(vueDir));
         res.render(vueDir + 'index.html');
     })

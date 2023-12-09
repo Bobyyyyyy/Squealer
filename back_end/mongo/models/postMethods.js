@@ -154,6 +154,7 @@ const addTimedPost = async (postId) => {
             destinations: post.destinationArray,
             contentType: post.contentType,
             dateOfCreation: Date.now(),
+            tags: post.tags,
             content: post.contentType === 'text' ? parseText(timedInfo.content,timedInfo.done + 1) : post.content
         }
 
@@ -326,7 +327,7 @@ const getAllPost = async (query,sessionUser) =>{
 
             ... {'reply.isReply': reply, ... (reply) && {'reply.repliedPost': query.reply.repliedPost}},
 
-            ...(query?.keyword) && {tags: query.keyword}
+            ...(query?.keyword) && {tags: {$regex: query.keyword , $options: 'i'}}
         }
 
         await connection.get();

@@ -1,5 +1,5 @@
 const postModel = require("../models/postMethods");
-const {createScheduledPost} = require("./CronController");
+const CronController = require("./CronController");
 const {mongo} = require("mongoose");
 
 
@@ -7,7 +7,7 @@ const createPost = async (req,res) => {
     try{
         let postSavedId = await postModel.addPost(req.body.post, req.body.quota)
         if (req.body.post?.timed) {
-            await createScheduledPost(postSavedId.postId, req.body.post.frequency, req.body.post.squealNumber, req.body.post.content, req.body.post.contentType);
+            await CronController.createScheduledPost(postSavedId.postId, req.body.post.frequency, req.body.post.squealNumber, req.body.post.content, req.body.post.contentType);
         }
         res.send({id: postSavedId})
     }

@@ -96,6 +96,8 @@
 
       let [tmpDest, tmpTags] = parseDestinations(receiverArr.value);
       if (tmpTags.length > 0 ) tags = tags.concat(tmpTags);
+      //remove duplicates
+      if(tags.length > 0) tags = tags.filter((tag,index) => tags.indexOf(tag) === index);
 
       let post = {
         creator: currentVip.value,

@@ -66,8 +66,8 @@
 <style>
 
   .postDim{
-    width: 40rem;
-    height: 40rem;
+    min-width: 50rem;
+    height: auto;
   }
 
   @media screen and (max-width: 768px) {
