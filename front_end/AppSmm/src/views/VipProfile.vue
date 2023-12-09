@@ -130,9 +130,9 @@
         </div>
       </div>
 
-    <h2 class="m-0 text-center fw-bold">{{'@'+currentVip }}</h2>
-    <h6 class="mt-1 text-center mb-0">{{[store.getters.getQuota.daily,store.getters.getQuota.weekly,store.getters.getQuota.monthly].join(' | ')}}</h6>
-     <p class="m-0 text-center mt-1 mb-0">{{n_post}} Squeal </p>
+    <h2 class="m-0 text-center text-white fw-bolder">{{'@'+currentVip }}</h2>
+    <h6 class="mt-1 text-center text-white fw-bold mb-0">{{[store.getters.getQuota.daily,store.getters.getQuota.weekly,store.getters.getQuota.monthly].join(' | ')}}</h6>
+     <p class="m-0 text-center text-white mt-1 mb-0">{{n_post}} Squeal </p>
 
       <div class="d-flex flex-column align-items-start">
         <div class="d-flex flex-row justify-content-around align-items-end">

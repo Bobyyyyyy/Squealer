@@ -95,9 +95,9 @@
       }
 
       let [tmpDest, tmpTags] = parseDestinations(receiverArr.value);
-      if (tmpTags.length > 0 ) tags = tags.concat(tmpTags);
+      if (tmpTags?.length > 0 ) tags = tags.concat(tmpTags);
       //remove duplicates
-      if(tags.length > 0) tags = tags.filter((tag,index) => tags.indexOf(tag) === index);
+      if(tags?.length > 0) tags = tags.filter((tag,index) => tags.indexOf(tag) === index);
 
       let post = {
         creator: currentVip.value,
@@ -215,7 +215,7 @@
                   </div>
                 <div class="m-1 w-100" style="max-height: 60vh">
 
-                  <textarea v-if=" postType==='text'" rows="6" v-model="textSqueal"  class="form-control"></textarea>
+                  <textarea v-if=" postType==='text'" rows="6" v-model="textSqueal" maxlength="500"  class="form-control"></textarea>
                   <div v-if="!!link && activeChoiceLink" class="d-flex flex-row mt-3 mb-2 align-items-center">
                     <h5 class="fw-light m-0">E' stato rilevato un link. Preferisci crearne uno breve? </h5>
                     <button type="button" class="btn btn-outline-success ms-3 btn-sm " style="width: 5%"
