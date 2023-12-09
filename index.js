@@ -80,13 +80,24 @@ const yesterday = () => {
     today.setDate(today.getDate() - 1);
     return today.toJSON().slice(0,10);
 }
+
+const today = () => {
+    return new Date().toJSON().slice(5,10).split('-').join('/');
+}
 // DA SISTEMARE.
 const API_NEWS_KEY = 'fb2d6c9f8a7b402e9410221202ad11d6';
 const API_TOP_NEWS = `https://newsapi.org/v2/everything?from=${yesterday()}&sortBy=popularity&apiKey=${API_NEWS_KEY}&pageSize=1`
 const API_NASA = 'https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY'
+const API_CATS = 'https://api.thecatapi.com/v1/images/search'
+const API_WIKI = `https://api.wikimedia.org/feed/v1/wikipedia/it/onthisday/events/${today()}`
 
 nodeCron.schedule(cronTabs.evening, async () => {await CC.createOfficialScheduledPost('TOP_NEWS', API_TOP_NEWS)}).start();
 nodeCron.schedule(cronTabs.evening, async () => {await CC.createOfficialScheduledPost('NASA_APOD',API_NASA)}).start()
+nodeCron.schedule(cronTabs.evening, async () => {await CC.createOfficialScheduledPost('RANDOM_CATS',API_CATS)}).start()
+nodeCron.schedule(cronTabs.evening, async () => {await CC.createOfficialScheduledPost('TODAY_FACTS',API_WIKI)}).start()
+
+
+
 
 
 // avvio di node

@@ -77,6 +77,25 @@ const createOfficialScheduledPost = async(canale, endpoint) => {
             contentType = 'text';
             break;
         }
+
+        case 'RANDOM_CATS': {
+            content = fetchobj[0].url;
+            creator = 'CatEnjoyer';
+            contentType = 'image';
+            break;
+        }
+
+        case 'TODAY_FACTS': {
+            let randomIndex = Math.floor(Math.random() * fetchobj.events.length);
+            let event = fetchobj.events[randomIndex]
+            content = "Lo sapevi che...." + `oggi nel ${event.year}` + " " + event.text + "\n";
+            for(let i = 0; i < event.pages.length; i++) {
+                content = content + event.pages[i].content_urls.desktop.page + "\n";
+            }
+            creator = 'Wikipedia';
+            contentType = 'text';
+            break;
+        }
     }
 
     try{

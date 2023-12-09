@@ -187,6 +187,9 @@ const addPost = async (post,quota) => {
     try{
         await connection.get()
         let destinations = ((typeof post.destinations) === 'string') ? JSON.parse(post.destinations) : post.destinations;
+        if(typeof destinations === "undefined") {
+            throw createError('Non si è inserito nessun destinatario',400);
+        }
         let postCategory = 'private';
         let officialChannels = [];
         let creator = await User.findOne({username: post.creator});
@@ -279,7 +282,9 @@ const addPost = async (post,quota) => {
 
         return {postId: newPost._id};
     }
-    catch(err){throw err; }
+    catch(err){
+        throw err;
+    }
 }
 
 /**
@@ -400,9 +405,7 @@ const removeDestination = async (destination,postID)=> {
 const addDestination = async (destination,postID) => {
     try {
         await connection.get();
-        let tipo = typeof destination;
-        console.log(tipo);
-        let checkDestination = await Post.findOne({$and: [{'destinationArray.name': destination.name}, {_id: postID}]});
+        let checkDestination = await Post.findOne({$and: [{$or: [{'destinationArray.name': destination.name},{'officialChannelsArray': destination.name}]}, {_id: postID}]});
         if (checkDestination) {
             throw createError('Destinazione gia nel post',400);
         }
@@ -531,10 +534,7 @@ const UpdateCategory = async (post, userID) => {
     if (positiveReactionsCount > criticalMass) {
         if (negativeReactionsCount > criticalMass) {
             await Post.findByIdAndUpdate(post._id, {popularity: 'controversial'});
-            if(post.popularity !== 'controversial') {
-                await addDestination({name: 'CONTROVERSIAL', destType: 'official'},post._id);
-            }
-
+            await addDestination({name: 'CONTROVERSIAL', destType: 'official'},post._id);
             if (post.popularity === 'popular') {
                 await changePopularity(userID, 'popularity',false);
             }
@@ -552,10 +552,7 @@ const UpdateCategory = async (post, userID) => {
     if (negativeReactionsCount > criticalMass) {
         if (positiveReactionsCount > criticalMass) {
             await Post.findByIdAndUpdate(post._id, {popularity: 'controversial'});
-            if(post.popularity !== 'controversial') {
-                await addDestination({name: 'CONTROVERSIAL', destType: 'official'},post._id);
-            }
-
+            await addDestination({name: 'CONTROVERSIAL', destType: 'official'},post._id);
             if (post.popularity === 'popular') {
                 await changePopularity(userID, 'popularity',false);
             }
