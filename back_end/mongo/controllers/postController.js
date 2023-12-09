@@ -11,9 +11,8 @@ const createPost = async (req,res) => {
         }
         res.send({id: postSavedId})
     }
-    catch (err){
-        console.log(err);
-        res.send(err)
+    catch (error){
+        res.status(error.statusCode).send({message: error.mes});
     }
 }
 
