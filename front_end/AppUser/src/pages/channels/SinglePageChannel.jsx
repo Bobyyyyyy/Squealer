@@ -4,14 +4,20 @@ import {getUsernameFromLocStor, setUsernameInLocStor} from "../../components/uti
 import Post from "../../components/posts/Post.jsx";
 import {FollowIcon, DontFollow} from "../../components/assets/index.jsx";
 import {Button} from "flowbite-react";
+import RequestModal from "./RequestModal.jsx";
 
 function SinglePageChannel() {
     const { nome } = useParams();
+    const [type, setType] = useState();
     const [isLoading, setIsLoading] = useState(true);
     const [posts, setPosts] = useState([]);
-    const [description, setDescription] = useState("")
+    const [description, setDescription] = useState("");
     const [role, setRole] = useState("");
-    const [isFollower, setIsFollower] = useState(false)
+    const [isFollower, setIsFollower] = useState(false);
+    const [showRequestModal, setShowRequestModal] = useState(false);
+    const [requests, setRequests] = useState([]);
+    const [hasUpdated, setHasUpdated] = useState(false);
+
     const fetchAllPosts = async () => {
         try {
             let res = await fetch(`/db/post/all?offset=0&limit=10&channel=${nome}`);
@@ -31,7 +37,6 @@ function SinglePageChannel() {
             console.log(e);
         }
     };
-
 
     const handleFollow = () => {
         fetch(`/db/channel/follower`, {
@@ -59,11 +64,15 @@ function SinglePageChannel() {
                         const username = getUsernameFromLocStor();
                         setDescription(res.description)
                         setRole(res.role);
+                        console.log("ruolo", res.role)
+                        setType(res.type);
+                        setRequests(res.requests)
                         setIsFollower(res.followers.some((follower)=> follower.user === username))
+                        setHasUpdated(false);
                         console.log("canale", res)
                     })
             })
-    }, []);
+    }, [hasUpdated]);
 
     return (
         <>
@@ -72,9 +81,24 @@ function SinglePageChannel() {
                 <h3 className={"text-center text-2xl font-extrabold mt-4"}>§{nome}</h3>
                 <p>{description}</p>
                 {role === "Creator" || role === "Admin" ? (
-                        <Button>
-                            Gestisci follower
-                        </Button>
+                        <div className="flex justify-around w-full">
+                            <Button>
+                                Gestisci follower
+                            </Button>
+                            {type === "private" &&
+                                <>
+                                <Button
+                                    onClick={()=>setShowRequestModal(true)}
+                                >
+                                    Gestisci richieste
+                                </Button>
+                                    <RequestModal
+                                        channelName={nome} requests={requests} isOpen={showRequestModal} setIsOpen={setShowRequestModal}
+                                        hasUpdated={hasUpdated} setHasUpdated={setHasUpdated}
+                                    />
+                                </>
+                            }
+                        </div>
                     ) :
                     <>
                     {isFollower ? (

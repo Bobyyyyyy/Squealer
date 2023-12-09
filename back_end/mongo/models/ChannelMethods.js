@@ -106,7 +106,7 @@ const getChannels = async (query) => {
                 //filtrare canale per nome
                 ...(query.filters.creator) && {'creator': {$regex: query.filters.creator, $options: 'i'}},
 
-                ...(query.filters.hasAccess) && {$or: [{'name': query.filters.hasAccess},{'admins': {$in: [query.filters.hasAccess]}},{'followers': {$in: [query.filters.hasAccess]}}]}
+                ...(query.filters.hasAccess) && {'admins': {$in: [query.filters.hasAccess]}}
         }
 
         if (query.filters.sortBy) {

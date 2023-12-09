@@ -1,7 +1,9 @@
 import { Modal, Button, Radio, Label, Checkbox } from 'flowbite-react';
 import React from "react";
+import {getUsernameFromLocStor} from "../../components/utils/usefulFunctions.js";
 
-function FiltersModal({isOpen, setIsOpen, channelName, setChannelName, setVisibility, isOwner, setIsOwner, handleSearch}){
+function FiltersModal({isOpen, setIsOpen, channelName, setChannelName, visibility,
+                          setVisibility, owner, setOwner, admin, setAdmin,handleSearch}) {
 
     return (
       <Modal show={isOpen} onClose={()=>setIsOpen(false)}>
@@ -19,11 +21,12 @@ function FiltersModal({isOpen, setIsOpen, channelName, setChannelName, setVisibi
                           onChange={(e)=>setChannelName(e.target.value)}
                       />
                   </div>
-                  <div className="flex justify-between items-center gap-2">
+                  <div className="flex justify-start items-center gap-8">
                       <Label>
                       <Radio
                           name = "visibility"
                           value="private"
+                          checked={visibility==='private'}
                           onChange={() => setVisibility('private')}
                       />
                           <span className="pl-2">
@@ -34,20 +37,11 @@ function FiltersModal({isOpen, setIsOpen, channelName, setChannelName, setVisibi
                       <Radio
                           name = "visibility"
                           value="public"
+                          checked={visibility==='public'}
                           onChange={() => setVisibility('public')}
                       />
                           <span className="pl-2">
                                 Public
-                          </span>
-                      </Label>
-                      <Label>
-                      <Radio
-                          name = "visibility"
-                          value="none"
-                          onChange={() => setVisibility('')}
-                      />
-                          <span className="pl-2">
-                                Nessuno
                           </span>
                       </Label>
                   </div>
@@ -55,10 +49,28 @@ function FiltersModal({isOpen, setIsOpen, channelName, setChannelName, setVisibi
                       <input
                           type="checkbox"
                           id="creator"
-                          onChange={()=>setIsOwner(!isOwner)}
+                          checked={!!owner}
+                          onChange={()=>setOwner((!owner)? getUsernameFromLocStor() : '')}
                       />
                       <Label>Sono il creatore</Label>
+                      <input
+                          type="checkbox"
+                          id="creator"
+                          checked={!!admin}
+                          onChange={()=>setAdmin((!admin)? getUsernameFromLocStor() : '')}
+                      />
+                      <Label>Sono l'admin</Label>
                   </div>
+                  <Button
+                    className="w-fit"
+                    onClick={() => {
+                        setChannelName('');
+                        setVisibility('');
+                        setOwner('');
+                    }}
+                  >
+                      Rimuovi filtri
+                  </Button>
               </div>
           </Modal.Body>
           <Modal.Footer>

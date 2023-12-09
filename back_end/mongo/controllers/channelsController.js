@@ -88,7 +88,7 @@ const addFollower = async function (req,res){
 
 const handleRequest = async function (req,res) {
     try {
-        let admin = req.body.admin;
+        let admin = req.session.user;
         let user = req.body.user
         let channel = req.body.channel;
         let accepted = req.body.accepted;
@@ -101,7 +101,7 @@ const handleRequest = async function (req,res) {
 
 const addAdmin = async function (req,res) {
     try {
-        let admin = req.body.admin;
+        let admin = req.session.user;
         let user = req.body.user
         let channel = req.body.channel;
         res.status(200).send(await channelsModel.addAdmin(user,admin,channel));
