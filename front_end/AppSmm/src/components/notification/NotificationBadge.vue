@@ -12,7 +12,7 @@ defineProps({
 const notification = ref(null);
 
 onMounted(async () => {
-  let res = await fetch(`/db/notification?user=${currentVip}`, {method:"GET"});
+  let res = await fetch(`/db/notification?user=${currentVip.value}`, {method:"GET"});
   notification.value = await res.json();
 })
 
