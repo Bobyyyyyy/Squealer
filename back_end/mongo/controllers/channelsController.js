@@ -111,6 +111,19 @@ const addAdmin = async function (req,res) {
     }
 }
 
+const handlePermission = async function (req, res) {
+    try {
+        let admin = req.session.user;
+        let user = req.body.user;
+        let channel = req.body.channel;
+        let canWrite = req.body.canWrite;
+        res.status(200).send(await channelsModel.handlePermission(admin,user,channel,canWrite))
+    }
+    catch (error) {
+        res.status(error.statusCode).send(error.message);
+    }
+}
+
 module.exports = {
     createChannel,
     getChannelList,
@@ -122,5 +135,6 @@ module.exports = {
     changeChannelName,
     addFollower,
     handleRequest,
+    handlePermission,
     addAdmin
 }

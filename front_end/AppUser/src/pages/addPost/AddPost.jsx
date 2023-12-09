@@ -352,7 +352,7 @@ const Content = ({errors, touched, setImgAsLink, ...formikProps}) => {
                         ) : <span>Contenuto</span>
                         }
                     </label>
-                    <div className="border border-red-500 w-full h-96">
+                    <div className="w-full h-96">
                         <Mappa setPosition={setPosition} position={position} />
                     </div>
                 </>

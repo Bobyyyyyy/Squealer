@@ -5,6 +5,7 @@ import Post from "../../components/posts/Post.jsx";
 import {FollowIcon, DontFollow} from "../../components/assets/index.jsx";
 import {Button} from "flowbite-react";
 import RequestModal from "./RequestModal.jsx";
+import FollowersModal from "./FollowersModal.jsx";
 
 function SinglePageChannel() {
     const { nome } = useParams();
@@ -15,7 +16,9 @@ function SinglePageChannel() {
     const [role, setRole] = useState("");
     const [isFollower, setIsFollower] = useState(false);
     const [showRequestModal, setShowRequestModal] = useState(false);
+    const [showFollowerModal, setShowFollowerModal] = useState(false);
     const [requests, setRequests] = useState([]);
+    const [followers, setFollowers] = useState([]);
     const [hasUpdated, setHasUpdated] = useState(false);
     const canSeePosts = useRef(false);
 
@@ -52,33 +55,33 @@ function SinglePageChannel() {
             .then((res)=> {
                 if (res.ok) {
                     setIsFollower(!isFollower);
+                    if (!isFollower) {
+                        location.reload();
+                    }
                 }
             })
     }
 
     useEffect(() => {
-        //fetchAllPosts()
-            //.then(()=>{
-                fetch(`/db/channel/${nome}`)
-                    .then((res) => res.json())
-                    .then((res)=> {
-                        const username = getUsernameFromLocStor();
-                        setDescription(res.description)
-                        setRole(res.role);
-                        canSeePosts.current = (res.role !== "Not Follower");
-                        console.log("ruolo", res.role)
-                        setType(res.type);
-                        setRequests(res.requests)
-                        setIsFollower(res.followers.some((follower)=> follower.user === username))
-                        setHasUpdated(false);
-                        console.log("canale", res)
-                    })
-                    .then(() => {
-                        if (canSeePosts) {
-                            fetchAllPosts()
-                        }
-                    })
-            //})
+        fetch(`/db/channel/${nome}`)
+            .then((res) => res.json())
+            .then((res)=> {
+                const username = getUsernameFromLocStor();
+                setDescription(res.description)
+                setRole(res.role);
+                canSeePosts.current = (res.role !== "Not Follower");
+                setFollowers(res.followers)
+                setType(res.type);
+                setRequests(res.requests)
+                setIsFollower(res.followers.some((follower)=> follower.user === username))
+                setHasUpdated(false);
+                console.log("canale", res)
+            })
+            .then(() => {
+                if (canSeePosts) {
+                    fetchAllPosts()
+                }
+            })
     }, [hasUpdated]);
 
     return (
@@ -89,16 +92,23 @@ function SinglePageChannel() {
                 <p>{description}</p>
                 {role === "Creator" || role === "Admin" ? (
                         <div className="flex justify-around w-full">
-                            <Button>
-                                Gestisci follower
-                            </Button>
+                            <>
+                                <Button
+                                    onClick={()=>setShowFollowerModal(true)}
+                                >
+                                    Gestisci follower
+                                </Button>
+                                <FollowersModal
+                                    channelName={nome} followers={followers} isOpen={showFollowerModal} setIsOpen={setShowFollowerModal}
+                                />
+                            </>
                             {type === "private" &&
                                 <>
-                                <Button
-                                    onClick={()=>setShowRequestModal(true)}
-                                >
-                                    Gestisci richieste
-                                </Button>
+                                    <Button
+                                        onClick={()=>setShowRequestModal(true)}
+                                    >
+                                        Gestisci richieste
+                                    </Button>
                                     <RequestModal
                                         channelName={nome} requests={requests} isOpen={showRequestModal} setIsOpen={setShowRequestModal}
                                         hasUpdated={hasUpdated} setHasUpdated={setHasUpdated}

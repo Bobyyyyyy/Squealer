@@ -301,6 +301,21 @@ const handleRequest = async function(adminName,userRequest,channelName,accepted)
     }
 }
 
+const handlePermission = async function(adminName, userRequest, channelName, canWrite) {
+    try {
+        await connection.get();
+        channelName = channelName.trim().toLowerCase();
+
+        let channel = await Channel.findOne({$and: [{name: channelName},{$or: [{'admins': adminName},{'creator': adminName}]}]}).lean();
+        if(!channel)
+            throw createError(`${adminName.username} non ha i permessi necessari`,400);
+
+        await Channel.findOneAndUpdate({name: channelName, 'followers.user':userRequest}, {$set: {'followers.$.canWrite': canWrite}});
+    }
+    catch (error) {
+        throw error
+    }
+}
 
 const getSingleChannel = async(name,user) => {
     try{
@@ -408,4 +423,5 @@ module.exports = {
     addFollower,
     handleRequest,
     addAdmin,
+    handlePermission
 }

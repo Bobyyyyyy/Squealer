@@ -54,9 +54,6 @@ function RequestModal({isOpen, setIsOpen, requests, channelName, hasUpdated, set
                     </div>
                 )}
             </Modal.Body>
-            <Modal.Footer>
-
-            </Modal.Footer>
         </Modal>
     );
 }
