@@ -197,8 +197,8 @@ $('#orderby').on('change',() => {
     else if(orderBy === 'visuals') {
         let options = `<label for="order"></label><select class="select btn btn-success" id="order" autocomplete="off">
                                   <option value="" selected disabled>Ordine</option>
-                                  <option value="più visual">Crescente</option>
-                                  <option value="meno visual">Descrescente</option>
+                                  <option value="più visual">Decrescente</option>
+                                  <option value="meno visual">Crescente</option>
                               </select>`
         $('#options').empty().html(options);
     }

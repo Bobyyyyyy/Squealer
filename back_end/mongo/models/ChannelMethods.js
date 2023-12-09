@@ -210,18 +210,17 @@ const addFollower = async function (userName, channelName) {
         let channel = await Channel.findOne({name: channelName}).lean();
         let user = await User.findOne({username: userName}).lean();
 
+        let checkFollow = await Channel.findOne({name: channelName, 'followers.user': userName});
+        if(checkFollow) {
+            await Channel.findOneAndUpdate({name: channelName}, {$pull: {'followers': {'user': userName}}});
+            return;
+        }
+
         if (channel.type === 'public') {
             // se sei gia' follower lo toglie
-            let checkFollow = await Channel.findOne({name: channelName, 'followers.user': userName});
-            if(checkFollow) {
-                await Channel.findOneAndUpdate({name: channelName}, {$pull: {'followers': {'user': userName}}});
-                return;
-            }
             await Channel.findByIdAndUpdate(channel._id,{$push: {'followers': {user: user.username, canWrite: true}}});
         }
         else {
-
-
             let checkRequest = await Channel.findOne({name: channelName, 'requests.user': userName});
             if(checkRequest) {
                 await Channel.findOneAndUpdate({name: channelName}, {$pull: {'requests': {'user': userName}}});

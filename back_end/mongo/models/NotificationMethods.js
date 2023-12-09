@@ -1,7 +1,7 @@
 const connection = require('../ConnectionSingle');
 
 /**
- * @param username
+ * @param {String} username
  * @returns {Promise<void>}
  */
 
@@ -16,7 +16,7 @@ const getNotification = async function (username) {
 }
 
 /**
- * @param username
+ * @param {String} username
  * @returns {Promise<*>}
  */
 const deleteNotification = async function(username) {
@@ -35,4 +35,5 @@ const deleteNotification = async function(username) {
 
 module.exports = {
     getNotification,
+    deleteNotification,
 }

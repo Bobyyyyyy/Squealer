@@ -154,6 +154,7 @@ const addTimedPost = async (postId) => {
             destinations: post.destinationArray,
             contentType: post.contentType,
             dateOfCreation: Date.now(),
+            tags: post.tags,
             content: post.contentType === 'text' ? parseText(timedInfo.content,timedInfo.done + 1) : post.content
         }
 
@@ -289,7 +290,7 @@ const addPost = async (post,quota) => {
  * @param {String} query.channel - name of channel destination
  * @param {String} query.official - name of official channel destination
  * @param {String} query.user - name of user destination
- * @param {Boolean} query.smm - is SMM requesting
+ * @param {Boolean} query.smm - is AppSmm requesting
  * @param {String} query.destType - only if destType activated
  * @param {String} query.popularity - only if popularity is activated
  * @param {String} query.typeFilter - only if type post filter activated
@@ -298,14 +299,14 @@ const addPost = async (post,quota) => {
  * @param {String} query.sort - only if Sort activated -- more recent by default
  * @param {Boolean} query.reply - if you want replies of a given post
  * @param {String} query.repliedPost - father id
+ * @param {String} query.keyword - keyword search
  * @returns {Promise<*>}
  */
 const getAllPost = async (query,sessionUser) =>{
     try{
-        await connection.get()
         let reply = !!query?.reply;
         let filter = {
-                /* Per i canali non mi serve l'id dell'utente che fa la richiesta, a meno che non sia SMM*/
+                /* Per i canali non mi serve l'id dell'utente che fa la richiesta, a meno che non sia AppSmm*/
             ...((query.smm || !query.channel) && query.name) && {'owner':  {$regex: query.name , $options: 'i'}},
                 /* FILTRO PER TIPO DI POST */
             ... (query.typeFilter && query.typeFilter !== 'all') && {'contentType': query.typeFilter},
@@ -325,6 +326,8 @@ const getAllPost = async (query,sessionUser) =>{
             ... (query.user) && {$or: [{'destinationArray.name': {$regex: query.user , $options: 'i'}}]},
 
             ... {'reply.isReply': reply, ... (reply) && {'reply.repliedPost': query.reply.repliedPost}},
+
+            ...(query?.keyword) && {tags: {$regex: query.keyword , $options: 'i'}}
         }
 
         await connection.get();
@@ -423,6 +426,11 @@ const addDestination = async (destination,postID) => {
                 await Channel.findByIdAndUpdate(channel._id,[{$set: {'postNumber': {$add: ['$postNumber',1]}}}]).lean();
                 await Post.findByIdAndUpdate(postID,{$push: {destinationArray: destination}},{new : true}).lean();
                 await Post.updateMany({'reply.repliedPost': postID}, {$push: {destinationArray: destination}}).lean();
+
+                let newNotification = channel.followers.map((follower) => {
+                    return {user: follower.user, sender: 'mod', channel: channel.name};
+                });
+                await Notification.insertMany(newNotification);
                 break;
 
             case 'official':
@@ -433,6 +441,8 @@ const addDestination = async (destination,postID) => {
                 await Post.findByIdAndUpdate(postID,{$push: {officialChannelsArray: destination.name}},{new : true});
                 break;
         }
+
+
     }
     catch (error) {
         throw error
@@ -521,7 +531,10 @@ const UpdateCategory = async (post, userID) => {
     if (positiveReactionsCount > criticalMass) {
         if (negativeReactionsCount > criticalMass) {
             await Post.findByIdAndUpdate(post._id, {popularity: 'controversial'});
-            await addDestination({name: 'CONTROVERSIAL', destType: 'official'},post._id);
+            if(post.popularity !== 'controversial') {
+                await addDestination({name: 'CONTROVERSIAL', destType: 'official'},post._id);
+            }
+
             if (post.popularity === 'popular') {
                 await changePopularity(userID, 'popularity',false);
             }
@@ -539,7 +552,10 @@ const UpdateCategory = async (post, userID) => {
     if (negativeReactionsCount > criticalMass) {
         if (positiveReactionsCount > criticalMass) {
             await Post.findByIdAndUpdate(post._id, {popularity: 'controversial'});
-            await addDestination({name: 'CONTROVERSIAL', destType: 'official'},post._id);
+            if(post.popularity !== 'controversial') {
+                await addDestination({name: 'CONTROVERSIAL', destType: 'official'},post._id);
+            }
+
             if (post.popularity === 'popular') {
                 await changePopularity(userID, 'popularity',false);
             }
@@ -555,7 +571,7 @@ const UpdateCategory = async (post, userID) => {
         return true;
     }
 
-    if (post.category !== 'neutral') {
+    if (post.popularity !== 'neutral') {
         await Post.findByIdAndUpdate(post._id, {popularity: 'neutral'});
         if (post.popularity === 'popular') {
             await changePopularity(userID, 'popularity' ,false);
@@ -596,7 +612,7 @@ const postLength = async (filters) => {
         let reply = !!filters?.reply;
 
         let filter = {
-            /* Per i canali non mi serve l'id dell'utente che fa la richiesta, a meno che non sia SMM*/
+            /* Per i canali non mi serve l'id dell'utente che fa la richiesta, a meno che non sia AppSmm*/
             ...((filters.smm || !filters.channel) && filters.name) && {'owner':  {$regex: filters.name , $options: 'i'}},
             /* FILTRO PER TIPO DI POST */
             ... (filters.typeFilter && filters.typeFilter !== 'all') && {'contentType': filters.typeFilter},

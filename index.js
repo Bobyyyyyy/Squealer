@@ -43,10 +43,6 @@ app.engine('html', es6Renderer);
 app.set('views', [__dirname + '/back_end/AppMod/views', __dirname+ '/back_end/Frontpage/views']);
 app.set('view engine','html');
 
-const distPath = path.join(__dirname,'front_end','SMM','dist');
-if(process.env.NODE_ENV){
-    app.use(["/dist/assets", "/SMM/dist/assets"],express.static(path.join(distPath,"assets")));
-}
 
 //il sito inizia dando il controllo al router della frontpage
 app.use('/', require('./back_end/Frontpage/routes/frontpage'));
@@ -70,13 +66,27 @@ app.use('/scss',express.static(rootDir + '/public/assets'))
 /* CRON */
 const nodeCron = require('node-cron')
 const CC = require('./back_end/mongo/controllers/CronController')
-const {resetDtimeout, resetWtimeout,resetMtimeout } = require("./back_end/mongo/controllers/utils");
+const cronTabs = require("./back_end/mongo/controllers/utils");
 const {logout} = require("./back_end/Frontpage/controllers/FrontPageController");
 
 // quota reset
-nodeCron.schedule(resetDtimeout, async () => {await CC.resetQuota('D')}).start()
-nodeCron.schedule(resetWtimeout, async () => {await CC.resetQuota('W')}).start()
-nodeCron.schedule(resetMtimeout, async () => {await CC.resetQuota('M')}).start()
+nodeCron.schedule(cronTabs.midnight, async () => {await CC.resetQuota('D')}).start()
+nodeCron.schedule(cronTabs.startWeek, async () => {await CC.resetQuota('W')}).start()
+nodeCron.schedule(cronTabs.startMonth, async () => {await CC.resetQuota('M')}).start()
+
+//Post Automatici canali ufficiali
+const yesterday = () => {
+    let today = new Date();
+    today.setDate(today.getDate() - 1);
+    return today.toJSON().slice(0,10);
+}
+// DA SISTEMARE.
+const API_NEWS_KEY = 'fb2d6c9f8a7b402e9410221202ad11d6';
+const API_TOP_NEWS = `https://newsapi.org/v2/everything?from=${yesterday()}&sortBy=popularity&apiKey=${API_NEWS_KEY}&pageSize=1`
+const API_NASA = 'https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY'
+
+nodeCron.schedule(cronTabs.evening, async () => {await CC.createOfficialScheduledPost('TOP_NEWS', API_TOP_NEWS)}).start();
+nodeCron.schedule(cronTabs.evening, async () => {await CC.createOfficialScheduledPost('NASA_APOD',API_NASA)}).start()
 
 
 // avvio di node

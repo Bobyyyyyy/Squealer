@@ -63,7 +63,7 @@ const isSessionActive = (req,res,next) => {
                 break;
 
             case 'smm':
-                res.redirect('/SMM');
+                res.redirect('/assets_vue/index.html');
         }
     }
 }
@@ -73,11 +73,7 @@ const createSession = async(req,res) => {
         req.session.authenticated = true;
         req.session.user = req.response.username;
         req.session.type = req.response.typeUser;
-        /*
-        console.log(req.response);
-        console.log(req.session);
 
-         */
         req.session.save();
       
         switch (req.response.typeUser) {
@@ -91,7 +87,9 @@ const createSession = async(req,res) => {
                 break;
 
             case 'smm':
-                res.redirect('/SMM/');
+                if (process.env.NODE_ENV === 'production')res.redirect('/assets_vue')
+                else res.redirect('/AppSmm/');
+
                 break;
         }
     });

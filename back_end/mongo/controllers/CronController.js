@@ -1,7 +1,7 @@
 const nodeCron = require('node-cron')
 const UMM = require('../models/userMethods')
 const {scheduledFnOne,scheduledPostArr, getNextTick, cast2millis, } = require("./utils");
-const {addTimedPost} = require("../models/postMethods");
+const PMM = require("../models/postMethods");
 
 
 /**
@@ -46,13 +46,63 @@ const createScheduledPost = async (postId, frequency, squealNumber, content, typ
         id : postId,
         ...(typeC === 'text') && {content: content},
         timestamp2next: timestamp,
-        job :  nodeCron.schedule(getNextTick(timestamp), async () => await addTimedPost(postId),{
+        job :  nodeCron.schedule(getNextTick(timestamp), async () => await PMM.addTimedPost(postId),{
             scheduled: true,
             timezone: 'Europe/Rome',
         })
     }
     scheduledPostArr.push(newTimedPost)
     return {trash: 0};
+}
+
+const createOfficialScheduledPost = async(canale, endpoint) => {
+    let res = await fetch(endpoint);
+    let fetchobj = await res.json();
+    let creator;
+    let content;
+    let contentType;
+
+    switch (canale){
+        case 'NASA_APOD':{
+            content = fetchobj.url;
+            creator = fetchobj.copyright.trim().split(' ').join('_');
+            contentType = 'image';
+            break;
+        }
+        case 'TOP_NEWS':{
+            let news = fetchobj.articles[0];
+            creator = content.author.trim().split(' ').join('');
+            let response = await fetch(`https://csclub.uwaterloo.ca/~phthakka/1pt/addURL.php?url=${news.url}`);
+            content = [news.title,`https://1pt.co/${(await response.json()).short}`].join(' ')
+            contentType = 'text';
+            break;
+        }
+    }
+
+    try{
+        await UMM.addUser({
+            name: creator,
+            //TODO: GENERATA CASUALMENTE
+            password: (Math.random() + 1).toString(36).substring(2),
+            // Non ci può accedere nessuno, scelta implementativa.
+            type:'mod'
+        })
+    }catch (e) {}
+    finally {
+        let newPost = {
+            creator: creator,
+            destinations:[{
+                name: canale,
+                destType: 'official',
+            }
+            ],
+            contentType: contentType,
+            content: content,
+            dateOfCreation: Date.now(),
+        }
+
+        await PMM.addPost(newPost, null);
+    }
 }
 
 const createMaxQuotaJob = async (timestamp, percentage,user) => {
@@ -78,5 +128,6 @@ const createMaxQuotaJob = async (timestamp, percentage,user) => {
 module.exports =  {
     resetQuota,
     createScheduledPost,
-    createMaxQuotaJob
+    createMaxQuotaJob,
+    createOfficialScheduledPost
 };

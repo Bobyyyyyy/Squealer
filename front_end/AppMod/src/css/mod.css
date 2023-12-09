@@ -10,7 +10,7 @@ ul {
 }
 
 body {
-    background-color: #333333;
+    background-color: navajowhite;
 }
 
 #div1 {
@@ -42,4 +42,8 @@ td {
 
 #description {
     font-size:15px
+}
+
+.bg-primary {
+    background-color: crimson !important;
 }

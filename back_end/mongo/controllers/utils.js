@@ -1,6 +1,7 @@
-const resetMtimeout = '0 0 0 1 * *';    //first day of every month at 00:00
-const resetWtimeout = '0 0 0 * * 1';    //first day of every week at 00:00
-const resetDtimeout = '0 0 0 * * *';    //every day at 00:00
+const startMonth = '0 0 0 1 * *';   //first day of every month at 00:00
+const startWeek = '0 0 0 * * 1';    //first day of every week at 00:00
+const midnight = '0 0 0 * * *';     //every day at 00:00
+const evening = '0 20 * * *'        //every day at 20:00
 
 const cast2millis = {
     'seconds': 1000,
@@ -39,8 +40,9 @@ module.exports = {
     getNextTick,
     scheduledPostArr,
     cast2millis,
-    resetDtimeout,
-    resetWtimeout,
-    resetMtimeout,
-    scheduledFnOne
+    midnight,
+    startWeek,
+    startMonth,
+    scheduledFnOne,
+    evening
 }
