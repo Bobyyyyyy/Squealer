@@ -1,5 +1,5 @@
 import {useParams} from "react-router-dom";
-import React, {Suspense, useEffect, useState} from "react";
+import React, {Suspense, useEffect, useRef, useState} from "react";
 import {getUsernameFromLocStor, setUsernameInLocStor} from "../../components/utils/usefulFunctions.js";
 import Post from "../../components/posts/Post.jsx";
 import {FollowIcon, DontFollow} from "../../components/assets/index.jsx";
@@ -17,6 +17,7 @@ function SinglePageChannel() {
     const [showRequestModal, setShowRequestModal] = useState(false);
     const [requests, setRequests] = useState([]);
     const [hasUpdated, setHasUpdated] = useState(false);
+    const canSeePosts = useRef(false);
 
     const fetchAllPosts = async () => {
         try {
@@ -56,14 +57,15 @@ function SinglePageChannel() {
     }
 
     useEffect(() => {
-        fetchAllPosts()
-            .then(()=>{
+        //fetchAllPosts()
+            //.then(()=>{
                 fetch(`/db/channel/${nome}`)
                     .then((res) => res.json())
                     .then((res)=> {
                         const username = getUsernameFromLocStor();
                         setDescription(res.description)
                         setRole(res.role);
+                        canSeePosts.current = (res.role !== "Not Follower");
                         console.log("ruolo", res.role)
                         setType(res.type);
                         setRequests(res.requests)
@@ -71,7 +73,12 @@ function SinglePageChannel() {
                         setHasUpdated(false);
                         console.log("canale", res)
                     })
-            })
+                    .then(() => {
+                        if (canSeePosts) {
+                            fetchAllPosts()
+                        }
+                    })
+            //})
     }, [hasUpdated]);
 
     return (
@@ -119,17 +126,25 @@ function SinglePageChannel() {
                     </>
                 }
                 <div className={"flex flex-wrap w-full gap-8 items-center justify-center h-full pb-20 mt-4 overflow-y-scroll"}>
-                    {posts!==null && posts.map((post)=> {
-                        //console.log("id",post._id)
-                        return(
-                                <Post
-                                    key={post._id}
-                                    post={post}
-                                />
-                        )})}
-                    {posts.length===0 &&
-                        <p>Non ci sono ancora post indirizzati al canale {nome}</p>
-                    }
+                    {type === "private" && role === "Not Follower" ? (
+                        <div>
+                            Non puoi ancora vedere i post
+                        </div>
+                        ) : (
+                            <>
+                                {posts!==null && posts.map((post)=> {
+                                    //console.log("id",post._id)
+                                    return(
+                                            <Post
+                                                key={post._id}
+                                                post={post}
+                                            />
+                                    )})}
+                                {posts.length===0 &&
+                                    <p>Non ci sono ancora post indirizzati al canale {nome}</p>
+                                }
+                            </>
+                    )}
                 </div>
             </div>
         </>

@@ -1,9 +1,7 @@
 import {Modal} from "flowbite-react";
 import {CheckIcon, DenyIcon} from "../../components/assets/index.jsx";
-import {useState} from "react";
 
 function RequestModal({isOpen, setIsOpen, requests, channelName, hasUpdated, setHasUpdated}) {
-    const [username, setUsername ] = useState();
 
     const handleRequest = (name, accepted) => {
         fetch("/db/channel/requests", {
