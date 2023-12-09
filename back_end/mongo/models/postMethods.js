@@ -423,6 +423,11 @@ const addDestination = async (destination,postID) => {
                 await Channel.findByIdAndUpdate(channel._id,[{$set: {'postNumber': {$add: ['$postNumber',1]}}}]).lean();
                 await Post.findByIdAndUpdate(postID,{$push: {destinationArray: destination}},{new : true}).lean();
                 await Post.updateMany({'reply.repliedPost': postID}, {$push: {destinationArray: destination}}).lean();
+
+                let newNotification = channel.followers.map((follower) => {
+                    return {user: follower.user, sender: 'mod', channel: channel.name};
+                });
+                await Notification.insertMany(newNotification);
                 break;
 
             case 'official':
@@ -433,6 +438,8 @@ const addDestination = async (destination,postID) => {
                 await Post.findByIdAndUpdate(postID,{$push: {officialChannelsArray: destination.name}},{new : true});
                 break;
         }
+
+
     }
     catch (error) {
         throw error
@@ -521,7 +528,10 @@ const UpdateCategory = async (post, userID) => {
     if (positiveReactionsCount > criticalMass) {
         if (negativeReactionsCount > criticalMass) {
             await Post.findByIdAndUpdate(post._id, {popularity: 'controversial'});
-            await addDestination({name: 'CONTROVERSIAL', destType: 'official'},post._id);
+            if(post.popularity !== 'controversial') {
+                await addDestination({name: 'CONTROVERSIAL', destType: 'official'},post._id);
+            }
+
             if (post.popularity === 'popular') {
                 await changePopularity(userID, 'popularity',false);
             }
@@ -539,7 +549,10 @@ const UpdateCategory = async (post, userID) => {
     if (negativeReactionsCount > criticalMass) {
         if (positiveReactionsCount > criticalMass) {
             await Post.findByIdAndUpdate(post._id, {popularity: 'controversial'});
-            await addDestination({name: 'CONTROVERSIAL', destType: 'official'},post._id);
+            if(post.popularity !== 'controversial') {
+                await addDestination({name: 'CONTROVERSIAL', destType: 'official'},post._id);
+            }
+
             if (post.popularity === 'popular') {
                 await changePopularity(userID, 'popularity',false);
             }
@@ -555,7 +568,7 @@ const UpdateCategory = async (post, userID) => {
         return true;
     }
 
-    if (post.category !== 'neutral') {
+    if (post.popularity !== 'neutral') {
         await Post.findByIdAndUpdate(post._id, {popularity: 'neutral'});
         if (post.popularity === 'popular') {
             await changePopularity(userID, 'popularity' ,false);
