@@ -43,10 +43,6 @@ app.engine('html', es6Renderer);
 app.set('views', [__dirname + '/back_end/AppMod/views', __dirname+ '/back_end/Frontpage/views']);
 app.set('view engine','html');
 
-const distPath = path.join(__dirname,'front_end','SMM','dist');
-if(process.env.NODE_ENV){
-    app.use(["/dist/assets", "/SMM/dist/assets"],express.static(path.join(distPath,"assets")));
-}
 
 //il sito inizia dando il controllo al router della frontpage
 app.use('/', require('./back_end/Frontpage/routes/frontpage'));

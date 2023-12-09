@@ -28,10 +28,10 @@ OBBLIGATORI:
         - aggiungere TPER
     - Reset password con domanda
     - Senza Login
-    - Risposte:
+    - Risposte:                                                        -- SMM
         - NO reaction ?
         - condivide i destinatari pubblici
-    - MESSAGGI TEMPORIZZATI: bip acustico ad ogni invio (copiare a frontend node-cron)
+    - MESSAGGI TEMPORIZZATI: bip acustico ad ogni invio                 -- SMM FATTO
     - risposte ai post visibili (SMM), mettere anche nei grafici
 
     - LOGIN
