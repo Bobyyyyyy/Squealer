@@ -1,6 +1,6 @@
 const Post = require("../schemas/Post");
 const User = require("../schemas/User");
-const Channel = require("../schemas/Channel")
+const Channel = require("../schemas/Channel");
 const Notification = require("../schemas/Notification")
 const ReservedChannel = require("../schemas/officialChannels");
 const {connectdb, createError, mongoCredentials,find_remove, CRITICAL_MASS_MULTIPLIER} = require("./utils");
@@ -179,7 +179,7 @@ const addTimedPost = async (postId) => {
 
 /**
  * @param {Object} post
- * {creator: String, destination: array of objects{name: String, destType: String}, contentType: String, content: String, dateOfCreation: Date , tags: Array<String>}
+ * {creator: String, destinations: array of objects{name: String, destType: String}, contentType: String, content: String, dateOfCreation: Date , tags: Array<String>}
  * @param {Object} quota - {daily,weekly-monthly} - remaining updated
  * @returns {Promise<{postId: *}>}
  */
@@ -239,7 +239,7 @@ const addPost = async (post,quota) => {
                 //update post number in channel schema
                 channel = await Channel.findOneAndUpdate({'name': channel.name}, {'postNumber': channel.postNumber+1});
                 let newNotification = channel.followers.filter((follower) => follower.user !== creator.username).map((follower) => {
-                    return {user: follower.user, sender: creator.username, channel: channel.name};
+                    return {user: follower.user, sender: creator.username, channel: channel._id};
                 });
 
                await Notification.insertMany(newNotification);
@@ -264,7 +264,7 @@ const addPost = async (post,quota) => {
 
         await newPost.save();
 
-        if (creator !== 'mod' ) {
+        if (creator !== 'mod') {
             /* QUOTA UPDATE */
             await User.findOneAndUpdate({username: post.creator}, {
                 characters:{
@@ -428,7 +428,7 @@ const addDestination = async (destination,postID) => {
                 await Post.updateMany({'reply.repliedPost': postID}, {$push: {destinationArray: destination}}).lean();
 
                 let newNotification = channel.followers.map((follower) => {
-                    return {user: follower.user, sender: 'mod', channel: channel.name};
+                    return {user: follower.user, sender: 'mod', channel: channel._id};
                 });
                 await Notification.insertMany(newNotification);
                 break;

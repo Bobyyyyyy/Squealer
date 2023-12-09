@@ -78,8 +78,8 @@ const showPosts = (filters,append = false) => {
                 }
 
                 let Post =
-                    `<div id="post-${id}" class="card mt-5 w-50">
-                    <div id="header-${id}" class="card-header d-flex flex border-black align-items-center" style="background-color: #CCBEF9">
+                    `<div id="post-${id}" class="card mt-5 w-50 border-black">
+                    <div id="header-${id}" class="card-header d-flex flex align-items-center bg-primary">
                     <div class="d-flex flex-column">
                         <div class="d-flex flex-row align-items-center justify-content-start">
                             <div class="fw-bold">@${post.owner}</div>
@@ -104,10 +104,10 @@ const showPosts = (filters,append = false) => {
                                 </ul>
                             </div>
                             
-                            <button class="btn " id="delete-${id}"><i  class="bi bi-trash"></i></button>
+                            <button class="btn" id="delete-${id}"><i  class="bi bi-trash"></i></button>
                         </div>
                 </div>
-                <div class="card-body flex-row" style="background-color: #ECEAF5">`
+                <div class="card-body flex-row bg-back">`
 
 
                 switch (`${post.contentType}`) {
@@ -129,7 +129,7 @@ const showPosts = (filters,append = false) => {
                 }
 
                 Post = Post + `</div>
-                    <div class="card-footer text-muted" style="background-color: #ECEAF5">
+                    <div class="card-footer text-muted bg-back">
                         <div class="d-flex flex-row">
                             <div id="reactions-${id}" class="me-auto d-inline-flex"> 
                                 <div class="d-flex flex-row"><i class="bi bi-heart-fill"></i> <div class="ms-1">${reactions.heart}</div> </div>
@@ -333,3 +333,4 @@ function inizializeToast() {
 $(document).ready(() => {
     getPostsNumber(LastCall.filters)
 })
+

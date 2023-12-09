@@ -131,7 +131,6 @@ const getChannels = async (query) => {
 
         let channels = await Channel.find(filter).skip(offset).limit(limit).sort(sort).lean();
 
-        console.log(channels);
         return channels;
 }
 

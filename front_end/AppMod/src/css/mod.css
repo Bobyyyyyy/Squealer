@@ -10,11 +10,15 @@ ul {
 }
 
 body {
-    background-color: navajowhite;
+    background-color: #232323;
+}
+
+.navbar {
+    background-color: #232323;
 }
 
 #div1 {
-    background-color: #333333;
+    background-color: #232323;
 }
 
 th {
@@ -45,5 +49,19 @@ td {
 }
 
 .bg-primary {
-    background-color: crimson !important;
+    background-color: #EA7F28 !important;
 }
+
+.bg-secondary {
+    background-color: #F5DEB3 !important;
+}
+
+.bg-accent {
+    background-color: #C20002;
+}
+
+.bg-back {
+    background-color: #D8D6D6;
+}
+
+

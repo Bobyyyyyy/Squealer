@@ -11,7 +11,7 @@
 <body class="d-flex flex-column">
 
 <!-- NavBar -->
-<nav class="navbar navbar-expand-lg bg-dark navbar-dark sticky-top m">
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top outline-1">
     <div class="d-flex flex-row justify-content-between w-100 p-1" >
         <div class="navbar-collapse collapse dual-collapse2" style="flex-basis: 100%">
             <ul class="navbar-nav">
@@ -45,7 +45,7 @@
             <div class="ms-auto"></div>
             <span class="navbar-text text-white ms-auto me-2"> @<span id="session-user">${user}</span>
             </span>
-            <button class="btn btn-light btn-outline-danger" onclick="window.location.href = '/logout'">Logout</button>
+            <button class="btn btn-outline-light bg-accent" onclick="window.location.href = '/logout'">Logout</button>
         </div>
     </div>
 </nav>
@@ -58,33 +58,33 @@
 
         <div class="d-flex flex-row align-items-center p-3 pe-0">
 
-            <div class="input-group w-25">
-                <span class="input-group-text " id="basic-addon1"><select class="select btn" id='search-type' autocomplete="off">
+            <div class="input-group w-25 border-black">
+                <span class="input-group-text bg-primary border-black" id="basic-addon1"><select class="select btn" id='search-type' autocomplete="off">
                         <option value="sender" selected>Mittente</option>
                         <option value="receiver">Destinatario</option>
                     </select></span>
-                <label for="filter" class="sr-only"></label><input class="form-control" id="filter" type="text" style="width: 15%; background-color: lightgray" placeholder="Cerca.." autocomplete="off">
+                <label for="filter" class="sr-only"></label><input class="form-control border-black bg-secondary" id="filter" type="text" style="width: 15%;" placeholder="Cerca.." autocomplete="off">
             </div>
 
 
             <div class="d-flex flex-row ms-auto">
                 <div id="channel-visual" class="btn-group ms-3 btn-group" role="group" aria-label="Basic radio toggle button group">
                     <input type="radio" class="btn-check" name="filters" id="filter-all" value="" autocomplete="off" checked>
-                    <label class="btn btn-success" for="filter-all">All</label>
+                    <label class="btn bg-secondary" for="filter-all">All</label>
 
                     <input type="radio" class="btn-check" name="filters" id="filter-popular" value="popular" autocomplete="off">
-                    <label class="btn btn-success" for="filter-popular">Popular</label>
+                    <label class="btn bg-secondary" for="filter-popular">Popular</label>
 
                     <input type="radio" class="btn-check" name="filters" id="filter-unpopular" value="unpopular" autocomplete="off">
-                    <label class="btn btn-success" for="filter-unpopular">Unpopular</label>
+                    <label class="btn bg-secondary" for="filter-unpopular">Unpopular</label>
 
                     <input type="radio" class="btn-check" name="filters" id="filter-controversial" value="controversial" autocomplete="off">
-                    <label class="btn btn-success" for="filter-controversial">Controversial</label>
+                    <label class="btn bg-secondary" for="filter-controversial">Controversial</label>
                 </div>
 
                 <div class="ms-3 d-flex flex-row justify-content-center align-self-center">
                     <label class="text-white fw-normal"> Ordina Per:
-                        <select class="select btn btn-success ms-2" id="orderby" autocomplete="off">
+                        <select class="select btn bg-secondary ms-2" id="orderby" autocomplete="off">
                             <option value="" disabled>Ordinamento</option>
                             <option value="publication" selected>Data di pubblicazione</option>
                             <option value="visuals">Numero di visualizzazioni</option>
@@ -93,7 +93,7 @@
                 </div>
                 <div class="ms-3 d-flex flex-row justify-content-center align-self-center me-2" id="options">
                     <label for="order"></label>
-                    <select class="select btn btn-success" id="order" autocomplete="off">
+                    <select class="select btn bg-secondary" id="order" autocomplete="off">
                         <option value="" disabled >Ordine</option>
                         <option value="più recente" selected>Piu' recenti</option>
                         <option value="meno recente">Meno recenti</option>
