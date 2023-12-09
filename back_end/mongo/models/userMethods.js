@@ -24,11 +24,7 @@ const addUser = async (body) => {
         let findName = await User.findOne({username: body.name}).lean();
         let findChannel = await User.findOne({name: body.name}).lean();
         if (findName || findChannel) {
-            let err = new Error("Nome non disponibile");
-            err.statusCode = 400;
-            console.log(err);
-
-            throw err;
+            throw createError("Nome non disponibile",404);
         }
 
 
@@ -52,8 +48,6 @@ const addUser = async (body) => {
         return newUser;
     }
     catch(err){
-
-        console.log(err);
         throw err;
     }
 }
