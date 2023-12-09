@@ -19,9 +19,9 @@ import {computed} from "vue";
 
 
 <template>
-  <div class="d-flex flex-row align-items-center ms-2 justify-content-center">
+  <div class="d-flex flex-row align-items-center ms-2 justify-content-center ">
 
-    <div type="button" v-if="!isThisActive" @click="$emit('changeReac',icon.name)"  class="d-flex justify-content-center">
+    <div type="button" v-if="!isThisActive" @click="$emit('changeReac',icon.name)"  class="d-flex justify-content-center ">
       <svg :class="icon.notActive.iconClasses" fill="currentColor" height="16" viewBox="0 0 16 16" width="16" xmlns="http://www.w3.org/2000/svg">
         <path :d="icon.notActive.pathSvg"/>
       </svg>

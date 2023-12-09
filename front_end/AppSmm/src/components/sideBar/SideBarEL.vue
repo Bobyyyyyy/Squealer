@@ -47,7 +47,7 @@ import {computed} from "vue";
   }
 
   .sdBarEl:hover{
-    background-color: #ccbef9;
+    background-color: var(secondary);
     border: var(--bs-border-radius);
   }
 

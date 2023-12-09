@@ -35,7 +35,7 @@
 
 
 <template>
-  <div class="card mb-4 d-flex flex-column justify-content-between mt-1 postDim">
+  <div class="card mb-4 d-flex flex-column justify-content-between mt-1 postDim bg-secondary">
 
       <HeaderPost
           :name= "user"
@@ -43,7 +43,7 @@
           :srcImg="picProfile"
           :dateCreation="creationDate"
       />
-      <div class="d-flex flex-row justify-content-center text-center align-items-center h-100">
+      <div class="d-flex flex-row justify-content-center text-center align-items-center h-100 text-dark">
         <img v-if="contentType==='image'" :src="content"  alt="silly cat" class="img-fluid" />
         <postMap v-if="contentType==='geolocation'"
                  :latlng = "JSON.parse(content)"
@@ -63,11 +63,11 @@
   </div>
 </template>
 
-<style>
+<style scoped>
 
   .postDim{
-    min-width: 50rem;
-    height: auto;
+    width: 32rem;
+    height: 32rem;
   }
 
   @media screen and (max-width: 768px) {

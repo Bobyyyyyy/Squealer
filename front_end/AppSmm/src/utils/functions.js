@@ -179,7 +179,7 @@ const parseContentText = (content, tag) => {
         let html = '<div class="w-100">';
         //str_no_links.length > links.length SEMPRE
         for (let i = 0; i < content_noLink.length; i++){
-            html += `<${tag} class="w-100" > ${content_noLink[i]}`
+            html += `<${tag} class="text-md-start"> ${content_noLink[i]}`
             if(typeof links[i] !== 'undefined')
                 html += `<a href=${links[i]} target=”_blank”>${links[i]}</a>`
             html += `</${tag}>`

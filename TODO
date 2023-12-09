@@ -21,14 +21,14 @@ TODO:
 
 OBBLIGATORI:
     - '@' menzioni cliccabili
-    - notifiche
-        - nuovo post per destinarati
-    - Canali silenziabili TUTTI tranne definiti su slide
+    - notifiche                                             --BE FATTO
+        - nuovo post per destinatari                        --BE FATTO
+    - Canali silenziabili TUTTI tranne definiti su slide    --BE FATTO
     - Geolocalizzazione che segue mappa
         - aggiungere TPER
     - Reset password con domanda
     - Senza Login
-    - Risposte:                                                        -- SMM
+    - Risposte:                                             --BE FATTO
         - NO reaction ?
         - condivide i destinatari pubblici
     - MESSAGGI TEMPORIZZATI: bip acustico ad ogni invio                 -- SMM FATTO
@@ -39,6 +39,8 @@ OBBLIGATORI:
 
 ARANCIONI:
     - pagare quota se messaggio va oltre
-    - aggiunta admin nel canale proprietario
+    - aggiunta admin nel canale proprietario            --BE FATTO
     - foto anche dal cellulare
     - Regola che attribuisce post ad un canale ufficiale automaticamente.
+        - CONTROVERSIAL     --BE FATTO
+        - TRENDING
