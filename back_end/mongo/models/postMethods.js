@@ -186,11 +186,15 @@ const addTimedPost = async (postId) => {
 const addPost = async (post,quota) => {
     try{
         await connection.get()
+        console.log(post);
         let destinations = ((typeof post.destinations) === 'string') ? JSON.parse(post.destinations) : post.destinations;
         let postCategory = 'private';
         let officialChannels = [];
         let creator = await User.findOne({username: post.creator});
         for (const destination of destinations) {
+            if ( !['user', 'channel', 'official'].includes(destination.destType)){
+                throw createError(`destinazione non valida. Inserire una destinazione sintatticamente valida.`, 400);
+            }
             let destinationType = destination.destType;
             let channel = await Channel.findOne({name: destination.name});
 

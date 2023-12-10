@@ -115,8 +115,6 @@
         ...(tags !== []) && {tags: tags}
       }
 
-      console.log("FILE UPLOADED:", fileUploaded.value);
-
 
       /* content based on squeal type */
       let content = postType.value === 'geolocation' ? JSON.stringify(mapLocationLatLng.value.value) :
@@ -126,7 +124,6 @@
                               await blob2base64(await compressBlob(fileUploaded.value.item(0)))
                                 :currentImgPath.value;
 
-      console.log(content);
 
       if (!content || content === ''){
         return {message: 'Squeal vuoto! Dicci qualcosa'};
@@ -249,7 +246,7 @@
                             }">si</button>
                     <button type="button" class="btn btn-outline-danger ms-3 btn-sm" style="width: 5%" @click="() => activeChoiceLink = false">no</button>
                   </div>
-                  <div v-if="linkShorter !== ''" class="d-flex flex-row mt-3 mb-2 align-items-center">
+                  <div v-if="linkShorter !== '' && !!link" class="d-flex flex-row mt-3 mb-2 align-items-center">
                     <h5 class="fw-light m-0">Ecco un'anteprima del link:</h5>
                     <a :href="linkShorter" target=”_blank”>
                       <h5 class="mb-0 ms-3">{{linkShorter}}</h5>
@@ -316,15 +313,16 @@
                   <div v-if="timed" class="d-flex flex-row flex-fill align-items-end">
                     <div class="d-flex flex-column">
                       <label for="numTimed" class="form-label">Numero di Squeal</label>
-                      <input type="number" class="form-control" id="numTimed" v-model="numberOfRepetitions">
+                      <input type="number" class="form-control" id="numTimed" v-model="numberOfRepetitions" min="1" required>
                     </div>
                       <div class="d-flex flex-column">
                         <label for="numFrequency" class=" form-label fw-light">Intervallo</label>
-                        <input type="number" class="form-control" id="numFrequency" v-model="numFrequency">
+                        <input type="number" class="form-control" id="numFrequency" v-model="numFrequency" min="1" required>
                       </div>
                       <Select
                           :dropItems="['seconds','minutes', 'days']"
                           :dropItemsName="['secondi','minuti', 'giorni']"
+                          :required="true"
                           updateRef="updateTypeF"
                           classButton="btn-secondary form-select-lg "
                           @updateTypeF="(el) => typeFrequency=el"
