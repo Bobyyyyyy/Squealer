@@ -186,7 +186,6 @@ const addTimedPost = async (postId) => {
 const addPost = async (post,quota) => {
     try{
         await connection.get()
-        console.log(post);
         let destinations = ((typeof post.destinations) === 'string') ? JSON.parse(post.destinations) : post.destinations;
         if(typeof destinations === "undefined") {
             throw createError('Non si è inserito nessun destinatario',400);
@@ -207,7 +206,7 @@ const addPost = async (post,quota) => {
                 throw createError("utente non esistente!", 422);
             }
             /* canale non esiste  */
-            else if (destinationType === 'channel' && channel?.length === 0) {
+            else if (destinationType === 'channel' && !channel) {
                 throw createError("canale non esistente!", 422);
             }
             /* canale ufficiale non esiste e l'utente non mod*/

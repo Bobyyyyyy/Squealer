@@ -32,6 +32,7 @@ function Profile () {
                 });
                 //console.log("risposta", res);
                 setBtnChangePic(false)
+                location.reload();
             } else {
                 setImgEmpty(true);
             }
@@ -51,7 +52,7 @@ function Profile () {
                       setIsLoading(false);
                   })
             })
-    }, [pic]);
+    }, []);
 
 
     const handleLogout = async () => {

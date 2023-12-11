@@ -14,9 +14,9 @@ function SinglePageChannel() {
     const [posts, setPosts] = useState([]);
     const [description, setDescription] = useState("");
     const [role, setRole] = useState("");
-    const [isFollower, setIsFollower] = useState(false);
     const [showRequestModal, setShowRequestModal] = useState(false);
     const [showFollowerModal, setShowFollowerModal] = useState(false);
+
     const [requests, setRequests] = useState([]);
     const [followers, setFollowers] = useState([]);
     const [hasUpdatedReq, setHasUpdatedReq] = useState(false);
@@ -32,7 +32,7 @@ function SinglePageChannel() {
             }
 
             let allPosts = await res.json();
-            console.log(allPosts);
+
             //console.log(allPosts)
             setPosts(allPosts);
             //console.log("num of post", allPosts.length)
@@ -72,7 +72,6 @@ function SinglePageChannel() {
                 setFollowers(res.followers.sort((a,b) => (a.user > b.user) ? 1 : ((b.user > a.user) ? -1 : 0)))
                 setType(res.type);
                 setRequests(res.requests)
-                setIsFollower(res.followers.some((follower)=> follower.user === username))
                 setHasUpdatedReq(false);
                 setHasUpdatedFol(false);
                 console.log("canale", res)
@@ -92,18 +91,16 @@ function SinglePageChannel() {
                 <h3 className={"text-center text-2xl font-extrabold mt-4"}>§{nome}</h3>
                 <p>{description}</p>
                 {role === "Creator" || role === "Admin" ? (
-                        <div className="flex justify-around w-full">
-                            <>
-                                <Button
-                                    onClick={()=>setShowFollowerModal(true)}
-                                >
-                                    Gestisci follower
-                                </Button>
-                                <FollowersModal
-                                        channelName={nome} followers={followers} isOpen={showFollowerModal} setIsOpen={setShowFollowerModal}
-                                        hasUpdated={hasUpdatedFol} setHasUpdated={setHasUpdatedFol}
-                                />
-                            </>
+                        <div className="flex flex-wrap justify-between items-center gap-4 px-8 w-full">
+                            <Button
+                                onClick={()=>setShowFollowerModal(true)}
+                            >
+                                Gestisci follower
+                            </Button>
+                            <FollowersModal
+                                    channelName={nome} followers={followers} isOpen={showFollowerModal} setIsOpen={setShowFollowerModal}
+                                    hasUpdated={hasUpdatedFol} setHasUpdated={setHasUpdatedFol}
+                            />
                             {type === "private" &&
                                 <>
                                     <Button
@@ -115,6 +112,20 @@ function SinglePageChannel() {
                                         channelName={nome} requests={requests} isOpen={showRequestModal} setIsOpen={setShowRequestModal}
                                         hasUpdated={hasUpdatedReq} setHasUpdated={setHasUpdatedReq}
                                     />
+                                </>
+                            }
+                            {role === "Creator" &&
+                                <>
+                                    <Button
+                                        onClick={()=>setShowRequestModal(true)}
+                                    >
+                                        Aggiungi admin
+                                    </Button>
+                                    <Button
+                                        onClick={()=>setShowRequestModal(true)}
+                                    >
+                                        Rimuovi admin
+                                    </Button>
                                 </>
                             }
                         </div>

@@ -67,6 +67,7 @@ function FiltersModal({isOpen, setIsOpen, channelName, setChannelName, visibilit
                         setChannelName('');
                         setVisibility('');
                         setOwner('');
+                        setAdmin('');
                     }}
                   >
                       Rimuovi filtri

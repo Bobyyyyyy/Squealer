@@ -7,7 +7,6 @@ function FollowersModal({isOpen, setIsOpen, followers, channelName, hasUpdated, 
                 return follower.canWrite;
             }
         })
-        console.log(name, !canWrite);
         fetch("/db/channel/permissions", {
             method: 'PUT',
             headers: {
@@ -24,7 +23,6 @@ function FollowersModal({isOpen, setIsOpen, followers, channelName, hasUpdated, 
             }
         })
     }
-    console.log(followers)
     return (
         <Modal  show={isOpen} onClose={()=>setIsOpen(false)}>
             <Modal.Header>
