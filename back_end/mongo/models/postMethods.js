@@ -1,6 +1,6 @@
 const Post = require("../schemas/Post");
 const User = require("../schemas/User");
-const Channel = require("../schemas/Channel")
+const Channel = require("../schemas/Channel");
 const Notification = require("../schemas/Notification")
 const ReservedChannel = require("../schemas/officialChannels");
 const {connectdb, createError, mongoCredentials,find_remove, CRITICAL_MASS_MULTIPLIER} = require("./utils");
@@ -179,7 +179,7 @@ const addTimedPost = async (postId) => {
 
 /**
  * @param {Object} post
- * {creator: String, destination: array of objects{name: String, destType: String}, contentType: String, content: String, dateOfCreation: Date , tags: Array<String>}
+ * {creator: String, destinations: array of objects{name: String, destType: String}, contentType: String, content: String, dateOfCreation: Date , tags: Array<String>}
  * @param {Object} quota - {daily,weekly-monthly} - remaining updated
  * @returns {Promise<{postId: *}>}
  */
@@ -187,6 +187,9 @@ const addPost = async (post,quota) => {
     try{
         await connection.get()
         let destinations = ((typeof post.destinations) === 'string') ? JSON.parse(post.destinations) : post.destinations;
+        if(typeof destinations === "undefined") {
+            throw createError('Non si è inserito nessun destinatario',400);
+        }
         let postCategory = 'private';
         let officialChannels = [];
         let creator = await User.findOne({username: post.creator});
@@ -239,7 +242,7 @@ const addPost = async (post,quota) => {
                 //update post number in channel schema
                 channel = await Channel.findOneAndUpdate({'name': channel.name}, {'postNumber': channel.postNumber+1});
                 let newNotification = channel.followers.filter((follower) => follower.user !== creator.username).map((follower) => {
-                    return {user: follower.user, sender: creator.username, channel: channel.name};
+                    return {user: follower.user, sender: creator.username, channel: channel._id};
                 });
 
                await Notification.insertMany(newNotification);
@@ -264,7 +267,7 @@ const addPost = async (post,quota) => {
 
         await newPost.save();
 
-        if (creator !== 'mod' ) {
+        if (creator !== 'mod') {
             /* QUOTA UPDATE */
             await User.findOneAndUpdate({username: post.creator}, {
                 characters:{
@@ -279,7 +282,9 @@ const addPost = async (post,quota) => {
 
         return {postId: newPost._id};
     }
-    catch(err){throw err; }
+    catch(err){
+        throw err;
+    }
 }
 
 /**
@@ -400,9 +405,7 @@ const removeDestination = async (destination,postID)=> {
 const addDestination = async (destination,postID) => {
     try {
         await connection.get();
-        let tipo = typeof destination;
-        console.log(tipo);
-        let checkDestination = await Post.findOne({$and: [{'destinationArray.name': destination.name}, {_id: postID}]});
+        let checkDestination = await Post.findOne({$and: [{$or: [{'destinationArray.name': destination.name},{'officialChannelsArray': destination.name}]}, {_id: postID}]});
         if (checkDestination) {
             throw createError('Destinazione gia nel post',400);
         }
@@ -428,7 +431,7 @@ const addDestination = async (destination,postID) => {
                 await Post.updateMany({'reply.repliedPost': postID}, {$push: {destinationArray: destination}}).lean();
 
                 let newNotification = channel.followers.map((follower) => {
-                    return {user: follower.user, sender: 'mod', channel: channel.name};
+                    return {user: follower.user, sender: 'mod', channel: channel._id};
                 });
                 await Notification.insertMany(newNotification);
                 break;
@@ -531,10 +534,7 @@ const UpdateCategory = async (post, userID) => {
     if (positiveReactionsCount > criticalMass) {
         if (negativeReactionsCount > criticalMass) {
             await Post.findByIdAndUpdate(post._id, {popularity: 'controversial'});
-            if(post.popularity !== 'controversial') {
-                await addDestination({name: 'CONTROVERSIAL', destType: 'official'},post._id);
-            }
-
+            await addDestination({name: 'CONTROVERSIAL', destType: 'official'},post._id);
             if (post.popularity === 'popular') {
                 await changePopularity(userID, 'popularity',false);
             }
@@ -552,10 +552,7 @@ const UpdateCategory = async (post, userID) => {
     if (negativeReactionsCount > criticalMass) {
         if (positiveReactionsCount > criticalMass) {
             await Post.findByIdAndUpdate(post._id, {popularity: 'controversial'});
-            if(post.popularity !== 'controversial') {
-                await addDestination({name: 'CONTROVERSIAL', destType: 'official'},post._id);
-            }
-
+            await addDestination({name: 'CONTROVERSIAL', destType: 'official'},post._id);
             if (post.popularity === 'popular') {
                 await changePopularity(userID, 'popularity',false);
             }

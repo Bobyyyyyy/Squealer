@@ -1,4 +1,7 @@
 const connection = require('../ConnectionSingle');
+const {getSingleChannel} = require("./ChannelMethods");
+const Channel = require("../schemas/Channel");
+const Notification = require("../schemas/Notification")
 
 /**
  * @param {String} username
@@ -8,7 +11,14 @@ const connection = require('../ConnectionSingle');
 const getNotification = async function (username) {
     try {
         await connection.get();
-        return await Notification.find({user: username});
+        let notifications = await Notification.find({user: username});
+
+        for (const notification of notifications) {
+            let channel = await Channel.findById(notification.channel)
+            notification.channel = channel.name;
+        }
+
+        return notifications;
     }
     catch (error) {
         throw error;

@@ -8,7 +8,7 @@ let LastCall = {
     posts: 0,
     filter: {
         'typeFilter': '',
-        'channel': ChannelName
+        'official': ChannelName
     }
 }
 
@@ -27,6 +27,7 @@ function updateLastCall(limit,offset,filter) {
         data: {filter: filter},
         type: 'get',
         success: (data) => {
+            console.log(data);
             LastCall.posts = data.length;
             $('#post-trovati').html(`${data.length}`);
             showPosts(LastCall.filter.typeFilter,LastCall.offset = 0,LastCall.limit);
