@@ -13,7 +13,8 @@ const channelRoles = {
     '1': 'Admin',
     '2': 'Not Follower',
     '3': 'Writer',
-    '4': 'Follower',
+    '4': 'Pending',
+    '5': 'Follower'
 }
 
 
@@ -290,7 +291,7 @@ const handleRequest = async function(adminName,userRequest,channelName,accepted)
             throw createError(`Non c'e' nessuna richiesta dell'utente ${userRequest}`,500);
 
         if (accepted) {
-            await Channel.findOneAndUpdate({name: channelName}, {$push: {'followers': {'user': userRequest}}});
+            await Channel.findOneAndUpdate({name: channelName}, {$push: {'followers': {'user': userRequest, 'canWrite':true}}});
         }
 
         await Channel.findOneAndUpdate({name: channelName}, {$pull: {'requests': {'user': userRequest}}});
@@ -319,8 +320,8 @@ const handlePermission = async function(adminName, userRequest, channelName, can
 const getSingleChannel = async(name,user) => {
     try{
         await connection.get()
-        let ChannelName = name.trim().toLowerCase();
-        let channel = await Channel.findOne({name: ChannelName}).lean();
+        let channelName = name.trim().toLowerCase();
+        let channel = await Channel.findOne({name: channelName}).lean();
         let findUser = await User.findOne({username: user}).lean();
         let userRole;
 
@@ -328,17 +329,21 @@ const getSingleChannel = async(name,user) => {
         if(isCreator)
             userRole = 0;
         else  {
-            let isAdmin = channel.admins.filter((admin) => {return admin === findUser.username});
+            let isAdmin = channel.admins.filter((admin) => admin === findUser.username);
             if(isAdmin.length !== 0)
                 userRole = 1;
             else {
                 let isFollower = channel.followers.filter((follower) => {return follower.user === findUser.username});
-                if(isFollower.length === 0)
+                if(await Channel.findOne({name: channelName, 'requests.user': user})) {
+                    userRole = 4;
+                }
+                else if(isFollower.length === 0)
                     userRole = 2;
                 else if (isFollower[0].canWrite)
                     userRole = 3;
-                else
-                    userRole = 4;
+                else {
+                    userRole = 5;
+                }
             }
         }
 

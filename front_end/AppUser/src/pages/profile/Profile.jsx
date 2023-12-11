@@ -51,7 +51,7 @@ function Profile () {
                       setIsLoading(false);
                   })
             })
-    }, []);
+    }, [pic]);
 
 
     const handleLogout = async () => {
@@ -95,7 +95,7 @@ function Profile () {
             </div>
             {btnChangePic &&
                 <>
-                    <div className="border border-red-500 px-4">
+                    <div className="px-4">
                         {imgEmpty &&
                             <div>
                                 Inserisci una foto

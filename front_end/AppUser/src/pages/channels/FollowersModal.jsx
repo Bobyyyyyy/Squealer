@@ -1,7 +1,13 @@
-import {Modal} from "flowbite-react";
+import {Modal, ToggleSwitch} from "flowbite-react";
 
 function FollowersModal({isOpen, setIsOpen, followers, channelName, hasUpdated, setHasUpdated}) {
     const setPermission = (name) => {
+        let canWrite = followers.some((follower) => {
+            if (follower.user === name) {
+                return follower.canWrite;
+            }
+        })
+        console.log(name, !canWrite);
         fetch("/db/channel/permissions", {
             method: 'PUT',
             headers: {
@@ -10,8 +16,12 @@ function FollowersModal({isOpen, setIsOpen, followers, channelName, hasUpdated, 
             body: JSON.stringify({
                 user: name,
                 channel: channelName,
-                canWrite: false
+                canWrite: !canWrite
             }),
+        }).then((res) => {
+            if (res.ok) {
+                setHasUpdated(true);
+            }
         })
     }
     console.log(followers)
@@ -22,12 +32,22 @@ function FollowersModal({isOpen, setIsOpen, followers, channelName, hasUpdated, 
             </Modal.Header>
             <Modal.Body>
                 {followers.map((follower) => {
+
+                    let canWrite = followers.some((fol) => {
+                        if (follower.user === fol.user) {
+                            return fol.canWrite;
+                        }
+                    })
                     return (
-                        <div key={follower._id}>
+                        <div key={follower._id} className="flex justify-between py-2">
                             {follower.user}
-                            <button onClick={()=>setPermission(follower.user)}>
-                                cliccami
-                            </button>
+                            <div className="flex gap-4">
+                                <span> può scrivere</span>
+                                <ToggleSwitch
+                                    onChange={()=>setPermission(follower.user)}
+                                    checked={canWrite}
+                                />
+                            </div>
                         </div>
                     );
                 })}

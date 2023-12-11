@@ -19,7 +19,8 @@ function SinglePageChannel() {
     const [showFollowerModal, setShowFollowerModal] = useState(false);
     const [requests, setRequests] = useState([]);
     const [followers, setFollowers] = useState([]);
-    const [hasUpdated, setHasUpdated] = useState(false);
+    const [hasUpdatedReq, setHasUpdatedReq] = useState(false);
+    const [hasUpdatedFol, setHasUpdatedFol] = useState(false);
     const canSeePosts = useRef(false);
 
     const fetchAllPosts = async () => {
@@ -54,10 +55,7 @@ function SinglePageChannel() {
         }})
             .then((res)=> {
                 if (res.ok) {
-                    setIsFollower(!isFollower);
-                    if (!isFollower) {
-                        location.reload();
-                    }
+                    location.reload();
                 }
             })
     }
@@ -69,20 +67,23 @@ function SinglePageChannel() {
                 const username = getUsernameFromLocStor();
                 setDescription(res.description)
                 setRole(res.role);
+                console.log("role", res.role);
                 canSeePosts.current = (res.role !== "Not Follower");
-                setFollowers(res.followers)
+                setFollowers(res.followers.sort((a,b) => (a.user > b.user) ? 1 : ((b.user > a.user) ? -1 : 0)))
                 setType(res.type);
                 setRequests(res.requests)
                 setIsFollower(res.followers.some((follower)=> follower.user === username))
-                setHasUpdated(false);
+                setHasUpdatedReq(false);
+                setHasUpdatedFol(false);
                 console.log("canale", res)
             })
             .then(() => {
                 if (canSeePosts) {
-                    fetchAllPosts()
+                    fetchAllPosts().
+                        then()
                 }
             })
-    }, [hasUpdated]);
+    }, [hasUpdatedReq, hasUpdatedFol]);
 
     return (
         <>
@@ -99,7 +100,8 @@ function SinglePageChannel() {
                                     Gestisci follower
                                 </Button>
                                 <FollowersModal
-                                    channelName={nome} followers={followers} isOpen={showFollowerModal} setIsOpen={setShowFollowerModal}
+                                        channelName={nome} followers={followers} isOpen={showFollowerModal} setIsOpen={setShowFollowerModal}
+                                        hasUpdated={hasUpdatedFol} setHasUpdated={setHasUpdatedFol}
                                 />
                             </>
                             {type === "private" &&
@@ -111,32 +113,40 @@ function SinglePageChannel() {
                                     </Button>
                                     <RequestModal
                                         channelName={nome} requests={requests} isOpen={showRequestModal} setIsOpen={setShowRequestModal}
-                                        hasUpdated={hasUpdated} setHasUpdated={setHasUpdated}
+                                        hasUpdated={hasUpdatedReq} setHasUpdated={setHasUpdatedReq}
                                     />
                                 </>
                             }
                         </div>
                     ) :
                     <>
-                    {isFollower ? (
+                    {role === "Follower" || role === "Writer" ? (
                         <Button  onClick={handleFollow}>
                             {DontFollow}
                             <span className="pl-2">
                                 Disicriviti
                             </span>
                         </Button>
-                    ):(
+                    ): (role === "Not Follower" ? (
                         <Button  onClick={handleFollow}>
                             {FollowIcon}
                             <span className="pl-2">
                                 Segui
                             </span>
                         </Button>
-                    )}
+                    ) : (
+                        <Button  onClick={handleFollow}>
+                            {DontFollow}
+                            <span className="pl-2">
+                                Annulla
+                            </span>
+                        </Button>
+                    ))
+                    }
                     </>
                 }
                 <div className={"flex flex-wrap w-full gap-8 items-center justify-center h-full pb-20 mt-4 overflow-y-scroll"}>
-                    {type === "private" && role === "Not Follower" ? (
+                    {type === "private" && (role === "Not Follower" || role === "Pending")? (
                         <div>
                             Non puoi ancora vedere i post
                         </div>
