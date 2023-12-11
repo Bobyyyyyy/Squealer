@@ -30,7 +30,7 @@
   function closeAppModal(addedPost) {
     modalState.addPostModal.hide()
     activeBut.value = beforeModalPage.value
-    if(addedPost && activeBut.value === 'Profilo') location.reload();
+    //if(addedPost && activeBut.value === 'Profilo') location.reload();
   }
 
   function openNotificationModal () {notificationModal.value.openModal()}

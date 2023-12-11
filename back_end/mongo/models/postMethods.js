@@ -186,6 +186,7 @@ const addTimedPost = async (postId) => {
 const addPost = async (post,quota) => {
     try{
         await connection.get()
+        console.log(post);
         let destinations = ((typeof post.destinations) === 'string') ? JSON.parse(post.destinations) : post.destinations;
         if(typeof destinations === "undefined") {
             throw createError('Non si è inserito nessun destinatario',400);
@@ -194,6 +195,9 @@ const addPost = async (post,quota) => {
         let officialChannels = [];
         let creator = await User.findOne({username: post.creator});
         for (const destination of destinations) {
+            if ( !['user', 'channel', 'official'].includes(destination.destType)){
+                throw createError(`destinazione non valida. Inserire una destinazione sintatticamente valida.`, 400);
+            }
             let destinationType = destination.destType;
             let channel = await Channel.findOne({name: destination.name});
 

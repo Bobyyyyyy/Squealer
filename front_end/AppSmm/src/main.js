@@ -5,6 +5,7 @@ import '../public/assets/custom.scss'
 import './assets/style.css'
 
 import tooltips from "./directives/tooltips.js";
+import ToastPlugin from "vue-toast-notification";
 import {router} from './router/router.js'
 import {store} from "./store/store.js";
 
@@ -23,6 +24,7 @@ const app = createApp(App);
 
 app.use(router);
 app.use(store);
+app.use(ToastPlugin);
 
 app
     .component('NavBarWel', NavBarWel)
