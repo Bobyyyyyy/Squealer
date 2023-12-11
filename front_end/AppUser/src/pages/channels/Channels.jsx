@@ -52,7 +52,7 @@ function Channels () {
     const checkRole = (admins, followers, creator, nameC) => {
         const name = getUsernameFromLocStor();
         const isCreator = creator === name;
-        const isAdmin = admins.some((adm) => adm.user === name);
+        const isAdmin = admins.some((adm) => adm === name);
         const isFollower = followers.some((follower) => follower.user === name);
         return isCreator ? "creator" : (isAdmin ? "admin" : (isFollower ? "follower" : ""));
     }

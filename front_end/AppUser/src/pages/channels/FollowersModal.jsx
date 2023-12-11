@@ -29,26 +29,29 @@ function FollowersModal({isOpen, setIsOpen, followers, channelName, hasUpdated, 
                 Gestione dei followers
             </Modal.Header>
             <Modal.Body>
-                {followers.map((follower) => {
-
-                    let canWrite = followers.some((fol) => {
-                        if (follower.user === fol.user) {
-                            return fol.canWrite;
-                        }
-                    })
-                    return (
-                        <div key={follower._id} className="flex justify-between py-2">
-                            {follower.user}
-                            <div className="flex gap-4">
-                                <span> può scrivere</span>
-                                <ToggleSwitch
-                                    onChange={()=>setPermission(follower.user)}
-                                    checked={canWrite}
-                                />
+                {followers === undefined || followers.length === 0 ? (
+                        <div>Non ci sono followers per questo canale</div>
+                    ) : (
+                    followers.map((follower) => {
+                        let canWrite = followers.some((fol) => {
+                            if (follower.user === fol.user) {
+                                return fol.canWrite;
+                            }
+                        })
+                        return (
+                            <div key={follower._id} className="flex justify-between py-2">
+                                {follower.user}
+                                <div className="flex gap-4">
+                                    <span> può scrivere</span>
+                                    <ToggleSwitch
+                                        onChange={()=>setPermission(follower.user)}
+                                        checked={canWrite}
+                                    />
+                                </div>
                             </div>
-                        </div>
-                    );
-                })}
+                        );
+                }))}
+
             </Modal.Body>
         </Modal>
     );

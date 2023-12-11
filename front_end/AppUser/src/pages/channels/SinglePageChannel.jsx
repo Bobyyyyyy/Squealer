@@ -6,6 +6,8 @@ import {FollowIcon, DontFollow} from "../../components/assets/index.jsx";
 import {Button} from "flowbite-react";
 import RequestModal from "./RequestModal.jsx";
 import FollowersModal from "./FollowersModal.jsx";
+import AddAdminModal from "./AddAdminModal.jsx";
+import RmAdminModal from "./RmAdminModal.jsx";
 
 function SinglePageChannel() {
     const { nome } = useParams();
@@ -14,13 +16,22 @@ function SinglePageChannel() {
     const [posts, setPosts] = useState([]);
     const [description, setDescription] = useState("");
     const [role, setRole] = useState("");
+
     const [showRequestModal, setShowRequestModal] = useState(false);
     const [showFollowerModal, setShowFollowerModal] = useState(false);
+    const [showAddAdminModal, setShowAddAdimnModal] = useState(false);
+    const [showRmAdminModal, setShowRmAdminModal] = useState(false);
+
+    const [hasUpdatedReq, setHasUpdatedReq] = useState(false);
+    const [hasUpdatedFol, setHasUpdatedFol] = useState(false);
+    const [hasUpdatedAddAdm, setHasUpdatedAddAdm] = useState(false);
+    const [hasUpdatedRmAdm, setHasUpdatedRmAdm] = useState(false);
 
     const [requests, setRequests] = useState([]);
     const [followers, setFollowers] = useState([]);
-    const [hasUpdatedReq, setHasUpdatedReq] = useState(false);
-    const [hasUpdatedFol, setHasUpdatedFol] = useState(false);
+    const [admins, setAdmins] = useState([]);
+
+
     const canSeePosts = useRef(false);
 
     const fetchAllPosts = async () => {
@@ -68,8 +79,9 @@ function SinglePageChannel() {
                 setDescription(res.description)
                 setRole(res.role);
                 console.log("role", res.role);
-                canSeePosts.current = (res.role !== "Not Follower");
+                canSeePosts.current = (res.role !== "Not Follower" || res.role !== "Pending");
                 setFollowers(res.followers.sort((a,b) => (a.user > b.user) ? 1 : ((b.user > a.user) ? -1 : 0)))
+                setAdmins(res.admins.sort())
                 setType(res.type);
                 setRequests(res.requests)
                 setHasUpdatedReq(false);
@@ -82,7 +94,7 @@ function SinglePageChannel() {
                         then()
                 }
             })
-    }, [hasUpdatedReq, hasUpdatedFol]);
+    }, [hasUpdatedReq, hasUpdatedFol, hasUpdatedAddAdm, hasUpdatedRmAdm]);
 
     return (
         <>
@@ -117,15 +129,24 @@ function SinglePageChannel() {
                             {role === "Creator" &&
                                 <>
                                     <Button
-                                        onClick={()=>setShowRequestModal(true)}
+                                        onClick={()=>setShowAddAdimnModal(true)}
                                     >
                                         Aggiungi admin
                                     </Button>
+                                    <AddAdminModal
+                                        channelName={nome} followers={followers} isOpen={showAddAdminModal} setIsOpen={setShowAddAdimnModal}
+                                        hasUpdated={hasUpdatedAddAdm} setHasUpdated={setHasUpdatedAddAdm}
+                                    />
+
                                     <Button
-                                        onClick={()=>setShowRequestModal(true)}
+                                        onClick={()=>setShowRmAdminModal(true)}
                                     >
                                         Rimuovi admin
                                     </Button>
+                                    <RmAdminModal
+                                        channelName={nome} admins={admins} isOpen={showRmAdminModal} setIsOpen={setShowRmAdminModal}
+                                        hasUpdated={hasUpdatedRmAdm} setHasUpdated={setHasUpdatedRmAdm}
+                                    />
                                 </>
                             }
                         </div>

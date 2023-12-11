@@ -256,7 +256,7 @@ const addAdmin = async function (username, adminName, channelName) {
         let checkAdmin = await Channel.findOne({$and: [{name: channelName},{'admins': user.username}]}).lean();
         if (checkAdmin) {
             if(creator.typeUser !== 'mod') {
-                channel = await Channel.findOneAndUpdate({$and: [{name: channelName},{'creator': admin.username}]},{$pull: {'admin': username}}).lean();
+                channel = await Channel.findOneAndUpdate({$and: [{name: channelName},{'creator': creator.username}]},{$pull: {'admins': username}}).lean();
                 await Channel.findOneAndUpdate({name: channelName},{$push: {'followers': {user: username,canWrite:true}}}).lean();
             }
             else {
@@ -266,7 +266,7 @@ const addAdmin = async function (username, adminName, channelName) {
         }
         else {
             if(creator.typeUser !== 'mod') {
-                channel = await Channel.findOneAndUpdate({$and: [{name: channelName},{'creator': admin.username}]},{$push: {'admin': username}}).lean();
+                channel = await Channel.findOneAndUpdate({$and: [{name: channelName},{'creator': creator.username}]},{$push: {'admins': username}}).lean();
                 await Channel.findOneAndUpdate({name: channelName},{$pull: {'followers': {user: username}}}).lean();
             }
             else {
