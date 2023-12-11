@@ -245,19 +245,35 @@ const addAdmin = async function (username, adminName, channelName) {
     try {
         await connection.get();
         channelName = channelName.trim().toLowerCase();
-        let admin = await User.findOne({username: adminName}).lean();
+        let creator = await User.findOne({username: adminName}).lean();
         let user = await User.findOne({username: username}).lean();
-        if (!user) {
+        if (!user || !creator) {
             throw createError(`${user.username} non esiste`,500);
         }
         let channel;
 
-        if(admin.typeUser !== 'mod') {
-            channel = await Channel.findOneAndUpdate({$and: [{name: channelName},{$or: [{'admins': admin.username},{'creator': admin.username}]}]},{$push: {'admin': username}}).lean();
+        let checkAdmin = await Channel.findOne({$and: [{name: channelName},{'admins': user.username}]}).lean();
+        if (checkAdmin) {
+            if(creator.typeUser !== 'mod') {
+                channel = await Channel.findOneAndUpdate({$and: [{name: channelName},{'creator': admin.username}]},{$pull: {'admin': username}}).lean();
+                await Channel.findOneAndUpdate({name: channelName},{$push: {'followers': {user: username,canWrite:true}}}).lean();
+            }
+            else {
+                channel = await Channel.findOneAndUpdate({name: channelName},{$pull: {'admins': username}}).lean();
+                await Channel.findOneAndUpdate({name: channelName},{$push: {'followers': {user: username,canWrite:true}}}).lean();
+            }
         }
         else {
-            channel = await Channel.findOneAndUpdate({name: channelName},{$push: {'admins': username}}).lean();
+            if(creator.typeUser !== 'mod') {
+                channel = await Channel.findOneAndUpdate({$and: [{name: channelName},{'creator': admin.username}]},{$push: {'admin': username}}).lean();
+                await Channel.findOneAndUpdate({name: channelName},{$pull: {'followers': {user: username}}}).lean();
+            }
+            else {
+                channel = await Channel.findOneAndUpdate({name: channelName},{$push: {'admins': username}}).lean();
+                await Channel.findOneAndUpdate({name: channelName},{$pull: {'followers': {user: username}}}).lean();
+            }
         }
+
 
         if(!channel)
             throw createError(`${admin.username} non ha i permessi necessari`,500);
