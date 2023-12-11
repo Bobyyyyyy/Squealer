@@ -60,6 +60,7 @@ const getSingleChannel = async (req,res) => {
         res.status(200).send(await channelsModel.getSingleChannel(name,req.session.user));
     }
     catch (error) {
+        console.log(error)
         res.status(error.statusCode).send(error.message);
     }
 }
@@ -107,7 +108,7 @@ const addAdmin = async function (req,res) {
         res.status(200).send(await channelsModel.addAdmin(user,admin,channel));
     }
     catch (error) {
-        res.status(error.statusCode).send(error.message);
+        res.status(error.statusCode).send(error.mes);
     }
 }
 

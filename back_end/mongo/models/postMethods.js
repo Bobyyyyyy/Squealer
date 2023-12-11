@@ -231,7 +231,7 @@ const addPost = async (post,quota) => {
                 }
                 if (channel.type === 'public') {
                     if(creator.typeUser !== 'mod') {
-                        permissionToWrite = await Channel.findOne({$and: [{'name': channel.name}, {$or: [{'creator': creator.username}, {$and: [{'followers.user': creator.username}, {'follower.canWrite': true}]}, {'admins': creator.username}]}]});
+                        permissionToWrite = await Channel.findOne({$and: [{'name': channel.name}, {$or: [{'creator': creator.username}, {$and: [{'followers.user': creator.username}, {'followers.canWrite': true}]}, {'admins': creator.username}]}]});
                         if (!permissionToWrite) {
                             throw createError(`Non hai il permesso di scrivere in ${channel.name}`, 400);
                         }
@@ -240,7 +240,7 @@ const addPost = async (post,quota) => {
                 }
                 else {
                     if(creator.typeUser !== 'mod') {
-                        permissionToWrite = await Channel.findOne({$and: [{'name': channel.name}, {$or: [{'creator': creator.username}, {$and: [{'followers.user': creator.username}, {'follower.canWrite': true}]}, {'admins': creator.username}]}]});
+                        permissionToWrite = await Channel.findOne({$and: [{'name': channel.name}, {$or: [{'creator': creator.username}, {$and: [{'followers.user': creator.username}, {'followers.canWrite': true}]}, {'admins': creator.username}]}]});
                         if (!permissionToWrite) {
                             throw createError(`Non hai il permesso di scrivere in ${channel.name}`, 400);
                         }

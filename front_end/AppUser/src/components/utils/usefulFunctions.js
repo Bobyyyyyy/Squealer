@@ -13,20 +13,17 @@ async function setUsernameInLocStor() {
     }
 }
 
-async function setQuotaInLocStor() {
+async function getQuotaByUsername(username) {
     try {
-        let res = await fetch("/db/user/quota");
-        console.log("quota res", res);
-        let quota = await res.json();
-        console.log("quota",quota);
-        localStorage.setItem("quota", quota);
+        let res = await fetch(`/db/user/quota?user=${username}`, {
+            method: 'GET'
+        });
+        if (res.ok) {
+            return await res.json();
+        }
     } catch (e) {
-        console.log("errore nel settare la quota nel local storage: ", e);
+        console.log(e);
     }
-}
-
-function getQuotaInLocStor () {
-    return localStorage.getItem("quota");
 }
 
 async function getPostByUsername(username){
@@ -131,8 +128,7 @@ const getEmbed = (url) => {
 export {
     getUsernameFromLocStor,
     setUsernameInLocStor,
-    setQuotaInLocStor,
-    getQuotaInLocStor,
+    getQuotaByUsername,
     getPostByUsername,
     getProfilePicByUsername,
     parseTime,

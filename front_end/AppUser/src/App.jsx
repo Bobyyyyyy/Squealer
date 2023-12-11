@@ -10,7 +10,6 @@ import Settings from "./pages/settings/Settings.jsx";
 import {Routes, Route, BrowserRouter, useParams} from "react-router-dom";
 import React, {useEffect, useRef, useState} from "react";
 import RootLayout from "./layouts/RootLayout.jsx";
-import {setQuotaInLocStor, setUsernameInLocStor} from "./components/utils/usefulFunctions.js";
 import SinglePageChannel from "./pages/channels/SinglePageChannel.jsx";
 
 function App() {

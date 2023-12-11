@@ -73,27 +73,34 @@ function SinglePageChannel() {
 
     useEffect(() => {
         fetch(`/db/channel/${nome}`)
-            .then((res) => res.json())
-            .then((res)=> {
-                const username = getUsernameFromLocStor();
-                setDescription(res.description)
-                setRole(res.role);
-                console.log("role", res.role);
-                canSeePosts.current = (res.role !== "Not Follower" || res.role !== "Pending");
-                setFollowers(res.followers.sort((a,b) => (a.user > b.user) ? 1 : ((b.user > a.user) ? -1 : 0)))
-                setAdmins(res.admins.sort())
-                setType(res.type);
-                setRequests(res.requests)
-                setHasUpdatedReq(false);
-                setHasUpdatedFol(false);
-                console.log("canale", res)
-            })
-            .then(() => {
-                if (canSeePosts) {
-                    fetchAllPosts().
-                        then()
-                }
-            })
+            .then((res) => {
+                    console.log(res.status);
+                    if (res.status === 200) {
+                        res.json()
+                            .then((res)=> {
+                                const username = getUsernameFromLocStor();
+                                setDescription(res.description)
+                                setRole(res.role);
+                                console.log("role", res.role);
+                                canSeePosts.current = (res.role !== "Not Follower" || res.role !== "Pending");
+                                setFollowers(res.followers.sort((a,b) => (a.user > b.user) ? 1 : ((b.user > a.user) ? -1 : 0)))
+                                setAdmins(res.admins.sort())
+                                setType(res.type);
+                                setRequests(res.requests)
+                                setHasUpdatedReq(false);
+                                setHasUpdatedFol(false);
+                                console.log("canale", res)
+                            })
+                            .then(() => {
+                                if (canSeePosts) {
+                                    fetchAllPosts().
+                                        then()
+                                }
+                            })
+                    } else if (res.status === 404) {
+                        location.replace("/");
+                    }
+                })
     }, [hasUpdatedReq, hasUpdatedFol, hasUpdatedAddAdm, hasUpdatedRmAdm]);
 
     return (

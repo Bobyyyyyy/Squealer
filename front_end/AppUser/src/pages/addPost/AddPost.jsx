@@ -2,7 +2,7 @@ import {Field, Formik, Form, useFormikContext} from 'formik';
 import * as Yup from "yup";
 import {alert, Button} from "@material-tailwind/react";
 import {useEffect, useState} from "react";
-import {getUsernameFromLocStor, compressBlob, blob2base64, getEmbed} from "../../components/utils/usefulFunctions.js"
+import {getUsernameFromLocStor, compressBlob, blob2base64, getEmbed, getQuotaByUsername} from "../../components/utils/usefulFunctions.js"
 
 import { MapContainer, TileLayer, Marker, Popup  } from 'react-leaflet'
 import Mappa from "../../components/posts/Mappa.jsx";
@@ -13,6 +13,7 @@ let geoPos = null;
 
 function AddPost () {
     const [imgAslink, setImgAsLink] = useState(false);
+    const [errorDestinatari, setErrorDestinatari] = useState(false);
 
     const initialValues = {
         contentType: "text",
@@ -144,7 +145,6 @@ function AddPost () {
         }
     }
 
-    const [errorDestinatari, setErrorDestinatari] = useState(false);
 
 
     return (
@@ -237,7 +237,13 @@ const Content = ({errors, touched, setImgAsLink, ...formikProps}) => {
     const [isPreview, setIsPreview] = useState(false);
     const [position, setPosition] = useState(null);
     const [isLink, setIsLink] = useState(false);
+    const [quota, setQuota] = useState('');
 
+
+    useEffect(() => {
+        getQuotaByUsername(getUsernameFromLocStor())
+            .then((res) => setQuota(res));
+    }, []);
 
     useEffect(() => {
         geoPos = position;
@@ -254,14 +260,20 @@ const Content = ({errors, touched, setImgAsLink, ...formikProps}) => {
                     >
                         {errors.testo && touched.testo ? (
                             <div className={"text-red-600"}>{errors.testo}</div>
-                        ) : <span>Contenuto</span>
+                        ) : <div className="flex justify-between">Contenuto {!!quota && <span>{quota.characters.daily}/{quota.characters.weekly}/{quota.characters.monthly}</span>}</div>
+
                         }
                     </label>
                     <Field
                         as={"textarea"}
                         id={"testo"}
                         name={"testo"}
+                        /* onChange={(e) => {
+                            console.log(e.target.value);
+                            //setQuota(quota.characters.daily - e)}
+                        }}
 
+                         */
                         rows="4"
                         className="border-2 border-gray-500  rounded-md w-full focus:border-teal-500 focus:ring-teal-500 "
                         placeholder="Raccontaci qualcosa..."
@@ -277,7 +289,8 @@ const Content = ({errors, touched, setImgAsLink, ...formikProps}) => {
                     >
                         {errors.foto && touched.foto ? (
                             <div className={"text-red-600"}>{errors.foto}</div>
-                        ) : <span>Contenuto</span>
+                        ) : <div className="flex justify-between">Contenuto {!!quota && <span>{quota.characters.daily}/{quota.characters.weekly}/{quota.characters.monthly}</span>}</div>
+
                         }
                     </label>
 
@@ -349,7 +362,7 @@ const Content = ({errors, touched, setImgAsLink, ...formikProps}) => {
                     >
                         {errors.geolocation && touched.geolocation ? (
                             <div className={"text-red-600"}>{errors.geolocation}</div>
-                        ) : <span>Contenuto</span>
+                        ) : <div className="flex justify-between">Contenuto {!!quota && <span>{quota.characters.daily}/{quota.characters.weekly}/{quota.characters.monthly}</span>}</div>
                         }
                     </label>
                     <div className="w-full h-96">
@@ -366,7 +379,9 @@ const Content = ({errors, touched, setImgAsLink, ...formikProps}) => {
                     >
                         {errors.video && touched.video ? (
                             <div className={"text-red-600"}>{errors.video}</div>
-                        ) : <span>Contenuto</span>
+                        ) : <div className="flex justify-between">Contenuto {!!quota && <span>{quota.characters.daily}/{quota.characters.weekly}/{quota.characters.monthly}</span>}</div>
+
+
                         }
                     </label>
                     <Field

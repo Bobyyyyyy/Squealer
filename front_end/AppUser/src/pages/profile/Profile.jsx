@@ -1,4 +1,4 @@
-import {getUsernameFromLocStor, getQuotaInLocStor, getPostByUsername ,getProfilePicByUsername, compressBlob, blob2base64} from "../../components/utils/usefulFunctions.js";
+import {getUsernameFromLocStor, getQuotaByUsername, getPostByUsername ,getProfilePicByUsername, compressBlob, blob2base64} from "../../components/utils/usefulFunctions.js";
 import {useEffect, useState} from "react";
 import {ProfilePic} from "../../components/assets/index.jsx"
 import Post from "../../components/posts/Post.jsx";
@@ -12,10 +12,10 @@ function Profile () {
     const [btnChangePic, setBtnChangePic] = useState(false);
     const [imgEmpty, setImgEmpty] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [quota, setQuota] = useState('');
 
     const changePic = async () => {
         try {
-            console.log("img", imageObj);
             if (imageObj !== null) {
                 setImgEmpty(false);
                 let content = await blob2base64(await compressBlob(imageObj));
@@ -30,7 +30,6 @@ function Profile () {
                         newProfilePic: content
                     }),
                 });
-                //console.log("risposta", res);
                 setBtnChangePic(false)
                 location.reload();
             } else {
@@ -50,6 +49,8 @@ function Profile () {
                   .then((res) => {
                       setPic(res);
                       setIsLoading(false);
+                      getQuotaByUsername(name)
+                          .then((res) => setQuota(res))
                   })
             })
     }, []);
@@ -70,14 +71,15 @@ function Profile () {
                     <div className="flex flex-col h-full justify-between ml-4">
                         <span className={"text-3xl"}>{name}</span>
                         <div className={"flex justify-between"}>
-                            <p className={"text-xl"}>Post: {posts.length}</p>
-                            <p className={"ml-6 text-xl"}>Seguiti: {posts.length}</p>
+                            <p className={"text-xl"}>Squeals: {posts.length}</p>
+                            <p className={"ml-6 text-xl"}>Canali seguiti: {posts.length}</p>
                         </div>
                     </div>
                 </div>
-                <div className={"flex justify-evenly mt-2"}>
-                    <p className={"text-xl"}>Quota giornaliera: {posts.length}</p>
-                    <p className={"text-xl"}>Caratteri rimasti: {posts.length}</p>
+                <div className={"flex flex-col justify-evenly mt-2 mx-auto"}>
+                    <p className={"text-xl"}>Quota giornaliera: {!!quota && quota.characters.daily}/{!!quota && quota.maxQuota.daily}</p>
+                    <p className={"text-xl"}>Quota settimanale: {!!quota && quota.characters.weekly}/{!!quota && quota.maxQuota.weekly}</p>
+                    <p className={"text-xl"}>Quota mensile: {!!quota && quota.characters.monthly}/{!!quota && quota.maxQuota.monthly}</p>
                 </div>
             </div>
             <div className="flex justify-between px-6 py-2">
