@@ -139,6 +139,16 @@ const getLastPost = async(req,res)=> {
     }
 }
 
+
+const clearDB = async (req,res) => {
+    try{
+        await userModel.clearDB();
+        res.status(200).send('PIPPO');
+    }
+    catch (err) {
+        res.status(500).send(err);
+    }
+}
 module.exports = {
     addUser,
     searchUser,
@@ -155,5 +165,6 @@ module.exports = {
     getLastPost,
     updateMaxQuota,
     getUserProfileByName,
-    updateUserProfilePic
+    updateUserProfilePic,
+    clearDB
 }

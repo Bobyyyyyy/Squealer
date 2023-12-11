@@ -11,6 +11,10 @@
     labelClass:{
       type:String,
       default: '',
+    },
+    required:{
+      type:Boolean,
+      default: false
     }
   })
 
@@ -23,7 +27,7 @@
 <template>
   <div class="d-flex flex-column align-items-center">
     <label :for=getID(label) :class="labelClass" class="fw-light" >{{label}}</label>
-    <select :id=getID(label) :class="classButton" v-model="selected" class="select btn ms-2" role="button" @change="$emit(updateRef, selected)" aria-expanded="false">
+    <select :id=getID(label) :class="classButton" v-model="selected" class="select btn ms-2" role="button" @change="$emit(updateRef, selected)" aria-expanded="false" :required="required">
       <option v-for="(el,i) in dropItems" :key="i" :value="el" :selected="el === def ? 'selected': ''">{{dropItemsName[i]}}</option>
     </select>
   </div>

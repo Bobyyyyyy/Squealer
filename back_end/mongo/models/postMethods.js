@@ -186,6 +186,7 @@ const addTimedPost = async (postId) => {
 const addPost = async (post,quota) => {
     try{
         await connection.get()
+        console.log(post);
         let destinations = ((typeof post.destinations) === 'string') ? JSON.parse(post.destinations) : post.destinations;
         if(typeof destinations === "undefined") {
             throw createError('Non si è inserito nessun destinatario',400);
@@ -194,6 +195,9 @@ const addPost = async (post,quota) => {
         let officialChannels = [];
         let creator = await User.findOne({username: post.creator});
         for (const destination of destinations) {
+            if ( !['user', 'channel', 'official'].includes(destination.destType)){
+                throw createError(`destinazione non valida. Inserire una destinazione sintatticamente valida.`, 400);
+            }
             let destinationType = destination.destType;
             let channel = await Channel.findOne({name: destination.name});
 
@@ -227,16 +231,20 @@ const addPost = async (post,quota) => {
                     throw createError('Il canale è bloccato',400);
                 }
                 if (channel.type === 'public') {
-                    permissionToWrite = await Channel.findOne({$and: [{'name': channel.name}, {$or: [{'creator': creator.username}, {'followers.user': creator.username}, {'admins': creator.username}]}]});
-                    if(!permissionToWrite) {
-                        throw createError(`Non hai il permesso di scrivere in ${channel.name}`, 400);
+                    if(creator.typeUser !== 'mod') {
+                        permissionToWrite = await Channel.findOne({$and: [{'name': channel.name}, {$or: [{'creator': creator.username}, {$and: [{'followers.user': creator.username}, {'follower.canWrite': true}]}, {'admins': creator.username}]}]});
+                        if (!permissionToWrite) {
+                            throw createError(`Non hai il permesso di scrivere in ${channel.name}`, 400);
+                        }
                     }
                     postCategory = 'public';
                 }
                 else {
-                    permissionToWrite = await Channel.findOne({$and: [{'name': channel.name}, {$or: [{'creator': creator.username}, {$and: [{'followers.user': creator.username},{'follower.canWrite': true}]},{'admins': creator.username}]}]});
-                    if(!permissionToWrite) {
-                        throw createError(`Non hai il permesso di scrivere in ${channel.name}`, 400);
+                    if(creator.typeUser !== 'mod') {
+                        permissionToWrite = await Channel.findOne({$and: [{'name': channel.name}, {$or: [{'creator': creator.username}, {$and: [{'followers.user': creator.username}, {'follower.canWrite': true}]}, {'admins': creator.username}]}]});
+                        if (!permissionToWrite) {
+                            throw createError(`Non hai il permesso di scrivere in ${channel.name}`, 400);
+                        }
                     }
                 }
                 //update post number in channel schema
@@ -267,7 +275,7 @@ const addPost = async (post,quota) => {
 
         await newPost.save();
 
-        if (creator !== 'mod') {
+        if (creator.typeUser !== 'mod') {
             /* QUOTA UPDATE */
             await User.findOneAndUpdate({username: post.creator}, {
                 characters:{

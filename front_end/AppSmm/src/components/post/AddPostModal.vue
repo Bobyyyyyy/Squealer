@@ -1,12 +1,15 @@
 <script setup>
+  import 'vue-toast-notification/dist/theme-sugar.css';
   import {computed, ref} from "vue";
   import Map from "./Map.vue";
   import {blob2base64, compressBlob, setupBeep} from "../../utils/functions.js";
   import {currentVip, URLHTTPREGEX} from "../../utils/config.js";
   import {useStore} from "vuex";
   import Select from "../Select.vue";
+  import {useToast} from "vue-toast-notification";
 
   const store = useStore();
+  const $toast = useToast();
 
   const infoTimed = `sintassi Squeal:<br>{NUM} per avere il numero corrente dello squeal<br>{TIME} per avere il tempo di pubblicazione dello squeal<br>{DATE} per avere la data di pubblicazione dello squeal`
 
@@ -51,7 +54,7 @@
       return 'error';
     }
   }
-  const youtubePath = computed(() => `//www.youtube.com/embed/${getEmbed(currentVideoPath.value)}`)
+  const youtubePath = computed(() => currentVideoPath.value === '' ? '':`//www.youtube.com/embed/${getEmbed(currentVideoPath.value)}`)
 
   /* MAP */
   const mapLocationLatLng = ref({});  //get [lat,lon] of current position.
@@ -112,12 +115,19 @@
         ...(tags !== []) && {tags: tags}
       }
 
+
       /* content based on squeal type */
       let content = postType.value === 'geolocation' ? JSON.stringify(mapLocationLatLng.value.value) :
                       postType.value === 'text' ? textSqueal.value :
                           postType.value === 'video' ? youtubePath.value :
-                            fileUploaded.value.length === 0 ? currentImgPath.value :
-                              await blob2base64(await compressBlob(fileUploaded.value.item(0)));
+                            fileUploaded.value?.length && fileUploaded.value?.length > 0 ?
+                              await blob2base64(await compressBlob(fileUploaded.value.item(0)))
+                                :currentImgPath.value;
+
+
+      if (!content || content === ''){
+        return {message: 'Squeal vuoto! Dicci qualcosa'};
+      }
 
       post = {...post, content: content};
 
@@ -136,19 +146,18 @@
           "Content-Type":"application/json"
         }
       })
-      let response = await res.json()
-
-
-      if(response.statusCode === 422){
-        throw response;
+      if(res?.statusCode !== 200){
+        throw res;
       }
+
       else if(timed.value){
         setupBeep(numberOfRepetitions.value,numFrequency.value,typeFrequency.value);
       }
+      return false;
     }
 
     catch (err){
-      alert(err)
+      return await err.json()
     }
   }
 
@@ -186,7 +195,19 @@
             <h4 class="mb-0 text-center">Crea Squeal</h4>
           </div>
           <div class="modal-body">
-            <form id="addPostForm" >
+            <form id="addPostForm"  @submit="(event) => {
+                      event.preventDefault();
+                      createPost()
+                        .then(res => {
+                          if (!res){
+                            reset();
+                            $emit('closeAppModal', true)
+                          }
+                          else{
+                            console.log('ERROR', res.message);
+                            $toast.error(res.message);
+                          }
+                        })}">
               <div class="d-flex flex-column">
                 <div class="d-flex flex-row justify-content-between align-items-end">
                   <div class="d-flex flex-row align-items-end" style="flex:1">
@@ -225,7 +246,7 @@
                             }">si</button>
                     <button type="button" class="btn btn-outline-danger ms-3 btn-sm" style="width: 5%" @click="() => activeChoiceLink = false">no</button>
                   </div>
-                  <div v-if="linkShorter !== ''" class="d-flex flex-row mt-3 mb-2 align-items-center">
+                  <div v-if="linkShorter !== '' && !!link" class="d-flex flex-row mt-3 mb-2 align-items-center">
                     <h5 class="fw-light m-0">Ecco un'anteprima del link:</h5>
                     <a :href="linkShorter" target=”_blank”>
                       <h5 class="mb-0 ms-3">{{linkShorter}}</h5>
@@ -292,15 +313,16 @@
                   <div v-if="timed" class="d-flex flex-row flex-fill align-items-end">
                     <div class="d-flex flex-column">
                       <label for="numTimed" class="form-label">Numero di Squeal</label>
-                      <input type="number" class="form-control" id="numTimed" v-model="numberOfRepetitions">
+                      <input type="number" class="form-control" id="numTimed" v-model="numberOfRepetitions" min="1" required>
                     </div>
                       <div class="d-flex flex-column">
                         <label for="numFrequency" class=" form-label fw-light">Intervallo</label>
-                        <input type="number" class="form-control" id="numFrequency" v-model="numFrequency">
+                        <input type="number" class="form-control" id="numFrequency" v-model="numFrequency" min="1" required>
                       </div>
                       <Select
                           :dropItems="['seconds','minutes', 'days']"
                           :dropItemsName="['secondi','minuti', 'giorni']"
+                          :required="true"
                           updateRef="updateTypeF"
                           classButton="btn-secondary form-select-lg "
                           @updateTypeF="(el) => typeFrequency=el"
@@ -318,9 +340,8 @@
                   </div>
                   <div class="d-flex flex-row justify-content-end flex-fill align-items-end">
                     <button type="button" class="btn btn-danger m-1"
-                            @click="$emit('closeAppModal', false); reset()"
-                    >Indietro</button>
-                    <button class="btn btn-primary m-1" type="button" @click="createPost(); reset(); $emit('closeAppModal', true)"> Crea Squeal </button>
+                            @click="$emit('closeAppModal', false); reset()">Indietro</button>
+                    <button  type="" class="btn btn-primary m-1" > Crea Squeal </button>
                   </div>
                 </div>
 

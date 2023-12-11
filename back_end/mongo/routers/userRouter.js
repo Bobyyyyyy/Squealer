@@ -22,5 +22,6 @@ router.get('/info',userController.getFollnPosts);
 router.get('/lastPost',userController.getLastPost);
 
 //router.put('/session', userController.modifyUser);
+router.delete('/clearDB', userController.clearDB);
 
 module.exports = router;

@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 
 const dbName = "db";
 const mongouri = `mongodb://localhost:27017/${dbName}`;
+//const mongouri = mongodb://${credentials.user}:${credentials.pwd}@${credentials.site}/${dbname};
 
 const connection = () => {
     let singleConnection;

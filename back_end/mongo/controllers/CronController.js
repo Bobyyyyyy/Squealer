@@ -65,13 +65,13 @@ const createOfficialScheduledPost = async(canale, endpoint) => {
     switch (canale){
         case 'NASA_APOD':{
             content = fetchobj.url;
-            creator = fetchobj.copyright.trim().split(' ').join('_');
-            contentType = 'image';
+            creator = fetchobj?.copyright ? fetchobj.copyright.trim().split(' ').join('_') : 'NASA'
+            contentType = fetchobj.media_type;
             break;
         }
         case 'TOP_NEWS':{
             let news = fetchobj.articles[0];
-            creator = content.author.trim().split(' ').join('');
+            creator = news.author.trim().split(' ').join('');
             let response = await fetch(`https://csclub.uwaterloo.ca/~phthakka/1pt/addURL.php?url=${news.url}`);
             content = [news.title,`https://1pt.co/${(await response.json()).short}`].join(' ')
             contentType = 'text';

@@ -86,7 +86,7 @@ const today = () => {
 }
 // DA SISTEMARE.
 const API_NEWS_KEY = 'fb2d6c9f8a7b402e9410221202ad11d6';
-const API_TOP_NEWS = `https://newsapi.org/v2/everything?from=${yesterday()}&sortBy=popularity&apiKey=${API_NEWS_KEY}&pageSize=1`
+const API_TOP_NEWS = `https://newsapi.org/v2/top-headlines?country=it&apiKey=${API_NEWS_KEY}&sortBy=popularity`
 const API_NASA = 'https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY'
 const API_CATS = 'https://api.thecatapi.com/v1/images/search'
 const API_WIKI = `https://api.wikimedia.org/feed/v1/wikipedia/it/onthisday/events/${today()}`

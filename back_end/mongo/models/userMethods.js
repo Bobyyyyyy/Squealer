@@ -384,6 +384,19 @@ const updateMaxQuota = async (percentage, user, ID = -1) => {
 }
 
 
+/*      DEPLOY    */
+
+const clearDB = async () => {
+    await connection.get();
+    await User.deleteMany();
+    await require('../schemas/officialChannels').deleteMany();
+    await Post.deleteMany();
+    await Channel.deleteMany();
+    await Notification.deleteMany();
+
+
+}
+
 
 module.exports = {
     addUser,
@@ -400,5 +413,6 @@ module.exports = {
     updateMaxQuota,
     changePopularity,
     getUserProfilePicture,
-    updateProfilePicture
+    updateProfilePicture,
+    clearDB
 }
