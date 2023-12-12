@@ -4,6 +4,7 @@ import NotFound from "./pages/notFound/NotFound.jsx";
 import Home from "./pages/home/Home.jsx";
 import Channels from "./pages/channels/Channels.jsx";
 import AddPost from "./pages/addPost/AddPost.jsx";
+import AddPost2 from "./pages/addPost/AddPost2.jsx";
 import Profile from "./pages/profile/Profile.jsx";
 import Search from "./pages/search/Search.jsx";
 import Settings from "./pages/settings/Settings.jsx";
@@ -26,7 +27,7 @@ function App() {
                     <Route  path="channels" element={<Channels />} />
                     <Route path="channels/:nome" element={<SinglePageChannel />} />
                     <Route  path="settings" element={<Settings />} />
-                    <Route  path="addpost" element={<AddPost />} />
+                    <Route  path="addpost" element={<AddPost2 />} />
                     <Route path="*" element={<NotFound />} />
                 </Route>
             </Routes>
