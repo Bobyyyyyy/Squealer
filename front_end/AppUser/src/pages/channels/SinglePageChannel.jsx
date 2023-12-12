@@ -10,8 +10,10 @@ import AddAdminModal from "./modals/AddAdminModal.jsx";
 import RmAdminModal from "./modals/RmAdminModal.jsx";
 
 function SinglePageChannel() {
-    const data = useLoaderData();
-    console.log("data", data);
+    //const initialData = useLoaderData();
+    //const [data, setData] = useState(initialData);
+    const {nome} = useParams();
+    //console.log("data", data);
 
     const [type, setType] = useState();
     const [isLoading, setIsLoading] = useState(true);
@@ -37,7 +39,7 @@ function SinglePageChannel() {
 
     const fetchAllPosts = async () => {
         try {
-            let res = await fetch(`/db/post/all?offset=0&limit=10&channel=${data.name}`);
+            let res = await fetch(`/db/post/all?offset=0&limit=10&channel=${nome}`);
             console.log(res);
             if (!res.ok) {
                 console.log("errore nel fetching dei post");
@@ -60,7 +62,7 @@ function SinglePageChannel() {
             method:"POST",
             body: JSON.stringify({
                 user: getUsernameFromLocStor(),
-                channel: data.name
+                channel: nome
             }),
             headers: {
             "Content-Type":"application/json"
@@ -73,29 +75,45 @@ function SinglePageChannel() {
     }
 
     useEffect(() => {
-        setDescription(data.description)
-        setRole(data.role);
-        console.log("role", data.role);
-        canSeePosts.current = (data.role !== "Not Follower" || data.role !== "Pending");
-        setFollowers(data.followers.sort((a,b) => (a.user > b.user) ? 1 : ((b.user > a.user) ? -1 : 0)))
-        setAdmins(data.admins.sort())
-        setType(data.type);
-        setRequests(data.requests)
-        setHasUpdatedReq(false);
-        setHasUpdatedFol(false);
-        console.log("canale", data)
-        if (canSeePosts) {
-            fetchAllPosts().
-                then()
-        }
-
+        fetch(`/db/channel/${nome}`)
+            .then((res) => {
+                console.log(res.status);
+                if (res.status === 200) {
+                    res.json()
+                        .then((res)=> {
+                            const username = getUsernameFromLocStor();
+                            setDescription(res.description)
+                            setRole(res.role);
+                            console.log("role", res.role);
+                            canSeePosts.current = (res.role !== "Not Follower" || res.role !== "Pending");
+                            setFollowers(res.followers.sort((a,b) => (a.user > b.user) ? 1 : ((b.user > a.user) ? -1 : 0)))
+                            setAdmins(res.admins.sort())
+                            setType(res.type);
+                            setRequests(res.requests)
+                            setHasUpdatedReq(false);
+                            setHasUpdatedFol(false);
+                            setHasUpdatedAddAdm(false);
+                            setHasUpdatedRmAdm(false);
+                            console.log("canale", res)
+                        })
+                        .then(() => {
+                            if (canSeePosts) {
+                                fetchAllPosts().
+                                then()
+                            }
+                        })
+                } else if (res.status === 404) {
+                    //location.replace("/");
+                    console.log("ERROREEE")
+                }
+            })
     }, [hasUpdatedReq, hasUpdatedFol, hasUpdatedAddAdm, hasUpdatedRmAdm]);
 
     return (
         <>
             {isLoading && <p>Caricamento...</p>}
             <div className="flex flex-col w-full justify-center items-center gap-4">
-                <h3 className={"text-center text-2xl font-extrabold mt-4"}>§{data.name}</h3>
+                <h3 className={"text-center text-2xl font-extrabold mt-4"}>§{nome}</h3>
                 <p>{description}</p>
                 {role === "Creator" || role === "Admin" ? (
                         <div className="flex flex-wrap justify-between items-center gap-4 px-8 w-full">
@@ -105,7 +123,7 @@ function SinglePageChannel() {
                                 Gestisci follower
                             </Button>
                             <FollowersModal
-                                    channelName={data.name} followers={followers} isOpen={showFollowerModal} setIsOpen={setShowFollowerModal}
+                                    channelName={nome} followers={followers} isOpen={showFollowerModal} setIsOpen={setShowFollowerModal}
                                     hasUpdated={hasUpdatedFol} setHasUpdated={setHasUpdatedFol}
                             />
                             {type === "private" &&
@@ -116,7 +134,7 @@ function SinglePageChannel() {
                                         Gestisci richieste
                                     </Button>
                                     <RequestModal
-                                        channelName={data.name} requests={requests} isOpen={showRequestModal} setIsOpen={setShowRequestModal}
+                                        channelName={nome} requests={requests} isOpen={showRequestModal} setIsOpen={setShowRequestModal}
                                         hasUpdated={hasUpdatedReq} setHasUpdated={setHasUpdatedReq}
                                     />
                                 </>
@@ -129,7 +147,7 @@ function SinglePageChannel() {
                                         Aggiungi admin
                                     </Button>
                                     <AddAdminModal
-                                        channelName={data.name} followers={followers} isOpen={showAddAdminModal} setIsOpen={setShowAddAdimnModal}
+                                        channelName={nome} followers={followers} isOpen={showAddAdminModal} setIsOpen={setShowAddAdimnModal}
                                         hasUpdated={hasUpdatedAddAdm} setHasUpdated={setHasUpdatedAddAdm}
                                     />
 
@@ -139,7 +157,7 @@ function SinglePageChannel() {
                                         Rimuovi admin
                                     </Button>
                                     <RmAdminModal
-                                        channelName={data.name} admins={admins} isOpen={showRmAdminModal} setIsOpen={setShowRmAdminModal}
+                                        channelName={nome} admins={admins} isOpen={showRmAdminModal} setIsOpen={setShowRmAdminModal}
                                         hasUpdated={hasUpdatedRmAdm} setHasUpdated={setHasUpdatedRmAdm}
                                     />
                                 </>
@@ -188,7 +206,7 @@ function SinglePageChannel() {
                                             />
                                     )})}
                                 {posts.length===0 &&
-                                    <p>Non ci sono ancora post indirizzati al canale {data.name}</p>
+                                    <p>Non ci sono ancora post indirizzati al canale {nome}</p>
                                 }
                             </>
                     )}
