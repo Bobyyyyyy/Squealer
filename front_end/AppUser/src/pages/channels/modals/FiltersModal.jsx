@@ -1,6 +1,6 @@
 import { Modal, Button, Radio, Label, Checkbox } from 'flowbite-react';
 import React from "react";
-import {getUsernameFromLocStor} from "../../components/utils/usefulFunctions.js";
+import {getUsernameFromLocStor} from "../../../components/utils/usefulFunctions.js";
 
 function FiltersModal({isOpen, setIsOpen, channelName, setChannelName, visibility,
                           setVisibility, owner, setOwner, admin, setAdmin,handleSearch}) {

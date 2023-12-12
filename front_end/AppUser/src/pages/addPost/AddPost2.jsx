@@ -95,6 +95,7 @@ function AddPost2(){
         try {
             if (canSendPost()) {
                 let post = await createPost();
+                console.log("post creato", post)
                 let res = await fetch("/db/post", {
                     method: "POST",
                     body: JSON.stringify({

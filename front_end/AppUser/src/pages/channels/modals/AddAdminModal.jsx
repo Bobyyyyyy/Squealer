@@ -1,5 +1,5 @@
 import {Modal, ToggleSwitch} from "flowbite-react";
-import {CheckIcon} from "../../components/assets/index.jsx";
+import {CheckIcon} from "../../../components/assets/index.jsx";
 
 function AddAdminModal({isOpen, setIsOpen, followers, channelName, hasUpdated, setHasUpdated}) {
     const promote2admin = (name) => {

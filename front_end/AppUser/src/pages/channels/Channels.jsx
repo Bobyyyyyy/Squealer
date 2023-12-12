@@ -2,8 +2,8 @@ import {useEffect, useState} from "react";
 import {ProfilePic} from "../../components/assets/index.jsx"
 import Searchbar from "../../components/Searchbar.jsx";
 import {Link} from "react-router-dom";
-import CreateChannelModal from "./CreateChannelModal.jsx";
-import FiltersModal from "./FiltersModal.jsx";
+import CreateChannelModal from "./modals/CreateChannelModal.jsx";
+import FiltersModal from "./modals/FiltersModal.jsx";
 import {getUsernameFromLocStor} from "../../components/utils/usefulFunctions.js";
 
 function Channels () {

@@ -1,3 +1,5 @@
+import {useParams} from "react-router-dom";
+
 function getUsernameFromLocStor () {
     return localStorage.getItem("username");
 }
@@ -123,6 +125,14 @@ const getEmbed = (url) => {
     }
 }
 
+const checkChannelExists = async ({params}) => {
+    const {nome} = params;
+    const res = await fetch(`/db/channel/${nome}`)
+    if (!res.ok) {
+        throw Error(`Non esiste il canale ${nome}`);
+    }
+    return await res.json();
+}
 
 export {
     getUsernameFromLocStor,
@@ -132,5 +142,5 @@ export {
     getProfilePicByUsername,
     parseTime,
     blob2base64, compressBlob,
-    getEmbed
+    getEmbed, checkChannelExists
 }
