@@ -10,10 +10,7 @@ import AddAdminModal from "./modals/AddAdminModal.jsx";
 import RmAdminModal from "./modals/RmAdminModal.jsx";
 
 function SinglePageChannel() {
-    //const initialData = useLoaderData();
-    //const [data, setData] = useState(initialData);
     const {nome} = useParams();
-    //console.log("data", data);
 
     const [type, setType] = useState();
     const [isLoading, setIsLoading] = useState(true);
@@ -47,9 +44,7 @@ function SinglePageChannel() {
 
             let allPosts = await res.json();
 
-            //console.log(allPosts)
             setPosts(allPosts);
-            //console.log("num of post", allPosts.length)
             setIsLoading(false)
 
         } catch (e) {
@@ -77,11 +72,10 @@ function SinglePageChannel() {
     useEffect(() => {
         fetch(`/db/channel/${nome}`)
             .then((res) => {
-                console.log(res.status);
-                if (res.status === 200) {
+                if (res.ok) {
                     res.json()
                         .then((res)=> {
-                            const username = getUsernameFromLocStor();
+                            console.log("canale", res)
                             setDescription(res.description)
                             setRole(res.role);
                             console.log("role", res.role);
@@ -94,17 +88,15 @@ function SinglePageChannel() {
                             setHasUpdatedFol(false);
                             setHasUpdatedAddAdm(false);
                             setHasUpdatedRmAdm(false);
-                            console.log("canale", res)
                         })
                         .then(() => {
                             if (canSeePosts) {
-                                fetchAllPosts().
-                                then()
+                                fetchAllPosts()
+                                    .then()
                             }
                         })
-                } else if (res.status === 404) {
-                    //location.replace("/");
-                    console.log("ERROREEE")
+                } else {
+                    throw Error(`Non esiste il canale ${nome}`);
                 }
             })
     }, [hasUpdatedReq, hasUpdatedFol, hasUpdatedAddAdm, hasUpdatedRmAdm]);
