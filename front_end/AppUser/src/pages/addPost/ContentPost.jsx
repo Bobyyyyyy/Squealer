@@ -1,13 +1,11 @@
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import Mappa from "../../components/posts/Mappa.jsx";
 
-let imageObj = null;
-let geoPos = null;
-
-function ContentPost({type, quota, currentQuota, setCurrentQuota, content, setContent, setImgAsFile, position, setPosition}) {
+function ContentPost({type, quota, currentQuota, setCurrentQuota, content, setContent, setImgAsFile, position, setPosition, destinations}) {
     const [isLink, setIsLink] = useState(false)
     const [preview, setPreview] = useState(false);
-
+    const [counterActive, setCounterActive] = useState(false);
+    const [showCounter, setShowCounter] = useState(false);
     const quotaForImg = 125;
 
     const handleQuotaChange = (e, type) => {
@@ -15,20 +13,24 @@ function ContentPost({type, quota, currentQuota, setCurrentQuota, content, setCo
             case "text":
                 setCurrentQuota({
                     daily: quota.characters.daily - e.target.value.length,
-                    weekly: quota.characters.weekly,
-                    monthly: quota.characters.monthly
+                    weekly: quota.characters.weekly - e.target.value.length,
+                    monthly: quota.characters.monthly - e.target.value.length
                 });
                 break;
             case "geolocation": case "image": case "video":
                 setCurrentQuota({
                     daily: quota.characters.daily - quotaForImg,
-                    weekly: quota.characters.weekly,
-                    monthly: quota.characters.monthly
+                    weekly: quota.characters.weekly - quotaForImg,
+                    monthly: quota.characters.monthly - quotaForImg
                 });
                 break;
             default:
                 break;
         }
+    }
+
+    const isQuotaNegative = () => {
+        return currentQuota.daily < 0 || currentQuota.weekly < 0;
     }
 
     useEffect(() => {
@@ -38,20 +40,34 @@ function ContentPost({type, quota, currentQuota, setCurrentQuota, content, setCo
             monthly: quota.characters.monthly
         });
         if (type === "geolocation") {
+            console.log(position);
             setContent(position);
         }
-    }, [type]);
+    }, [type, position]);
+
+
+    useEffect(() => {
+        setCounterActive(true);
+        setTimeout(() => {
+            setCounterActive(false);
+        }, 200)
+    }, [content]);
+
+
+    useEffect(() => {
+        setShowCounter(destinations.includes("§"))
+    }, [destinations]);
 
     return (
         <>
-            <div className="flex justify-between mb-2">
+            <div className="flex justify-between items-center mb-2">
                 <span className="text-xl md:text-2xl">
                     Contenuto
                 </span>
-                {!!currentQuota &&
-                    <span className="text-lg md:xl">
+                {!!currentQuota && showCounter &&
+                    <div className={`text-base md:text-xl text-white bg-${isQuotaNegative() ? "red-600" : "green-600"} rounded-xl p-2 quotaCounter ${counterActive && "active"}`}>
                         {currentQuota.daily}/{currentQuota.weekly}/{currentQuota.monthly}
-                    </span>
+                    </div>
                 }
             </div>
             {type === "text" &&
@@ -102,7 +118,7 @@ function ContentPost({type, quota, currentQuota, setCurrentQuota, content, setCo
                             accept={"image/png, image/jpeg"}
                             onChange={async (e)=> {
                                 let imageURL = (URL.createObjectURL(e.target.files[0]));
-                                imageObj = e.target.files[0];
+                                const imageObj = e.target.files[0];
                                 setImgAsFile(imageObj);
                                 setContent(imageURL);
                                 handleQuotaChange(e, "image");

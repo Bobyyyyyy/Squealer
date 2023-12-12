@@ -1,5 +1,5 @@
 import ContentPost from "./ContentPost.jsx";
-import {useEffect, useRef, useState} from "react";
+import {useEffect, useState} from "react";
 import {Button} from "@material-tailwind/react";
 import {SubmitIcon} from "../../components/assets/index.jsx";
 import {
@@ -100,28 +100,42 @@ function AddPost2(){
                     body: JSON.stringify({
                         post: post,
                         quota: {
+                            /*
                             daily: currentQuota.daily,
                             weekly: currentQuota.weekly,
                             monthly: currentQuota.monthly,
+
+                             */
+                            daily: 300,
+                            weekly: 50,
+                            monthly: 1000,
+
                         }
                     }),
                     headers: {
                         "Content-Type": "application/json"
                     },
                 });
-                res = res.json();
-                if (res.statusCode === 400 ) {
-                    console.log(res.message);
+                if (!res.ok) {
+                    console.log(res)
+                    console.error(`Error: ${res.status} - ${res.statusText}`);
+                    throw new Error(`Server error: ${res.status}`);
+                }
+
+                let data = await res.json();
+                console.log(data.statusCode)
+                if (data.statusCode === 400) {
+                    console.log(data.message);
                     window.alert("l'utente non esiste");
-                } else if (res.name) {
+                } else if (data.name) {
                     window.alert("errore nell'invio del post, controlla di aver inserito i destinatari corretti");
                 } else {
-                    //window.location.href = "/user/"
+                    window.location.href = "/user/"
                 }
             }
         } catch (e) {
-            console.log("ERRORE:", e);
-
+            console.error("Caught an error:", e.message);
+            window.alert("errore nell'invio del post, assicurarsi di aver inserito tutti i campi in modo appropriato")
         }
     }
 
@@ -176,7 +190,7 @@ function AddPost2(){
                 {/* CONTENUTO DEL POST */}
                 {!!quota &&
                     <ContentPost
-                        type={type} content={content} setContent={setContent}
+                        type={type} content={content} setContent={setContent} destinations={destinations}
                         quota={quota} currentQuota={currentQuota} setCurrentQuota={setCurrentQuota}
                         setImgAsFile={setImgAsFile} position={position} setPosition={setPosition}
                     />

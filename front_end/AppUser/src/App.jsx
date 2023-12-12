@@ -12,10 +12,7 @@ import {Routes, Route, BrowserRouter, useParams} from "react-router-dom";
 import React, {useEffect, useRef, useState} from "react";
 import RootLayout from "./layouts/RootLayout.jsx";
 import SinglePageChannel from "./pages/channels/SinglePageChannel.jsx";
-
 function App() {
-    const [user, setUser] = useState(null);
-    const savedUser = useRef(false);
 
     return (
         <BrowserRouter basename={"/user"}>
@@ -31,7 +28,7 @@ function App() {
                     <Route path="*" element={<NotFound />} />
                 </Route>
             </Routes>
-    </BrowserRouter>
+        </BrowserRouter>
     );
 
 }

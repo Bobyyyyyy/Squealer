@@ -124,7 +124,6 @@ const getEmbed = (url) => {
 }
 
 
-
 export {
     getUsernameFromLocStor,
     setUsernameInLocStor,
@@ -133,5 +132,5 @@ export {
     getProfilePicByUsername,
     parseTime,
     blob2base64, compressBlob,
-    getEmbed,
+    getEmbed
 }
