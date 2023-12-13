@@ -13,6 +13,7 @@ router.put('/profilePic', userController.updateUserProfilePic);
 router.get('/session',userController.getSessionUser);
 router.get('/number',userController.getUsersNumber);
 router.get('/all',userController.getAllUsers);
+router.get('/singleuser',userController.getSingleUser);
 router.get('/getVips',userController.getVips)
 router.get('/quota',userController.getQuota);
 router.put('/quota', userController.updateMaxQuota);
@@ -20,6 +21,10 @@ router.put('/sessionVip',userController.updateSessionVip);
 router.get('/sessionVip', userController.getSessionVip);
 router.get('/info',userController.getFollnPosts);
 router.get('/lastPost',userController.getLastPost);
+//AGGIUNGERE
+// - RICHIESTA PER TUTTI I PROFILI (o fixare getAllUsers)
+// - RICHIESTA SE UN UTENTE ESISTE
+
 
 //router.put('/session', userController.modifyUser);
 router.delete('/clearDB', userController.clearDB);

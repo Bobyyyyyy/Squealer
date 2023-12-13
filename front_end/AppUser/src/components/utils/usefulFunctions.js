@@ -134,6 +134,17 @@ const checkChannelExists = async ({params}) => {
     return await res.json();
 }
 
+const checkUserExists = async ({params}) => {
+    const {username} = params;
+    const res = await fetch(`/db/user/singleuser?name=${username}`)
+    if (!res.ok) {
+        throw Error(`Non esiste l'utente ${username}`);
+    }
+    const sol = await res.json();
+    console.log("utente", sol);
+    return sol;
+}
+
 export {
     getUsernameFromLocStor,
     setUsernameInLocStor,
@@ -141,6 +152,9 @@ export {
     getPostByUsername,
     getProfilePicByUsername,
     parseTime,
-    blob2base64, compressBlob,
-    getEmbed, checkChannelExists
+    blob2base64,
+    compressBlob,
+    getEmbed,
+    checkChannelExists,
+    checkUserExists
 }

@@ -12,7 +12,7 @@ function Body({post}) {
                 <p className="">{post.content}</p>
             }
             {post.contentType === "image" &&
-                <img className={"aspect-auto w-full"} src={post.content} alt={"image"}/>
+                <img className={"aspect-auto w-full object-cover overflow-hidden"} src={post.content} alt={"image"}/>
             }
             {post.contentType === "geolocation" &&
                 <div className=" w-full h-96">

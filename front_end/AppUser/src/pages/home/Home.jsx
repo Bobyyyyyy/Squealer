@@ -19,7 +19,9 @@ function Home() {
     const fetchAllPosts = async () => {
         try {
 
-            let res = await fetch(`/db/post/all?offset=0&limit=10`);
+            let res = await fetch(`/db/post/all?offset=0&limit=10`, {
+                method: 'GET'
+            });
             console.log(res);
             if (!res.ok) {
                console.log("errore nel fetching dei post");

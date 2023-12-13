@@ -18,8 +18,9 @@ import {
 import React, {useEffect, useRef, useState} from "react";
 import RootLayout from "./layouts/RootLayout.jsx";
 import SinglePageChannel from "./pages/channels/SinglePageChannel.jsx";
-import {checkChannelExists} from "./components/utils/usefulFunctions.js";
-import ChannelErrorPage from "./pages/channels/ChannelErrorPage.jsx";
+import {checkChannelExists, checkUserExists} from "./components/utils/usefulFunctions.js";
+import ErrorPage from "./pages/ErrorPage.jsx";
+import PageProfileByName from "./pages/profile/PageProfileByName.jsx";
 function App() {
 
     const router = createBrowserRouter(
@@ -27,12 +28,21 @@ function App() {
             <Route path="/" element={<RootLayout />} >
                 <Route index element={<Home />} />
                 <Route  path="profile" element={<Profile />} />
-                <Route  path="search" element={<Search />} />
+                <Route
+                    path="search"
+                    element={<Search />}
+                />
+                <Route
+                    path="search/:username"
+                    element={<PageProfileByName />}
+                    loader={checkUserExists}
+                    errorElement={<ErrorPage />}
+                />
                 <Route  path="channels" element={<Channels />} />
                 <Route
                     path="channels/:nome"
                     element={<SinglePageChannel />}
-                    errorElement={<ChannelErrorPage />}
+                    errorElement={<ErrorPage />}
                     loader={checkChannelExists}
                 />
                 <Route  path="settings" element={<Settings />} />

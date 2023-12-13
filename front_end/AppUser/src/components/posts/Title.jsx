@@ -29,7 +29,7 @@ function Title({post}) {
             <div className="flex justify-between items-center px-4 py-2">
                 <div className="flex w-full items-center" >
                     <Suspense fallback={<Caricamento />}>
-                        <img className="w-14 h-14 rounded-full" alt="foto profilo" src={profilePic} />
+                        <img className="w-14 h-14 rounded-full object-cover" alt="foto profilo" src={profilePic} />
                     </Suspense>
                     <div className="flex flex-col ml-4 gap-2">
                         <h3 className="text-primary w-fit h-fit">

@@ -1,6 +1,6 @@
 import { Link, useRouteError } from "react-router-dom"
 
-function ChannelErrorPage() {
+function ErrorPage() {
     const error = useRouteError()
 
     return (
@@ -16,4 +16,4 @@ function ChannelErrorPage() {
     )
 }
 
-export default ChannelErrorPage;
+export default ErrorPage;

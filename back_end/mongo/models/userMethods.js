@@ -166,10 +166,33 @@ const getUsers = async (query) =>{
         await connection.get();
         let offset = parseInt(query.offset);
         let limit = parseInt(query.limit);
-        return await User.find({$or : [{username: {$regex: query.filter , $options: 'i'}},{email: {$regex: query.filter , $options: 'i'}},{typeUser: {$regex: query.filter , $options: 'i'}}, ] } ).skip(offset).limit(limit).lean();
+
+        query.filter = JSON.parse(query.filter);
+
+        let filter = {
+            // filtrare profili per nome
+            ...(query.filter.name) && {'username': new RegExp(`^${query.filter.name}`)},
+            // filtrare profili per tipo ['public','private']
+            ...(query.filter.type) && {'type': query.filter.type},
+        }
+        return await User.find(filter).skip(offset).limit(limit).lean();
     }
     catch (err){
         throw err;
+    }
+}
+
+const getSingleUser = async (query) => {
+    try {
+        await connection.get()
+        let findUser = await User.findOne({username: query.name}).lean();
+        console.log(findUser);
+        if (!findUser) {
+            throw createError("l'utente non esiste", 404);
+        }
+        return findUser;
+    } catch (error) {
+        throw error;
     }
 }
 
@@ -404,6 +427,7 @@ module.exports = {
     changePwsd,
     loginUser,
     getUsers,
+    getSingleUser,
     usersLength,
     altUser,
     getHandledVip,

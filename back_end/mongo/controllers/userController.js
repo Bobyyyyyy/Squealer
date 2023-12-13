@@ -61,10 +61,18 @@ const modifyUser = async(req,res) => {
 
 const getAllUsers = async (req,res) => {
     try {
-        res.send(await userModel.getUsers(req.query));
+        res.status(200).send(await userModel.getUsers(req.query));
     }
     catch (error) {
-        res.send(error);
+        res.status(error.statusCode).send(error.message);
+    }
+}
+
+const getSingleUser = async (req, res) => {
+    try {
+        res.status(200).send(await userModel.getSingleUser(req.query));
+    } catch (error) {
+        res.status(error.statusCode).send(error.message);
     }
 }
 
@@ -158,6 +166,7 @@ module.exports = {
     getSessionVip,
     modifyUser,
     getAllUsers,
+    getSingleUser,
     getUsersNumber,
     getVips,
     getQuota,
