@@ -1,5 +1,3 @@
-import {useParams} from "react-router-dom";
-
 function getUsernameFromLocStor () {
     return localStorage.getItem("username");
 }
@@ -33,9 +31,8 @@ async function getPostByUsername(username){
         let res = await fetch(`/db/post/all?name=${username}&offset=0`, {
             method: 'GET',
         });
-        let allPosts = await res.json();
         if (res.ok) {
-            return allPosts;
+            return await res.json();
         }
     } catch (e) {
         console.log(e);

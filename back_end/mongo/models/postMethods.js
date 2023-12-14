@@ -290,6 +290,7 @@ const addPost = async (post,quota) => {
         return {postId: newPost._id};
     }
     catch(err){
+        console.log(err);
         throw err;
     }
 }

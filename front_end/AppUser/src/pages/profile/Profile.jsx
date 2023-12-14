@@ -170,7 +170,7 @@ function Profile () {
             <div className="text-lg text-center mt-4">
                 Al momento non ci sono post!
             </div>}
-            </>
+        </>
     );
 }
 

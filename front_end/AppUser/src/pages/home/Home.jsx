@@ -4,17 +4,10 @@ import {
     getUsernameFromLocStor,
     setUsernameInLocStor
 } from "../../components/utils/usefulFunctions.js";
-import {useFetch} from "../../components/utils/useFetch.js";
 
 function Home() {
     const [isLoading, setIsLoading] = useState(true);
     const [posts, setPosts] = useState([]);
-    /*
-    const {data, isLoading, error} = useFetch(`/db/post/all?name=${getUsernameFromLocStor()}&offset=0`);
-    console.log("isLoading", isLoading)
-    console.log("data", data);
-     */
-
 
     const fetchAllPosts = async () => {
         try {

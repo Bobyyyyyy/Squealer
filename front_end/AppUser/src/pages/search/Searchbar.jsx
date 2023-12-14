@@ -2,7 +2,7 @@ import {SearchbarIcon} from "../../components/assets/index.jsx"
 
 function Searchbar ({name, setName}) {
     return (
-        <div className="flex w-full items-center">
+        <div className="flex w-full items-center gap-4">
             <input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
