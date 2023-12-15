@@ -5,9 +5,12 @@ import {Modal} from "bootstrap";
 import AddChannelModal from "../components/channels/AddChannelModal.vue";
 import Channel from "../components/channels/Channel.vue";
 import {currentVip} from "../utils/config.js";
+import Select from "../components/Select.vue";
 
 let channels = []
 const channelsReady = ref(false);
+const visibilityFilter = ref('');
+const roleFilter = ref('');
 
 const modalState = reactive({Modal: null,})
 onMounted(async () => {
@@ -34,8 +37,8 @@ function closeChannelModal() {
   <div class="centralDiv">
     <div class="marginCD">
       <h1 class="text-center">Lista Canali</h1>
-      <div class="d-flex flex-row justify-content-between">
-        <div id="filterCh" class="input-group">
+      <div class="d-flex flex-row justify-content-between align-items-end">
+        <div id="filterCh" class="input-group m-0">
           <input  type="text" class="form-control " placeholder="Search..." aria-label="Username" aria-describedby="basic-addon1">
           <button type="submit" class="btn btn-secondary">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
@@ -43,6 +46,22 @@ function closeChannelModal() {
             </svg>
           </button>
         </div>
+        <Select
+            classButton="btn btn-secondary"
+            :updateRef="visibilityFilter"
+            :dropItems="['public', 'private', 'all']"
+            :dropItemsName="['pubblico', 'privato', 'tutto']"
+            label="visibilità"
+            def="tutto"
+        />
+        <Select
+            classButton="btn btn-secondary"
+            :updateRef="roleFilter"
+            :dropItems="['creator', 'admin', 'all']"
+            :dropItemsName="['creatore', 'privato', 'tutti']"
+            label="tipo utente"
+            def="tutti"
+        />
         <div>
           <button class="btn btn-secondary ms-2" @click="openChannelModal">Add</button>
         </div>
@@ -55,6 +74,7 @@ function closeChannelModal() {
                  :isPublic="ch.isPublic"
                  :creator="ch.creator"
                  :admins="ch.admins"
+                 channelPic="https://picsum.photos/id/1/300/300"
         />
       </div>
     </div>

@@ -199,12 +199,11 @@
                       event.preventDefault();
                       createPost()
                         .then(res => {
-                          if (!res){
+                          if (res){
                             reset();
                             $emit('closeAppModal', true)
                           }
                           else{
-                            console.log('ERROR', res.message);
                             $toast.error(res.message);
                           }
                         })}">
@@ -313,16 +312,15 @@
                   <div v-if="timed" class="d-flex flex-row flex-fill align-items-end">
                     <div class="d-flex flex-column">
                       <label for="numTimed" class="form-label">Numero di Squeal</label>
-                      <input type="number" class="form-control" id="numTimed" v-model="numberOfRepetitions" min="1" required>
+                      <input type="number" class="form-control" id="numTimed" v-model="numberOfRepetitions" min="1">
                     </div>
                       <div class="d-flex flex-column">
                         <label for="numFrequency" class=" form-label fw-light">Intervallo</label>
-                        <input type="number" class="form-control" id="numFrequency" v-model="numFrequency" min="1" required>
+                        <input type="number" class="form-control" id="numFrequency" v-model="numFrequency" min="1">
                       </div>
                       <Select
                           :dropItems="['seconds','minutes', 'days']"
                           :dropItemsName="['secondi','minuti', 'giorni']"
-                          :required="true"
                           updateRef="updateTypeF"
                           classButton="btn-secondary form-select-lg "
                           @updateTypeF="(el) => typeFrequency=el"
