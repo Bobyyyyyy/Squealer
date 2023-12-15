@@ -1,7 +1,10 @@
 import {useEffect, useRef, useState} from "react";
 import Mappa from "../../components/posts/Mappa.jsx";
 
-function ContentPost({type, quota, currentQuota, setCurrentQuota, content, setContent, setImgAsFile, position, setPosition, destinations}) {
+function ContentPost({type, quota, currentQuota, setCurrentQuota,
+                     content, setContent, setImgAsFile, position, setPosition,
+                     destinations, setError, isQuotaNegative}) {
+
     const [isLink, setIsLink] = useState(false)
     const [preview, setPreview] = useState(false);
     const [counterActive, setCounterActive] = useState(false);
@@ -9,41 +12,45 @@ function ContentPost({type, quota, currentQuota, setCurrentQuota, content, setCo
     const quotaForImg = 125;
 
     const handleQuotaChange = (e, type) => {
-        switch (type) {
-            case "text":
-                setCurrentQuota({
-                    daily: quota.characters.daily - e.target.value.length,
-                    weekly: quota.characters.weekly - e.target.value.length,
-                    monthly: quota.characters.monthly - e.target.value.length
-                });
-                break;
-            case "geolocation": case "image": case "video":
-                setCurrentQuota({
-                    daily: quota.characters.daily - quotaForImg,
-                    weekly: quota.characters.weekly - quotaForImg,
-                    monthly: quota.characters.monthly - quotaForImg
-                });
-                break;
-            default:
-                break;
-        }
+        const quota2remove = (type === "text") ? e.target.value.length : quotaForImg;
+        updateQuota(quota2remove)
     }
 
-    const isQuotaNegative = () => {
-        return currentQuota.daily < 0 || currentQuota.weekly < 0;
+    const has2removeQuota = () => {
+        return !!destinations.includes("§");
+    }
+
+    const updateQuota = (quota2remove) => {
+        let remainingDquota =  quota.characters.daily - quota2remove;
+        let remainingWquota = quota.characters.weekly + ((remainingDquota < 0) ? remainingDquota : 0);
+        let remainingMquota = quota.characters.monthly + ((remainingWquota < 0) ? remainingWquota : 0);
+
+        setError( remainingMquota < 0? "hai finito la quota mensile" : "");
+
+        remainingDquota = (remainingDquota < 0) ? 0 : remainingDquota;
+        remainingWquota = (remainingWquota < 0) ? 0 : remainingWquota;
+        setCurrentQuota({
+            daily: remainingDquota,
+            weekly: remainingWquota,
+            monthly: remainingMquota
+        });
     }
 
     useEffect(() => {
-        setCurrentQuota({
-            daily: quota.characters.daily - ((type === "geolocation") ? quotaForImg : 0),
-            weekly: quota.characters.weekly,
-            monthly: quota.characters.monthly
-        });
-        if (type === "geolocation") {
-            console.log(position);
-            setContent(position);
+        if (has2removeQuota()) {
+            if (type === "geolocation") {
+                updateQuota(quotaForImg);
+                setContent(position);
+            } else {
+                updateQuota((type !== "text" && !!content) ? quotaForImg : content.length);
+            }
+        } else {
+            updateQuota(0);
+            if (type === "geolocation") {
+                setContent(position);
+            }
         }
-    }, [type, position]);
+    }, [type, position, destinations]);
 
 
     useEffect(() => {

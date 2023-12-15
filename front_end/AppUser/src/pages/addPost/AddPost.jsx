@@ -7,6 +7,7 @@ import {
     getQuotaByUsername,
     getUsernameFromLocStor
 } from "../../components/utils/usefulFunctions.js";
+import {Toast} from "flowbite-react";
 
 function AddPost(){
     const username = getUsernameFromLocStor();
@@ -32,7 +33,6 @@ function AddPost(){
     }
 
     const canSendPost = () => {
-        console.log(destinations, content);
         let x = true;
         if (!destinations && !content) {
             setError("Inserisci i destinatari e il contenuto")
@@ -43,9 +43,19 @@ function AddPost(){
         } else if (!destinations) {
             setError("Inserisci i destinatari")
             x = false;
+        } else if (!(destinations.includes("§") || destinations.includes("@"))) {
+            setError("Inserisci @ o § nei destinatari");
+            x = false;
+        } else if (isQuotaNegative()) {
+            x = false;
         }
         return x;
     }
+
+    const isQuotaNegative = () => {
+        return currentQuota?.monthly < 0;
+    }
+
 
     async function createPost() {
         let content2send;
@@ -94,51 +104,36 @@ function AddPost(){
         try {
             if (canSendPost()) {
                 let post = await createPost();
-                console.log("post creato", post)
+                console.log("post creato", post, currentQuota)
                 let res = await fetch("/db/post", {
                     method: "POST",
                     body: JSON.stringify({
                         post: post,
-                        quota: {
-                            /*
-                            daily: currentQuota.daily,
-                            weekly: currentQuota.weekly,
-                            monthly: currentQuota.monthly,
-
-                             */
-                            daily: 300,
-                            weekly: 50,
-                            monthly: 1000,
-                        }
+                        quota: currentQuota
                     }),
                     headers: {
                         "Content-Type": "application/json"
                     },
                 });
                 if (!res.ok) {
-                    //console.log(res.mes)
-                    //let x = await res.json();
-                    //console.log(x);
-
-                    console.error(res);
-                    console.error(`Error: ${res.statusCode} - ${res.statusText}`);
-                    throw new Error(`Server error: ${res.status}`);
-                }
-
-                let data = await res.json();
-                console.log(data.statusCode)
-                if (data.statusCode === 400) {
-                    console.log(data.message);
-                    window.alert("l'utente non esiste");
-                } else if (data.name) {
-                    window.alert("errore nell'invio del post, controlla di aver inserito i destinatari corretti");
+                    console.log(res)
+                    throw res;
                 } else {
-                    window.location.href = "/user/"
+                    let data = await res.json();
+                    console.log(data.statusCode)
+                    if (data.statusCode === 400) {
+                        console.log(data.message);
+                        window.alert("l'utente non esiste");
+                    } else if (data.name) {
+                        window.alert("errore nell'invio del post, controlla di aver inserito i destinatari corretti");
+                    } else {
+                        window.location.href = "/user/"
+                    }
                 }
             }
         } catch (e) {
-            console.error("Caught an error:", e.message);
-            window.alert("errore nell'invio del post, assicurarsi di aver inserito tutti i campi in modo appropriato")
+            console.log(e)
+            window.alert("canale o utente non esistente")
         }
     }
 
@@ -147,11 +142,14 @@ function AddPost(){
             .then((res) => {
                 setQuota(res);
                 setCurrentQuota(res);
+                console.log(res.characters)
             })
     }, []);
 
     useEffect(() => {
-        setError('')
+        if (!isQuotaNegative()) {
+            setError('')
+        }
     }, [content, destinations]);
 
     return (
@@ -195,6 +193,7 @@ function AddPost(){
                         type={type} content={content} setContent={setContent} destinations={destinations}
                         quota={quota} currentQuota={currentQuota} setCurrentQuota={setCurrentQuota}
                         setImgAsFile={setImgAsFile} position={position} setPosition={setPosition}
+                        setError={setError} isQuotaNegative={isQuotaNegative}
                     />
                 }
             </div>
@@ -204,11 +203,21 @@ function AddPost(){
             <button
                 className="flex w-full align-center justify-center items-center gap-2 bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded"
                 type="submit"
-                onClick={onSubmit}
+                onClick={(e) => {
+                    e.preventDefault();
+                    onSubmit()
+                }}
             >
                 Submit
                 {SubmitIcon}
             </button>
+            <Toast>
+                <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-cyan-100 text-cyan-500 dark:bg-cyan-800 dark:text-cyan-200">
+                    {SubmitIcon}
+                </div>
+                <div className="ml-3 text-sm font-normal">Set yourself free.</div>
+                <Toast.Toggle />
+            </Toast>
         </main>
     );
 }
