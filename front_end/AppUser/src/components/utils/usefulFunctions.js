@@ -52,6 +52,24 @@ async function getProfilePicByUsername (username) {
     }
 }
 
+async function getUserInfoByUsername (username) {
+    try {
+        let res = await fetch(`/db/user/singleuser?name=${username}`)
+            if (res.ok) {
+                res = await res.json();
+                return {
+                    profilePicture: res.profilePicture,
+                    typeUser: res.typeUser,
+                    _id: res._id,
+                    characters: res.characters,
+                    maxQuota: res.maxQuota
+                };
+            }
+    } catch (e) {
+        console.log(e)
+    }
+}
+
 function parseTime(post){
     let now = new Date().getTime()
     let timePassed = (now - new Date(post.dateOfCreation).getTime()) / 1000
@@ -153,5 +171,6 @@ export {
     compressBlob,
     getEmbed,
     checkChannelExists,
-    checkUserExists
+    checkUserExists,
+    getUserInfoByUsername
 }

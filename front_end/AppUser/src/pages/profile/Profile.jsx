@@ -1,7 +1,7 @@
-import {getUsernameFromLocStor, getQuotaByUsername, getPostByUsername ,getProfilePicByUsername, compressBlob, blob2base64} from "../../components/utils/usefulFunctions.js";
-import {useEffect, useState} from "react";
-import {ProfilePic} from "../../components/assets/index.jsx"
+import {getUsernameFromLocStor, getPostByUsername, getUserInfoByUsername, compressBlob, blob2base64} from "../../components/utils/usefulFunctions.js";
+import {useEffect, useRef, useState} from "react";
 import Post from "../../components/posts/Post.jsx";
+import {Spinner} from "flowbite-react";
 
 let imageObj = null;
 
@@ -11,17 +11,18 @@ function Profile () {
     const [pic, setPic] = useState(null);
     const [btnChangePic, setBtnChangePic] = useState(false);
     const [imgEmpty, setImgEmpty] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
-    const [quota, setQuota] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
     const [isLink, setIsLink] = useState(false)
+
+    const user = useRef(null);
+
 
     const changePic = async () => {
         try {
             if (imageObj !== null) {
                 setImgEmpty(false);
                 let content = (isLink) ? imageObj : await blob2base64(await compressBlob(imageObj));
-                //setPic(content);
-                setPic((isLink) ? imageObj : URL.createObjectURL(imageObj));
+                user.current.profilePicture = ((isLink) ? imageObj : URL.createObjectURL(imageObj));
                 let res = await fetch("/db/user/profilePic", {
                     method: 'PUT',
                     headers: {
@@ -42,18 +43,18 @@ function Profile () {
         }
     }
 
+
+    const fetchData = async () => {
+        setIsLoading(true);
+        user.current = await getUserInfoByUsername(name);
+        const postRes = await getPostByUsername(name);
+        setPosts(postRes);
+        setIsLoading(false);
+    }
+
     useEffect(() => {
-        getPostByUsername(name)
-            .then((res) => {
-                setPosts(res);
-                getProfilePicByUsername(name)
-                  .then((res) => {
-                      setPic(res);
-                      setIsLoading(false);
-                      getQuotaByUsername(name)
-                          .then((res) => setQuota(res))
-                  })
-            })
+        fetchData()
+            .catch(console.error)
     }, []);
 
 
@@ -65,10 +66,16 @@ function Profile () {
 
     return (
         <>
+        {isLoading || user.current === null ? (
+            <div className="flex h-screen items-center justify-center">
+                <Spinner aria-label="loading profile spinner" size="xl" color="pink" />
+            </div>
+        ) : (
+            <>
             <div className={"flex flex-col h-fit"}>
                 {/* HEADER */}
                 <div className={"flex items-center justify-start p-4 border border-b-black"}>
-                    <img className={"w-20 h-20 rounded-full object-cover"} src={pic} alt={"profile"} />
+                    <img className={"w-20 h-20 rounded-full object-cover"} src={user.current.profilePicture} alt={"profile"} />
                     <div className="flex flex-col h-full justify-between ml-4">
                         <span className={"text-3xl"}>{name}</span>
                         <div className={"flex justify-between"}>
@@ -78,9 +85,9 @@ function Profile () {
                     </div>
                 </div>
                 <div className={"flex flex-col justify-evenly my-2 mx-auto"}>
-                    <p className={"text-xl"}>Quota giornaliera: {!!quota && quota.characters.daily}/{!!quota && quota.maxQuota.daily}</p>
-                    <p className={"text-xl"}>Quota settimanale: {!!quota && quota.characters.weekly}/{!!quota && quota.maxQuota.weekly}</p>
-                    <p className={"text-xl"}>Quota mensile: {!!quota && quota.characters.monthly}/{!!quota && quota.maxQuota.monthly}</p>
+                    <p className={"text-xl"}>Quota giornaliera: {user.current.characters.daily}/{user.current.maxQuota.daily}</p>
+                    <p className={"text-xl"}>Quota settimanale: {user.current.characters.weekly}/{user.current.maxQuota.weekly}</p>
+                    <p className={"text-xl"}>Quota mensile: {user.current.characters.monthly}/{user.current.maxQuota.monthly}</p>
                 </div>
             </div>
             <div className="flex justify-between px-6 py-2">
@@ -96,6 +103,7 @@ function Profile () {
                 >
                     cambia foto profilo
                 </button>
+
             </div>
             {btnChangePic &&
                 <>
@@ -170,6 +178,8 @@ function Profile () {
             <div className="text-lg text-center mt-4">
                 Al momento non ci sono post!
             </div>}
+            </>
+        )}
         </>
     );
 }
