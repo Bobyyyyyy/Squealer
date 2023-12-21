@@ -15,7 +15,8 @@ router.get('/number',userController.getUsersNumber);
 router.get('/all',userController.getAllUsers);
 router.get('/getVips',userController.getVips)
 router.get('/quota',userController.getQuota);
-router.put('/quota', userController.updateMaxQuota);
+router.put('/maxquota', userController.updateMaxQuota);
+router.put('/quota', userController.updateRemainingQuota)
 router.put('/sessionVip',userController.updateSessionVip);
 router.get('/sessionVip', userController.getSessionVip);
 router.get('/info',userController.getFollnPosts);

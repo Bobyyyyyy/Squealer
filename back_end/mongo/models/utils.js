@@ -11,7 +11,7 @@ const CRITICAL_MASS_MULTIPLIER = 0.25;
 
 
 /* Characters Quota */
-const baseQuota = 50;
+const baseQuota = 250;
 const quota ={
     daily: baseQuota,
     weekly: baseQuota*6,
