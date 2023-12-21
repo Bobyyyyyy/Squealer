@@ -328,7 +328,7 @@ const updateMaxQuota = async (percentage, user, ID = -1) => {
     try{
         let updateQuota = {};
         Object.keys(quota).forEach((key)=> {
-            updateQuota[key] = percentage* (quota[key]);
+            updateQuota[key] = Math.floor((percentage/100) * (quota[key]));
         })
 
         await connection.get();
@@ -355,7 +355,7 @@ const updateMaxQuota = async (percentage, user, ID = -1) => {
                           }
                       ]
                   },
-                  'maxQuota.mohtly': {
+                  'maxQuota.monthly': {
                       $trunc:[
                           {
                               $add:[
@@ -366,7 +366,7 @@ const updateMaxQuota = async (percentage, user, ID = -1) => {
                       ]
                   }
               }
-            }]).lean()
+            }], { returnOriginal: false }).lean()
 
 
 

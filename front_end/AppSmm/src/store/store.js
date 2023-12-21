@@ -44,12 +44,9 @@ export const store = createStore({
         getQuota(state){
             return state.remainingQuota;
         },
-        /*
         getMaxQuota(state){
             return state.maxQuota;
         }
-
-         */
     }
 })
 
