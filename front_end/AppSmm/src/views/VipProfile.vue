@@ -1,5 +1,5 @@
 <script setup>
-  import {onMounted, onUnmounted, reactive, ref} from "vue";
+import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
   import {
     currentVip,
     filterValues,
@@ -30,9 +30,10 @@
   const follower= ref(0);
   const n_post = ref(0);
 
+  const squeals = computed(()=> store.getters.getSqueal);
+
   let query = ''
 
-  let curPosts= ref([]);
   let lastRequestLength = 12;
 
   async function updatePostType(newText){
@@ -43,7 +44,8 @@
 
     typePostFilter.value=newText
 
-    curPosts.value = (await getPosts(query,0))
+    store.commit('clearSqueal');
+    store.commit('pushSqueal', await getPosts(query,0) )
     readyPosts.value=true
   }
   async function updateSortFilter(newText){
@@ -53,8 +55,8 @@
     else query = query.replace(`&sort=${sortFilter.value}`, `&sort=${newText}`)
 
     sortFilter.value = newText
-
-    curPosts.value = (await getPosts(query,0))
+    store.commit('clearSqueal');
+    store.commit('pushSqueal', await getPosts(query,0) )
     readyPosts.value=true
   }
   async function updateDestFilter(newText){
@@ -69,21 +71,22 @@
       //GESTIRE IL CASO DELLA KEYWORD
 
     destFilter.value = newText;
-
-    curPosts.value = (await getPosts(query,0))
+    store.commit('clearSqueal');
+    store.commit('pushSqueal', await getPosts(query,0) )
     readyPosts.value=true
   }
 
   async function updatePost(){
     offset.value += 12;
     let posts = await getPosts(query,offset.value);
-    curPosts.value.push(...posts);
+    store.commit('pushSqueal', posts);
     return posts.length;
   }
 
   async function updateTagPosts(){
     offset.value = 12;
-    curPosts.value = await getPosts(`${query}&keyword=${keyWord.value}`);
+    store.commit('clearSqueal');
+    store.commit('pushSqueal', await getPosts(`${query}&keyword=${keyWord.value}`));
   }
 
 
@@ -96,12 +99,13 @@
 
 
   onMounted(async ()=> {
-      readyPosts.value = false
+    readyPosts.value = false
 
-      n_post.value = (await getUserInfo()).nposts;
+    store.commit('clearSqueal');
+
+    n_post.value = (await getUserInfo()).nposts;
 
     document.addEventListener('scroll', scrollEndDetector, true);
-
 
     let quota = await getUserQuota();
 
@@ -109,12 +113,13 @@
 
     query = `name=${currentVip.value}`
 
-    curPosts.value.push(...(await getPosts(query, 0)));
+    store.commit('pushSqueal',(await getPosts(query, 0)));
 
     readyPosts.value = true
-    })
+  })
 
   onUnmounted(() => {
+    store.commit('clearSqueal');
     document.removeEventListener('scroll', scrollEndDetector, true);
     offset.value = 0;
   })
@@ -177,7 +182,7 @@
         </div>
       </div>
       <div id="postContainer" v-if="readyPosts" class="d-flex flex-row flex-wrap justify-content-around mt-3">
-        <Post v-for="(post,i) in curPosts" :key="post._id"
+        <Post v-for="(post,i) in squeals" :key="post._id"
               :user="post.owner"
               :dest= "parseDestinationsViewPost(post.destinationArray, post.tags)"
               :content="post.content"

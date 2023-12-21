@@ -11,7 +11,10 @@
   import {logout} from "../../utils/functions.js";
   import NotificationBadge from "../notification/NotificationBadge.vue";
   import NotificationModal from "../notification/notificationModal.vue";
+  import {useStore} from "vuex";
 
+
+  const store = useStore();
   const modalState = reactive({addPostModal: null})
   const beforeModalPage = ref('');
   const quotaModal = ref();
@@ -42,6 +45,10 @@
 
   function restoreSidebar(){
     activeBut.value = beforeModalPage.value
+  }
+
+  function updateSqueals(post){
+    if(activeBut.value === 'Profilo') store.commit('pushSqueal',[post]);
   }
 
   //HISTORY:    Forse si può fare utilizzano le lifecycle hooks
@@ -125,7 +132,7 @@
       </ul>
     </div>
   </nav>
-  <AddPostModal ref="postModal" @restoreSideBar = "restoreSidebar" @addedPost="(post) => location.reload()" />
+  <AddPostModal ref="postModal" @restoreSideBar = "restoreSidebar" @addedPost="(post) => updateSqueals(post)" />
   <buyQuotaModal ref="quotaModal" @restoreSideBar="restoreSidebar" />
   <NotificationModal ref="notificationModal" />
 </template>
