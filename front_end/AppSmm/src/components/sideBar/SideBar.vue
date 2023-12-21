@@ -15,30 +15,22 @@
   const modalState = reactive({addPostModal: null})
   const beforeModalPage = ref('');
   const quotaModal = ref();
+  const postModal = ref();
   const notificationModal = ref()
 
   onMounted(async () => {
-    modalState.addPostModal = new Modal('#AddPostModal',{});
     modalState.notificationModal = new Modal('#notModal',{});
   })
 
   const activeBut = ref(getPage());
 
-  function openAppModal() {
-    modalState.addPostModal.show()
-  }
-  function closeAppModal(addedPost) {
-    modalState.addPostModal.hide()
-    activeBut.value = beforeModalPage.value
-    //if(addedPost && activeBut.value === 'Profilo') location.reload();
-  }
-
   function openNotificationModal () {notificationModal.value.openModal()}
 
-  function setupAppModal() {
-    openAppModal();
+  function setupPostModal(){
+    postModal.value.openModal();
     beforeModalPage.value = getPage();
   }
+
   function setupQuotaModal() {
     quotaModal.value.openModal();
     beforeModalPage.value = getPage();
@@ -46,6 +38,10 @@
 
   function getUrlPage(page){
     return "/AppSmm/"+ page.split(' ').join('');
+  }
+
+  function restoreSidebar(){
+    activeBut.value = beforeModalPage.value
   }
 
   //HISTORY:    Forse si può fare utilizzano le lifecycle hooks
@@ -90,7 +86,7 @@
                    }"
 
                    @pushTo = "(name) => {
-                     if(name === 'Aggiungi Squeal') setupAppModal()
+                     if(name === 'Aggiungi Squeal') setupPostModal()
                      else if (name === 'Compra Quota') setupQuotaModal();
                      else  $router.push(getUrlPage(name))
                    }"
@@ -129,8 +125,8 @@
       </ul>
     </div>
   </nav>
-  <AddPostModal @closeAppModal = "closeAppModal" />
-  <buyQuotaModal ref="quotaModal" />
+  <AddPostModal ref="postModal" @restoreSideBar = "restoreSidebar" @addedPost="(post) => location.reload()" />
+  <buyQuotaModal ref="quotaModal" @restoreSideBar="restoreSidebar" />
   <NotificationModal ref="notificationModal" />
 </template>
 

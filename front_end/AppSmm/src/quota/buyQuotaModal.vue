@@ -6,16 +6,20 @@ import {onMounted, reactive} from "vue";
 
 const modalStateQuota = reactive({quota: null});
 
+const emits = defineEmits(['restoreSideBar']);
+
 const openModal = () => {
   modalStateQuota.quota.show()
 }
 function closeModal() {
+  emits('restoreSideBar');
   modalStateQuota.quota.hide()
 }
 
 defineExpose({
   openModal,
 })
+
 
 onMounted(()=> {
   modalStateQuota.quota = new Modal('#buyQuotaModel',{});

@@ -13,8 +13,12 @@ const openModal = () => {
   modalState.conf.show()
 }
 function closeModal() {
+  modalState.conf.hide();
+}
+
+function closeWithPayment() {
   emits('acquisto');
-  modalState.conf.hide()
+  modalState.conf.hide();
 }
 
 
@@ -43,7 +47,7 @@ onMounted(()=> {
         </div>
         <div class="modal-footer d-flex justify-content-between">
           <button class="btn btn-lg btn-danger" @click="closeModal">Indietro</button>
-          <button class="btn btn-lg btn-primary" @click="closeModal">Paga</button>
+          <button class="btn btn-lg btn-primary" @click="closeWithPayment">Paga</button>
         </div>
       </div>
     </div>

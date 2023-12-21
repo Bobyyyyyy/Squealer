@@ -128,6 +128,24 @@ const updateMaxQuota = async(req,res) => {
     }
 }
 
+const updateRemainingQuota = async(req,res) => {
+    try{
+        let type = req.body.type;
+        let user = req.session.type === 'smm' ? req.session.vip : req.session.user;
+        if(!['D','W','M'].includes(type)) throw createError('tipo di quota invalido', 404);
+
+        let response = await userModel.resetQuota(type,user);
+
+        res.status(200).send({
+            message:`quota ${type === 'D' ? 'giornaliera' : type === 'W' ? 'settimanale' : 'mensile'} resettata con successo`,
+            newQuota: response}
+        );
+    }
+    catch (err) {
+        res.status(err.statusCode).send(err.message);
+    }
+}
+
 const getFollnPosts = async(req,res)=> {
     try {
         res.send(await userModel.get_n_FollnPosts(req.query));
@@ -173,5 +191,6 @@ module.exports = {
     updateMaxQuota,
     getUserProfileByName,
     updateUserProfilePic,
-    clearDB
+    clearDB,
+    updateRemainingQuota
 }

@@ -45,9 +45,29 @@
     modalConf.value.openModal();
   }
 
+  async function quotaReset (type){
+    let res = await fetch('/db/user/quota', {
+      method: 'PUT',
+      headers:{
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        type: type,
+      })
+    })
+    if(res.ok){
+      let data = await res.json();
+      console.log("ENTRO:", data);
+      store.commit('setQuota',data.newQuota);
+      $toast.success(data.message, {position: 'top-right'});
+    }
+    else {
+      $toast.error(`errore ${res.statusCode}: ${(await res.json()).message}`)
+    }
+  }
   async function fetchPayment(){
     if (upgrade.value) {
-      let res = await fetch('/db/user/quota', {
+      let res = await fetch('/db/user/maxquota', {
         method: 'PUT',
         headers:{
           "Content-Type": "application/json",
@@ -66,9 +86,9 @@
       }
     }
 
-    if (resetDaily.value){
-      let res = await fetch('')
-    }
+    if (resetDaily.value) await quotaReset('D');
+    if (resetWeekly.value) await quotaReset('W');
+    if (resetMonthly.value) await quotaReset('M');
 
     emits('closeModal');
   }
