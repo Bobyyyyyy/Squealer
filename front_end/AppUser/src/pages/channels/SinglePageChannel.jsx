@@ -34,24 +34,6 @@ function SinglePageChannel() {
 
     const canSeePosts = useRef(false);
 
-    const fetchAllPosts = async () => {
-        try {
-            let res = await fetch(`/db/post/all?offset=0&limit=10&channel=${nome}`);
-            console.log(res);
-            if (!res.ok) {
-                console.log("errore nel fetching dei post");
-            }
-
-            let allPosts = await res.json();
-
-            setPosts(allPosts);
-            setIsLoading(false)
-
-        } catch (e) {
-            console.log(e);
-        }
-    };
-
     const handleFollow = () => {
         fetch(`/db/channel/follower`, {
             method:"POST",
@@ -70,7 +52,6 @@ function SinglePageChannel() {
     }
 
     const fetchData = async () => {
-        setIsLoading(true);
         let res = await fetch(`/db/channel/${nome}`);
         res = await res.json();
         setDescription(res.description)
@@ -87,8 +68,8 @@ function SinglePageChannel() {
         if (canSeePosts) {
             const resPost = await getPostByChannelName(nome);
             setPosts(resPost);
+            setIsLoading(false)
         }
-        setIsLoading(false)
     }
 
     useEffect(() => {
