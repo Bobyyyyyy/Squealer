@@ -16,7 +16,8 @@ export const store = createStore({
                 daily: 0,
                 weekly: 0,
                 monthly: 0,
-            }
+            },
+            currentSqueals: []
         }
     },
     mutations: {
@@ -39,17 +40,23 @@ export const store = createStore({
             state.maxQuota.weekly = maxQuota.weekly;
             state.maxQuota.monthly = maxQuota.monthly;
         },
+        pushSqueal(state, squeals){
+            state.currentSqueals.push(...squeals);
+        },
+        clearSqueal(state){
+            state.currentSqueals = [];
+        }
     },
     getters:{
         getQuota(state){
             return state.remainingQuota;
         },
-        /*
         getMaxQuota(state){
             return state.maxQuota;
+        },
+        getSqueal(state){
+            return state.currentSqueals;
         }
-
-         */
     }
 })
 

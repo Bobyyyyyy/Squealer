@@ -21,7 +21,6 @@ const parse2timestamp = (frequency) => {
  */
 const resetQuota = async (type) => {
     try{
-        //AGGIUNERE CASI DI ERROR
         await UMM.resetQuota(type)
 
     }catch (err){

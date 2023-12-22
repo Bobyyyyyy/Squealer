@@ -284,10 +284,7 @@ const addPost = async (post,quota) => {
                 }
             } );
         }
-
-
-
-        return {postId: newPost._id};
+        return {post: newPost};
     }
     catch(err){
         throw err;
