@@ -1,4 +1,4 @@
-import {Modal, ToggleSwitch} from "flowbite-react";
+import {Modal} from "flowbite-react";
 import {CheckIcon} from "../../../components/assets/index.jsx";
 
 function AddAdminModal({isOpen, setIsOpen, followers, channelName, hasUpdated, setHasUpdated}) {

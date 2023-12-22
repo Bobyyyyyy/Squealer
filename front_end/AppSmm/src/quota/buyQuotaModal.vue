@@ -1,7 +1,7 @@
 <script setup>
 import {currentVip} from "../utils/config.js";
 import {Modal} from "bootstrap";
-import BuyQuota from "./BuyQuota.vue";
+import BuyQuotaModal from "./BuyQuota.vue";
 import {onMounted, reactive} from "vue";
 
 const modalStateQuota = reactive({quota: null});

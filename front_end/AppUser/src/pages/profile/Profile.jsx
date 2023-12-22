@@ -1,7 +1,15 @@
-import {getUsernameFromLocStor, getPostByUsername, getUserInfoByUsername, compressBlob, blob2base64} from "../../utils/usefulFunctions.js";
-import {useEffect, useRef, useState} from "react";
+import {
+    getUsernameFromLocStor,
+    getPostByUsername,
+    getUserInfoByUsername,
+    compressBlob,
+    blob2base64,
+    getQuotaByUsername
+} from "../../utils/usefulFunctions.js";
+import React, {useEffect, useRef, useState} from "react";
 import Post from "../../components/posts/Post.jsx";
-import {Spinner} from "flowbite-react";
+import {Button, Spinner} from "flowbite-react";
+import BuyQuotaModal from "./modals/BuyQuotaModal.jsx";
 
 let imageObj = null;
 
@@ -12,6 +20,11 @@ function Profile () {
     const [imgEmpty, setImgEmpty] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [isLink, setIsLink] = useState(false)
+    const [quota, setQuota] = useState(null);
+    const [updatedQuota, setUpdatedQuota] = useState(false);
+
+    const [showBuyQuotaModal, setShowBuyQuotaModal] = useState(false);
+    const [showSmmModal, setShowSmmModal] = useState(false);
 
     const user = useRef(null);
 
@@ -31,8 +44,10 @@ function Profile () {
                         newProfilePic: content
                     }),
                 });
-                setBtnChangePic(false)
-                location.reload();
+                if (res.ok) {
+                    setBtnChangePic(false)
+                    location.reload();
+                }
             } else {
                 setImgEmpty(true);
             }
@@ -42,9 +57,16 @@ function Profile () {
         }
     }
 
+    const handleLogout = async () => {
+        let res = await fetch("/logout");
+        window.location.href= res.url;
+        localStorage.clear();
+    }
 
     const fetchData = async () => {
         setIsLoading(true);
+        const quotaRes = await getQuotaByUsername(name);
+        setQuota(quotaRes);
         user.current = await getUserInfoByUsername(name);
         console.log(user.current)
         const postRes = await getPostByUsername(name);
@@ -57,12 +79,14 @@ function Profile () {
             .catch(console.error)
     }, []);
 
-
-    const handleLogout = async () => {
-        let res = await fetch("/logout");
-        window.location.href= res.url;
-        localStorage.clear();
-    }
+    useEffect(() => {
+        getQuotaByUsername(name)
+            .then((res) => {
+                setQuota(res);
+                console.log(res);
+                setUpdatedQuota(false);
+            })
+    }, [updatedQuota])
 
     return (
         <>
@@ -85,9 +109,9 @@ function Profile () {
                     </div>
                 </div>
                 <div className={"flex flex-col justify-evenly my-2 mx-auto"}>
-                    <p className={"text-xl"}>Quota giornaliera: {user.current.characters.daily}/{user.current.maxQuota.daily}</p>
-                    <p className={"text-xl"}>Quota settimanale: {user.current.characters.weekly}/{user.current.maxQuota.weekly}</p>
-                    <p className={"text-xl"}>Quota mensile: {user.current.characters.monthly}/{user.current.maxQuota.monthly}</p>
+                    <p className={"text-xl"}>Quota giornaliera: {quota.characters.daily < 0 ? 0 : quota.characters.daily}/{quota.maxQuota.daily}</p>
+                    <p className={"text-xl"}>Quota settimanale: {quota.characters.weekly < 0 ? 0 : quota.characters.weekly}/{quota.maxQuota.weekly}</p>
+                    <p className={"text-xl"}>Quota mensile: {quota.characters.monthly < 0 ? 0 : quota.characters.monthly}/{quota.maxQuota.monthly}</p>
                 </div>
             </div>
             <div className="flex flex-wrap justify-between gap-4 px-6 py-2">
@@ -95,21 +119,22 @@ function Profile () {
                     className="bg-primary px-4 py-2  text-lg rounded"
                     onClick={handleLogout}
                 >
-                    disconettiti
+                    Disconettiti
                 </button>
                 <button
                     className="bg-primary px-4 py-2  text-lg rounded"
                     onClick={()=>setBtnChangePic(!btnChangePic)}
                 >
-                    cambia foto profilo
+                    Cambia foto profilo
                 </button>
                 {user.current.typeUser === "vip" &&
                 <>
-                    <button
-                        className="bg-primary px-4 py-2  text-lg rounded"
+                    <Button
+                        onClick={()=>setShowBuyQuotaModal(true)}
                     >
                         Compra quota
-                    </button>
+                    </Button>
+                    <BuyQuotaModal isOpen={showBuyQuotaModal} setIsOpen={setShowBuyQuotaModal} setHasUpdated={setUpdatedQuota}/>
                     <button
                         className="bg-primary px-4 py-2  text-lg rounded"
                     >

@@ -5,12 +5,10 @@ import {
     AddIcon,
     ChannelIcon,
     HomeIcon,
-    Logo,
     SearchIcon,
     UserIcon
 } from "../components/assets/index.jsx"
 
-import sidebar from "../components/navbar/pc/Sidebar.jsx";
 
 export default function RootLayout() {
     const navigationButtons = [
