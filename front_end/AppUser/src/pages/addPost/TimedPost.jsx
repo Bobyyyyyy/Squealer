@@ -8,15 +8,15 @@ function TimedPost({frequency, numberOfPosts, setNumberOfPosts}) {
     const [days, setDays] = useState(0);
 
     const parseInMs = () => {
-        let totalSec = seconds + 60*(minutes + 60*(hours + 24 * days));
-        return totalSec*1000;
+        let sec = (seconds !== '') ? parseInt(seconds) : 0;
+        let minInSec = (minutes !== '') ? parseInt(minutes) * 60 : 0;
+        let hourInSec = (hours   !== '') ? parseInt(hours) * 60 * 60 : 0;
+        let dayInSec = (days   !== '') ? parseInt(days) * 60 * 60 * 24 : 0;
+        return (sec + minInSec + hourInSec + dayInSec) * 1000;
     }
 
     useEffect(() => {
         frequency.current = parseInMs();
-
-        console.log(seconds, minutes, hours, days)
-        console.log(frequency.current)
     }, [seconds, minutes, hours, days]);
 
     return (

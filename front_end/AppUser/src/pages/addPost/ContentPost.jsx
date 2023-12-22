@@ -12,12 +12,14 @@ function ContentPost({type, quota, currentQuota, setCurrentQuota,
     const quotaForImg = 125;
 
     const handleQuotaChange = (e, type) => {
-        const quota2remove = (type === "text") ? e.target.value.length : quotaForImg;
-        updateQuota(quota2remove)
+        if (has2removeQuota()) {
+            const quota2remove = (type === "text") ? e.target.value.length : quotaForImg;
+            updateQuota(quota2remove)
+        }
     }
 
     const has2removeQuota = () => {
-        return !!destinations.includes("§");
+        return destinations.includes("§");
     }
 
     const updateQuota = (quota2remove) => {
@@ -25,7 +27,7 @@ function ContentPost({type, quota, currentQuota, setCurrentQuota,
         let remainingWquota = quota.characters.weekly + ((remainingDquota < 0) ? remainingDquota : 0);
         let remainingMquota = quota.characters.monthly + ((remainingWquota < 0) ? remainingWquota : 0);
 
-        setError( remainingMquota < 0? "hai finito la quota mensile" : "");
+        setError(remainingMquota < 0? "hai finito la quota mensile" : "");
 
         remainingDquota = (remainingDquota < 0) ? 0 : remainingDquota;
         remainingWquota = (remainingWquota < 0) ? 0 : remainingWquota;

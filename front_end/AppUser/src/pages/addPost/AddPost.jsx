@@ -24,6 +24,19 @@ function AddPost(){
     const frequencyMs = useRef(0);
     const [numberOfPosts, setNumberOfPosts] = useState(1)
 
+    const infoNum = "{NUM}";
+    const infoTime = "{TIME}";
+    const infoDate = "{DATE}";
+    const infoTimedText = (
+        <div className="flex flex-col flex-wrap w-full mb-4 text-md font-normal justify-center items-center">
+            <span className="text-lg">Sintassi Squeal:</span>
+            <span> <span className="font-semibold">{infoNum}</span> numero corrente dello squeal</span>
+            <span> <span className="font-semibold">{infoTime}</span> tempo di pubblicazione dello squeal</span>
+            <span> <span className="font-semibold">{infoDate}</span> data di pubblicazione dello squeal</span>
+        </div>
+    );
+
+
     function parseDestinations(dests) {
         let finalDest = [];
         let allDest = dests.replaceAll(" ", "").split(",");
@@ -102,18 +115,12 @@ function AddPost(){
         };
 
         if (isTimed) {
-            //post.timed =
+            post.timed = true;
+            post.millis = frequencyMs.current;
+            post.squealNumber = parseInt(numberOfPosts);
         }
-
-        return (
-            {
-                contentType: type,
-                dateOfCreation: Date.now(),
-                creator: username,
-                destinations: dests,
-                content: content2send
-            }
-        );
+        console.log(post)
+        return post;
     }
 
     const onSubmit = async () => {
@@ -225,6 +232,11 @@ function AddPost(){
                         </label>
                 </div>
             </div>
+            {isTimed && type === "text" &&
+                <>
+                    {infoTimedText}
+                </>
+            }
             {isTimed && <TimedPost frequency={frequencyMs} numberOfPosts={numberOfPosts} setNumberOfPosts={setNumberOfPosts}/>}
             {!!error && <div className="flex w-full justify-start text-xl text-red-600 mb-4">
                 {error}
