@@ -42,9 +42,14 @@ export const store = createStore({
         },
         pushSqueal(state, squeals){
             state.currentSqueals.push(...squeals);
+            console.log(state.currentSqueals);
         },
         clearSqueal(state){
             state.currentSqueals = [];
+        },
+        pushHeadSqueal(state, squeal){
+            state.currentSqueals.unshift(squeal.post);
+            console.log(state.currentSqueals);
         }
     },
     getters:{

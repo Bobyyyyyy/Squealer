@@ -173,7 +173,7 @@
       if (res.ok) {
         reset();
         $toast.success('Squal aggiunto con successo!', {position: 'top-right'});
-        closeModal(true, {post: await res.json()});
+        closeModal(true, await res.json());
 
         if (timed.value) {
           setupBeep(numberOfRepetitions.value, numFrequency.value, typeFrequency.value);
@@ -360,7 +360,7 @@
                   <div class="d-flex flex-row justify-content-end flex-fill align-items-end">
                     <button type="button" class="btn btn-danger m-1"
                             @click="closeModal(false); reset()">Indietro</button>
-                    <button  type="" class="btn btn-primary m-1" > Crea Squeal </button>
+                    <button type="submit" class="btn btn-primary m-1" > Crea Squeal </button>
                   </div>
                 </div>
 

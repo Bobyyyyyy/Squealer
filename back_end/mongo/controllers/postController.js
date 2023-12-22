@@ -9,7 +9,7 @@ const createPost = async (req,res) => {
         if (req.body.post?.timed) {
             await CronController.createScheduledPost(postSaved._id, req.body.post.frequency, req.body.post.squealNumber, req.body.post.content, req.body.post.contentType);
         }
-        res.send({post: postSaved})
+        res.send(postSaved)
     }
     catch (error){
         res.status(error.statusCode).send(error.message);

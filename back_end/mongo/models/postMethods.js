@@ -285,7 +285,7 @@ const addPost = async (post,quota) => {
                 }
             } );
         }
-        return {post: newPost};
+        return {post: newPost.toObject()};
     }
     catch(err){
         throw err;

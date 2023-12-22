@@ -48,7 +48,7 @@
   }
 
   function updateSqueals(post){
-    if(activeBut.value === 'Profilo') store.commit('pushSqueal',[post]);
+    if(activeBut.value === 'Profilo') store.commit('pushHeadSqueal',post);
   }
 
   //HISTORY:    Forse si può fare utilizzano le lifecycle hooks
