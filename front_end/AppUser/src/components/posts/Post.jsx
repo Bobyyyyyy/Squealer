@@ -60,12 +60,8 @@ function Post({post}) {
     return(
     <>
         <div className="w-full md:w-[32rem] border border-gray-200">
-            <Suspense fallback={<Caricamento />}>
-                <Title post={post} />
-            </Suspense>
-            <div>
-                <Body post={post} />
-            </div>
+            <Title post={post} />
+            <Body post={post} />
             <div className="flex w-full justify-evenly py-2 px-4" >
                 {buttonsReaction.map( (item) => (
                     <button
@@ -81,13 +77,6 @@ function Post({post}) {
     </>
     );
 
-}
-function Caricamento () {
-    return (
-        <h1>
-            caricamento
-        </h1>
-    );
 }
 
 export default Post;

@@ -165,7 +165,6 @@ function Profile () {
                     </div>
                 </>
             }
-            {isLoading && <h1>Caricamento...</h1>}
             {posts.map((post)=> {
                 //console.log("id",post._id)
                 return(
