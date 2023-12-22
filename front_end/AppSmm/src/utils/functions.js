@@ -210,7 +210,6 @@ function setupBeep(times, interval, frequency){
     }
 }
 
-
 export{
     getPage,
     getPosts,
@@ -227,5 +226,5 @@ export{
     getLast30Days,
     parseContentText,
     logout,
-    setupBeep
+    setupBeep,
 }
