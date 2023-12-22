@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Modal, Button, Radio, Label } from 'flowbite-react';
-import {getUsernameFromLocStor} from "../../../components/utils/usefulFunctions.js";
+import {getUsernameFromLocStor} from "../../../utils/usefulFunctions.js";
 function CreateChannelModal({ isOpen, setIsOpen, setNuovoCanale}) {
 
     const [name, setName] = useState('');

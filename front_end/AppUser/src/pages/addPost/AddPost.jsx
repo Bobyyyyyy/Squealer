@@ -6,7 +6,7 @@ import {
     compressBlob, getEmbed,
     getQuotaByUsername,
     getUsernameFromLocStor
-} from "../../components/utils/usefulFunctions.js";
+} from "../../utils/usefulFunctions.js";
 import {Toast} from "flowbite-react";
 import TimedPost from "./TimedPost.jsx";
 

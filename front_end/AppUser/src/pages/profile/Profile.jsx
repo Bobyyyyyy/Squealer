@@ -1,4 +1,4 @@
-import {getUsernameFromLocStor, getPostByUsername, getUserInfoByUsername, compressBlob, blob2base64} from "../../components/utils/usefulFunctions.js";
+import {getUsernameFromLocStor, getPostByUsername, getUserInfoByUsername, compressBlob, blob2base64} from "../../utils/usefulFunctions.js";
 import {useEffect, useRef, useState} from "react";
 import Post from "../../components/posts/Post.jsx";
 import {Spinner} from "flowbite-react";
@@ -8,7 +8,6 @@ let imageObj = null;
 function Profile () {
     const name = getUsernameFromLocStor();
     const [posts, setPosts] = useState([]);
-    const [pic, setPic] = useState(null);
     const [btnChangePic, setBtnChangePic] = useState(false);
     const [imgEmpty, setImgEmpty] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -47,6 +46,7 @@ function Profile () {
     const fetchData = async () => {
         setIsLoading(true);
         user.current = await getUserInfoByUsername(name);
+        console.log(user.current)
         const postRes = await getPostByUsername(name);
         setPosts(postRes);
         setIsLoading(false);
@@ -90,7 +90,7 @@ function Profile () {
                     <p className={"text-xl"}>Quota mensile: {user.current.characters.monthly}/{user.current.maxQuota.monthly}</p>
                 </div>
             </div>
-            <div className="flex justify-between px-6 py-2">
+            <div className="flex flex-wrap justify-between gap-4 px-6 py-2">
                 <button
                     className="bg-primary px-4 py-2  text-lg rounded"
                     onClick={handleLogout}
@@ -103,7 +103,19 @@ function Profile () {
                 >
                     cambia foto profilo
                 </button>
-
+                {user.current.typeUser === "vip" &&
+                <>
+                    <button
+                        className="bg-primary px-4 py-2  text-lg rounded"
+                    >
+                        Compra quota
+                    </button>
+                    <button
+                        className="bg-primary px-4 py-2  text-lg rounded"
+                    >
+                        Gestisci SMM
+                    </button>
+                </>}
             </div>
             {btnChangePic &&
                 <>
@@ -166,7 +178,6 @@ function Profile () {
                 </>
             }
             {posts.map((post)=> {
-                //console.log("id",post._id)
                 return(
                     <Post
                         key={post._id}

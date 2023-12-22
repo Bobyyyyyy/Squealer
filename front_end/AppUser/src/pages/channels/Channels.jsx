@@ -4,7 +4,7 @@ import Searchbar from "../search/Searchbar.jsx";
 import {Link} from "react-router-dom";
 import CreateChannelModal from "./modals/CreateChannelModal.jsx";
 import FiltersModal from "./modals/FiltersModal.jsx";
-import {getUsernameFromLocStor} from "../../components/utils/usefulFunctions.js";
+import {getUsernameFromLocStor} from "../../utils/usefulFunctions.js";
 
 function Channels () {
 

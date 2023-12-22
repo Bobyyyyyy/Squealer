@@ -1,6 +1,6 @@
 import {useLoaderData} from "react-router-dom";
 import {useEffect, useState} from "react";
-import {getPostByUsername} from "../../components/utils/usefulFunctions.js";
+import {getPostByUsername} from "../../utils/usefulFunctions.js";
 import Post from "../../components/posts/Post.jsx";
 import {Spinner} from 'flowbite-react'
 

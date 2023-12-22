@@ -3,7 +3,7 @@ import React, {Suspense, useEffect, useState} from "react";
 import {
     getUsernameFromLocStor,
     setUsernameInLocStor
-} from "../../components/utils/usefulFunctions.js";
+} from "../../utils/usefulFunctions.js";
 
 function Home() {
     const [isLoading, setIsLoading] = useState(true);

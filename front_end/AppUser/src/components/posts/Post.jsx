@@ -5,7 +5,7 @@ import Title from "./Title.jsx";
 import {
     Dislike, Like, Heart, MadIcon, ProfilePic
 } from "../assets/index.jsx"
-import {getUsernameFromLocStor} from "../utils/usefulFunctions.js";
+import {getUsernameFromLocStor} from "../../utils/usefulFunctions.js";
 
 function Post({post}) {
 

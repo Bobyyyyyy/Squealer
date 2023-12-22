@@ -16,7 +16,7 @@ import {
 import React from "react";
 import RootLayout from "./layouts/RootLayout.jsx";
 import SinglePageChannel from "./pages/channels/SinglePageChannel.jsx";
-import {checkChannelExists, checkUserExists} from "./components/utils/usefulFunctions.js";
+import {checkChannelExists, checkUserExists} from "./utils/usefulFunctions.js";
 import ErrorPage from "./pages/ErrorPage.jsx";
 import PageProfileByName from "./pages/profile/PageProfileByName.jsx";
 function App() {

@@ -1,6 +1,6 @@
 import {useLoaderData, useParams} from "react-router-dom";
 import React, {Suspense, useEffect, useRef, useState} from "react";
-import {getUsernameFromLocStor} from "../../components/utils/usefulFunctions.js";
+import {getPostByChannelName, getUsernameFromLocStor} from "../../utils/usefulFunctions.js";
 import Post from "../../components/posts/Post.jsx";
 import {FollowIcon, DontFollow} from "../../components/assets/index.jsx";
 import {Button} from "flowbite-react";
@@ -69,36 +69,31 @@ function SinglePageChannel() {
             })
     }
 
+    const fetchData = async () => {
+        setIsLoading(true);
+        let res = await fetch(`/db/channel/${nome}`);
+        res = await res.json();
+        setDescription(res.description)
+        setRole(res.role);
+        canSeePosts.current = (res.role !== "Not Follower" || res.role !== "Pending");
+        setFollowers(res.followers.sort((a,b) => (a.user > b.user) ? 1 : ((b.user > a.user) ? -1 : 0)))
+        setAdmins(res.admins.sort())
+        setType(res.type);
+        setRequests(res.requests)
+        setHasUpdatedReq(false);
+        setHasUpdatedFol(false);
+        setHasUpdatedAddAdm(false);
+        setHasUpdatedRmAdm(false);
+        if (canSeePosts) {
+            const resPost = await getPostByChannelName(nome);
+            setPosts(resPost);
+        }
+        setIsLoading(false)
+    }
+
     useEffect(() => {
-        fetch(`/db/channel/${nome}`)
-            .then((res) => {
-                if (res.ok) {
-                    res.json()
-                        .then((res)=> {
-                            console.log("canale", res)
-                            setDescription(res.description)
-                            setRole(res.role);
-                            console.log("role", res.role);
-                            canSeePosts.current = (res.role !== "Not Follower" || res.role !== "Pending");
-                            setFollowers(res.followers.sort((a,b) => (a.user > b.user) ? 1 : ((b.user > a.user) ? -1 : 0)))
-                            setAdmins(res.admins.sort())
-                            setType(res.type);
-                            setRequests(res.requests)
-                            setHasUpdatedReq(false);
-                            setHasUpdatedFol(false);
-                            setHasUpdatedAddAdm(false);
-                            setHasUpdatedRmAdm(false);
-                        })
-                        .then(() => {
-                            if (canSeePosts) {
-                                fetchAllPosts()
-                                    .then()
-                            }
-                        })
-                } else {
-                    throw Error(`Non esiste il canale ${nome}`);
-                }
-            })
+        fetchData()
+            .catch(console.error)
     }, [hasUpdatedReq, hasUpdatedFol, hasUpdatedAddAdm, hasUpdatedRmAdm]);
 
     return (

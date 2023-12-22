@@ -1,4 +1,4 @@
-import {getProfilePicByUsername, getUsernameFromLocStor, parseTime} from "../utils/usefulFunctions.js";
+import {getProfilePicByUsername, getUsernameFromLocStor, parseTime} from "../../utils/usefulFunctions.js";
 import React, {Suspense, useEffect, useState} from "react";
 import {Link} from "react-router-dom";
 
@@ -38,7 +38,6 @@ function Title({post}) {
                             {post.destinationArray.map((dest) => {
                                 const isUser = dest.destType === "user";
                                 const name = (isUser ? "@" : "§") + dest.name;
-                                console.log(dest.name, name)
                                 const path = isUser ? `/search/${dest.name}` : `/channels/${dest.name}`;
                                 return(
                                     <Link to={path} key={dest._id}>

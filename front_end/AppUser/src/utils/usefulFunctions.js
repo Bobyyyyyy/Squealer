@@ -39,6 +39,19 @@ async function getPostByUsername(username){
     }
 }
 
+async function getPostByChannelName(channelName){
+    try {
+        let res = await fetch(`/db/post/all?offset=0&limit=10&channel=${channelName}`,{
+            method: 'GET',
+        });
+        if (res.ok) {
+            return await res.json();
+        }
+    } catch (e) {
+        console.log(e);
+    }
+}
+
 async function getProfilePicByUsername (username) {
     try {
         let res = await fetch(`/db/user/profilePic?name=${username}`);
@@ -160,6 +173,8 @@ const checkUserExists = async ({params}) => {
     return sol;
 }
 
+
+
 export {
     getUsernameFromLocStor,
     setUsernameInLocStor,
@@ -172,5 +187,6 @@ export {
     getEmbed,
     checkChannelExists,
     checkUserExists,
-    getUserInfoByUsername
+    getUserInfoByUsername,
+    getPostByChannelName
 }
