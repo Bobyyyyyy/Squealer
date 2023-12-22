@@ -85,7 +85,7 @@
 
   /* QUOTA */
   const quota2remove = computed(() => (postType.value === 'text' ? textSqueal.value.length : postType.value === 'Select type' ? 0 : 125)
-      * (timed.value && numberOfRepetitions.value > 2 ? parseInt(numberOfRepetitions.value) : 1)
+      * (timed.value && numberOfRepetitions.value > 1 ? parseInt(numberOfRepetitions.value) : 1)
   );
   /* 15 è il valore tolto per immagine e geolocalizzazione */
   const getLiveDQuota = computed(()=> (store.getters.getQuota.daily - (inChannel.value ? quota2remove.value : 0)));

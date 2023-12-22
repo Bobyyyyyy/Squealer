@@ -39,7 +39,7 @@ const createScheduledPost = async (postId, millis, squealNumber, content, typeC)
         })
     }
     scheduledPostArr.push(newTimedPost)
-    return {};
+    return {inserted: true};
 }
 
 const createOfficialScheduledPost = async(canale, endpoint) => {
