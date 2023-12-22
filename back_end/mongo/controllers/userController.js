@@ -108,10 +108,15 @@ const updateMaxQuota = async(req,res) => {
 
     try{
         let percentage= req.body.percentage;
+        let user = req.session.vip;
 
         if (isNaN(percentage)) throw createError('percentage not number', 404);  //cambiare
 
-        let res = await userModel.updateMaxQuota(percentage,req.body.user)
+        let response = await userModel.updateMaxQuota(percentage,user)
+
+        if (response instanceof Error){
+            throw createError('upgrade della quota fallito', 404) // cambiare
+        }
 
         //caso di errore -> preso dal catch;
         let tsyear = new Date(new Date().setFullYear(new Date().getFullYear() + 1)).getTime();
@@ -119,13 +124,33 @@ const updateMaxQuota = async(req,res) => {
         /*
         TODO: PER POPI, in caso di altri utilizzi, bisogna creare funzione che calcola il timestamp desiderato
          */
-        createMaxQuotaJob(tsyear,percentage,req.body.user);
+        await createMaxQuotaJob(tsyear,percentage,user);
 
-        res.send(await userModel.updateMaxQuota(percentage,user));
-
+        res.status(200).send({
+                message:'upgrade avvenuto con successo!',
+                newMaxQuota: response.maxQuota,
+            });
     }
     catch(err){
-        res.send(err)
+        res.status(err.statusCode).send({message: err.message});
+    }
+}
+
+const updateRemainingQuota = async(req,res) => {
+    try{
+        let type = req.body.type;
+        let user = req.session.type === 'smm' ? req.session.vip : req.session.user;
+        if(!['D','W','M'].includes(type)) throw createError('tipo di quota invalido', 404);
+
+        let response = await userModel.resetQuota(type,user);
+
+        res.status(200).send({
+            message:`quota ${type === 'D' ? 'giornaliera' : type === 'W' ? 'settimanale' : 'mensile'} resettata con successo`,
+            newQuota: response}
+        );
+    }
+    catch (err) {
+        res.status(err.statusCode).send(err.message);
     }
 }
 
@@ -175,5 +200,6 @@ module.exports = {
     updateMaxQuota,
     getUserProfileByName,
     updateUserProfilePic,
-    clearDB
+    clearDB,
+    updateRemainingQuota
 }

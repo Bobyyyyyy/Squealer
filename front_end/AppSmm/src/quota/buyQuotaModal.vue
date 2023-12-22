@@ -6,10 +6,13 @@ import {onMounted, reactive} from "vue";
 
 const modalStateQuota = reactive({quota: null});
 
+const emits = defineEmits(['restoreSideBar']);
+
 const openModal = () => {
   modalStateQuota.quota.show()
 }
 function closeModal() {
+  emits('restoreSideBar');
   modalStateQuota.quota.hide()
 }
 
@@ -17,9 +20,11 @@ defineExpose({
   openModal,
 })
 
+
 onMounted(()=> {
   modalStateQuota.quota = new Modal('#buyQuotaModel',{});
 })
+
 
 </script>
 
@@ -29,11 +34,11 @@ onMounted(()=> {
       <div class="modal-dialog modal-dialog-centered ">
         <div class="modal-content">
           <div class="modal-header">
-            <h1 class="modal-title fs-5"> Buy quota - {{currentVip}}</h1>
+            <h1 class="modal-title fs-5 fw-bolder"> Compra quota - {{currentVip}}</h1>
             <button type="button" class="btn-close" @click="closeModal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <BuyQuota />
+            <BuyQuota @closeModal="closeModal" />
           </div>
         </div>
       </div>

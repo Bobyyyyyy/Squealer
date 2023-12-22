@@ -5,11 +5,11 @@ const {mongo} = require("mongoose");
 
 const createPost = async (req,res) => {
     try{
-        let postSavedId = await postModel.addPost(req.body.post, req.body.quota)
+        let postSaved = await postModel.addPost(req.body.post, req.body.quota)
         if (req.body.post?.timed) {
-            await CronController.createScheduledPost(postSavedId.postId, req.body.post.frequency, req.body.post.squealNumber, req.body.post.content, req.body.post.contentType);
+            await CronController.createScheduledPost(postSaved.post._id, req.body.post.millis, req.body.post.squealNumber, req.body.post.content, req.body.post.contentType);
         }
-        res.status(200).send({id: postSavedId})
+        res.send(postSaved)
     }
     catch (error){
         res.status(error.statusCode).send(error.message);

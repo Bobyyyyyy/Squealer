@@ -278,25 +278,40 @@ const get_n_FollnPosts = async(body) => {
 /**
  *
  * @param {String} type - ['D','W','M']
+ * @param {String} user
  * @return {Promise<void>}
  */
-const resetQuota = async (type) => {
+const resetQuota = async (type, user = 'ALL_USER') => {
     try{
         await connection.get();
-
-        switch (type){
-            case 'D':
-                await User.updateMany({typeUser: {$not: {$eq:'mod'}}},[{$set: {"characters.daily": "$maxQuota.daily"}}])
-                break;
-            case 'W':
-                await User.updateMany({typeUser: {$not: {$eq:'mod'}}},[{$set: {"characters.weekly": "$maxQuota.weekly"}}])
-                break;
-            case 'M':
-                await User.updateMany({typeUser: {$not: {$eq:'mod'}}},[{$set: {"characters.monthly": "$maxQuota.monthly"}}])
-                break;
+        if (user === 'ALL_USER'){
+            switch (type){
+                case 'D':
+                    await User.updateMany({typeUser: {$not: {$eq:'mod'}}},[{$set: {"characters.daily": "$maxQuota.daily"}}])
+                    break;
+                case 'W':
+                    await User.updateMany({typeUser: {$not: {$eq:'mod'}}},[{$set: {"characters.weekly": "$maxQuota.weekly"}}])
+                    break;
+                case 'M':
+                    await User.updateMany({typeUser: {$not: {$eq:'mod'}}},[{$set: {"characters.monthly": "$maxQuota.monthly"}}])
+                    break;
+            }
         }
-
-
+        else{
+            let res ;
+            switch (type){
+                case 'D':
+                    res = await User.findOneAndUpdate({username: user},[{$set: {"characters.daily": "$maxQuota.daily"}}], { returnOriginal: false }).lean()
+                    break;
+                case 'W':
+                    res = await User.findOneAndUpdate({username: user},[{$set: {"characters.weekly": "$maxQuota.weekly"}}], { returnOriginal: false }).lean()
+                    break;
+                case 'M':
+                    res = await User.findOneAndUpdate({username: user},[{$set: {"characters.monthly": "$maxQuota.monthly"}}], { returnOriginal: false }).lean()
+                    break;
+            }
+            return res.characters;
+        }
 
     }catch (e) {
         throw(e)
@@ -351,7 +366,7 @@ const updateMaxQuota = async (percentage, user, ID = -1) => {
     try{
         let updateQuota = {};
         Object.keys(quota).forEach((key)=> {
-            updateQuota[key] = percentage* (quota[key]);
+            updateQuota[key] = Math.floor((percentage/100) * (quota[key]));
         })
 
         await connection.get();
@@ -378,7 +393,7 @@ const updateMaxQuota = async (percentage, user, ID = -1) => {
                           }
                       ]
                   },
-                  'maxQuota.mohtly': {
+                  'maxQuota.monthly': {
                       $trunc:[
                           {
                               $add:[
@@ -389,7 +404,7 @@ const updateMaxQuota = async (percentage, user, ID = -1) => {
                       ]
                   }
               }
-            }]).lean()
+            }], { returnOriginal: false }).lean()
 
 
 

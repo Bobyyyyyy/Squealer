@@ -1,15 +1,39 @@
 <script setup>
   import 'vue-toast-notification/dist/theme-sugar.css';
-  import {computed, ref} from "vue";
+  import {computed, onMounted, reactive, ref} from "vue";
   import Map from "./Map.vue";
-  import {blob2base64, compressBlob, setupBeep} from "../../utils/functions.js";
+  import {blob2base64, compressBlob, parse2timestamp, setupBeep} from "../../utils/functions.js";
   import {currentVip, URLHTTPREGEX} from "../../utils/config.js";
   import {useStore} from "vuex";
   import Select from "../Select.vue";
   import {useToast} from "vue-toast-notification";
+  import {Modal} from "bootstrap";
 
   const store = useStore();
   const $toast = useToast();
+
+  const modalState = reactive({post: null});
+
+  const emits = defineEmits(['restoreSideBar', 'addedPost']);
+
+  function openModal() {
+    modalState.post.show()
+  }
+
+  function closeModal(addedPost, post) {
+    emits('restoreSideBar');
+    if(addedPost) emits('addedPost', post);
+    modalState.post.hide()
+  }
+
+  defineExpose({
+    openModal,
+  })
+
+  onMounted(()=> {
+    modalState.post = new Modal('#AddPostModal',{});
+  })
+
 
   const infoTimed = `sintassi Squeal:<br>{NUM} per avere il numero corrente dello squeal<br>{TIME} per avere il tempo di pubblicazione dello squeal<br>{DATE} per avere la data di pubblicazione dello squeal`
 
@@ -61,7 +85,7 @@
 
   /* QUOTA */
   const quota2remove = computed(() => (postType.value === 'text' ? textSqueal.value.length : postType.value === 'Select type' ? 0 : 125)
-      * (timed.value && numberOfRepetitions.value > 2 ? parseInt(numberOfRepetitions.value) : 1)
+      * (timed.value && numberOfRepetitions.value > 1 ? parseInt(numberOfRepetitions.value) : 1)
   );
   /* 15 è il valore tolto per immagine e geolocalizzazione */
   const getLiveDQuota = computed(()=> (store.getters.getQuota.daily - (inChannel.value ? quota2remove.value : 0)));
@@ -88,19 +112,19 @@
   }
 
   async function createPost() {
-    try{
+    try {
 
       let tags = [];
 
-      if (postType.value === 'text'){
+      if (postType.value === 'text') {
         tags = textSqueal.value.match(/\#\w+/g)
         if (tags) tags = tags.map(el => el.substring(1));
       }
 
       let [tmpDest, tmpTags] = parseDestinations(receiverArr.value);
-      if (tmpTags?.length > 0 ) tags = tags.concat(tmpTags);
+      if (tmpTags?.length > 0) tags = tags.concat(tmpTags);
       //remove duplicates
-      if(tags?.length > 0) tags = tags.filter((tag,index) => tags.indexOf(tag) === index);
+      if (tags?.length > 0) tags = tags.filter((tag, index) => tags.indexOf(tag) === index);
 
       let post = {
         creator: currentVip.value,
@@ -108,9 +132,9 @@
         dateOfCreation: Date.now(),
         destinations: tmpDest,
         timed: timed.value,
-        ... (timed) && {
+        ...(timed) && {
           squealNumber: numberOfRepetitions.value,
-          frequency: [numFrequency.value.toString(),typeFrequency.value].join(' ')
+          millis: parse2timestamp([numFrequency.value.toString(), typeFrequency.value]),
         },
         ...(tags !== []) && {tags: tags}
       }
@@ -118,46 +142,50 @@
 
       /* content based on squeal type */
       let content = postType.value === 'geolocation' ? JSON.stringify(mapLocationLatLng.value.value) :
-                      postType.value === 'text' ? textSqueal.value :
-                          postType.value === 'video' ? youtubePath.value :
-                            fileUploaded.value?.length && fileUploaded.value?.length > 0 ?
-                              await blob2base64(await compressBlob(fileUploaded.value.item(0)))
-                                :currentImgPath.value;
+          postType.value === 'text' ? textSqueal.value :
+              postType.value === 'video' ? youtubePath.value :
+                  fileUploaded.value?.length && fileUploaded.value?.length > 0 ?
+                      await blob2base64(await compressBlob(fileUploaded.value.item(0)))
+                      : currentImgPath.value;
 
 
-      if (!content || content === ''){
+      if (!content || content === '') {
         return {message: 'Squeal vuoto! Dicci qualcosa'};
       }
 
       post = {...post, content: content};
 
 
-      let res = await fetch("/db/post",{
+      let res = await fetch("/db/post", {
         method: "POST",
         body: JSON.stringify({
           post: post,
           quota: {
             daily: getLiveDQuota.value < 0 ? 0 : getLiveDQuota.value,
-            weekly: getLiveWQuota.value - (getLiveDQuota.value < 0 ? - getLiveDQuota.value : 0),
-            monthly: getLiveMQuota.value - (getLiveWQuota.value < 0 ? - getLiveWQuota.value : 0),
+            weekly: getLiveWQuota.value - (getLiveDQuota.value < 0 ? -getLiveDQuota.value : 0),
+            monthly: getLiveMQuota.value - (getLiveWQuota.value < 0 ? -getLiveWQuota.value : 0),
           }
         }),
         headers: {
-          "Content-Type":"application/json"
+          "Content-Type": "application/json"
         }
       })
-      if(res?.statusCode !== 200){
+      if (res.ok) {
+        reset();
+        $toast.success('Squal aggiunto con successo!', {position: 'top-right'});
+        closeModal(true, await res.json());
+
+        if (timed.value) {
+          setupBeep(numberOfRepetitions.value, numFrequency.value, typeFrequency.value);
+        }
+      }
+      else{
         throw res;
       }
-
-      else if(timed.value){
-        setupBeep(numberOfRepetitions.value,numFrequency.value,typeFrequency.value);
-      }
-      return false;
     }
-
     catch (err){
-      return await err.json()
+      let message = await err.json()
+        $toast.error(message);
     }
   }
 
@@ -198,15 +226,7 @@
             <form id="addPostForm"  @submit="(event) => {
                       event.preventDefault();
                       createPost()
-                        .then(res => {
-                          if (res){
-                            reset();
-                            $emit('closeAppModal', true)
-                          }
-                          else{
-                            $toast.error(res.message);
-                          }
-                        })}">
+                      }">
               <div class="d-flex flex-column">
                 <div class="d-flex flex-row justify-content-between align-items-end">
                   <div class="d-flex flex-row align-items-end" style="flex:1">
@@ -312,15 +332,16 @@
                   <div v-if="timed" class="d-flex flex-row flex-fill align-items-end">
                     <div class="d-flex flex-column">
                       <label for="numTimed" class="form-label">Numero di Squeal</label>
-                      <input type="number" class="form-control" id="numTimed" v-model="numberOfRepetitions" min="1">
+                      <input type="number" class="form-control" id="numTimed" v-model="numberOfRepetitions" min="1" required>
                     </div>
                       <div class="d-flex flex-column">
                         <label for="numFrequency" class=" form-label fw-light">Intervallo</label>
-                        <input type="number" class="form-control" id="numFrequency" v-model="numFrequency" min="1">
+                        <input type="number" class="form-control" id="numFrequency" v-model="numFrequency" min="1" required>
                       </div>
                       <Select
-                          :dropItems="['seconds','minutes', 'days']"
-                          :dropItemsName="['secondi','minuti', 'giorni']"
+                          :dropItems="['seconds','minutes', 'hours']"
+                          :dropItemsName="['secondi','minuti', 'ore']"
+                          :required="true"
                           updateRef="updateTypeF"
                           classButton="btn-secondary form-select-lg "
                           @updateTypeF="(el) => typeFrequency=el"
@@ -338,8 +359,8 @@
                   </div>
                   <div class="d-flex flex-row justify-content-end flex-fill align-items-end">
                     <button type="button" class="btn btn-danger m-1"
-                            @click="$emit('closeAppModal', false); reset()">Indietro</button>
-                    <button  type="" class="btn btn-primary m-1" > Crea Squeal </button>
+                            @click="closeModal(false); reset()">Indietro</button>
+                    <button type="submit" class="btn btn-primary m-1" > Crea Squeal </button>
                   </div>
                 </div>
 

@@ -24,7 +24,7 @@
 </script>
 
 <template>
-  <div class="card-header d-flex justify-content-between header_post w-100 bg-primary">
+  <div class="d-flex justify-content-between header_post bg-secondary" style="width: 94%; margin-left: 3%; margin-right: 3%;" >
     <div class="d-flex justify-content-start align-items-center w-100">
       <div style="width: 13%">
         <img :src=" srcImg " alt="immagine profilo" class="img-fluid rounded-circle" />
