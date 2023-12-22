@@ -25,12 +25,12 @@ import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
   const typePostFilter = ref('Type');
   const keyWord = ref('');
   const sortFilter = ref('Sort');
-  const offset = ref(0);
 
   const follower= ref(0);
   const n_post = ref(0);
 
   const squeals = computed(()=> store.getters.getSqueal);
+  const offset = computed(() => store.getters.getOffset);
 
   let query = ''
 
@@ -77,23 +77,21 @@ import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
   }
 
   async function updatePost(){
-    offset.value += 12;
+    store.commit('updateOffset');
     let posts = await getPosts(query,offset.value);
     store.commit('pushSqueal', posts);
     return posts.length;
   }
 
   async function updateTagPosts(){
-    offset.value = 12;
     store.commit('clearSqueal');
     store.commit('pushSqueal', await getPosts(`${query}&keyword=${keyWord.value}`));
   }
 
 
   const scrollEndDetector = async () => {
-    if (window.innerHeight + window.pageYOffset >= document.getElementById("bodyDiv").offsetHeight && lastRequestLength === 12) {
+    if (window.innerHeight + window.pageYOffset >= document.getElementById("bodyDiv").offsetHeight && lastRequestLength >= 12) {
       lastRequestLength = await(updatePost());
-
     }
   }
 
@@ -110,8 +108,9 @@ import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
     let quota = await getUserQuota();
 
     store.commit('setQuota', quota.characters);
+    store.commit('setMaxQuota',quota.maxQuota);
 
-    query = `name=${currentVip.value}`
+    query = `name=${currentVip.value}&limit=12`
 
     store.commit('pushSqueal',(await getPosts(query, 0)));
 
@@ -121,7 +120,6 @@ import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
   onUnmounted(() => {
     store.commit('clearSqueal');
     document.removeEventListener('scroll', scrollEndDetector, true);
-    offset.value = 0;
   })
 
 </script>

@@ -2,7 +2,7 @@
   import 'vue-toast-notification/dist/theme-sugar.css';
   import {computed, onMounted, reactive, ref} from "vue";
   import Map from "./Map.vue";
-  import {blob2base64, compressBlob, setupBeep} from "../../utils/functions.js";
+  import {blob2base64, compressBlob, parse2timestamp, setupBeep} from "../../utils/functions.js";
   import {currentVip, URLHTTPREGEX} from "../../utils/config.js";
   import {useStore} from "vuex";
   import Select from "../Select.vue";
@@ -85,7 +85,7 @@
 
   /* QUOTA */
   const quota2remove = computed(() => (postType.value === 'text' ? textSqueal.value.length : postType.value === 'Select type' ? 0 : 125)
-      * (timed.value && numberOfRepetitions.value > 2 ? parseInt(numberOfRepetitions.value) : 1)
+      * (timed.value && numberOfRepetitions.value > 1 ? parseInt(numberOfRepetitions.value) : 1)
   );
   /* 15 è il valore tolto per immagine e geolocalizzazione */
   const getLiveDQuota = computed(()=> (store.getters.getQuota.daily - (inChannel.value ? quota2remove.value : 0)));
@@ -134,7 +134,7 @@
         timed: timed.value,
         ...(timed) && {
           squealNumber: numberOfRepetitions.value,
-          frequency: [numFrequency.value.toString(), typeFrequency.value].join(' ')
+          millis: parse2timestamp([numFrequency.value.toString(), typeFrequency.value]),
         },
         ...(tags !== []) && {tags: tags}
       }
@@ -173,7 +173,7 @@
       if (res.ok) {
         reset();
         $toast.success('Squal aggiunto con successo!', {position: 'top-right'});
-        closeModal(true, {post: await res.json()});
+        closeModal(true, await res.json());
 
         if (timed.value) {
           setupBeep(numberOfRepetitions.value, numFrequency.value, typeFrequency.value);
@@ -339,8 +339,8 @@
                         <input type="number" class="form-control" id="numFrequency" v-model="numFrequency" min="1" required>
                       </div>
                       <Select
-                          :dropItems="['seconds','minutes', 'days']"
-                          :dropItemsName="['secondi','minuti', 'giorni']"
+                          :dropItems="['seconds','minutes', 'hours']"
+                          :dropItemsName="['secondi','minuti', 'ore']"
                           :required="true"
                           updateRef="updateTypeF"
                           classButton="btn-secondary form-select-lg "
@@ -360,7 +360,7 @@
                   <div class="d-flex flex-row justify-content-end flex-fill align-items-end">
                     <button type="button" class="btn btn-danger m-1"
                             @click="closeModal(false); reset()">Indietro</button>
-                    <button  type="" class="btn btn-primary m-1" > Crea Squeal </button>
+                    <button type="submit" class="btn btn-primary m-1" > Crea Squeal </button>
                   </div>
                 </div>
 

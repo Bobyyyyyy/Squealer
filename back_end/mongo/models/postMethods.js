@@ -157,9 +157,9 @@ const addTimedPost = async (postId) => {
             tags: post.tags,
             content: post.contentType === 'text' ? parseText(timedInfo.content,timedInfo.done + 1) : post.content
         }
+        let delQuota = !!newPost.destinations.find(dest => dest.destType === 'channel' || dest.destType === 'official');
 
-
-        let quota2del = newPost.destType === 'user' ? 0 : (post.contentType === 'text' ? newPost.content.length : 125);
+        let quota2del = delQuota ? (post.contentType === 'text' ? newPost.content.length : 125) : 0 ;
         //GESTIRE CASI IN CUI NON PUO' INSERIRE
         let id = await addPost(newPost, {
                 daily: userQuota.daily - quota2del,
@@ -284,7 +284,7 @@ const addPost = async (post,quota) => {
                 }
             } );
         }
-        return {post: newPost};
+        return {post: newPost.toObject()};
     }
     catch(err){
         throw err;

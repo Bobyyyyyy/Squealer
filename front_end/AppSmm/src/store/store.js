@@ -17,7 +17,8 @@ export const store = createStore({
                 weekly: 0,
                 monthly: 0,
             },
-            currentSqueals: []
+            currentSqueals: [],
+            offsetSqueals: 0,
         }
     },
     mutations: {
@@ -45,6 +46,14 @@ export const store = createStore({
         },
         clearSqueal(state){
             state.currentSqueals = [];
+            state.offsetSqueals = 0;
+        },
+        pushHeadSqueal(state, squeal){
+            state.currentSqueals.unshift(squeal.post);
+            state.offsetSqueals += 1;
+        },
+        updateOffset(state){
+            state.offsetSqueals += 12;
         }
     },
     getters:{
@@ -56,6 +65,9 @@ export const store = createStore({
         },
         getSqueal(state){
             return state.currentSqueals;
+        },
+        getOffset(state){
+            return state.offsetSqueals;
         }
     }
 })
