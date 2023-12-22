@@ -339,8 +339,8 @@
                         <input type="number" class="form-control" id="numFrequency" v-model="numFrequency" min="1" required>
                       </div>
                       <Select
-                          :dropItems="['seconds','minutes', 'days']"
-                          :dropItemsName="['secondi','minuti', 'giorni']"
+                          :dropItems="['seconds','minutes', 'hours']"
+                          :dropItemsName="['secondi','minuti', 'ore']"
                           :required="true"
                           updateRef="updateTypeF"
                           classButton="btn-secondary form-select-lg "

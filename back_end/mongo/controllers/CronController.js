@@ -30,7 +30,7 @@ const resetQuota = async (type) => {
 /**
  *
  * @param {Types.ObjectId} postId
- * @param {String} frequency - Interval, type of time (e.g. 5 seconds, 9 days, ... )
+ * @param {String} frequency - Interval, type of time (e.g. 5 seconds, 9 hours, ... )
  * @param {String} content  - content of Squeal. Used for parse {NUM}, ...
  * @param {String} typeC - content type. Used for store only text content.
  * @param {Number} squealNumber - number of squeal of scheduled Squeal
