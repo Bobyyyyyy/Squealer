@@ -2,7 +2,7 @@
   import 'vue-toast-notification/dist/theme-sugar.css';
   import {computed, onMounted, reactive, ref} from "vue";
   import Map from "./Map.vue";
-  import {blob2base64, compressBlob, setupBeep} from "../../utils/functions.js";
+  import {blob2base64, compressBlob, parse2timestamp, setupBeep} from "../../utils/functions.js";
   import {currentVip, URLHTTPREGEX} from "../../utils/config.js";
   import {useStore} from "vuex";
   import Select from "../Select.vue";
@@ -134,7 +134,7 @@
         timed: timed.value,
         ...(timed) && {
           squealNumber: numberOfRepetitions.value,
-          frequency: [numFrequency.value.toString(), typeFrequency.value].join(' ')
+          millis: parse2timestamp([numFrequency.value.toString(), typeFrequency.value]),
         },
         ...(tags !== []) && {tags: tags}
       }

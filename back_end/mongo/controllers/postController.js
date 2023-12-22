@@ -7,7 +7,7 @@ const createPost = async (req,res) => {
     try{
         let postSaved = await postModel.addPost(req.body.post, req.body.quota)
         if (req.body.post?.timed) {
-            await CronController.createScheduledPost(postSaved.post._id, req.body.post.frequency, req.body.post.squealNumber, req.body.post.content, req.body.post.contentType);
+            await CronController.createScheduledPost(postSaved.post._id, req.body.post.millis, req.body.post.squealNumber, req.body.post.content, req.body.post.contentType);
         }
         res.send(postSaved)
     }

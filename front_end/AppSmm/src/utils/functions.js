@@ -210,6 +210,16 @@ function setupBeep(times, interval, frequency){
     }
 }
 
+/**
+ *
+ * @param {Array} frequency - e.g. [6,seconds], [5,days], ...
+ * @returns {number} - timestamp - e.g. 100000 ms
+ */
+const parse2timestamp = (frequency) => {
+    return (cast2millis[frequency[1]] * parseInt(frequency[0]));
+}
+
+
 export{
     getPage,
     getPosts,
@@ -227,4 +237,5 @@ export{
     parseContentText,
     logout,
     setupBeep,
+    parse2timestamp,
 }

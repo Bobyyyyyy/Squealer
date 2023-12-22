@@ -18,7 +18,7 @@ let scheduledFnOne = [];
 
 /**
  *
- * @param {string} time2next
+ * @param {Number} time2next
  * @returns {string}    - '* * * * * *'
  */
 const getNextTick = (time2next) => {
