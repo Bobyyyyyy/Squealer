@@ -8,6 +8,10 @@ export default defineConfig({
       react(),
       nodePolyfills(),
   ],
+    build: {
+        outDir: "dist_react",
+        assetsDir:"assets_react"
+    },
   server: {
     port: 5173,
   }

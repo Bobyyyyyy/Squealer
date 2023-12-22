@@ -12,6 +12,8 @@ const addOfficialChannel = async (body,creator) => {
         // trasformare il nome in una forma ragionevole
         let name = body.name.toUpperCase();
         name = name.trim();
+        name = name.replace('§',"");
+        name = name.replace('@',"");
         name = name.replace(/\s/g, "_");
         name = name.replace('/','_');
         //check if channel exists already
@@ -20,7 +22,6 @@ const addOfficialChannel = async (body,creator) => {
             let err = new Error("Canale Già esistente");
             err.statusCode = 400;
             console.log(err);
-            
             throw err;
         }
         let newChannel = new ReservedChannel({

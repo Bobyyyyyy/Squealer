@@ -50,7 +50,7 @@ const showPosts = (filters,append = false) => {
                 return;
             }
             let html = `${$.map(posts, (post) => {
-
+                console.log(post.content)
                 let destinationNames = []
                 let officialChannelNames = [];
 
@@ -205,6 +205,7 @@ $('#orderby').on('change',() => {
 
     $('#order').on('change', () => {
         LastCall.filters.sort = $('#order option:selected').val();
+        console.log(LastCall.filters)
         getPostsNumber(LastCall.filters)
     })
 
