@@ -1,5 +1,5 @@
 import ContentPost from "./ContentPost.jsx";
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {SubmitIcon} from "../../components/assets/index.jsx";
 import {
     blob2base64,
@@ -8,6 +8,7 @@ import {
     getUsernameFromLocStor
 } from "../../components/utils/usefulFunctions.js";
 import {Toast} from "flowbite-react";
+import TimedPost from "./TimedPost.jsx";
 
 function AddPost(){
     const username = getUsernameFromLocStor();
@@ -19,6 +20,9 @@ function AddPost(){
     const [quota,setQuota] = useState();
     const [currentQuota, setCurrentQuota] = useState();
     const [error, setError] = useState('');
+    const [isTimed, setIsTimed] = useState(false);
+    const frequencyMs = useRef(0);
+    const [numberOfPosts, setNumberOfPosts] = useState(1)
 
     function parseDestinations(dests) {
         let finalDest = [];
@@ -89,6 +93,18 @@ function AddPost(){
             throw new Error("NON PUOI INIVIARE MESSAGGI A TE STESSO");
         }
 
+        let post = {
+            contentType: type,
+            dateOfCreation: Date.now(),
+            creator: username,
+            destinations: dests,
+            content: content2send
+        };
+
+        if (isTimed) {
+            //post.timed =
+        }
+
         return (
             {
                 contentType: type,
@@ -123,9 +139,9 @@ function AddPost(){
                     console.log(data.statusCode)
                     if (data.statusCode === 400) {
                         console.log(data.message);
-                        window.alert("l'utente non esiste");
-                    } else if (data.name) {
-                        window.alert("errore nell'invio del post, controlla di aver inserito i destinatari corretti");
+                        window.alert("Non hai il prermesso di scrivere");
+                    } else if (data.statusCode === 400) {
+                        window.alert("Canale o utente non esiste");
                     } else {
                         window.location.href = "/user/"
                     }
@@ -196,7 +212,20 @@ function AddPost(){
                         setError={setError} isQuotaNegative={isQuotaNegative}
                     />
                 }
+                <div className="flex items-center gap-4 mt-4">
+                    <input
+                        id="default-checkbox" type="checkbox" checked={isTimed} onChange={() => setIsTimed((prev) => !prev)}
+                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                    />
+                        <label
+                            htmlFor="default-checkbox"
+                            className="text-xl md:text-2xl"
+                        >
+                            Messaggio temporizzato
+                        </label>
+                </div>
             </div>
+            {isTimed && <TimedPost frequency={frequencyMs} numberOfPosts={numberOfPosts} setNumberOfPosts={setNumberOfPosts}/>}
             {!!error && <div className="flex w-full justify-start text-xl text-red-600 mb-4">
                 {error}
             </div>}
