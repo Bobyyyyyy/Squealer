@@ -1,5 +1,5 @@
 import {useLoaderData} from "react-router-dom";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {getPostByUsername} from "../../utils/usefulFunctions.js";
 import Post from "../../components/posts/Post.jsx";
 import {Spinner} from 'flowbite-react'
@@ -23,7 +23,9 @@ function PageProfileByName() {
     return (
         <>
             {isLoading ? (
-                <Spinner aria-label="Medium sized spinner example" size="md" color="primary" />
+                <div className="flex h-screen items-center justify-center">
+                    <Spinner aria-label="loading profile spinner" size="xl" color="pink" />
+                </div>
             ) : (
                 <>
                     <div className={"flex w-full items-center justify-start gap-8 p-4"}>

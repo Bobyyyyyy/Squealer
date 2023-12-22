@@ -108,7 +108,7 @@ const updateMaxQuota = async(req,res) => {
 
     try{
         let percentage= req.body.percentage;
-        let user = req.session.vip;
+        let user = req.session.type === 'smm' ? req.session.vip : req.session.user;
 
         if (isNaN(percentage)) throw createError('percentage not number', 404);  //cambiare
 
