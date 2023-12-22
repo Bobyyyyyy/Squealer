@@ -105,8 +105,8 @@ function SinglePageChannel() {
         <>
             {isLoading && <p>Caricamento...</p>}
             <div className="flex flex-col w-full justify-center items-center gap-4">
-                <h3 className={"text-center text-2xl font-extrabold mt-4"}>§{nome}</h3>
-                <p>{description}</p>
+                <h3 className="text-center text-2xl font-extrabold mt-4">§{nome}</h3>
+                <p className="w-full h-fit p-2 break-words">{description}</p>
                 {role === "Creator" || role === "Admin" ? (
                         <div className="flex flex-wrap justify-between items-center gap-4 px-8 w-full">
                             <Button

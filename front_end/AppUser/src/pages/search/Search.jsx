@@ -9,6 +9,7 @@ function Search ()  {
     const [name, setName] = useState('');
     const [type, setType] = useState('');
     const [users, setUsers] = useState([]);
+    const [error, setError] = useState(false);
 
     useEffect(() => {
         if (!!name) {
@@ -23,12 +24,14 @@ function Search ()  {
                             res.json()
                                 .then((res)=> {
                                     setUsers(res);
+                                    setError(res.length === 0);
                                 });
                         }
                     })
             }, 1000)
         } else {
             setUsers([]);
+            setError(false);
         }
     }, [name, type]);
 
@@ -50,6 +53,11 @@ function Search ()  {
                         </Link>
                     );
                 })}
+                {error &&
+                    <div>
+                        nessun utente trovato
+                    </div>
+                }
             </div>
         </div>
         </>
