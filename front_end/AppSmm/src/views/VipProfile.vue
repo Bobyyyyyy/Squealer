@@ -108,6 +108,7 @@ import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
     let quota = await getUserQuota();
 
     store.commit('setQuota', quota.characters);
+    store.commit('setMaxQuota',quota.maxQuota);
 
     query = `name=${currentVip.value}&limit=12`
 
