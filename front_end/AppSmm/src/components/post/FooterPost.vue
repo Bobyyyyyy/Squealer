@@ -4,16 +4,16 @@
   import {onMounted, reactive, ref, watch} from "vue";
   import ChartModalPost from "./ChartModalPost.vue";
   import {parseReactionType} from "../../utils/functions.js";
+  import ReplyModal from "./reply/ReplyModal.vue";
 
   const props = defineProps({
-    reactions: Array,
-    postId: String,
+    post: Object,
     idx: Number,
-    views: Number,
   });
 
   const modalActive = ref(false);
   const chartModal = ref();
+  const replyModal = ref();
   const parsedType = reactive({});
 
   const parsedReac = ref ({
@@ -33,14 +33,14 @@
         date: new Date().toISOString(),
       }
 
-      let idx = props.reactions.findIndex(el => el.user === newReaction.user);
+      let idx = props.post.reactions.findIndex(el => el.user === newReaction.user);
       if (idx >= 0){
-        props.reactions[idx] = newReaction;
+        props.post.reactions[idx] = newReaction;
       }
       else{
-        props.reactions.push(newReaction);
+        props.post.reactions.push(newReaction);
       }
-      console.log(props.reactions);
+      console.log(props.post.reactions);
   }
 
   const changeReac = async (newReac) => {
@@ -52,7 +52,7 @@
 
     updateProps(newReac);
 
-    parsedType.value = parseReactionType(props.reactions);
+    parsedType.value = parseReactionType(props.post.reactions);
 
     await fetch(`/db/post/updateReaction`,{
       method:"PUT",
@@ -60,7 +60,7 @@
         'Content-Type': 'application/json'
       },
       body:JSON.stringify({
-        postId: props.postId,
+        postId: props.post.postId,
         user: currentVip.value,
         reaction: newReac,
       })
@@ -76,7 +76,7 @@
         'Content-Type': 'application/json'
       },
       body:JSON.stringify({
-        postId: props.postId,
+        postId: props.post.postId,
         user: currentVip.value,
       })
     })
@@ -87,12 +87,16 @@
     chartModal.value.openModal();
   }
 
+  function openReplyModal(){
+    replyModal.value.openModal();
+  }
+
   onMounted(()=>{
 
-    let idx = props.reactions.findIndex(el => el.user === currentVip.value);
-    if (idx >= 0) currentActive.value = props.reactions[idx].rtype
+    let idx = props.post.reactions.findIndex(el => el.user === currentVip.value);
+    if (idx >= 0) currentActive.value = props.post.reactions[idx].rtype
 
-    parsedType.value = parseReactionType(props.reactions);
+    parsedType.value = parseReactionType(props.post.reactions);
 
     parsedReac.value['heart'] = parsedType.value['heart'].length;
     parsedReac.value['thumbs-up'] = parsedType.value['thumbs-up'].length
@@ -125,7 +129,7 @@
           <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0"/>
         </svg>
         <h6 class="m-0 ms-2 me-2">
-          {{views}}
+          {{post.views.length}}
         </h6>
       </div>
     </div>
@@ -134,7 +138,7 @@
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chat" viewBox="0 0 16 16">
         <path d="M2.678 11.894a1 1 0 0 1 .287.801 10.97 10.97 0 0 1-.398 2c1.395-.323 2.247-.697 2.634-.893a1 1 0 0 1 .71-.074A8.06 8.06 0 0 0 8 14c3.996 0 7-2.807 7-6 0-3.192-3.004-6-7-6S1 4.808 1 8c0 1.468.617 2.83 1.678 3.894m-.493 3.905a21.682 21.682 0 0 1-.713.129c-.2.032-.352-.176-.273-.362a9.68 9.68 0 0 0 .244-.637l.003-.01c.248-.72.45-1.548.524-2.319C.743 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7-3.582 7-8 7a9.06 9.06 0 0 1-2.347-.306c-.52.263-1.639.742-3.468 1.105z"/>
       </svg>
-      <h6 class="m-0 ms-1 text-dark">
+      <h6 @click="openReplyModal" class="m-0 ms-1 text-dark">
         Risposte
       </h6>
       <div class="d-flex sameWidth justify-content-end">
@@ -145,4 +149,5 @@
 
   </div>
   <ChartModalPost ref="chartModal" :reactions="parsedType" :idx="idx"/>
+  <ReplyModal ref="replyModal" :post="post" :idx="idx"/>
 </template>

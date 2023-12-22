@@ -181,15 +181,9 @@ import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
       </div>
       <div id="postContainer" v-if="readyPosts" class="d-flex flex-row flex-wrap justify-content-around mt-3">
         <Post v-for="(post,i) in squeals" :key="post._id"
-              :user="post.owner"
+              :post="post"
               :dest= "parseDestinationsViewPost(post.destinationArray, post.tags)"
-              :content="post.content"
-              :creationDate="post.dateOfCreation"
-              :reactions = "post.reactions"
-              :contentType = "post.contentType"
-              :postId = "post._id"
               :numberOfPost="i"
-              :views="post.views.length"
               picProfile = "/img/defaultUser.jpeg"
         />
       </div>
