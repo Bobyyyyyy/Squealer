@@ -15,6 +15,7 @@
   const chartModal = ref();
   const replyModal = ref();
   const parsedType = reactive({});
+  const replyOpen = ref(false);
 
   const parsedReac = ref ({
     'heart': 0,
@@ -85,9 +86,11 @@
   function activeModal(){
     modalActive.value = true;
     chartModal.value.openModal();
+
   }
 
   function openReplyModal(){
+    replyOpen.value = true;
     replyModal.value.openModal();
   }
 
