@@ -138,8 +138,7 @@ const showPosts = (filter,offset,limit,append = false) => {
                         break;
 
                     case 'video':
-                        const embeddedVideoLink = getEmbed(post.content);
-                        Post = Post + `<iframe src="//www.youtube.com/embed/${embeddedVideoLink}" class="w-100" allowfullscreen style="height: 60vh"></iframe>`
+                        Post = Post + `<iframe src="${post.content}" class="w-100" allowfullscreen style="height: 60vh"></iframe>`
                         break;
 
                 }
@@ -243,23 +242,32 @@ $('#addPostButton').on('click',(contentType, content) => {
 
     let destinations = []
 
+    let timed = $('#timedButton').is(':checked')
     destinations.push({
         destType: 'official',
         name: ChannelName,
     });
-
-
-
     const currentDate = new Date();
-    $.ajax({
+    let newPost = {post:
+            {creator: User,
+                destinations: JSON.stringify(destinations),
+            contentType: contentType,
+                content: content,
+                dateOfCreation: currentDate,
+                millis: $('#squealFrequency').val() * $('#time-select option:selected').val(),
+                squealNumber: $('#squealNumber').val(),
+                timed: timed}}
+
+
+   $.ajax({
         url:'/db/post',
-        data: {post: {creator: User, destinations: JSON.stringify(destinations),
-                contentType: contentType, content: content, dateOfCreation: currentDate, millis: 10000, squealNumber: 5, timed: true}},
+        data: newPost,
         type: 'post',
         success: (post) => {
             location.reload();
         }
     })
+
 })
 
 $('#type-select').on('change',() => {
@@ -318,8 +326,10 @@ $('#type-select').on('change',() => {
             $('#content').empty().replaceWith(videoInput);
             $('#content').append(videoPreview);
             $('#preview-button').on('click', () => {
-                const embeddedVideoLink = getEmbed($('#post-content').val())
-                $('#preview').empty().html(`<iframe src="//www.youtube.com/embed/${embeddedVideoLink}" class="w-100" allowfullscreen style="height: 60vh"></iframe>`)
+                const embeddedVideoLink = "//www.youtube.com/embed/" + getEmbed($('#post-content').val())
+                $('#preview').empty().html(`<iframe src="${embeddedVideoLink}" class="w-100" allowfullscreen style="height: 60vh"></iframe>`)
+                $('#post-content').val(embeddedVideoLink);
+
             })
             break;
 
@@ -340,6 +350,37 @@ $('#post-filters').on('change', () => {
     LastCall.filter.typeFilter = filter
     getPostsNumber(LastCall.filter);
 })
+
+$('#timedButton').on('change', () => {
+
+    if($('#timedButton').is(':checked')) {
+        $('#timedParameters').append(`<div class="d-flex flex-column justify-content-center">
+                                    <div class="w-100 h-100">
+                                       <label for="squealFrequency" class="form-label w-75"> Squeal Frequency
+                                        <input type="number" class="form-control" name="squealFrequency" id="squealFrequency" min="1"  value="1">
+                                    </div>
+                                    <div class="w-75 h-100">
+                                        <select id="time-select" class="form-select" aria-label="squealTimeFrequency" autocomplete="off">
+                                            <option value="1000" selected>seconds</option>
+                                         <option value="60000">minutes</option>
+                                         <option value="3600000">hour</option>
+                                         <option value="86400000">days</option>
+                                        </select>
+                                    </div>
+                                    </label>
+                                     </div>
+                                     <div class=" ms-1 d-flex flex-column align-items-center">
+                                    <label for="squealNumber" class="form-label w-75 "> Squeal Number
+                                    <input type="number" class="form-control" name="squealFrequency" id="squealNumber" min="1"  value="1">
+                                    </label>
+                                     </div>
+                                    `)
+    }
+    else {
+        $('#timedParameters').empty()
+    }
+})
+
 
 $('#changeReactionsButton').on('click',() => {
 

@@ -142,7 +142,7 @@ const addTimedPost = async (postId) => {
     try {
         await connection.get()
 
-        let post = await Post.findById(postId);
+        let post = await Post.findById(postId).lean();
         let userQuota = (await User.findOne({username: post.owner})).characters;
 
         let timedInfo = scheduledPostArr.find(el => el['id']===postId);
@@ -152,6 +152,7 @@ const addTimedPost = async (postId) => {
         let newPost = {
             creator: post.owner,
             destinations: post.destinationArray,
+            officialChannelsArray: post.officialChannelsArray,
             contentType: post.contentType,
             dateOfCreation: Date.now(),
             tags: post.tags,
@@ -191,7 +192,7 @@ const addPost = async (post,quota) => {
             throw createError('Non si è inserito nessun destinatario',400);
         }
         let postCategory = 'private';
-        let officialChannels = [];
+        let officialChannels = post?.officialChannelsArray ? post.officialChannelsArray : [];
         let creator = await User.findOne({username: post.creator});
         for (const destination of destinations) {
             if ( !['user', 'channel', 'official'].includes(destination.destType)){
