@@ -32,7 +32,7 @@ function SinglePageChannel() {
     const [followers, setFollowers] = useState([]);
     const [admins, setAdmins] = useState([]);
 
-    const canSeePosts = useRef(false);
+    const [canSeePosts, setCanSeePosts] = useState(false);
 
     const handleFollow = () => {
         fetch(`/db/channel/follower`, {
@@ -51,12 +51,23 @@ function SinglePageChannel() {
             })
     }
 
-    const fetchData = async () => {
+    const fetchPost = async () => {
+        setIsLoading(true);
+        if (canSeePosts) {
+            const resPost = await getPostByChannelName(nome);
+            setPosts(resPost);
+        } else {
+            setPosts([]);
+        }
+        setIsLoading(false)
+    }
+
+    const updateRequestAdminFollower = async () => {
         let res = await fetch(`/db/channel/${nome}`);
         res = await res.json();
         setDescription(res.description)
         setRole(res.role);
-        canSeePosts.current = (res.role !== "Not Follower" || res.role !== "Pending");
+        setCanSeePosts((res.role !== "Not Follower" || res.role !== "Pending"));
         setFollowers(res.followers.sort((a,b) => (a.user > b.user) ? 1 : ((b.user > a.user) ? -1 : 0)))
         setAdmins(res.admins.sort())
         setType(res.type);
@@ -65,27 +76,19 @@ function SinglePageChannel() {
         setHasUpdatedFol(false);
         setHasUpdatedAddAdm(false);
         setHasUpdatedRmAdm(false);
-        if (canSeePosts) {
-            const resPost = await getPostByChannelName(nome);
-            setPosts(resPost);
-            setIsLoading(false)
-        }
-    }
-/*
-    const updateRequestAdminFollower = async () => {
-
     }
 
     useEffect(() => {
-
-    }, []);
-
- */
-
-    useEffect(() => {
-        fetchData()
-            .catch(console.error)
+        updateRequestAdminFollower()
+            .catch(console.error);
     }, [hasUpdatedReq, hasUpdatedFol, hasUpdatedAddAdm, hasUpdatedRmAdm]);
+
+
+    useEffect(() => {
+        fetchPost()
+            .catch(console.error);
+    }, [canSeePosts]);
+
 
     return (
         <>
