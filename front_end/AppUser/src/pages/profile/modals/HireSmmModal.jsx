@@ -6,7 +6,10 @@ function HireSmmModal({isOpen, setIsOpen, setHasUpdated}) {
     const [smm, setSmm] = useState([]);
 
     const getSmm = async () => {
-        let res = await fetch("/db/user/allSmm?limit=100&offset=0", {
+        let filter = JSON.stringify({
+            vipUsername: getUsernameFromSessionStore(),
+        });
+        let res = await fetch(`/db/user/allSmm?limit=100&offset=0&filter=${filter}`, {
             method: 'GET'
         })
         if (res.ok) {

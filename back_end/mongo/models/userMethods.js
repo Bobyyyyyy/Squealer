@@ -428,7 +428,16 @@ const getAllSmm = async (query) => {
         let limit = parseInt(query.limit);
 
         let filter =  {'typeUser': "smm"};
-        return await User.find(filter).skip(offset).limit(limit).lean();
+        let vipUsername = query.filter.vipUsername;
+
+        let singleSMM = await User.find({typeUser:"smm",vipHandled: {$in: [vipUsername]}})
+
+        console.log("singleSMM", singleSMM);
+        if (singleSMM.length === 0) {
+            return await User.find(filter).skip(offset).limit(limit).lean();
+        } else {
+            return singleSMM;
+        }
     } catch (e) {
         throw(e);
     }
