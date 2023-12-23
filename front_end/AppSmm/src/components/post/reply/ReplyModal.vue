@@ -1,9 +1,10 @@
 <script setup>
 import {Modal} from "bootstrap";
-import {onMounted, onUnmounted, reactive} from "vue";
+import {onMounted, onUnmounted, reactive, ref} from "vue";
 import {parseDestinationsViewPost} from "../../../utils/functions.js";
 import Post from "../Post.vue";
 
+const reply = ref('');
 const modalStateQuota = reactive({replies: null});
 
 const props = defineProps({
@@ -16,6 +17,19 @@ const openModal = () => {
 }
 function closeModal() {
   modalStateQuota.replies.hide()
+}
+
+async function addComment(){
+  let res = await fetch('/db/reply/', {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body:JSON.stringify({
+      content: reply.value,
+      parentid: props.post._id,
+    })
+  })
 }
 
 defineExpose({
@@ -51,8 +65,8 @@ onMounted(()=> {
         </div>
         <div class="modal-footer">
           <div class="input-group mb-1">
-            <input type="text" class="form-control" placeholder="scrivi risposta..." aria-label="scrivi_risposta">
-            <button type="button" class="btn btn-primary">Invia</button>
+            <input type="text" class="form-control" placeholder="scrivi risposta..." aria-label="scrivi_risposta" v-model="reply" >
+            <button type="button" class="btn btn-primary" @click="addComment">Invia</button>
           </div>
         </div>
       </div>

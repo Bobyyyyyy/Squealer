@@ -44,8 +44,9 @@ const getReplies = async (parentID) => {
                     dateOfCreation: 'dateOfCreation',
                 },
             },
-            {$match: {parent: parentID}},
+            {$match: {'parent': parentID}},
             {$sort: sorts['meno recente']},
+            /*
             {
                 $lookup: {
                     from: "users",
@@ -53,12 +54,16 @@ const getReplies = async (parentID) => {
                     foreignField: "username",
                     pipeline:[
                         {
-                            $project: '$profilePicture'
+                            $project: {
+                                profilePicture: '$profilePicture'
+                            }
                         }
                     ],
                     as: "user_info",
                 }
             },
+
+             */
         ]);
         return replies;
     }catch(error){
