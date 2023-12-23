@@ -2,6 +2,19 @@ let ChannelName = $('#channel-name').html();
 let User = $('#session-user').html();
 const urlRegex =/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
 
+function getEmbed(url) {
+    let regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    let match = url.match(regExp);
+
+    if (match && match[2].length === 11) {
+        return match[2];
+    } else {
+        return 'error';
+        }
+}
+
+
+
 let LastCall = {
     limit : 5,
     offset: 0,
@@ -123,6 +136,12 @@ const showPosts = (filter,offset,limit,append = false) => {
                         Post = Post + `<div class="align-self-center" style="height: 50vh"><div id="map-${id}" class="w-100 h-100" ></div></div>
                           <script>showMap('map-${id}','${post.content}')</script>`
                         break;
+
+                    case 'video':
+                        const embeddedVideoLink = getEmbed(post.content);
+                        Post = Post + `<iframe src="//www.youtube.com/embed/${embeddedVideoLink}" class="w-100" allowfullscreen style="height: 60vh"></iframe>`
+                        break;
+
                 }
                 
                 Post = Post +`</div>
@@ -235,7 +254,7 @@ $('#addPostButton').on('click',(contentType, content) => {
     $.ajax({
         url:'/db/post',
         data: {post: {creator: User, destinations: JSON.stringify(destinations),
-                contentType: contentType, content: content, dateOfCreation: currentDate}},
+                contentType: contentType, content: content, dateOfCreation: currentDate, millis: 10000, squealNumber: 5, timed: true}},
         type: 'post',
         success: (post) => {
             location.reload();
@@ -281,6 +300,26 @@ $('#type-select').on('change',() => {
             $('#content').append(preview);
             $('#preview-button').on('click', () => {
                 $('#preview').empty().html(`<img src="${$('#post-content').val()}" class='img-fluid mt-3' alt="Image Preview">`)
+            })
+            break;
+
+        case 'video':
+            let videoPreview = `
+                        <div class="mx-auto">
+                            <button id="preview-button" class="btn btn-success ms-2"><i class="bi bi-upload"></i></button>
+                        </div>`
+
+            let videoInput = `
+                            <div id="content" class="mt-3 d-flex flex-row" style="width: 100%">
+                                <label for="post-content" class="form-label w-100" style>
+                                    <textarea class="form-control" id="post-content" name="content" rows="1" placeholder="Inserisci link video" style="resize: none" data-role="none" autocomplete="off"></textarea>
+                                </label>
+                            </div><div class="d-flex flex-row justify-content-center text-center align-items-center h-100 w-100 text-dark" id="preview"></div>`
+            $('#content').empty().replaceWith(videoInput);
+            $('#content').append(videoPreview);
+            $('#preview-button').on('click', () => {
+                const embeddedVideoLink = getEmbed($('#post-content').val())
+                $('#preview').empty().html(`<iframe src="//www.youtube.com/embed/${embeddedVideoLink}" class="w-100" allowfullscreen style="height: 60vh"></iframe>`)
             })
             break;
 

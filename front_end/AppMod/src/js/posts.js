@@ -1,6 +1,18 @@
 const User = $('#session-user').html();
 let post = ''
 
+function getEmbed(url) {
+    let regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    let match = url.match(regExp);
+
+    if (match && match[2].length === 11) {
+        return match[2];
+    } else {
+        return 'error';
+    }
+}
+
+
 let LastCall = {
     posts: 0,
     filters: {
@@ -125,6 +137,11 @@ const showPosts = (filters,append = false) => {
                     case 'geolocation':
                         Post = Post + `<div class="align-self-center" style="height: 50vh"><div id="map-${id}" class="w-100 h-100" ></div></div>
                           <script>showMap('map-${id}','${post.content}')</script>`
+                        break;
+
+                    case 'video':
+                        const embeddedVideoLink = getEmbed(post.content);
+                        Post = Post + `<iframe src="//www.youtube.com/embed/${embeddedVideoLink}" class="w-100" allowfullscreen style="height: 60vh"></iframe>`
                         break;
                 }
 
