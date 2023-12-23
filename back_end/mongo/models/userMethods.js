@@ -434,12 +434,21 @@ const getAllSmm = async (query) => {
     }
 }
 
-const hireSmm = async (vipUsername, smmUsername) => {
+const hireSmm = async (vipUsername, smmUsername, isHiring) => {
     try {
         await connection.get();
-        let res = await User.findOneAndUpdate({username: smmUsername, typeUser: "smm"}, {$push: {vipHandled: vipUsername}}, { new: true }).lean();
-
-        console.log("new smm vip handled", res)
+        let res = {};
+        if (isHiring) {
+            res = await User.findOneAndUpdate({
+                username: smmUsername,
+                typeUser: "smm"
+            }, {$push: {vipHandled: vipUsername}}, {new: true}).lean();
+        } else {
+            res = await User.findOneAndUpdate({
+                username: smmUsername,
+                typeUser: "smm"
+            }, {$pull: {vipHandled: vipUsername}}, {new: true}).lean();
+        }
         return res;
     } catch (e) {
         throw e;

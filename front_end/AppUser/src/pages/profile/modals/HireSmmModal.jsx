@@ -16,13 +16,14 @@ function HireSmmModal({isOpen, setIsOpen, setHasUpdated}) {
         }
     }
 
-    const hireSmm = async (smmUsername) => {
+    const hireSmm = async (smmUsername, isHiring) => {
         try {
             let res = await fetch(`/db/user/hireSmm`, {
                 method: 'PUT',
                 body: JSON.stringify({
                     vipUsername: getUsernameFromSessionStore(),
-                    smmUsername: smmUsername
+                    smmUsername: smmUsername,
+                    isHiring: isHiring
                 }),
                 headers: {
                     "Content-Type":"application/json"
@@ -63,8 +64,11 @@ function HireSmmModal({isOpen, setIsOpen, setHasUpdated}) {
                                 <div className="flex gap-4">
                                     <span className="text-lg">gestisce {numVipHandled} vips</span>
                                 </div>
-                                <Button onClick={() => hireSmm(smm.username)}>
+                                <Button onClick={() => hireSmm(smm.username, true)}>
                                     assumi
+                                </Button>
+                                <Button onClick={() => hireSmm(smm.username, false)}>
+                                    licenzia
                                 </Button>
                             </div>
                         </div>

@@ -205,13 +205,14 @@ const getAllSmm = async (req, res) => {
 const hireSmm = async (req, res) => {
     try {
         let vipUsername = req.body.vipUsername;
-        let smmUsername = req.body.smmUsername
-        let response = await userModel.hireSmm(vipUsername, smmUsername);
-        res.status(200).send({ hired: true});
+        let smmUsername = req.body.smmUsername;
+        let isHiring = req.body.isHiring;
+        res.status(200).send(await userModel.hireSmm(vipUsername, smmUsername, isHiring));
     } catch (error) {
         res.send(error);
     }
 }
+
 
 module.exports = {
     addUser,
