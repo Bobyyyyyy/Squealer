@@ -4,7 +4,6 @@ import {MapContainer, Marker, Popup, TileLayer} from "react-leaflet";
 
 function MappaPost({stringCoor}){
     const coordinates = JSON.parse(stringCoor);
-    console.log(coordinates);
     //let coordinatesString = stringCoor.split(",");
     /*
     const coordinates = [

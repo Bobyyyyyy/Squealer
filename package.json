@@ -7,7 +7,8 @@
     "dev:backend": "nodemon server/index.js",
     "dev": "concurrently  'npm:dev:frontend_REACT' 'npm:dev:frontend_VUE' 'npm:dev:backend'",
     "build:frontend_VUE": "cd front_end/AppSmm && npm run build",
-    "build": "npm run build:frontend_VUE"
+    "build:frontend_REACT": "cd front_end/AppUser && npm run build",
+    "build": "npm run build:frontend_VUE && npm run build:frontend_REACT"
   },
   "dependencies": {
     "@popperjs/core": "^2.11.8",

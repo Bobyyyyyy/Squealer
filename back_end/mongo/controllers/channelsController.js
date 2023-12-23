@@ -88,7 +88,7 @@ const addFollower = async function (req,res){
 
 const handleRequest = async function (req,res) {
     try {
-        let admin = req.body.admin;
+        let admin = req.session.user;
         let user = req.body.user
         let channel = req.body.channel;
         let accepted = req.body.accepted;
@@ -101,10 +101,23 @@ const handleRequest = async function (req,res) {
 
 const addAdmin = async function (req,res) {
     try {
-        let admin = req.body.admin;
+        let admin = req.session.user;
         let user = req.body.user
         let channel = req.body.channel;
         res.status(200).send(await channelsModel.addAdmin(user,admin,channel));
+    }
+    catch (error) {
+        res.status(error.statusCode).send(error.message);
+    }
+}
+
+const handlePermission = async function (req, res) {
+    try {
+        let admin = req.session.user;
+        let user = req.body.user;
+        let channel = req.body.channel;
+        let canWrite = req.body.canWrite;
+        res.status(200).send(await channelsModel.handlePermission(admin,user,channel,canWrite))
     }
     catch (error) {
         res.status(error.statusCode).send(error.message);
@@ -122,5 +135,6 @@ module.exports = {
     changeChannelName,
     addFollower,
     handleRequest,
+    handlePermission,
     addAdmin
 }

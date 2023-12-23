@@ -1,4 +1,4 @@
-import {getUsernameFromLocStor, getQuotaInLocStor, getAllPostFrontend ,getProfilePic, compressBlob, blob2base64} from "../../components/utils/usefulFunctions.js";
+import {getUsernameFromLocStor, getQuotaInLocStor, getPostByUsername ,getProfilePicByUsername, compressBlob, blob2base64} from "../../components/utils/usefulFunctions.js";
 import {useEffect, useState} from "react";
 import {ProfilePic} from "../../components/assets/index.jsx"
 import Post from "../../components/posts/Post.jsx";
@@ -6,49 +6,12 @@ import Post from "../../components/posts/Post.jsx";
 let imageObj = null;
 
 function Profile () {
+    const name = getUsernameFromLocStor();
     const [posts, setPosts] = useState([]);
     const [pic, setPic] = useState(null);
-
-    const name = getUsernameFromLocStor();
+    const [btnChangePic, setBtnChangePic] = useState(false);
+    const [imgEmpty, setImgEmpty] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
-
-    const fetchAllPosts = async () => {
-        try {
-            let currentUser = getUsernameFromLocStor();
-            //console.log("name user:", currentUser);
-
-            let res = await fetch(`/db/post/all?name=${currentUser}&offset=0`);
-
-            if (res.ok) {
-                let allPosts = await res.json();
-                //console.log("allPosts", allPosts)
-                setPosts(allPosts);
-                //console.log("num of post", allPosts.length)
-                setIsLoading(false)
-            } else {
-                console.log("errore nel fetching dei post");
-            }
-
-        } catch (e) {
-            console.log(e);
-        }
-    };
-
-    const prendiProfilo = async () => {
-        try {
-            let res = await fetch(`/db/user/profilePic?name=${getUsernameFromLocStor()}`);
-            //console.log("risposta", res);
-            if (res.ok) {
-                let profilePic = await res.json();
-                //console.log("pic diocane", profilePic.profilePic);
-                setPic(profilePic.profilePic)
-                return profilePic;
-            }
-        }
-        catch (e) {
-            console.log(e)
-        }
-    }
 
     const changePic = async () => {
         try {
@@ -69,6 +32,7 @@ function Profile () {
                 });
                 //console.log("risposta", res);
                 setBtnChangePic(false)
+                location.reload();
             } else {
                 setImgEmpty(true);
             }
@@ -79,10 +43,14 @@ function Profile () {
     }
 
     useEffect(() => {
-        fetchAllPosts()
+        getPostByUsername(name)
             .then((res) => {
-                prendiProfilo()
-                  .then()
+                setPosts(res);
+                getProfilePicByUsername(name)
+                  .then((res) => {
+                      setPic(res);
+                      setIsLoading(false);
+                  })
             })
     }, []);
 
@@ -92,10 +60,6 @@ function Profile () {
         window.location.href= res.url;
         localStorage.clear();
     }
-
-    const [btnChangePic, setBtnChangePic] = useState(false);
-    const [imgEmpty, setImgEmpty] = useState(false);
-
 
     return (
         <>
@@ -132,7 +96,7 @@ function Profile () {
             </div>
             {btnChangePic &&
                 <>
-                    <div className="border border-red-500 px-4">
+                    <div className="px-4">
                         {imgEmpty &&
                             <div>
                                 Inserisci una foto

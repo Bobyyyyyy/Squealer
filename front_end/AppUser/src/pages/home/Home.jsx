@@ -1,7 +1,6 @@
 import Post from "../../components/posts/Post.jsx";
 import React, {Suspense, useEffect, useState} from "react";
 import {
-    getAllPostFrontend,
     getUsernameFromLocStor,
     setUsernameInLocStor
 } from "../../components/utils/usefulFunctions.js";
@@ -19,9 +18,6 @@ function Home() {
 
     const fetchAllPosts = async () => {
         try {
-            //let currentUser = getUsernameFromLocStor();
-            let currentUser = localStorage.getItem("username");
-            console.log("name user:", currentUser);
 
             let res = await fetch(`/db/post/all?offset=0&limit=10`);
             console.log(res);

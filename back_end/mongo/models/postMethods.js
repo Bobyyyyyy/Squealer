@@ -101,16 +101,16 @@ const removeScheduledPost = (postId) => {
 
 const sorts = {
     'più recente':{
-        dateOfCreation: -1
+        'dateOfCreation': -1
     },
     'meno recente':{
-        dateOfCreation: 1
+        'dateOfCreation': 1
     },
     'più visual':{
-        views: -1
+        'views_count': -1
     },
     'meno visual':{
-        views: 1
+        'views_count': 1
     }
 }
 
@@ -186,7 +186,6 @@ const addTimedPost = async (postId) => {
 const addPost = async (post,quota) => {
     try{
         await connection.get()
-        console.log(post);
         let destinations = ((typeof post.destinations) === 'string') ? JSON.parse(post.destinations) : post.destinations;
         if(typeof destinations === "undefined") {
             throw createError('Non si è inserito nessun destinatario',400);
@@ -207,7 +206,7 @@ const addPost = async (post,quota) => {
                 throw createError("utente non esistente!", 422);
             }
             /* canale non esiste  */
-            else if (destinationType === 'channel' && channel?.length === 0) {
+            else if (destinationType === 'channel' && !channel) {
                 throw createError("canale non esistente!", 422);
             }
             /* canale ufficiale non esiste e l'utente non mod*/
@@ -232,7 +231,7 @@ const addPost = async (post,quota) => {
                 }
                 if (channel.type === 'public') {
                     if(creator.typeUser !== 'mod') {
-                        permissionToWrite = await Channel.findOne({$and: [{'name': channel.name}, {$or: [{'creator': creator.username}, {$and: [{'followers.user': creator.username}, {'follower.canWrite': true}]}, {'admins': creator.username}]}]});
+                        permissionToWrite = await Channel.findOne({$and: [{'name': channel.name}, {$or: [{'creator': creator.username}, {$and: [{'followers.user': creator.username}, {'followers.canWrite': true}]}, {'admins': creator.username}]}]});
                         if (!permissionToWrite) {
                             throw createError(`Non hai il permesso di scrivere in ${channel.name}`, 400);
                         }
@@ -241,7 +240,7 @@ const addPost = async (post,quota) => {
                 }
                 else {
                     if(creator.typeUser !== 'mod') {
-                        permissionToWrite = await Channel.findOne({$and: [{'name': channel.name}, {$or: [{'creator': creator.username}, {$and: [{'followers.user': creator.username}, {'follower.canWrite': true}]}, {'admins': creator.username}]}]});
+                        permissionToWrite = await Channel.findOne({$and: [{'name': channel.name}, {$or: [{'creator': creator.username}, {$and: [{'followers.user': creator.username}, {'followers.canWrite': true}]}, {'admins': creator.username}]}]});
                         if (!permissionToWrite) {
                             throw createError(`Non hai il permesso di scrivere in ${channel.name}`, 400);
                         }
@@ -317,7 +316,7 @@ const getAllPost = async (query,sessionUser) =>{
         let reply = !!query?.reply;
         let filter = {
                 /* Per i canali non mi serve l'id dell'utente che fa la richiesta, a meno che non sia AppSmm*/
-            ...((query.smm || !query.channel) && query.name) && {'owner':  {$regex: query.name , $options: 'i'}},
+            ...((query.smm || !query.channel) && query.name) && {'owner':  {$regex: query.name}},
                 /* FILTRO PER TIPO DI POST */
             ... (query.typeFilter && query.typeFilter !== 'all') && {'contentType': query.typeFilter},
 
@@ -328,24 +327,45 @@ const getAllPost = async (query,sessionUser) =>{
 
 
                 /* PER IL CANALE SINGOLO */
-            ... (query.channel) && {'destinationArray.name': {$regex: query.channel , $options: 'i'}},
+            ... (query.channel) && {'destinationArray.name': {$regex: query.channel}},
 
                 /* PER IL CANALE UFFICIALE */
-            ...(query.official) && {'officialChannelsArray': {$regex: query.official , $options: 'i'}},
+            ...(query.official) && {'officialChannelsArray': {$regex: query.official}},
 
-            ... (query.user) && {$or: [{'destinationArray.name': {$regex: query.user , $options: 'i'}}]},
+            ... (query.user) && {$or: [{'destinationArray.name': {$regex: query.user}}]},
 
             ... {'reply.isReply': reply, ... (reply) && {'reply.repliedPost': query.reply.repliedPost}},
 
-            ...(query?.keyword) && {tags: {$regex: query.keyword , $options: 'i'}}
+            ...(query?.keyword) && {tags: {$regex: query.keyword}},
+
         }
 
         await connection.get();
-        let posts = await Post.find(filter)
-            .skip(parseInt(query.offset))
-            .limit(parseInt(query.limit))
-            .sort(sorts[query.sort ?  query.sort : 'più recente'])
-            .lean();
+
+        let posts = await Post.aggregate([
+            {
+                $project: {
+                    owner: '$owner',
+                    destinationArray: '$destinationArray',
+                    officialChannelsArray: '$officialChannelsArray',
+                    category: '$category',
+                    popularity: '$popularity',
+                    contentType: '$contentType',
+                    content: '$content',
+                    reactions: '$reactions',
+                    dateOfCreation: '$dateOfCreation',
+                    criticalMass: '$criticalMass',
+                    views: '$views',
+                    tags: '$tags',
+                    reply: '$reply',
+                    views_count: {$size: '$views'},
+                }
+            },
+            {$match: filter},
+            {$sort: query.sort ? sorts[query.sort] : sorts['più recente']},
+            {$skip: parseInt(query.offset)},
+            {$limit: parseInt(query.limit)},
+        ])
 
         // Update delle views e della categoria se necessario
         let user = await User.findOne({username: sessionUser});

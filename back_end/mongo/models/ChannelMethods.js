@@ -13,7 +13,8 @@ const channelRoles = {
     '1': 'Admin',
     '2': 'Not Follower',
     '3': 'Writer',
-    '4': 'Follower',
+    '4': 'Pending',
+    '5': 'Follower'
 }
 
 
@@ -106,7 +107,7 @@ const getChannels = async (query) => {
                 //filtrare canale per nome
                 ...(query.filters.creator) && {'creator': {$regex: query.filters.creator, $options: 'i'}},
 
-                ...(query.filters.hasAccess) && {$or: [{'name': query.filters.hasAccess},{'admins': {$in: [query.filters.hasAccess]}},{'followers': {$in: [query.filters.hasAccess]}}]}
+                ...(query.filters.hasAccess) && {'admins': {$in: [query.filters.hasAccess]}}
         }
 
         if (query.filters.sortBy) {
@@ -255,7 +256,7 @@ const addAdmin = async function (username, adminName, channelName) {
         let checkAdmin = await Channel.findOne({$and: [{name: channelName},{'admins': user.username}]}).lean();
         if (checkAdmin) {
             if(creator.typeUser !== 'mod') {
-                channel = await Channel.findOneAndUpdate({$and: [{name: channelName},{'creator': admin.username}]},{$pull: {'admin': username}}).lean();
+                channel = await Channel.findOneAndUpdate({$and: [{name: channelName},{'creator': creator.username}]},{$pull: {'admins': username}}).lean();
                 await Channel.findOneAndUpdate({name: channelName},{$push: {'followers': {user: username,canWrite:true}}}).lean();
             }
             else {
@@ -265,7 +266,7 @@ const addAdmin = async function (username, adminName, channelName) {
         }
         else {
             if(creator.typeUser !== 'mod') {
-                channel = await Channel.findOneAndUpdate({$and: [{name: channelName},{'creator': admin.username}]},{$push: {'admin': username}}).lean();
+                channel = await Channel.findOneAndUpdate({$and: [{name: channelName},{'creator': creator.username}]},{$push: {'admins': username}}).lean();
                 await Channel.findOneAndUpdate({name: channelName},{$pull: {'followers': {user: username}}}).lean();
             }
             else {
@@ -306,7 +307,7 @@ const handleRequest = async function(adminName,userRequest,channelName,accepted)
             throw createError(`Non c'e' nessuna richiesta dell'utente ${userRequest}`,500);
 
         if (accepted) {
-            await Channel.findOneAndUpdate({name: channelName}, {$push: {'followers': {'user': userRequest}}});
+            await Channel.findOneAndUpdate({name: channelName}, {$push: {'followers': {'user': userRequest, 'canWrite':true}}});
         }
 
         await Channel.findOneAndUpdate({name: channelName}, {$pull: {'requests': {'user': userRequest}}});
@@ -316,12 +317,27 @@ const handleRequest = async function(adminName,userRequest,channelName,accepted)
     }
 }
 
+const handlePermission = async function(adminName, userRequest, channelName, canWrite) {
+    try {
+        await connection.get();
+        channelName = channelName.trim().toLowerCase();
+
+        let channel = await Channel.findOne({$and: [{name: channelName},{$or: [{'admins': adminName},{'creator': adminName}]}]}).lean();
+        if(!channel)
+            throw createError(`${adminName.username} non ha i permessi necessari`,400);
+
+        await Channel.findOneAndUpdate({name: channelName, 'followers.user':userRequest}, {$set: {'followers.$.canWrite': canWrite}});
+    }
+    catch (error) {
+        throw error
+    }
+}
 
 const getSingleChannel = async(name,user) => {
     try{
         await connection.get()
-        let ChannelName = name.trim().toLowerCase();
-        let channel = await Channel.findOne({name: ChannelName}).lean();
+        let channelName = name.trim().toLowerCase();
+        let channel = await Channel.findOne({name: channelName}).lean();
         let findUser = await User.findOne({username: user}).lean();
         let userRole;
 
@@ -329,17 +345,21 @@ const getSingleChannel = async(name,user) => {
         if(isCreator)
             userRole = 0;
         else  {
-            let isAdmin = channel.admins.filter((admin) => {return admin === findUser.username});
+            let isAdmin = channel.admins.filter((admin) => admin === findUser.username);
             if(isAdmin.length !== 0)
                 userRole = 1;
             else {
                 let isFollower = channel.followers.filter((follower) => {return follower.user === findUser.username});
-                if(isFollower.length === 0)
+                if(await Channel.findOne({name: channelName, 'requests.user': user})) {
+                    userRole = 4;
+                }
+                else if(isFollower.length === 0)
                     userRole = 2;
                 else if (isFollower[0].canWrite)
                     userRole = 3;
-                else
-                    userRole = 4;
+                else {
+                    userRole = 5;
+                }
             }
         }
 
@@ -423,4 +443,5 @@ module.exports = {
     addFollower,
     handleRequest,
     addAdmin,
+    handlePermission
 }
