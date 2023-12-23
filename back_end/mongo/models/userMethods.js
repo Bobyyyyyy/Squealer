@@ -421,6 +421,31 @@ const updateMaxQuota = async (percentage, user, ID = -1) => {
     }
 }
 
+const getAllSmm = async (query) => {
+    try {
+        await connection.get();
+        let offset = parseInt(query.offset);
+        let limit = parseInt(query.limit);
+
+        let filter =  {'typeUser': "smm"};
+        return await User.find(filter).skip(offset).limit(limit).lean();
+    } catch (e) {
+        throw(e);
+    }
+}
+
+const hireSmm = async (vipUsername, smmUsername) => {
+    try {
+        await connection.get();
+        let res = await User.findOneAndUpdate({username: smmUsername, typeUser: "smm"}, {$push: {vipHandled: vipUsername}}, { new: true }).lean();
+
+        console.log("new smm vip handled", res)
+        return res;
+    } catch (e) {
+        throw e;
+    }
+}
+
 
 /*      DEPLOY    */
 
@@ -453,5 +478,7 @@ module.exports = {
     changePopularity,
     getUserProfilePicture,
     updateProfilePicture,
-    clearDB
+    getAllSmm,
+    clearDB,
+    hireSmm
 }

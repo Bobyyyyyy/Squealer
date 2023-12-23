@@ -13,7 +13,11 @@ const addUser = async (req, res, next) => {
     }
 }
 const searchUser = async (req,res) => {
-    res.send(await userModel.searchByUsername(req.body));
+    try {
+        res.send(await userModel.searchByUsername(req.body));
+    } catch (err) {
+        res.status(err.statusCode).send(err.message);
+    }
 }
 
 const changePassword = async (req,res) => {
@@ -21,12 +25,19 @@ const changePassword = async (req,res) => {
 }
 
 const getSessionUser = async (req,res) => {
-    res.send({username: req.session.user});
+    try {
+        res.send({username: req.session.user});
+    } catch (err) {
+        res.status(err.statusCode).send(err.message);
+    }
 }
 
 const getUserProfileByName = async (req,res) => {
-    console.log(req.query)
-    res.send(await userModel.getUserProfilePicture(req.query.name));
+    try {
+        res.send(await userModel.getUserProfilePicture(req.query.name));
+    } catch (err) {
+        res.status(err.statusCode).send(err.message);
+    }
 }
 
 const updateUserProfilePic = async (req, res) => {
@@ -182,6 +193,26 @@ const clearDB = async (req,res) => {
         res.status(500).send(err);
     }
 }
+
+const getAllSmm = async (req, res) => {
+    try {
+        res.status(200).send(await userModel.getAllSmm(req.query));
+    } catch (error) {
+        res.send(error);
+    }
+}
+
+const hireSmm = async (req, res) => {
+    try {
+        let vipUsername = req.body.vipUsername;
+        let smmUsername = req.body.smmUsername
+        let response = await userModel.hireSmm(vipUsername, smmUsername);
+        res.status(200).send({ hired: true});
+    } catch (error) {
+        res.send(error);
+    }
+}
+
 module.exports = {
     addUser,
     searchUser,
@@ -201,5 +232,7 @@ module.exports = {
     getUserProfileByName,
     updateUserProfilePic,
     clearDB,
-    updateRemainingQuota
+    updateRemainingQuota,
+    getAllSmm,
+    hireSmm
 }

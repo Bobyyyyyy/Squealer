@@ -1,13 +1,14 @@
-function getUsernameFromLocStor () {
-    return localStorage.getItem("username");
+function getUsernameFromSessionStore () {
+    return sessionStorage.getItem("username");
 }
 
-async function setUsernameInLocStor() {
+async function setUsernameInSessionStore() {
     localStorage.clear();
+    sessionStorage.clear();
     try {
         let res = await fetch("/db/user/session");
-        let username = await res.json();
-        localStorage.setItem("username", username.username);
+        res = await res.json();
+        sessionStorage.setItem("username", res.username);
     } catch (e) {
         console.log("errore nel settare l'user nel local storage: ", e);
     }
@@ -183,8 +184,8 @@ const checkUserExists = async ({params}) => {
 
 
 export {
-    getUsernameFromLocStor,
-    setUsernameInLocStor,
+    getUsernameFromSessionStore,
+    setUsernameInSessionStore,
     getQuotaByUsername,
     getPostByUsername,
     getProfilePicByUsername,

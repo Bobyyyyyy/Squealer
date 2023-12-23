@@ -1,6 +1,6 @@
 import {useLoaderData, useParams} from "react-router-dom";
 import React, {Suspense, useEffect, useRef, useState} from "react";
-import {getPostByChannelName, getUsernameFromLocStor} from "../../utils/usefulFunctions.js";
+import {getPostByChannelName, getUsernameFromSessionStore} from "../../utils/usefulFunctions.js";
 import Post from "../../components/posts/Post.jsx";
 import {FollowIcon, DontFollow} from "../../components/assets/index.jsx";
 import {Button, Spinner} from "flowbite-react";
@@ -38,7 +38,7 @@ function SinglePageChannel() {
         fetch(`/db/channel/follower`, {
             method:"POST",
             body: JSON.stringify({
-                user: getUsernameFromLocStor(),
+                user: getUsernameFromSessionStore(),
                 channel: nome
             }),
             headers: {

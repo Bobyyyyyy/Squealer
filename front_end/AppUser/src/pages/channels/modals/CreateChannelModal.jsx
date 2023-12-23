@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Modal, Button, Radio, Label } from 'flowbite-react';
-import {getUsernameFromLocStor} from "../../../utils/usefulFunctions.js";
+import {getUsernameFromSessionStore} from "../../../utils/usefulFunctions.js";
 function CreateChannelModal({ isOpen, setIsOpen, setNuovoCanale}) {
 
     const [name, setName] = useState('');
@@ -21,7 +21,7 @@ function CreateChannelModal({ isOpen, setIsOpen, setNuovoCanale}) {
                 name:   name.toLowerCase().split(' ').join('_'),
                 description: description,
                 type: visibility,
-                creator: getUsernameFromLocStor(),
+                creator: getUsernameFromSessionStore(),
             }
             console.log("channel creato:", channel)
             await fetch("/db/channel",{

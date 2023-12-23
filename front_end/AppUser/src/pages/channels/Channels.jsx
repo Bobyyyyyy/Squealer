@@ -4,7 +4,7 @@ import Searchbar from "../search/Searchbar.jsx";
 import {Link} from "react-router-dom";
 import CreateChannelModal from "./modals/CreateChannelModal.jsx";
 import FiltersModal from "./modals/FiltersModal.jsx";
-import {getUsernameFromLocStor} from "../../utils/usefulFunctions.js";
+import {getUsernameFromSessionStore} from "../../utils/usefulFunctions.js";
 
 function Channels () {
 
@@ -31,7 +31,7 @@ function Channels () {
     }
 
     const checkRole = (admins, followers, creator, requests) => {
-        const name = getUsernameFromLocStor();
+        const name = getUsernameFromSessionStore();
         const isCreator = creator === name;
         const isAdmin = admins.some((adm) => adm === name);
         const isFollower = followers.some((follower) => follower.user === name);

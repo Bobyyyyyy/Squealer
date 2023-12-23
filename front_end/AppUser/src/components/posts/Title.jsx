@@ -1,4 +1,4 @@
-import {getProfilePicByUsername, getUsernameFromLocStor, parseTime} from "../../utils/usefulFunctions.js";
+import {getProfilePicByUsername, getUsernameFromSessionStore, parseTime} from "../../utils/usefulFunctions.js";
 import React, {Suspense, useEffect, useState} from "react";
 import {Link} from "react-router-dom";
 

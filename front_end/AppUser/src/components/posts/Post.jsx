@@ -5,7 +5,7 @@ import Title from "./Title.jsx";
 import {
     Dislike, Like, Heart, MadIcon, ProfilePic
 } from "../assets/index.jsx"
-import {getUsernameFromLocStor} from "../../utils/usefulFunctions.js";
+import {getUsernameFromSessionStore} from "../../utils/usefulFunctions.js";
 
 function Post({post}) {
 
@@ -18,14 +18,14 @@ function Post({post}) {
 
 
     // controllo bottoni
-    const lastReaction = post.reactions.find((reaction)=> reaction.user === getUsernameFromLocStor());
+    const lastReaction = post.reactions.find((reaction)=> reaction.user === getUsernameFromSessionStore());
     const [activeButton, setActiveButton] = useState(lastReaction ? lastReaction.rtype : null);
 
     async function changeActiveButton({id}) {
         setActiveButton((id === activeButton) ? undefined : id);
         // si può fare perché lo stato activeButton cambia
         // effettivamente quando il componente viene renderizzato
-        const user = getUsernameFromLocStor();
+        const user = getUsernameFromSessionStore();
         if (id !== activeButton) {
             const newReaction = {
                 rtype: id,

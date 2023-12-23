@@ -1,5 +1,5 @@
 import {
-    getUsernameFromLocStor,
+    getUsernameFromSessionStore,
     getPostByUsername,
     getUserInfoByUsername,
     compressBlob,
@@ -10,11 +10,12 @@ import React, {useEffect, useRef, useState} from "react";
 import Post from "../../components/posts/Post.jsx";
 import {Button, Spinner} from "flowbite-react";
 import BuyQuotaModal from "./modals/BuyQuotaModal.jsx";
+import HireSmmModal from "./modals/HireSmmModal.jsx";
 
 let imageObj = null;
 
 function Profile () {
-    const name = getUsernameFromLocStor();
+    const name = getUsernameFromSessionStore();
     const [posts, setPosts] = useState([]);
     const [btnChangePic, setBtnChangePic] = useState(false);
     const [imgEmpty, setImgEmpty] = useState(false);
@@ -22,6 +23,7 @@ function Profile () {
     const [isLink, setIsLink] = useState(false)
     const [quota, setQuota] = useState(null);
     const [updatedQuota, setUpdatedQuota] = useState(false);
+    const [updatedSmm, setUpdatedSmm] = useState(false);
 
     const [showBuyQuotaModal, setShowBuyQuotaModal] = useState(false);
     const [showSmmModal, setShowSmmModal] = useState(false);
@@ -68,7 +70,6 @@ function Profile () {
         const quotaRes = await getQuotaByUsername(name);
         setQuota(quotaRes);
         user.current = await getUserInfoByUsername(name);
-        console.log(user.current)
         const postRes = await getPostByUsername(name);
         setPosts(postRes);
         setIsLoading(false);
@@ -83,7 +84,6 @@ function Profile () {
         getQuotaByUsername(name)
             .then((res) => {
                 setQuota(res);
-                console.log(res);
                 setUpdatedQuota(false);
             })
     }, [updatedQuota])
@@ -137,9 +137,11 @@ function Profile () {
                     <BuyQuotaModal isOpen={showBuyQuotaModal} setIsOpen={setShowBuyQuotaModal} setHasUpdated={setUpdatedQuota}/>
                     <button
                         className="bg-primary px-4 py-2  text-lg rounded"
+                        onClick={()=>setShowSmmModal(true)}
                     >
                         Gestisci SMM
                     </button>
+                    <HireSmmModal isOpen={showSmmModal} setIsOpen={setShowSmmModal} setHasUpdated={setUpdatedSmm}/>
                 </>}
             </div>
             {btnChangePic &&

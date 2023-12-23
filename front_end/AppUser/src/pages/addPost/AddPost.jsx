@@ -5,13 +5,13 @@ import {
     blob2base64,
     compressBlob, getEmbed,
     getQuotaByUsername,
-    getUsernameFromLocStor
+    getUsernameFromSessionStore
 } from "../../utils/usefulFunctions.js";
 import {Toast} from "flowbite-react";
 import TimedPost from "./TimedPost.jsx";
 
 function AddPost(){
-    const username = getUsernameFromLocStor();
+    const username = getUsernameFromSessionStore();
     const [type, setType] = useState("text");
     const [destinations, setDestinations] = useState('');
     const [content, setContent] = useState('');

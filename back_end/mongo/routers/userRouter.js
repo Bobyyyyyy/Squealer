@@ -22,6 +22,8 @@ router.put('/sessionVip',userController.updateSessionVip);
 router.get('/sessionVip', userController.getSessionVip);
 router.get('/info',userController.getFollnPosts);
 router.get('/lastPost',userController.getLastPost);
+router.get('/allSmm', userController.getAllSmm);
+router.put('/hireSmm', userController.hireSmm);
 
 
 //router.put('/session', userController.modifyUser);
