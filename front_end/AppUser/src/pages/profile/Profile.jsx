@@ -22,6 +22,9 @@ function Profile () {
     const [isLoading, setIsLoading] = useState(false);
     const [isLink, setIsLink] = useState(false)
     const [quota, setQuota] = useState(null);
+    const [smm, setSmm] = useState([]);
+    const [hasSMM, setHasSMM] = useState(false);
+
     const [updatedQuota, setUpdatedQuota] = useState(false);
     const [updatedSmm, setUpdatedSmm] = useState(false);
 
@@ -29,7 +32,6 @@ function Profile () {
     const [showSmmModal, setShowSmmModal] = useState(false);
 
     const user = useRef(null);
-
 
     const changePic = async () => {
         try {
@@ -65,20 +67,46 @@ function Profile () {
         localStorage.clear();
     }
 
+    const getSmm = async () => {
+        let filter = JSON.stringify({
+            vipUsername: getUsernameFromSessionStore(),
+        });
+        let res = await fetch(`/db/user/allSmm?limit=100&offset=0&filter=${filter}`, {
+            method: 'GET'
+        })
+        if (res.ok) {
+            return await res.json();
+        }
+    }
+
     const fetchData = async () => {
         setIsLoading(true);
         const quotaRes = await getQuotaByUsername(name);
         setQuota(quotaRes);
         user.current = await getUserInfoByUsername(name);
         const postRes = await getPostByUsername(name);
+        console.log("post:", postRes);
         setPosts(postRes);
         setIsLoading(false);
+    }
+
+    const updateSmm = async () => {
+        let resSMM = await getSmm();
+        setHasSMM(resSMM.found);
+        setSmm(resSMM.smmUser);
+        setUpdatedSmm(false);
     }
 
     useEffect(() => {
         fetchData()
             .catch(console.error)
     }, []);
+
+    useEffect(() => {
+        updateSmm()
+            .catch(console.error)
+    }, [updatedSmm]);
+
 
     useEffect(() => {
         getQuotaByUsername(name)
@@ -88,9 +116,10 @@ function Profile () {
             })
     }, [updatedQuota])
 
+
     return (
         <>
-        {isLoading || user.current === null ? (
+        {isLoading || user.current === null || posts === undefined ? (
             <div className="flex h-screen items-center justify-center">
                 <Spinner aria-label="loading profile spinner" size="xl" color="pink" />
             </div>
@@ -141,7 +170,10 @@ function Profile () {
                     >
                         Gestisci SMM
                     </button>
-                    <HireSmmModal isOpen={showSmmModal} setIsOpen={setShowSmmModal} setHasUpdated={setUpdatedSmm}/>
+                    <HireSmmModal
+                        isOpen={showSmmModal} setIsOpen={setShowSmmModal}
+                        setHasUpdated={setUpdatedSmm} smm={smm} hasSMM={hasSMM}
+                    />
                 </>}
             </div>
             {btnChangePic &&
@@ -204,13 +236,14 @@ function Profile () {
                     </div>
                 </>
             }
-            {posts.map((post)=> {
+            {/*posts.map((post)=> {
                 return(
                     <Post
                         key={post._id}
                         post={post}
                     />
-                )})}
+                )})
+                */}
             {posts.length === 0 &&
             <div className="text-lg text-center mt-4">
                 Al momento non ci sono post!

@@ -426,18 +426,20 @@ const getAllSmm = async (query) => {
         await connection.get();
         let offset = parseInt(query.offset);
         let limit = parseInt(query.limit);
-
-        let filter =  {'typeUser': "smm"};
-        let vipUsername = query.filter.vipUsername;
-
-        let singleSMM = await User.find({typeUser:"smm",vipHandled: {$in: [vipUsername]}})
-
-        console.log("singleSMM", singleSMM);
+        JSON.parse(query.filter);
+        let filter =  JSON.parse(query.filter);
+        let vipUsername = filter.vipUsername;
+        let singleSMM = await User.find({vipHandled: {$in: [vipUsername]}})
         if (singleSMM.length === 0) {
-            return await User.find(filter).skip(offset).limit(limit).lean();
-        } else {
-            return singleSMM;
+            return {
+                found: false,
+                smmUser: await User.find({"typeUser": "smm"}).skip(offset).limit(limit).lean()
+            };
         }
+        return {
+            found: true,
+            smmUser: singleSMM
+        };
     } catch (e) {
         throw(e);
     }

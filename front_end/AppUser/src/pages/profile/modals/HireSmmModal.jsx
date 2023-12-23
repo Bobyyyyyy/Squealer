@@ -1,23 +1,8 @@
-import {useEffect, useState} from "react";
-import {Button, Modal, ToggleSwitch} from "flowbite-react";
+import React, {useEffect, useState} from "react";
+import {Button, Modal, Spinner, ToggleSwitch} from "flowbite-react";
 import {getUsernameFromSessionStore} from "../../../utils/usefulFunctions.js";
 
-function HireSmmModal({isOpen, setIsOpen, setHasUpdated}) {
-    const [smm, setSmm] = useState([]);
-
-    const getSmm = async () => {
-        let filter = JSON.stringify({
-            vipUsername: getUsernameFromSessionStore(),
-        });
-        let res = await fetch(`/db/user/allSmm?limit=100&offset=0&filter=${filter}`, {
-            method: 'GET'
-        })
-        if (res.ok) {
-            res = await res.json();
-            console.log(res);
-            setSmm(res);
-        }
-    }
+function HireSmmModal({isOpen, setIsOpen, setHasUpdated, smm, hasSMM}) {
 
     const hireSmm = async (smmUsername, isHiring) => {
         try {
@@ -32,17 +17,14 @@ function HireSmmModal({isOpen, setIsOpen, setHasUpdated}) {
                     "Content-Type":"application/json"
                 }})
             if (res.ok) {
-                res = await res.json();
-                console.log(res)
+                setHasUpdated(true);
+                return await res.json();
             }
         } catch (e) {
             console.log(e)
         }
     }
 
-    useEffect(() => {
-        getSmm()
-    }, []);
 
     return (
         <Modal show={isOpen} onClose={()=>setIsOpen(false)}>
@@ -50,37 +32,59 @@ function HireSmmModal({isOpen, setIsOpen, setHasUpdated}) {
                 Gestione SMM
             </Modal.Header>
             <Modal.Body>
-                {smm.map((smm) => {
-                    let numVipHandled = smm.vipHandled.length;
-                    return (
-                        <div key={smm._id} className="flex w-full flex-col justify-center items-start gap-2 py-2 my-2">
+                <>
+                    {hasSMM ? (
+                        <div className="flex w-full flex-col justify-center items-start gap-2 py-2 my-2">
                             <div className="flex w-full justify-center items-center gap-4">
                                 <img
                                     className="w-12 h-12 rounded-full"
-                                    src={smm.profilePicture} alt={`${smm.user}'s profile picture`}
+                                    src={smm[0].profilePicture} alt={`${smm[0].user}'s profile picture`}
                                 />
                                 <span className="text-xl">
-                                    {smm.username}
+                                    {smm[0].username}
                                 </span>
                             </div>
                             <div className="flex w-full justify-around items-center">
                                 <div className="flex gap-4">
-                                    <span className="text-lg">gestisce {numVipHandled} vips</span>
+                                    <span className="text-lg">gestisce {smm[0].vipHandled.length} vips</span>
                                 </div>
-                                <Button onClick={() => hireSmm(smm.username, true)}>
-                                    assumi
-                                </Button>
-                                <Button onClick={() => hireSmm(smm.username, false)}>
+                                <Button onClick={() => hireSmm(smm[0].username, false)}>
                                     licenzia
                                 </Button>
                             </div>
                         </div>
-                    );
-                })}
-                {smm.length === 0 &&
-                <div>
-                    Non ci sono SMM disponibili al momento!
-                </div>}
+                    ) : (
+                        <>
+                            {smm.map((smmUser) => {
+                                return (
+                                    <div key={smmUser._id} className="flex w-full flex-col justify-center items-start gap-2 py-2 my-2">
+                                        <div className="flex w-full justify-center items-center gap-4">
+                                            <img
+                                                className="w-12 h-12 rounded-full"
+                                                src={smmUser.profilePicture} alt={`${smmUser.username}'s profile picture`}
+                                            />
+                                            <span className="text-xl">
+                                                {smmUser.username}
+                                            </span>
+                                        </div>
+                                        <div className="flex w-full justify-around items-center">
+                                            <div className="flex gap-4">
+                                                <span className="text-lg">gestisce {smmUser.vipHandled.length} vips</span>
+                                            </div>
+                                            <Button onClick={() => hireSmm(smmUser.username, true)}>
+                                                assumi
+                                            </Button>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                            {smm.length === 0 &&
+                            <div>
+                                Non ci sono SMM disponibili al momento!
+                            </div>}
+                        </>
+                    )}
+                </>
             </Modal.Body>
         </Modal>
     );

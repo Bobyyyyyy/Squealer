@@ -71,6 +71,16 @@ function SinglePageChannel() {
             setIsLoading(false)
         }
     }
+/*
+    const updateRequestAdminFollower = async () => {
+
+    }
+
+    useEffect(() => {
+
+    }, []);
+
+ */
 
     useEffect(() => {
         fetchData()
