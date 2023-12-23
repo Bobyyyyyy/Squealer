@@ -37,33 +37,28 @@ const getReplies = async (parentID) => {
     try{
         await connection.get();
         let replies = await Reply.aggregate([
-            {
-                $project:{
-                    owner: '$owner',
-                    content: 'content',
-                    dateOfCreation: 'dateOfCreation',
-                },
-            },
             {$match: {'parent': parentID}},
-            {$sort: sorts['meno recente']},
-            /*
+            {$sort: sorts['più recente']},
             {
                 $lookup: {
                     from: "users",
                     localField: "owner",
                     foreignField: "username",
-                    pipeline:[
-                        {
-                            $project: {
-                                profilePicture: '$profilePicture'
-                            }
-                        }
-                    ],
                     as: "user_info",
-                }
+                },
+            },
+            {
+                $unwind: "$user_info"
+            },
+            {
+                $project:{
+                    owner: '$owner',
+                    content: '$content',
+                    dateOfCreation: '$dateOfCreation',
+                    profilePicture: '$user_info.profilePicture',
+                },
             },
 
-             */
         ]);
         return replies;
     }catch(error){
