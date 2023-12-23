@@ -2,18 +2,6 @@ let ChannelName = $('#channel-name').html();
 let User = $('#session-user').html();
 const urlRegex =/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
 
-function getEmbed(url) {
-    let regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-    let match = url.match(regExp);
-
-    if (match && match[2].length === 11) {
-        return match[2];
-    } else {
-        return 'error';
-    }
-}
-
-
 let LastCall = {
     limit : 5,
     offset: 0,
@@ -154,8 +142,7 @@ const showPosts = (filter,offset,limit,append = false) => {
                         break;
 
                     case 'video':
-                        const embeddedVideoLink = getEmbed(post.content);
-                        Post = Post + `<iframe src="//www.youtube.com/embed/${embeddedVideoLink}" class="w-100" allowfullscreen style="height: 60vh"></iframe>`
+                        Post = Post + `<iframe src="${post.content}" class="w-100" allowfullscreen style="height: 60vh"></iframe>`
                         break;
                 }
 
