@@ -6,5 +6,6 @@ dbRouter.use('/post',require('./postRouter'));
 dbRouter.use('/official',require('./officialChannelsRouter'));
 dbRouter.use('/channel',require('./channelsRouter'));
 dbRouter.use('/notification',require('./notificationRouter'));
+dbRouter.use('/reply', require('./replyRouter'));
 
 module.exports = dbRouter;

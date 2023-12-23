@@ -3,7 +3,7 @@ const User = require("../schemas/User");
 const Channel = require("../schemas/Channel");
 const Notification = require("../schemas/Notification")
 const ReservedChannel = require("../schemas/officialChannels");
-const {connectdb, createError, mongoCredentials,find_remove, CRITICAL_MASS_MULTIPLIER} = require("./utils");
+const {connectdb, createError, mongoCredentials,find_remove, CRITICAL_MASS_MULTIPLIER, sorts} = require("./utils");
 const {scheduledPostArr, getNextTick} = require("../controllers/utils");
 const nodeCron = require("node-cron");
 const {changePopularity} = require("./userMethods");
@@ -97,21 +97,6 @@ const updateScheduledPost = ( postId) => {
 const removeScheduledPost = (postId) => {
     let jobDel = find_remove(scheduledPostArr,postId);
     jobDel.job.stop();
-}
-
-const sorts = {
-    'più recente':{
-        dateOfCreation: -1
-    },
-    'meno recente':{
-        dateOfCreation: 1
-    },
-    'più visual':{
-        views: -1
-    },
-    'meno visual':{
-        views: 1
-    }
 }
 
 function parseText(squealText, squealNumber){
@@ -269,7 +254,6 @@ const addPost = async (post,quota) => {
             popularity: 'neutral',
             dateOfCreation: post.dateOfCreation,
             ...(post.tags && post.tags !== []) && {tags: post.tags},
-            ... ({'reply.isReply': !!post.reply, ...(!!post.reply) && {'reply.repliedPost': post.reply.repliedPost}}),
         })
 
         await newPost.save();
@@ -307,17 +291,15 @@ const addPost = async (post,quota) => {
  * @param {Number} query.offset - offset to skip
  * @param {String} query.limit - max number of post to return
  * @param {String} query.sort - only if Sort activated -- more recent by default
- * @param {Boolean} query.reply - if you want replies of a given post
  * @param {String} query.repliedPost - father id
  * @param {String} query.keyword - keyword search
  * @returns {Promise<*>}
  */
 const getAllPost = async (query,sessionUser) =>{
     try{
-        let reply = !!query?.reply;
         let filter = {
                 /* Per i canali non mi serve l'id dell'utente che fa la richiesta, a meno che non sia AppSmm*/
-            ...((query.smm || !query.channel) && query.name) && {'owner':  {$regex: query.name , $options: 'i'}},
+            ...((query.smm || !query.channel) && query.name) && {'owner':  {$regex: query.name}},
                 /* FILTRO PER TIPO DI POST */
             ... (query.typeFilter && query.typeFilter !== 'all') && {'contentType': query.typeFilter},
 
@@ -328,24 +310,42 @@ const getAllPost = async (query,sessionUser) =>{
 
 
                 /* PER IL CANALE SINGOLO */
-            ... (query.channel) && {'destinationArray.name': {$regex: query.channel , $options: 'i'}},
+            ... (query.channel) && {'destinationArray.name': {$regex: query.channel}},
 
                 /* PER IL CANALE UFFICIALE */
-            ...(query.official) && {'officialChannelsArray': {$regex: query.official , $options: 'i'}},
+            ...(query.official) && {'officialChannelsArray': {$regex: query.official}},
 
-            ... (query.user) && {$or: [{'destinationArray.name': {$regex: query.user , $options: 'i'}}]},
+            ... (query.user) && {$or: [{'destinationArray.name': {$regex: query.user}}]},
 
-            ... {'reply.isReply': reply, ... (reply) && {'reply.repliedPost': query.reply.repliedPost}},
+            ...(query?.keyword) && {tags: {$regex: query.keyword}},
 
-            ...(query?.keyword) && {tags: {$regex: query.keyword , $options: 'i'}}
         }
 
         await connection.get();
-        let posts = await Post.find(filter)
-            .skip(parseInt(query.offset))
-            .limit(parseInt(query.limit))
-            .sort(sorts[query.sort ?  query.sort : 'più recente'])
-            .lean();
+
+        let posts = await Post.aggregate([
+            {
+                $project: {
+                    owner: '$owner',
+                    destinationArray: '$destinationArray',
+                    officialChannelsArray: '$officialChannelsArray',
+                    category: '$category',
+                    popularity: '$popularity',
+                    contentType: '$contentType',
+                    content: '$content',
+                    reactions: '$reactions',
+                    dateOfCreation: '$dateOfCreation',
+                    criticalMass: '$criticalMass',
+                    views: '$views',
+                    tags: '$tags',
+                    views_count: {$size: '$views'},
+                }
+            },
+            {$match: filter},
+            {$sort: query.sort ? sorts[query.sort] : sorts['più recente']},
+            {$skip: parseInt(query.offset)},
+            {$limit: parseInt(query.limit)},
+        ])
 
         // Update delle views e della categoria se necessario
         let user = await User.findOne({username: sessionUser});
@@ -433,7 +433,6 @@ const addDestination = async (destination,postID) => {
                 }
                 await Channel.findByIdAndUpdate(channel._id,[{$set: {'postNumber': {$add: ['$postNumber',1]}}}]).lean();
                 await Post.findByIdAndUpdate(postID,{$push: {destinationArray: destination}},{new : true}).lean();
-                await Post.updateMany({'reply.repliedPost': postID}, {$push: {destinationArray: destination}}).lean();
 
                 let newNotification = channel.followers.map((follower) => {
                     return {user: follower.user, sender: 'mod', channel: channel._id};
@@ -611,7 +610,6 @@ const getLastPostUser = async (query) => {
 const postLength = async (filters) => {
     try {
         await connection.get()
-        let reply = !!filters?.reply;
 
         let filter = {
             /* Per i canali non mi serve l'id dell'utente che fa la richiesta, a meno che non sia AppSmm*/
@@ -632,7 +630,6 @@ const postLength = async (filters) => {
 
             ... (filters.user) && {$or: [{'destinationArray.name': {$regex: filters.user , $options: 'i'}}]},
 
-            ... {'reply.isReply': reply, ... (reply) && {'reply.repliedPost': filters.reply.repliedPost}},
         }
 
         let posts = await Post.find(filter).lean();

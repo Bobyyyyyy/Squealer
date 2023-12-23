@@ -11,9 +11,11 @@ router.post('/register',userController.addUser,frontPageController.createSession
 router.use('/mod',frontPageController.isMod,require('../../AppMod/routes/homepage'));
 router.get('/logout',frontPageController.logout);
 
+const path = require('path');
+const {isUser} = require("../controllers/FrontPageController");
+
 /* -------------------- for AppSmm build -------------------- */
 
-const path = require('path');
 
 const vueDir = path.join(rootDir ,'front_end','AppSmm','dist_vue/');
 
@@ -27,6 +29,25 @@ if(process.env.NODE_ENV === 'production') {
 else {
     router.get(['/AppSmm/','/AppSmm/*'], isSMM, async(req,res) => {
         res.render(rootDir + '/front_end/AppSmm/index.html')
+    })
+}
+
+
+/* -------------------- for AppUser build -------------------- */
+
+
+const reactDir = path.join(rootDir ,'front_end','AppUser','dist_react/');
+
+if(process.env.NODE_ENV === 'production') {
+    router.use(express.static(reactDir));
+    router.get(['/assets_react*','/assets_react/', '/user*'], isUser, async (req,res) => {
+        router.use(express.static(reactDir));
+        res.render(reactDir + 'index.html');
+    })
+}
+else {
+    router.get(['/user/','/user/*'], isUser, async(req,res) => {
+        res.render(rootDir + '/front_end/AppUser/index.html')
     })
 }
 
