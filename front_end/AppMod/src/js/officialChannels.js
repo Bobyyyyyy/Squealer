@@ -38,7 +38,7 @@ function getChannels (limit,offset,filter) {
             }
 
             let html = `${$.map(data,(channel,index) => `
-            <div class="mt-3 mx-auto rounded d-flex flex-row align-items-center text-center channeldiv" onclick="window.location.href = 'officialChannels/${channel.name}'" style="height:6vh; width: 90vw;">
+            <div class="mt-3 mx-auto rounded d-flex flex-row bg-back align-items-center text-center channeldiv" onclick="window.location.href = 'officialChannels/${channel.name}'" style="height:7vh; width: 90vw;">
                 <div style="width: 50%;"> §${channel.name}</> </div>
                 <div style="width: 50%;"> @${channel.creator}</> </div> 
             </div>`).join('\n')}`;

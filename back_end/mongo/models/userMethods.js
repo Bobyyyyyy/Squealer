@@ -167,7 +167,8 @@ const getUsers = async (query) =>{
         let offset = parseInt(query.offset);
         let limit = parseInt(query.limit);
 
-        query.filter = JSON.parse(query.filter);
+        if(typeof query.filter === "string")
+            query.filter = JSON.parse(query.filter);
 
         let filter = {
             // filtrare profili per nome

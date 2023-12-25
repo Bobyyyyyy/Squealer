@@ -45,7 +45,7 @@ const showPosts = (filters,append = false) => {
         type: 'get',
         success: (posts) => {
             if (posts.length === 0) {
-                $('#posts').empty().append(`<h4>Nessun Post Trovato</h4>`);
+                $('#posts').empty().append(`<h4 class="mt-5 text-white fw-bold">Nessun Post Trovato</h4>`);
                 $('#under_posts').empty();
                 return;
             }
@@ -94,6 +94,7 @@ const showPosts = (filters,append = false) => {
                         
                         
                         <div class="d-flex flex-row ms-auto">
+                        <button class="btn" onclick="getReplies('${post._id}')" data-bs-toggle="tooltip" data-bs-placement="top" title="Mostra risposte" ><i class="bi bi-chat-square-text-fill" ></i></button>
                             <div class="btn-group dropup">
                                 <button class="ms-2 btn"  data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="bi bi-three-dots"></i></i>
@@ -103,8 +104,6 @@ const showPosts = (filters,append = false) => {
                                      <li onclick = "post = '${post._id}'" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#changeDestination"> Modifica Destinatari</li>
                                 </ul>
                             </div>
-                            
-                            <button class="btn" id="delete-${id}"><i  class="bi bi-trash"></i></button>
                         </div>
                 </div>
                 <div class="card-body flex-row bg-back">`
@@ -190,7 +189,7 @@ $('#orderby').on('change',() => {
 
     if(orderBy === 'publication') {
         let options = `<label for="order"></label>
-                                <select class="select btn btn-success" id="order" autocomplete="off">
+                                <select class="select btn bg-secondary" id="order" autocomplete="off">
                                     <option value="" disabled selected>Ordine</option>
                                     <option value="più recente" >Piu' recenti</option>
                                     <option value="meno recente">Meno recenti</option>
@@ -199,7 +198,7 @@ $('#orderby').on('change',() => {
     }
 
     else if(orderBy === 'visuals') {
-        let options = `<label for="order"></label><select class="select btn btn-success" id="order" autocomplete="off">
+        let options = `<label for="order"></label><select class="select btn bg-secondary" id="order" autocomplete="off">
                                   <option value="" selected disabled>Ordine</option>
                                   <option value="più visual">Decrescente</option>
                                   <option value="meno visual">Crescente</option>
@@ -209,7 +208,7 @@ $('#orderby').on('change',() => {
 
     $('#order').on('change', () => {
         LastCall.filters.sort = $('#order option:selected').val();
-        console.log(LastCall.filters)
+        LastCall.filters.offset = 0;
         getPostsNumber(LastCall.filters)
     })
 
@@ -220,12 +219,14 @@ $('#orderby').on('change',() => {
 
 $('#order').on('change', () => {
     LastCall.filters.sort = $('#order option:selected').val();
+    LastCall.filters.offset = 0;
     getPostsNumber(LastCall.filters);
 })
 
 
 $('#channel-visual').on('change',() => {
     LastCall.filters.popularity = $('#channel-visual input:checked').val();
+    LastCall.filters.offset = 0;
     getPostsNumber(LastCall.filters);
 })
 
@@ -243,6 +244,7 @@ $('#filter').on("keyup", () => {
             break;
     }
 
+    LastCall.filters.offset = 0;
     getPostsNumber(LastCall.filters);
 });
 
@@ -334,8 +336,75 @@ function inizializeToast() {
     });
 }
 
+function inizializeToolTips() {
+    let tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    return tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+}
+
+function getReplies(parentID) {
+    $.ajax({
+        url: '/db/reply',
+        data: {parentid: parentID},
+        type: 'GET',
+        success: (replies) => {
+            let numberOfReplies = replies.length;
+            console.log(numberOfReplies)
+            if(numberOfReplies === 0) {
+                $('#replies').empty().append(`<h4>Nessuna risposta per questo post</h4>`)
+                $('#postReplies').modal('show');
+                return
+            }
+
+            let html = `${$.map(replies, (reply) => {
+                let content = `
+                  <div id="reply-${reply._id}" class="card mt-3 w-100 border rounded border-black">
+                    <div id="header-${reply._id}" class="card-header d-flex flex align-items-center bg-primary">
+                        <div class="d-flex flex-column">
+                            <div class="d-flex flex-row align-items-center justify-content-start">
+                                <div class="fw-bold">@${reply.owner}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body flex-row bg-back">
+                `
+                
+                let parsedText = `${reply.content}`.replace(urlRegex, function (url) {
+                    return `<a class="fw-bold"  href="${url}" target="_blank">${url}</a>`;
+                })
+                content = content + `<span><p class='card-text lead' > ${parsedText} </p></span></div>`
+                
+                
+                content = content + `</div>`
+                return content;
+            }).join('\n')}`;
+
+
+            $('#replies').empty().append(html)
+
+
+            $('#postReplies').modal('show');
+        }
+    })
+}
+
+
+// Usata per testare
+function addReply(parent) {
+    $.ajax({
+        url: '/db/reply',
+        data: {owner: User, content: "Ciao bel post di merda https://www.youtube.com/", parentid: parent},
+        type: 'POST',
+        success: (data) => {
+        }
+    })
+}
+
+
 
 $(document).ready(() => {
     getPostsNumber(LastCall.filters)
+    inizializeToolTips();
 })
 

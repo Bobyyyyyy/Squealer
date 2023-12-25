@@ -130,7 +130,13 @@ const getChannels = async (query) => {
         }
 
 
-        let channels = await Channel.find(filter).skip(offset).limit(limit).sort(sort).lean();
+        let channels = await Channel.aggregate([
+            {$match: filter},
+            {$sort: sort},
+            {$skip: offset},
+            {$limit: limit}
+        ])
+
 
         return channels;
 }

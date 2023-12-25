@@ -82,7 +82,7 @@ function userTable (limit,offset,filter) {
     updateLastCall(limit, offset, filter);
     $.ajax({
         url: '/db/user/all',
-        data: {limit: limit, offset: offset, filter: filter},
+        data: {filter: {name: filter}, limit: limit, offset: offset},
         type: 'get',
         success: (data) => {
             $('#pages').empty();
