@@ -3,9 +3,9 @@
 @tailwind utilities;
 
 * {
-    /*
     margin: 0;
     padding: 0;
+    /*
     border: solid red 1px;
     */
 }
@@ -34,94 +34,13 @@ body {
     margin: 0;
 }
 
-/*
 
-a {
-  text-decoration: none;
+.quotaCounter {
+    position: relative;
+    right: 0;
+    transition: transform 0.2s ease-in-out;
 }
 
-.containerOfNavbar {
-    position: fixed;
-    top: 0;
-    height: 100vh;
-    border-right: solid var(--lineaSeparazione);
-    padding: 0 12px 0 12px;
+.quotaCounter.active {
+    transform: translateX(-10px) rotate(-0.8deg);
 }
-
-
-@media only screen and (max-width: 600px) {
-    .containerOfNavbar {
-        border-top: solid var(--lineaSeparazione);
-        bottom: 0;
-        top: auto;
-        width: 100vw;
-    }
-}
-
-
-.navbar {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    height: 100%;
-}
-
-@media only screen and (max-width: 600px) {
-    display: flex;
-    margin: 12px 0 12px 0;
-}
-
-
-.navBtn {
-    background: var(--normalBtn);
-
-    text-decoration: none;
-    padding: 12px;
-
-    border-radius: 4px;
-    transition: background-color 0.3s;
-
-    margin: 12px 0 12px 0;
-}
-
-.selected {
-  background: var(--activeBtn);
-}
-
-.navBtn:active {
-  background: var(--activeBtn);
-}
-
-.navBtn:hover {
-  background: var(--activeBtn);
-}
-
-.textBtn{
-    width: fit-content;
-    font-size: medium;
-    height: auto;
-    margin: 0;
-    padding: 0 0 0 12px;
-}
-
-.imageIcon {
-    width: 24px;
-    height: 24px;
-    padding: 0;
-    margin: 0;
-}
-
-.imageAndText {
-    display: flex;
-    align-items: center;
-    width: fit-content;
-}
-
-.topButtons {
-    height: fit-content;
-    display: flex;
-    flex-direction: column;
-}
-
- */

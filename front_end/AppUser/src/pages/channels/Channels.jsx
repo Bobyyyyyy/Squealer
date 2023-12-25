@@ -1,10 +1,10 @@
 import {useEffect, useState} from "react";
 import {ProfilePic} from "../../components/assets/index.jsx"
-import Searchbar from "../../components/Searchbar.jsx";
+import Searchbar from "../search/Searchbar.jsx";
 import {Link} from "react-router-dom";
-import CreateChannelModal from "./CreateChannelModal.jsx";
-import FiltersModal from "./FiltersModal.jsx";
-import {getUsernameFromLocStor} from "../../components/utils/usefulFunctions.js";
+import CreateChannelModal from "./modals/CreateChannelModal.jsx";
+import FiltersModal from "./modals/FiltersModal.jsx";
+import {getUsernameFromSessionStore} from "../../utils/usefulFunctions.js";
 
 function Channels () {
 
@@ -18,8 +18,29 @@ function Channels () {
     const [admin, setAdmin] = useState('');
     const [queryFilter, setQueryFilter] = useState('');
 
+    const handleFilters = () => {
+        const filter = {
+            name: channelName,
+            type: visibility,
+            creator: owner,
+            hasAccess: admin
+        }
+
+        setQueryFilter(JSON.stringify(filter))
+        setShowFilterModal(false)
+    }
+
+    const checkRole = (admins, followers, creator, requests) => {
+        const name = getUsernameFromSessionStore();
+        const isCreator = creator === name;
+        const isAdmin = admins.some((adm) => adm === name);
+        const isFollower = followers.some((follower) => follower.user === name);
+        console.log(requests)
+        const isPending = !!requests && requests.some((req) => req.user === name);
+        return isCreator ? "creator" : (isAdmin ? "admin" : (isFollower ? "follower" : (isPending) ? "pending" : ""));
+    }
+
     useEffect(() => {
-        console.log("query",queryFilter)
         fetch(`/db/channel/?offset=0&filters=${queryFilter}`, {
             method: 'GET'
         })
@@ -35,27 +56,6 @@ function Channels () {
                     })
             })
     }, [nuovoCanale, queryFilter]);
-
-    const handleFilters = () => {
-        const filter = {
-            name: channelName,
-            type: visibility,
-            creator: owner,
-            hasAccess: admin
-        }
-
-        setQueryFilter(JSON.stringify(filter))
-        //console.log(query)
-        setShowFilterModal(false)
-    }
-
-    const checkRole = (admins, followers, creator, nameC) => {
-        const name = getUsernameFromLocStor();
-        const isCreator = creator === name;
-        const isAdmin = admins.some((adm) => adm === name);
-        const isFollower = followers.some((follower) => follower.user === name);
-        return isCreator ? "creator" : (isAdmin ? "admin" : (isFollower ? "follower" : ""));
-    }
 
     return (
         <>
@@ -77,10 +77,10 @@ function Channels () {
                 />
                 <div className="flex flex-wrap w-full h-fit max-h-[580px] overflow-y-scroll mt-2 gap-4">
                     {channels!==null && channels.map((channel) => {
-                        const role = checkRole(channel.admins, channel.followers, channel.creator, channel.name);
+                        const role = checkRole(channel.admins, channel.followers, channel.creator, channel.requests);
                         return (
                             <Link className="w-full" to={`/channels/${channel.name}`} key={channel._id} >
-                                <div className="flex w-full justify-start gap-4 border-2 border-black" key={channel._id}>
+                                <div className="flex w-full justify-start gap-4 border-2 border-black">
                                     <img src={ProfilePic} alt="immagine canale" className="w-14 h-14"/>
                                     <div className="flex flex-col overflow-x-hidden  mx-2 w-full">
                                         <div className="flex justify-between">

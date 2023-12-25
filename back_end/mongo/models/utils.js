@@ -34,6 +34,21 @@ const find_remove = (arr,id) => {
     return el2ret;
 }
 
+const sorts = {
+    'più recente':{
+        'dateOfCreation': -1
+    },
+    'meno recente':{
+        'dateOfCreation': 1
+    },
+    'più visual':{
+        'views_count': -1
+    },
+    'meno visual':{
+        'views_count': 1
+    }
+}
+
 
 module.exports = {
     CRITICAL_MASS_MULTIPLIER,
@@ -43,4 +58,5 @@ module.exports = {
     quota,
     createError,
     find_remove,
+    sorts
 }

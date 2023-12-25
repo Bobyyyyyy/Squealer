@@ -1,4 +1,4 @@
-import {MapContainer, Marker, Popup, TileLayer, useMap, useMapEvents} from "react-leaflet";
+import {MapContainer, Marker, Popup, TileLayer} from "react-leaflet";
 import {useEffect, useState} from "react";
 import {Icon} from "leaflet"
 import "leaflet/dist/leaflet.css"
@@ -61,43 +61,5 @@ function Mappa({position, setPosition}) {
         </div>
     );
 }
-/*
-function LocationMarker() {
-    const [position, setPosition] = useState(null)
-    //const map = useMap();
-
-    const map = useMapEvents({
-        click: () => {
-            let x = map.locate()
-            console.log(x)
-        },
-        locationfound(e) {
-            setPosition(e.latlng)
-            console.log("cord", e.latlng);
-            map.flyTo(e.latlng, map.getZoom())
-        },
-    })
-
-
-    const IconMarker = new Icon({
-        //iconUrl: MarkerPosition,
-        iconUrl: "/img/location.png",
-        iconSize: [48, 48],
-    })
-
-
-
-
-    return position === null ? null : (
-        <Marker
-            position={position}
-            icon={IconMarker}
-        >
-            <Popup>You are here</Popup>
-        </Marker>
-    )
-}
-
- */
 
 export default Mappa;

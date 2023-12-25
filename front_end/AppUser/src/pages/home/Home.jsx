@@ -1,25 +1,21 @@
 import Post from "../../components/posts/Post.jsx";
 import React, {Suspense, useEffect, useState} from "react";
 import {
-    getUsernameFromLocStor,
-    setUsernameInLocStor
-} from "../../components/utils/usefulFunctions.js";
-import {useFetch} from "../../components/utils/useFetch.js";
+    getUsernameFromSessionStore,
+    setUsernameInSessionStore
+} from "../../utils/usefulFunctions.js";
+import {Spinner} from "flowbite-react";
 
 function Home() {
     const [isLoading, setIsLoading] = useState(true);
     const [posts, setPosts] = useState([]);
-    /*
-    const {data, isLoading, error} = useFetch(`/db/post/all?name=${getUsernameFromLocStor()}&offset=0`);
-    console.log("isLoading", isLoading)
-    console.log("data", data);
-     */
-
 
     const fetchAllPosts = async () => {
         try {
 
-            let res = await fetch(`/db/post/all?offset=0&limit=10`);
+            let res = await fetch(`/db/post/all?offset=0&limit=10`, {
+                method: 'GET'
+            });
             console.log(res);
             if (!res.ok) {
                console.log("errore nel fetching dei post");
@@ -38,7 +34,7 @@ function Home() {
     };
 
     useEffect(() => {
-        setUsernameInLocStor()
+        setUsernameInSessionStore()
             .then((res) => {
                 fetchAllPosts()
                     .then()
@@ -46,30 +42,22 @@ function Home() {
     }, []);
 
 
-    function Caricamento () {
-        return (
-            <h1>
-                caricamento
-            </h1>
-        );
-    }
-
     return (
         <>
-            {isLoading && <h1>Caricamento...</h1>}
-            {!isLoading &&
-            <div className={"flex flex-wrap w-full gap-8 items-center justify-center h-screen pb-20 overflow-y-scroll"}>
-                {posts!==null && posts.map((post)=> {
-                    //console.log("id",post._id)
-                    return(
-                        <Suspense fallback={<Caricamento />} key={post._id}>
+            {isLoading ? (
+                <div className="flex h-screen items-center justify-center">
+                    <Spinner aria-label="loading profile spinner" size="xl" color="pink" />
+                </div>
+            ) : (
+                <div className={"flex flex-wrap w-full gap-8 items-center justify-center h-screen pb-20 overflow-y-scroll"}>
+                    {posts!==null && posts.map((post)=> {
+                        return(
                             <Post
-                                post={post}
+                                post={post} key={post._id}
                             />
-                        </Suspense>
-                )})}
-            </div>
-            }
+                    )})}
+                </div>
+            )}
          </>
     );
 }

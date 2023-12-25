@@ -166,10 +166,33 @@ const getUsers = async (query) =>{
         await connection.get();
         let offset = parseInt(query.offset);
         let limit = parseInt(query.limit);
-        return await User.find({$or : [{username: {$regex: query.filter , $options: 'i'}},{email: {$regex: query.filter , $options: 'i'}},{typeUser: {$regex: query.filter , $options: 'i'}}, ] } ).skip(offset).limit(limit).lean();
+
+        query.filter = JSON.parse(query.filter);
+
+        let filter = {
+            // filtrare profili per nome
+            ...(query.filter.name) && {'username': new RegExp(`^${query.filter.name}`)},
+            // filtrare profili per tipo ['public','private']
+            ...(query.filter.type) && {'type': query.filter.type},
+        }
+        return await User.find(filter).skip(offset).limit(limit).lean();
     }
     catch (err){
         throw err;
+    }
+}
+
+const getSingleUser = async (query) => {
+    try {
+        await connection.get()
+        let findUser = await User.findOne({username: query.name}).lean();
+        console.log(findUser);
+        if (!findUser) {
+            throw createError("l'utente non esiste", 404);
+        }
+        return findUser;
+    } catch (error) {
+        throw error;
     }
 }
 
@@ -398,6 +421,51 @@ const updateMaxQuota = async (percentage, user, ID = -1) => {
     }
 }
 
+const getAllSmm = async (query) => {
+    try {
+        await connection.get();
+        let offset = parseInt(query.offset);
+        let limit = parseInt(query.limit);
+        JSON.parse(query.filter);
+        let filter =  JSON.parse(query.filter);
+        let vipUsername = filter.vipUsername;
+        let singleSMM = await User.find({vipHandled: {$in: [vipUsername]}})
+        if (singleSMM.length === 0) {
+            return {
+                found: false,
+                smmUser: await User.find({"typeUser": "smm"}).skip(offset).limit(limit).lean()
+            };
+        }
+        return {
+            found: true,
+            smmUser: singleSMM
+        };
+    } catch (e) {
+        throw(e);
+    }
+}
+
+const hireSmm = async (vipUsername, smmUsername, isHiring) => {
+    try {
+        await connection.get();
+        let res = {};
+        if (isHiring) {
+            res = await User.findOneAndUpdate({
+                username: smmUsername,
+                typeUser: "smm"
+            }, {$push: {vipHandled: vipUsername}}, {new: true}).lean();
+        } else {
+            res = await User.findOneAndUpdate({
+                username: smmUsername,
+                typeUser: "smm"
+            }, {$pull: {vipHandled: vipUsername}}, {new: true}).lean();
+        }
+        return res;
+    } catch (e) {
+        throw e;
+    }
+}
+
 
 /*      DEPLOY    */
 
@@ -419,6 +487,7 @@ module.exports = {
     changePwsd,
     loginUser,
     getUsers,
+    getSingleUser,
     usersLength,
     altUser,
     getHandledVip,
@@ -429,5 +498,7 @@ module.exports = {
     changePopularity,
     getUserProfilePicture,
     updateProfilePicture,
-    clearDB
+    getAllSmm,
+    clearDB,
+    hireSmm
 }

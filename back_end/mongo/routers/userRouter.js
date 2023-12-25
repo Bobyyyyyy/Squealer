@@ -13,6 +13,7 @@ router.put('/profilePic', userController.updateUserProfilePic);
 router.get('/session',userController.getSessionUser);
 router.get('/number',userController.getUsersNumber);
 router.get('/all',userController.getAllUsers);
+router.get('/singleuser',userController.getSingleUser);
 router.get('/getVips',userController.getVips)
 router.get('/quota',userController.getQuota);
 router.put('/maxquota', userController.updateMaxQuota);
@@ -21,6 +22,9 @@ router.put('/sessionVip',userController.updateSessionVip);
 router.get('/sessionVip', userController.getSessionVip);
 router.get('/info',userController.getFollnPosts);
 router.get('/lastPost',userController.getLastPost);
+router.get('/allSmm', userController.getAllSmm);
+router.put('/hireSmm', userController.hireSmm);
+
 
 //router.put('/session', userController.modifyUser);
 router.delete('/clearDB', userController.clearDB);

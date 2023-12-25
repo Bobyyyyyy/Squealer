@@ -1,5 +1,5 @@
 import {Modal} from "flowbite-react";
-import {CheckIcon, DenyIcon} from "../../components/assets/index.jsx";
+import {CheckIcon, DenyIcon} from "../../../components/assets/index.jsx";
 
 function RequestModal({isOpen, setIsOpen, requests, channelName, hasUpdated, setHasUpdated}) {
 

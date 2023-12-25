@@ -32,13 +32,8 @@
       <h5 class="mb-0">Ultimo Post: </h5>
       <div v-if="!noPost" class="d-flex flex-row justify-content-center">
         <Post
-            :user="post.owner"
+            :post="post"
             :dest= "parseDestinationsViewPost(post.destinationArray, post.tags)"
-            :content="post.content"
-            :creationDate="new Date(post.dateOfCreation)"
-            :reactions = "post.reactions"
-            :contentType = "post.contentType"
-            :postId = "post._id"
             :numberOfPost="1"
             picProfile = "/img/defaultUser.jpeg"
         />

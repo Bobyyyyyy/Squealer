@@ -1,5 +1,5 @@
 import {Modal} from "flowbite-react";
-import {DenyIcon} from "../../components/assets/index.jsx";
+import {DenyIcon} from "../../../components/assets/index.jsx";
 
 function RmAdminModal({isOpen, setIsOpen, admins, channelName, hasUpdated, setHasUpdated}) {
     const promote2admin = (name) => {
