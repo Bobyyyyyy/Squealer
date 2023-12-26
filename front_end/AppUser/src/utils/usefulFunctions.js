@@ -29,7 +29,7 @@ async function getQuotaByUsername(username) {
 
 async function getPostByUsername(username){
     try {
-        let res = await fetch(`/db/post/all?name=${username}&offset=0`, {
+        let res = await fetch(`/db/post/all?name=${username}&offset=0&limit=100`, {
             method: 'GET',
         });
         if (res.ok) {

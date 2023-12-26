@@ -81,55 +81,82 @@ const showPosts = (filter,offset,limit,append = false) => {
         data: {official: ChannelName, typeFilter: filter , offset: offset, limit: limit},
         type: 'get',
         success: (posts) => {
-            if(posts.length === 0) {
-                $('#posts').empty().append(`<h4>Nessun Post Trovato</h4>`);
+            if (posts.length === 0) {
+                $('#posts').empty().append(`<h4 class="mt-5 text-white fw-bold">Nessun Post Trovato</h4>`);
                 $('#under_posts').empty();
                 return;
             }
             let html = `${$.map(posts, (post) => {
-                let id = post._id;
+                console.log(post.content)
+                let destinationNames = []
+                let officialChannelNames = [];
+
+                post.destinationArray.forEach(destination => {
+                    if (destination.destType === "channel") {
+                        destinationNames.push('§' + destination.name + '');
+                    }
+
+                    if (destination.destType === "user") {
+                        destinationNames.push('@' + destination.name);
+                    }
+                })
+
+                post.officialChannelsArray.forEach(destination => {
+                    officialChannelNames.push('§' + destination);
+                })
+
+
+                const id = post._id;
                 let reactions = {
                     heart: post.reactions.filter((reaction) => reaction.rtype === 'heart').length,
-                    heartbreak : post.reactions.filter((reaction) => reaction.rtype === 'heartbreak').length,
+                    heartbreak: post.reactions.filter((reaction) => reaction.rtype === 'heartbreak').length,
                     'thumbs-up': post.reactions.filter((reaction) => reaction.rtype === 'thumbs-up').length,
                     'thumbs-down': post.reactions.filter((reaction) => reaction.rtype === 'thumbs-down').length,
                 }
-                
+
                 let Post =
-                    `<div id="post-${id}" class="card mt-5 w-50">
-                    <div id="header-${id}" class="card-header d-flex border-black align-items-center" style="background-color: #CCBEF9">
-                        <div class="d-flex flex-row align-items-center justify-content-center">
+                    `<div id="post-${id}" class="card mt-5 w-50 border-black">
+                    <div id="header-${id}" class="card-header d-flex flex align-items-center bg-primary">
+                    <div class="d-flex flex-column">
+                        <div class="d-flex flex-row align-items-center justify-content-start">
                             <div class="fw-bold">@${post.owner}</div>
-                            <div class="ms-2 fw-light">${post.category}</div>
-                            <div class="ms-2 fw-light">/${post.popularity}</div>
+                            <div class="ms-1 fw-light">/${post.popularity}</div> 
                         </div>
+                        
+                        <div class="d-flex flex-row justify-content-start align-items-center" style="font-size: 10px">
+                            <div class="fw-light">${destinationNames}</div>
+                            <div class="ms-1 fw-light">${officialChannelNames}</div> 
+                        </div>
+                    </div>
+                        
                         
                         <div class="d-flex flex-row ms-auto">
                             <div class="btn-group dropup">
-                                <button class="ms-2 btn"  data-bs-toggle="dropdown" aria-expanded="false">
+                                <button class="btn" onclick="getReplies('${post._id}')" data-bs-toggle="tooltip" data-bs-placement="top" title="Mostra risposte" ><i class="bi bi-chat-square-text-fill" ></i></button>
+                                <button class="btn"  data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="bi bi-three-dots"></i></i>
                                 </button>
                                 <ul class="dropdown-menu">
                                     <li onclick = "post = '${post._id}'" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#changeReactions"> Modifica Reazioni</li>
                                 </ul>
+                                 <button class="btn" id="delete-${id}"><i class="bi bi-trash"></i></button>
                             </div>
-                            
-                            <button class="btn " id="delete-${id}"><i  class="bi bi-trash"></i></button>
+                           
                         </div>
                 </div>
-                <div class="card-body flex-row" style="background-color: #ECEAF5">`
-                
-                
+                <div class="card-body flex-row bg-back">`
+
+
                 switch (`${post.contentType}`) {
                     case 'text':
-                        let parsedText = `${post.content}`.replace(urlRegex, function(url) {
+                        let parsedText = `${post.content}`.replace(urlRegex, function (url) {
                             return `<a class="fw-bold"  href="${url}" target="_blank">${url}</a>`;
                         })
                         Post = Post + `<span><p class='card-text lead' > ${parsedText} </p></span>`
                         break;
 
                     case 'image':
-                        Post = Post + `<span><img src='${post.content}' class='card-img-top img-fluid' alt="content"></span>`
+                        Post = Post + `<span><img src='${post.content}' class='card-img-top img-fluid' alt="Immagine non valida"></span>`
                         break;
 
                     case 'geolocation':
@@ -138,13 +165,13 @@ const showPosts = (filter,offset,limit,append = false) => {
                         break;
 
                     case 'video':
-                        Post = Post + `<iframe src="${post.content}" class="w-100" allowfullscreen style="height: 60vh"></iframe>`
+                        
+                        Post = Post + `<iframe src="${post.content}" id="videoContent" class="w-100" allowfullscreen style="height: 60vh"></iframe>`
                         break;
-
                 }
-                
-                Post = Post +`</div>
-                    <div class="card-footer text-muted" style="background-color: #ECEAF5">
+
+                Post = Post + `</div>
+                    <div class="card-footer text-muted bg-back">
                         <div class="d-flex flex-row">
                             <div id="reactions-${id}" class="me-auto d-inline-flex"> 
                                 <div class="d-flex flex-row"><i class="bi bi-heart-fill"></i> <div class="ms-1">${reactions.heart}</div> </div>
@@ -167,33 +194,30 @@ const showPosts = (filter,offset,limit,append = false) => {
                     deletePost('${post._id}');
                 });
                 </script>`
-                
+
+
                 return Post
             }).join('\n')}`;
 
-
-
             if (offset + limit < LastCall.posts) {
-                $('#under_posts').html(`<div class="mx-auto"> <a id="load_posts" class="link-opacity-100 link-opacity-50-hover"> Carica altri post</a></div>`)
-            }
-            else {
+                $('#under_posts').html(`<div class="mx-auto"> <a id="load_posts" class="link-opacity-100 link-opacity-50-hover bg-secondary text-black rounded p-2"> Carica altri post </a></div>`)
+            } else {
                 $('#under_posts').empty();
             }
 
 
-
             if (append) {
                 $('#posts').append(html);
-            }
-            else {
+            } else {
                 $('#posts').empty().append(html);
             }
 
-            $('#load_posts').on('click',() => {
-                showPosts(filter,offset+limit,limit,true);
+            $('#load_posts').on('click', () => {
+                offset = offset + limit;
+                showPosts(filter,offset,limit,true);
             })
-
         }
+
     })
 }
 
@@ -229,7 +253,8 @@ $('#delete-button').on('click', () => {
 })
 
 
-$('#addPostButton').on('click',(contentType, content) => {
+$('#addPostForm').on('submit',(event,contentType, content) => {
+    event.preventDefault();
     contentType = $('#type-select option:selected').val();
 
     if(contentType === 'geolocation') {
@@ -265,7 +290,13 @@ $('#addPostButton').on('click',(contentType, content) => {
         type: 'post',
         success: (post) => {
             location.reload();
-        }
+        },
+       error: (error) => {
+            console.log(error)
+           $('#toast-content').empty().html(error.responseText);
+           let toastList = inizializeToast();
+           toastList.forEach(toast => toast.show()); // This show them
+       }
     })
 
 })
@@ -280,12 +311,12 @@ $('#type-select').on('change',() => {
                         <div id="content" class="mt-2" style="width: 100%">
                             <div class="d-flex flex-row align-items-center">
                                 <label for="short-link" class="mt-2 form-label w-25">
-                                    <textarea class="form-control" id="short-link" name="shortener" rows="1" placeholder="Inserisci link" style="resize: none" data-role="none" autocomplete="off"></textarea>
+                                    <textarea class="form-control" id="short-link" name="shortener" rows="1" placeholder="Inserisci link" style="resize: none;" data-role="none" autocomplete="off"></textarea>
                                 </label>
                                 <button type="button" id="shortener-button" class="btn btn-primary ms-2"> Accorcia link </button>
                             </div>
                             <label for="post-content" class="form-label w-100" style>
-                                <textarea class="form-control" name="content" id="post-content" rows="3" placeholder="Inserisci testo o link per immagine...." style="resize: none" data-role="none" autocomplete="off"></textarea>
+                                <textarea class="form-control" name="content" id="post-content" rows="3" placeholder="Inserisci testo o link per immagine...." style="resize: none" data-role="none" autocomplete="off" required></textarea>
                             </label>
                         </div>
 `
@@ -295,13 +326,13 @@ $('#type-select').on('change',() => {
         case 'image':
             let preview = `
                         <div class="mx-auto">
-                            <button id="preview-button" class="btn btn-success ms-2"><i class="bi bi-upload"></i></button>
+                            <button id="preview-button" type="button" class="btn btn-success ms-2"><i class="bi bi-upload"></i></button>
                         </div>`
 
             let imageInput = `
                             <div id="content" class="mt-3 d-flex flex-row" style="width: 100%">
                                 <label for="post-content" class="form-label w-100" style>
-                                    <textarea class="form-control" id="post-content" name="content" rows="1" placeholder="Inserisci link immagine" style="resize: none" data-role="none" autocomplete="off"></textarea>
+                                    <textarea class="form-control" id="post-content" name="content" rows="1" placeholder="Inserisci link immagine" style="resize: none" data-role="none" autocomplete="off" required></textarea>
                                 </label>
                             </div><div id="preview"></div>`
             $('#content').empty().replaceWith(imageInput);
@@ -314,13 +345,13 @@ $('#type-select').on('change',() => {
         case 'video':
             let videoPreview = `
                         <div class="mx-auto">
-                            <button id="preview-button" class="btn btn-success ms-2"><i class="bi bi-upload"></i></button>
+                            <button id="preview-button" type="button" class="btn btn-success ms-2"><i class="bi bi-upload"></i></button>
                         </div>`
 
             let videoInput = `
                             <div id="content" class="mt-3 d-flex flex-row" style="width: 100%">
                                 <label for="post-content" class="form-label w-100" style>
-                                    <textarea class="form-control" id="post-content" name="content" rows="1" placeholder="Inserisci link video" style="resize: none" data-role="none" autocomplete="off"></textarea>
+                                    <textarea class="form-control" id="post-content" name="content" rows="1" placeholder="Inserisci link video" style="resize: none" data-role="none" autocomplete="off" required></textarea>
                                 </label>
                             </div><div class="d-flex flex-row justify-content-center text-center align-items-center h-100 w-100 text-dark" id="preview"></div>`
             $('#content').empty().replaceWith(videoInput);
@@ -382,13 +413,21 @@ $('#timedButton').on('change', () => {
 })
 
 
-$('#changeReactionsButton').on('click',() => {
+$('#changeReactionsForm').on('submit',(event) => {
+    event.preventDefault();
 
     let reactions = {
-        heart: $('#heart').val(),
-        heartbreak: $('#heartbreak').val(),
-        'thumbs-up': $('#thumbs-up').val(),
-        'thumbs-down': $('#thumbs-down').val(),
+        heart: parseInt($('#heart').val()),
+        heartbreak: parseInt($('#heartbreak').val()),
+        'thumbs-up': parseInt($('#thumbs-up').val()),
+        'thumbs-down': parseInt($('#thumbs-down').val()),
+    }
+
+    if(reactions.heart + reactions.heartbreak + reactions["thumbs-up"] + reactions["thumbs-down"] > 500) {
+        $('#toast-content').empty().html(`Puoi aggiungere al massimo 500 reactions`);
+        let toastList = inizializeToast();
+        toastList.forEach(toast => toast.show()); // This show them
+        return;
     }
 
     let allReactions = []
@@ -423,21 +462,78 @@ $('#changeReactionsButton').on('click',() => {
         })
     }
 
-    if(allReactions.length > 500) {
-        alert('Puoi aggiungere al massimo 500 reactions!!');
-        return;
-    }
-
     $.ajax({
         url: '/db/post/updateReaction',
         data: {user: User, reactions: JSON.stringify(allReactions), postId: post},
         type: 'put',
         success: (data) => {
             location.reload();
+        },
+        error: (error) => {
+            $('#toast-content').empty().html(error.responseJSON.mes);
+            let toastList = inizializeToast();
+            toastList.forEach(toast => toast.show()); // This show them
         }
     })
+
+
 })
 
+function inizializeToast() {
+    let toastElList = [].slice.call(document.querySelectorAll('.toast'))
+    return toastList = toastElList.map(function(toastEl) {
+        // Creates an array of toasts (it only initializes them)
+        return new bootstrap.Toast(toastEl) // No need for options; use the default options
+    });
+}
+
+function getReplies(parentID) {
+    $.ajax({
+        url: '/db/reply',
+        data: {parentid: parentID},
+        type: 'GET',
+        success: (replies) => {
+            let numberOfReplies = replies.length;
+            if(numberOfReplies === 0) {
+                console.log('porcodio')
+                $('#replies').empty().append(`<h4>Nessuna risposta per questo post</h4>`)
+                $('#postReplies').modal('show');
+                return
+            }
+
+            let html = `${$.map(replies, (reply) => {
+                let content = `
+                  <div id="reply-${reply._id}" class="card mt-3 w-100 border rounded border-black">
+                    <div id="header-${reply._id}" class="card-header d-flex flex align-items-center bg-primary">
+                        <div class="d-flex flex-column w-100">
+                            <div class="d-flex flex-row align-items-center justify-content-start w-100">
+                                <div class="fw-bold">@${reply.owner}</div>
+                                <div class="fw-bold ms-auto">${reply.dateOfCreation.split('T')[0]},
+                                ${reply.dateOfCreation.split('T')[1].split('.')[0]}</div>
+                                </div>
+                        </div>
+                    </div>
+                    <div class="card-body flex-row bg-back">
+                `
+
+                let parsedText = `${reply.content}`.replace(urlRegex, function (url) {
+                    return `<a class="fw-bold"  href="${url}" target="_blank">${url}</a>`;
+                })
+                content = content + `<span><p class='card-text lead' > ${parsedText} </p></span></div>`
+
+
+                content = content + `</div>`
+                return content;
+            }).join('\n')}`;
+
+
+            $('#replies').empty().append(html)
+
+
+            $('#postReplies').modal('show');
+        }
+    })
+}
 
 
 

@@ -44,7 +44,7 @@
         <div class="navbar-collapse collapse dual-collapse2" style="flex-basis: 100%">
             <div class="ms-auto"></div>
             <span class="navbar-text text-white ms-auto me-2">@<span id="session-user" >${user}</span></span>
-            <button class="btn btn-light btn-outline-danger" onclick="window.location.href = '/logout'">Logout</button>
+            <button class="btn btn-outline-light bg-accent" onclick="window.location.href = '/logout'">Logout</button>
         </div>
     </div>
 </nav>
@@ -54,6 +54,7 @@
 <div class="d-flex flex-column">
 
     <div class="p-5 flex-column text-white" id="div1" style="height: 100%; width: 100%">
+        <div class="d-flex flex-column align-items-center justify-content-center w-100">
         <h1> §<span id="channel-name" class="fw-bold">${name}</span> </h1>
         <h6 class="fw-light"> creato da @<span id="channel-creator"></span></h6>
         <div class="d-inline-flex flex-row align-items-center pt-3">
@@ -63,31 +64,32 @@
                 Fatto
             </button>
         </div>
+        </div>
+
         <!-- Modal Button -->
         <div class="d-flex flex-row align-items-center pt-4">
-            <div class="me-2">Filters: </div>
-            <div id="post-filters" class="btn-group" role="group" aria-label="Radio toggle button for type of posts">
-                <input type="radio" class="btn-check" name="filters" id="filter-all" value="" checked>
-                <label class="btn btn-light" for="filter-all">Mostra tutti</label>
+            <div id="post-filters" class="btn-group text-black" role="group" aria-label="Radio toggle button for type of posts">
+                <input type="radio" class="btn-check " name="filters" id="filter-all" value="" checked>
+                <label class="btn bg-secondary" for="filter-all">Mostra tutti</label>
 
                 <input type="radio" class="btn-check" name="filters" id="filter-text" value="text">
-                <label class="btn btn-light" for="filter-text">Testo</label>
+                <label class="btn bg-secondary" for="filter-text">Testo</label>
 
                 <input type="radio" class="btn-check" name="filters" id="filter-image" value="image">
-                <label class="btn btn-light" for="filter-image">Immagini</label>
+                <label class="btn bg-secondary" for="filter-image">Immagini</label>
 
                 <input type="radio" class="btn-check" name="filters" id="filter-geo" value="geolocation">
-                <label class="btn btn-light" for="filter-geo">Geolocalizzazione</label>
+                <label class="btn bg-secondary" for="filter-geo">Geolocalizzazione</label>
 
                 <input type="radio" class="btn-check" name="filters" id="filter-video" value="video">
-                <label class="btn btn-light" for="filter-video">Video</label>
+                <label class="btn bg-secondary" for="filter-video">Video</label>
             </div>
 
                 <div class="ms-auto m-1">
-                    <button type="button" class="btn btn-primary ms-auto " data-bs-toggle="modal" data-bs-target="#addPost">
+                    <button type="button" class="btn bg-secondary ms-auto text-black " data-bs-toggle="modal" data-bs-target="#addPost">
                         Aggiungi Post
                     </button>
-                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteChannel">
+                    <button type="button" class="btn btn-danger text-black" data-bs-toggle="modal" data-bs-target="#deleteChannel">
                         Elimina Canale
                     </button>
                 </div>
@@ -113,10 +115,11 @@
 <div class="modal fade" id="addPost" tabindex="-1" aria-labelledby="addPostModal" aria-hidden="true">
 <div class="modal-dialog modal-lg">
     <div class="modal-content">
-        <div class="modal-header bg-info">
+        <div class="modal-header bg-primary">
             <h1 class="modal-title fs-5 fw-bold">Inserisci post in §${name}</h1>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
+        <form id="addPostForm">
             <div class="modal-body">
                 <div>
                     <select id="type-select" class="form-select" aria-label="Post type select" autocomplete="off">
@@ -129,28 +132,29 @@
 
                 <div class="form-group d-flex align-items-center flex-column">
                     <div id="content" class="mt-2" style="width: 100%">
-                        <div class="d-flex flex-row align-items-center">
-                            <label for="short-link" class="mt-2 form-label w-25">
+                        <div class="d-flex flex-row align-items-center h-100">
+                            <label for="short-link" class="form-label w-50">
                                 <textarea class="form-control" id="short-link" name="shortener" rows="1" placeholder="Inserisci link" style="resize: none" data-role="none" autocomplete="off"></textarea>
                             </label>
-                            <button type="button" id="shortener-button" class="btn btn-primary ms-2"> Accorcia link </button>
+                            <button type="button" id="shortener-button" class="btn bg-secondary ms-2 h-100"> Accorcia link </button>
                         </div>
                         <label for="post-content" class="form-label w-100" style>
-                            <textarea class="form-control" name="content" id="post-content" rows="3" placeholder="Inserisci testo o link per immagine...." style="resize: none" data-role="none" autocomplete="off"></textarea>
+                            <textarea class="form-control" name="content" id="post-content" rows="3" placeholder="Inserisci testo o link per immagine...." style="resize: none" data-role="none" autocomplete="off" required></textarea>
                         </label>
                     </div>
 
                     <div class="d-flex flex-column align-items-center">
                         <input type="checkbox" class="btn-check" name="timedButton" id="timedButton" autocomplete="off">
-                        <label class="btn btn-primary" for="timedButton">Timed Post</label>
+                        <label class="btn bg-secondary" for="timedButton">Timed Post</label>
                         <div class="d-flex flex-row mt-2" id="timedParameters"></div>
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
-                <button type="submit" id="addPostButton" class="btn btn-primary">Inserisci</button>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Chiudi</button>
+                <button type="submit" id="addPostButton" class="btn bg-primary">Inserisci</button>
             </div>
+        </form>
     </div>
 </div>
 </div>
@@ -178,36 +182,68 @@
 <div class="modal fade" id="changeReactions" tabindex="-1" aria-labelledby="changeReactionsModal" aria-hidden="true" style="top:25%">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <h1 class="modal-title fs-5 fw-bold">Aggiungi reazioni</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="changeReactionsForm">
                 <div class="modal-body d-flex flex-row">
                     <div class="d-flex flex-column align-items-center">
                         <label for="heart" class="form-label w-75"> <i class="bi bi-heart-fill"></i> Heart
-                            <input type="number" class="form-control" name="heart" id="heart" min="0" value="0">
+                            <input type="number" class="form-control" name="heart" id="heart" min="0" value="0" autocomplete="off">
                         </label>
                     </div>
                     <div class="d-flex flex-column align-items-center">
                         <label for="heartbreak" class="form-label w-75"> <i class="bi bi-heartbreak"></i> Heartbreak
-                            <input type="number" class="form-control" name="heartbreak" id="heartbreak" min="0" value="0">
+                            <input type="number" class="form-control" name="heartbreak" id="heartbreak" min="0" value="0" autocomplete="off">
                         </label>
                     </div>
                     <div class="d-flex flex-column align-items-center">
                         <label for="thumbs-up" class="form-label w-75"> <i class="bi bi-hand-thumbs-up-fill"></i> Thumbs-Up
-                            <input type="number" class="form-control" name="thumbs-up" id="thumbs-up" min="0"  value="0">
+                            <input type="number" class="form-control" name="thumbs-up" id="thumbs-up" min="0" value="0" autocomplete="off">
                         </label>
                     </div>
                     <div class="d-flex flex-column align-items-center">
                         <label for="thumbs-down" class="form-label w-75"> <i class="bi bi-hand-thumbs-down"></i> Thumbs-Down
-                            <input type="number" class="form-control" name="thumbs-down" id="thumbs-down" min="0" pattern="[0-9]{10}" value="0">
+                            <input type="number" class="form-control" name="thumbs-down" id="thumbs-down" min="0" value="0"  autocomplete="off">
                         </label>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
-                    <button class="btn btn-primary" id="changeReactionsButton">Modifica</button>
+                    <button type="button" class="btn bg-secondary" data-bs-dismiss="modal">Chiudi</button>
+                    <button type="submit" class="btn bg-primary" id="changeReactionsButton">Modifica</button>
                 </div>
+            </form>
         </div>
     </div>
 </div>
 
+<div class="modal fade" id="postReplies" tabindex="-1" aria-labelledby="postRepliesModal" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <h1 class="modal-title fs-5 fw-bold">Risposte</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body d-flex flex-column bg-secondary rounded">
+                <div id="replies" class="d-flex flex-column align-items-center">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="toast-container position-fixed top-0 end-0 p-3">
+    <div class="toast align-items-center text-bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body" id="toast-content">
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
 
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>

@@ -161,7 +161,7 @@ const showPosts = (filters,append = false) => {
             }).join('\n')}`;
 
             if (filters.offset + filters.limit < LastCall.posts) {
-                $('#under_posts').html(`<div class="mx-auto"> <a id="load_posts" class="link-opacity-100 link-opacity-50-hover"> Carica altri post </a></div>`)
+                $('#under_posts').html(`<div class="mx-auto"> <a id="load_posts" class="link-opacity-100 link-opacity-50-hover bg-secondary text-black rounded p-2"> Carica altri post </a></div>`)
             } else {
                 $('#under_posts').empty();
             }
@@ -249,13 +249,21 @@ $('#filter').on("keyup", () => {
 });
 
 
-$('#changeReactionsButton').on('click',() => {
+$('#changeReactionsForm').on('submit',(event) => {
+    event.preventDefault();
 
     let reactions = {
-        heart: $('#heart').val(),
-        heartbreak: $('#heartbreak').val(),
-        'thumbs-up': $('#thumbs-up').val(),
-        'thumbs-down': $('#thumbs-down').val(),
+        heart: parseInt($('#heart').val()),
+        heartbreak: parseInt($('#heartbreak').val()),
+        'thumbs-up': parseInt($('#thumbs-up').val()),
+        'thumbs-down': parseInt($('#thumbs-down').val()),
+    }
+
+    if(reactions.heart + reactions.heartbreak + reactions["thumbs-up"] + reactions["thumbs-down"] > 500) {
+        $('#toast-content').empty().html(`Puoi aggiungere al massimo 500 reactions`);
+        let toastList = inizializeToast();
+        toastList.forEach(toast => toast.show()); // This show them
+        return;
     }
 
     let allReactions = []
@@ -290,22 +298,25 @@ $('#changeReactionsButton').on('click',() => {
         })
     }
 
-    if(allReactions.length > 500) {
-        alert('Puoi aggiungere al massimo 500 reactions!!');
-        return;
-    }
-
     $.ajax({
         url: '/db/post/updateReaction',
         data: {user: User, reactions: JSON.stringify(allReactions), postId: post},
         type: 'put',
         success: (data) => {
             location.reload();
+        },
+        error: (error) => {
+            $('#toast-content').empty().html(error.responseJSON.mes);
+            let toastList = inizializeToast();
+            toastList.forEach(toast => toast.show()); // This show them
         }
     })
+
+
 })
 
-$('#addDestinationButton').on('click',() => {
+$('#addDestinationForm').on('submit',(event) => {
+    event.preventDefault();
     let destination = {
         destType: $('#type-select option:selected').val(),
         name: $('#destination-name').val(),
@@ -322,7 +333,7 @@ $('#addDestinationButton').on('click',() => {
             $('#toast-content').empty().html(error.responseJSON.mes);
             let toastList = inizializeToast();
             toastList.forEach(toast => toast.show()); // This show them
-            }
+        }
     })
 
 })
@@ -361,10 +372,12 @@ function getReplies(parentID) {
                 let content = `
                   <div id="reply-${reply._id}" class="card mt-3 w-100 border rounded border-black">
                     <div id="header-${reply._id}" class="card-header d-flex flex align-items-center bg-primary">
-                        <div class="d-flex flex-column">
-                            <div class="d-flex flex-row align-items-center justify-content-start">
+                        <div class="d-flex flex-column w-100">
+                            <div class="d-flex flex-row align-items-center justify-content-start w-100">
                                 <div class="fw-bold">@${reply.owner}</div>
-                            </div>
+                                <div class="fw-bold ms-auto">${reply.dateOfCreation.split('T')[0]},
+                                ${reply.dateOfCreation.split('T')[1].split('.')[0]}</div>
+                                </div>
                         </div>
                     </div>
                     <div class="card-body flex-row bg-back">

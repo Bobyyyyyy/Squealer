@@ -30,6 +30,10 @@ td {
     height: 10vh;
 }
 
+a {
+    cursor:pointer;
+    text-decoration: none;
+}
 .channeldiv {
     background-color: white;
 }
