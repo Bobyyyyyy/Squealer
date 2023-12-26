@@ -8,6 +8,7 @@ function PageProfileByName() {
     const user = useLoaderData();
     const [posts, setPosts] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
+
     const fetchData = async () => {
         setIsLoading(true);
         let postsRes = await getPostByUsername(user.username);
@@ -18,7 +19,7 @@ function PageProfileByName() {
     useEffect(() => {
         fetchData()
             .catch(console.error);
-    }, []);
+    }, [user]);
 
     return (
         <>
