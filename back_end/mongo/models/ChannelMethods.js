@@ -338,6 +338,11 @@ const getSingleChannel = async(name,user) => {
         await connection.get()
         let channelName = name.trim().toLowerCase();
         let channel = await Channel.findOne({name: channelName}).lean();
+
+        if (!channel) {
+            throw createError('Canale Non trovato',404);
+        }
+
         let findUser = await User.findOne({username: user}).lean();
         let userRole;
 
@@ -361,12 +366,6 @@ const getSingleChannel = async(name,user) => {
                     userRole = 5;
                 }
             }
-        }
-
-        if (!channel) {
-            let err = new Error("Nessun canale trovato!");
-            err.statusCode = 400;       // 400 ??;
-            throw err;
         }
 
         channel.role = channelRoles[userRole];

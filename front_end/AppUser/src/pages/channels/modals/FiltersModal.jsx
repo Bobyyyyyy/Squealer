@@ -1,6 +1,6 @@
 import { Modal, Button, Radio, Label, Checkbox } from 'flowbite-react';
 import React from "react";
-import {getUsernameFromLocStor} from "../../components/utils/usefulFunctions.js";
+import {getUsernameFromSessionStore} from "../../../utils/usefulFunctions.js";
 
 function FiltersModal({isOpen, setIsOpen, channelName, setChannelName, visibility,
                           setVisibility, owner, setOwner, admin, setAdmin,handleSearch}) {
@@ -50,14 +50,14 @@ function FiltersModal({isOpen, setIsOpen, channelName, setChannelName, visibilit
                           type="checkbox"
                           id="creator"
                           checked={!!owner}
-                          onChange={()=>setOwner((!owner)? getUsernameFromLocStor() : '')}
+                          onChange={()=>setOwner((!owner)? getUsernameFromSessionStore() : '')}
                       />
                       <Label>Sono il creatore</Label>
                       <input
                           type="checkbox"
                           id="creator"
                           checked={!!admin}
-                          onChange={()=>setAdmin((!admin)? getUsernameFromLocStor() : '')}
+                          onChange={()=>setAdmin((!admin)? getUsernameFromSessionStore() : '')}
                       />
                       <Label>Sono l'admin</Label>
                   </div>

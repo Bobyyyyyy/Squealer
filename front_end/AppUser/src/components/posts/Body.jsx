@@ -9,10 +9,10 @@ function Body({post}) {
     return (
         <div className={"flex justify-center"}>
             {post.contentType === "text" &&
-                <p className="">{post.content}</p>
+                <p className="p-2 overflow-hidden break-words">{post.content}</p>
             }
             {post.contentType === "image" &&
-                <img className={"aspect-auto w-full"} src={post.content} alt={"image"}/>
+                <img className={"aspect-auto w-full object-cover overflow-hidden"} src={post.content} alt={"image"}/>
             }
             {post.contentType === "geolocation" &&
                 <div className=" w-full h-96">

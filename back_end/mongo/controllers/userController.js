@@ -13,7 +13,11 @@ const addUser = async (req, res, next) => {
     }
 }
 const searchUser = async (req,res) => {
-    res.send(await userModel.searchByUsername(req.body));
+    try {
+        res.send(await userModel.searchByUsername(req.body));
+    } catch (err) {
+        res.status(err.statusCode).send(err.message);
+    }
 }
 
 const changePassword = async (req,res) => {
@@ -21,12 +25,19 @@ const changePassword = async (req,res) => {
 }
 
 const getSessionUser = async (req,res) => {
-    res.send({username: req.session.user});
+    try {
+        res.send({username: req.session.user});
+    } catch (err) {
+        res.status(err.statusCode).send(err.message);
+    }
 }
 
 const getUserProfileByName = async (req,res) => {
-    console.log(req.query)
-    res.send(await userModel.getUserProfilePicture(req.query.name));
+    try {
+        res.send(await userModel.getUserProfilePicture(req.query.name));
+    } catch (err) {
+        res.status(err.statusCode).send(err.message);
+    }
 }
 
 const updateUserProfilePic = async (req, res) => {
@@ -61,10 +72,18 @@ const modifyUser = async(req,res) => {
 
 const getAllUsers = async (req,res) => {
     try {
-        res.send(await userModel.getUsers(req.query));
+        res.status(200).send(await userModel.getUsers(req.query));
     }
     catch (error) {
-        res.send(error);
+        res.status(error.statusCode).send(error.message);
+    }
+}
+
+const getSingleUser = async (req, res) => {
+    try {
+        res.status(200).send(await userModel.getSingleUser(req.query));
+    } catch (error) {
+        res.status(error.statusCode).send(error.message);
     }
 }
 
@@ -100,7 +119,7 @@ const updateMaxQuota = async(req,res) => {
 
     try{
         let percentage= req.body.percentage;
-        let user = req.session.vip;
+        let user = req.session.type === 'smm' ? req.session.vip : req.session.user;
 
         if (isNaN(percentage)) throw createError('percentage not number', 404);  //cambiare
 
@@ -174,6 +193,27 @@ const clearDB = async (req,res) => {
         res.status(500).send(err);
     }
 }
+
+const getAllSmm = async (req, res) => {
+    try {
+        res.status(200).send(await userModel.getAllSmm(req.query));
+    } catch (error) {
+        res.send(error);
+    }
+}
+
+const hireSmm = async (req, res) => {
+    try {
+        let vipUsername = req.body.vipUsername;
+        let smmUsername = req.body.smmUsername;
+        let isHiring = req.body.isHiring;
+        res.status(200).send(await userModel.hireSmm(vipUsername, smmUsername, isHiring));
+    } catch (error) {
+        res.send(error);
+    }
+}
+
+
 module.exports = {
     addUser,
     searchUser,
@@ -183,6 +223,7 @@ module.exports = {
     getSessionVip,
     modifyUser,
     getAllUsers,
+    getSingleUser,
     getUsersNumber,
     getVips,
     getQuota,
@@ -192,5 +233,7 @@ module.exports = {
     getUserProfileByName,
     updateUserProfilePic,
     clearDB,
-    updateRemainingQuota
+    updateRemainingQuota,
+    getAllSmm,
+    hireSmm
 }

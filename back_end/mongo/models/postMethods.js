@@ -271,6 +271,7 @@ const addPost = async (post,quota) => {
         return {post: newPost.toObject()};
     }
     catch(err){
+        console.log(err);
         throw err;
     }
 }

@@ -1,32 +1,30 @@
-function getUsernameFromLocStor () {
-    return localStorage.getItem("username");
+function getUsernameFromSessionStore () {
+    return sessionStorage.getItem("username");
 }
 
-async function setUsernameInLocStor() {
+async function setUsernameInSessionStore() {
     localStorage.clear();
+    sessionStorage.clear();
     try {
         let res = await fetch("/db/user/session");
-        let username = await res.json();
-        localStorage.setItem("username", username.username);
+        res = await res.json();
+        sessionStorage.setItem("username", res.username);
     } catch (e) {
         console.log("errore nel settare l'user nel local storage: ", e);
     }
 }
 
-async function setQuotaInLocStor() {
+async function getQuotaByUsername(username) {
     try {
-        let res = await fetch("/db/user/quota");
-        console.log("quota res", res);
-        let quota = await res.json();
-        console.log("quota",quota);
-        localStorage.setItem("quota", quota);
+        let res = await fetch(`/db/user/quota?user=${username}`, {
+            method: 'GET'
+        });
+        if (res.ok) {
+            return await res.json();
+        }
     } catch (e) {
-        console.log("errore nel settare la quota nel local storage: ", e);
+        console.log(e);
     }
-}
-
-function getQuotaInLocStor () {
-    return localStorage.getItem("quota");
 }
 
 async function getPostByUsername(username){
@@ -34,9 +32,21 @@ async function getPostByUsername(username){
         let res = await fetch(`/db/post/all?name=${username}&offset=0`, {
             method: 'GET',
         });
-        let allPosts = await res.json();
         if (res.ok) {
-            return allPosts;
+            return await res.json();
+        }
+    } catch (e) {
+        console.log(e);
+    }
+}
+
+async function getPostByChannelName(channelName){
+    try {
+        let res = await fetch(`/db/post/all?offset=0&limit=10&channel=${channelName}`,{
+            method: 'GET',
+        });
+        if (res.ok) {
+            return await res.json();
         }
     } catch (e) {
         console.log(e);
@@ -52,6 +62,24 @@ async function getProfilePicByUsername (username) {
         }
     }
     catch (e) {
+        console.log(e)
+    }
+}
+
+async function getUserInfoByUsername (username) {
+    try {
+        let res = await fetch(`/db/user/singleuser?name=${username}`)
+            if (res.ok) {
+                res = await res.json();
+                return {
+                    profilePicture: res.profilePicture,
+                    typeUser: res.typeUser,
+                    _id: res._id,
+                    characters: res.characters,
+                    maxQuota: res.maxQuota
+                };
+            }
+    } catch (e) {
         console.log(e)
     }
 }
@@ -126,16 +154,47 @@ const getEmbed = (url) => {
     }
 }
 
+const checkChannelExists = async ({params}) => {
+    const {nome} = params;
+    const res = await fetch(`/db/channel/${nome}`)
+    if (!res.ok) {
+        throw Error(`Non esiste il canale ${nome}`);
+    }
+    return await res.json();
+}
+
+const checkUserExists = async ({params}) => {
+    const {username} = params;
+    const res = await fetch(`/db/user/singleuser?name=${username}`)
+    if (!res.ok) {
+        throw Error(`Non esiste l'utente ${username}`);
+    }
+    const sol = await res.json();
+    const user = {
+        _id: sol._id,
+        characters: sol.characters,
+        maxQuota: sol.maxQuota,
+        profilePicture: sol.profilePicture,
+        username: sol.username,
+    }
+    console.log("utente", sol, user);
+    return user;
+}
+
 
 
 export {
-    getUsernameFromLocStor,
-    setUsernameInLocStor,
-    setQuotaInLocStor,
-    getQuotaInLocStor,
+    getUsernameFromSessionStore,
+    setUsernameInSessionStore,
+    getQuotaByUsername,
     getPostByUsername,
     getProfilePicByUsername,
     parseTime,
-    blob2base64, compressBlob,
+    blob2base64,
+    compressBlob,
     getEmbed,
+    checkChannelExists,
+    checkUserExists,
+    getUserInfoByUsername,
+    getPostByChannelName
 }
