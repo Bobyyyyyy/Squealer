@@ -33,7 +33,7 @@
 
 
 <template>
-  <div class="card mb-4 d-flex flex-column justify-content-between mt-1 postDim bg-secondary">
+  <div class="card mb-4 d-flex flex-column justify-content-between mt-1 postDim bg-secondary" :class="post.contentType === 'text' ? 'h-auto' : ''">
 
       <HeaderPost
           :name= "post.owner"
@@ -59,7 +59,7 @@
   </div>
 </template>
 
-<style scoped>
+<style>
 
   .postDim{
     width: 32rem;

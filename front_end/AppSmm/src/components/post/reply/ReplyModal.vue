@@ -60,8 +60,8 @@ const getId =  () => `repliesModal${props.idx}`;
 
 <template>
   <div class="modal fade" :id="getId()" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-      <div class="modal-content">
+    <div class="modal-dialog modal-dialog-centered ">
+      <div class="modal-content modalReplyDim">
         <div class="modal-header">
           <h1 class="modal-title fs-5">Risposte</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @click="closeModal"></button>
@@ -95,5 +95,7 @@ const getId =  () => `repliesModal${props.idx}`;
 </template>
 
 <style scoped>
-
+  .modalReplyDim{
+    width: 36rem !important;
+  }
 </style>
