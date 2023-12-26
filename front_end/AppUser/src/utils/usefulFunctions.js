@@ -53,6 +53,21 @@ async function getPostByChannelName(channelName){
     }
 }
 
+async function getAllPost(offset) {
+    try {
+        let res = await fetch(`/db/post/all?offset=${offset}&limit=10`, {
+            method: 'GET'
+        });
+
+        if (res.ok) {
+            return await res.json();
+        }
+    } catch (e) {
+        console.log(e);
+    }
+}
+
+
 async function getProfilePicByUsername (username) {
     try {
         let res = await fetch(`/db/user/profilePic?name=${username}`);
@@ -196,5 +211,6 @@ export {
     checkChannelExists,
     checkUserExists,
     getUserInfoByUsername,
-    getPostByChannelName
+    getPostByChannelName,
+    getAllPost
 }
