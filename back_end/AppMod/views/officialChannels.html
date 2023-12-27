@@ -8,10 +8,14 @@
 <body class="d-flex flex-column">
 
 <!-- NavBar -->
-<nav class="navbar navbar-expand-lg bg-dark navbar-dark sticky-top fontcustom" style="height: 10%">
-    <div class="d-flex flex-row justify-content-between w-100 p-1" >
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark sticky-top fontcustom" style="height: 10%">
+        <div class="container-fluid" >
+            <a class="navbar-brand" style="font-size: 3vh" href="/mod">SquealerMOD</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".dual-collapse2">
+                <span class="navbar-toggler-icon" ></span>
+            </button>
         <div class="navbar-collapse collapse dual-collapse2" style="flex-basis: 100%">
-            <ul class="navbar-nav">
+            <ul class="navbar-nav me-auto mb-lg-0">
                 <li class="nav-item">
                     <a class="nav-link" aria-current="page" href="/mod/users">Utenti</a>
                 </li>
@@ -29,17 +33,6 @@
                     </ul>
                 </li>
             </ul>
-        </div>
-
-        <div class="order-sm-first order-lg-0 mx-auto">
-            <a class="navbar-brand" style="font-size: 3.5vh" href="/mod">SquealerMOD</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".dual-collapse2">
-                <span class="navbar-toggler-icon" style="width: 3.5vh;"></span>
-            </button>
-        </div>
-
-        <div class="navbar-collapse collapse dual-collapse2" style="flex-basis: 100%">
-            <div class="ms-auto"></div>
             <span class="navbar-text text-white ms-auto me-2 fontcustom" >@${user}
             </span>
             <button class="btn btn-outline-light bg-accent fontcustom" onclick="window.location.href = '/logout'">Logout</button>
@@ -55,7 +48,7 @@
         <!-- Modal Button -->
         <div class="d-flex flex-row align-items-center p-3 pe-0">
             <label for="filter"></label><input class="form-control fontcustom" id="filter" type="text" style="height: 10%; width: 15%; background-color: lightgray" placeholder="Cerca Canale..">
-            <button type="button" class="btn bg-primary ms-auto" data-bs-toggle="modal" data-bs-target="#addChannel" style="font-size: 2.5vh">
+            <button type="button" class="btn bg-primary ms-auto" data-bs-toggle="modal" data-bs-target="#addChannel" style="font-size: 2vh">
                 Add Channel
             </button>
         </div>
@@ -98,8 +91,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
-                    <button type="submit" class="btn btn-primary" id="addChannelButton">Inserisci</button>
+                    <button type="button" class="btn bg-secondary" data-bs-dismiss="modal">Chiudi</button>
+                    <button type="submit" class="btn bg-primary" id="addChannelButton">Inserisci</button>
                 </div>
             </form>
         </div>

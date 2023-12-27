@@ -4,12 +4,11 @@ const {createError} = require("../models/utils");
 const {createMaxQuotaJob} = require("./CronController");
 
 
-const addUser = async (req, res, next) => {
+const addUser = async (req, res) => {
     try {
-        req.response = await userModel.addUser(req.body);
-        next();
+        res.status(200).send(await userModel.addUser(req.body))
     } catch (Error) {
-        res.redirect('/register');
+        res.status(Error.statusCode).send(Error.message);
     }
 }
 const searchUser = async (req,res) => {

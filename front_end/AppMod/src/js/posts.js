@@ -107,7 +107,7 @@ const showPosts = (filters,append = false) => {
                            
                         </div>
                 </div>
-                <div class="card-body d-flex flex-row bg-back">`
+                <div class="card-body d-flex flex-row bg-back align-items-center justify-content-center">`
 
 
                 switch (`${post.contentType}`) {

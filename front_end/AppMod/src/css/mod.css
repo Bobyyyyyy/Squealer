@@ -26,12 +26,13 @@ body {
 }
 
 th {
-    background-color: steelblue !important;
+    background-color: #F5DEB3 !important;
 }
 
 td {
     width: 20vw;
     height: 10vh;
+    background-color: #D8D6D6 !important;
 }
 
 a {

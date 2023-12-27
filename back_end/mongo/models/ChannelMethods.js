@@ -41,8 +41,13 @@ const addChannel = async (body) => {
         // trasformare il nome in una forma ragionevole
         let name = body.name.toLowerCase();
         name = name.trim();
+        name = name.replace('§',"");
+        name = name.replace('@',"");
         name = name.replace(/\s/g, "_");
         name = name.replace('/','_');
+        if(!isNaN(parseInt(body.name))) {
+            throw createError('Nome non valido',400);
+        }
         //check if channel exists already
         let findName = await Channel.findOne({name: name}).lean();
         let findUser = await User.findOne({name:name}).lean();
@@ -72,7 +77,6 @@ const addChannel = async (body) => {
         return newChannel;
     }
     catch(err){
-        await mongoose.connection.close();
         throw err;
     }
 }
@@ -192,7 +196,6 @@ const getChannelsNumber = async (filters) => {
 
         let channels = await Channel.find(filter).lean();
 
-        console.log(channels.length)
         return {length: channels.length};
     }
     catch (Error){

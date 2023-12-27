@@ -4,6 +4,7 @@ const Post = require("../schemas/Post");
 const User = require("../schemas/User");
 const connection = require('../ConnectionSingle');
 const {createError} = require("./utils");
+const Channel = require("../schemas/Channel");
 
 
 //POST
@@ -17,10 +18,14 @@ const addOfficialChannel = async (body,creator) => {
         name = name.replace('@',"");
         name = name.replace(/\s/g, "_");
         name = name.replace('/','_');
+        if(!isNaN(parseInt(body.name))) {
+            throw createError('Nome non valido',400);
+        }
         //check if channel exists already
-        let findName = await ReservedChannel.findOne({name: name}).lean();
-        if (findName) {
-            throw createError('Nome non disponibile',400)
+        let findName = await Channel.findOne({name: name}).lean();
+        let findUser = await User.findOne({name:name}).lean();
+        if (findName || findUser) {
+            throw createError('Nome già utilizzato',400)
         }
         let newChannel = new ReservedChannel({
             name: name,

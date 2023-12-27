@@ -58,82 +58,81 @@ const showPosts = (filter,offset,limit,append = false) => {
         type: 'get',
         success: (posts) => {
             if(posts.length === 0) {
-                $('#posts').empty().append(`<h4>Nessun Post Trovato</h4>`);
+                $('#posts').empty().append(`<h4 class="mt-5" style="font-size: 3vh">Nessun Post Trovato</h4>`);
                 $('#under_posts').empty();
                 return;
             }
             let html = `${$.map(posts, (post) => {
-                
+                console.log(post.content)
                 let destinationNames = []
                 let officialChannelNames = [];
-                
+
                 post.destinationArray.forEach(destination => {
-                    if(destination.destType === "channel") {
+                    if (destination.destType === "channel") {
                         destinationNames.push('§' + destination.name + '');
                     }
-    
-                    if(destination.destType === "user") {
+
+                    if (destination.destType === "user") {
                         destinationNames.push('@' + destination.name);
                     }
-
-
                 })
 
                 post.officialChannelsArray.forEach(destination => {
                     officialChannelNames.push('§' + destination);
                 })
-                
-                
-                let id = post._id;
+
+
+                const id = post._id;
                 let reactions = {
                     heart: post.reactions.filter((reaction) => reaction.rtype === 'heart').length,
-                    heartbreak : post.reactions.filter((reaction) => reaction.rtype === 'heartbreak').length,
+                    heartbreak: post.reactions.filter((reaction) => reaction.rtype === 'heartbreak').length,
                     'thumbs-up': post.reactions.filter((reaction) => reaction.rtype === 'thumbs-up').length,
                     'thumbs-down': post.reactions.filter((reaction) => reaction.rtype === 'thumbs-down').length,
                 }
 
                 let Post =
-                    `<div id="post-${id}" class="card mt-5 w-50">
-                    <div id="header-${id}" class="card-header d-flex flex border-black align-items-center" style="background-color: #CCBEF9">
+                    `<div id="post-${id}" class="card mt-5 border-black fontcustom" style="width: 60vw;">
+                    <div id="header-${id}" class="card-header d-flex flex align-items-center bg-primary">
                     <div class="d-flex flex-column">
                         <div class="d-flex flex-row align-items-center justify-content-start">
                             <div class="fw-bold">@${post.owner}</div>
                             <div class="ms-1 fw-light">/${post.popularity}</div> 
                         </div>
                         
-                        <div class="d-flex flex-row justify-content-start align-items-center" style="font-size: 10px">
+                        <div class="d-flex flex-row justify-content-start align-items-center fontcustom" style="">
                             <div class="fw-light">${destinationNames}</div>
-                            <div class="ms-1 fw-light">${officialChannelNames}</div> 
+                            <div class="ms-1 fw<-light">${officialChannelNames}</div> 
                         </div>
                     </div>
                         
                         
-                        <div class="d-flex flex-row ms-auto">
+                        <div class="d-flex flex-row ms-auto flex-wrap">
                             <div class="btn-group dropup">
-                                <button class="ms-2 btn"  data-bs-toggle="dropdown" aria-expanded="false">
+                                <button class="btn fontcustom" onclick="getReplies('${post._id}')" data-bs-toggle="tooltip" data-bs-placement="top" title="Mostra risposte" ><i class="bi bi-chat-square-text-fill" ></i></button>
+                                <button class="btn fontcustom"  data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="bi bi-three-dots"></i></i>
                                 </button>
                                 <ul class="dropdown-menu">
-                                    <li onclick = "post = '${post._id}'" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#changeReactions"> Modifica Reazioni</li>
+                                    <li onclick = "post = '${post._id}'" class="dropdown-item fontcustom" data-bs-toggle="modal" data-bs-target="#changeReactions"> Modifica Reazioni</li>
                                 </ul>
+                                 <button class="btn fontcustom" id="delete-${id}"><i class="bi bi-trash"></i></button>
                             </div>
-                            
-                            <button class="btn " id="delete-${id}"><i  class="bi bi-trash"></i></button>
+                           
                         </div>
                 </div>
-                <div class="card-body flex-row" style="background-color: #ECEAF5">`
+                <div class="card-body d-flex flex-row bg-back align-items-center justify-content-center">`
 
 
                 switch (`${post.contentType}`) {
                     case 'text':
-                        let parsedText = `${post.content}`.replace(urlRegex, function(url) {
+                        let parsedText = `${post.content}`.replace(urlRegex, function (url) {
                             return `<a class="fw-bold"  href="${url}" target="_blank">${url}</a>`;
                         })
-                        Post = Post + `<span><p class='card-text lead' > ${parsedText} </p></span>`
+                        Post = Post + `<span><p class='card-text lead' style="font-size: 3vh" > ${parsedText} </p></span>`
                         break;
 
                     case 'image':
-                        Post = Post + `<span><img src='${post.content}' class='card-img-top img-fluid' alt="content"></span>`
+                        Post = Post + `<span><img src='${post.content}' class='card-img-top img-fluid' alt="Immagine non valida"></span>`
                         break;
 
                     case 'geolocation':
@@ -142,13 +141,14 @@ const showPosts = (filter,offset,limit,append = false) => {
                         break;
 
                     case 'video':
-                        Post = Post + `<iframe src="${post.content}" class="w-100" allowfullscreen style="height: 60vh"></iframe>`
+
+                        Post = Post + `<iframe src="${post.content}" id="videoContent" allowfullscreen style="height: 50vh; width: 100%"></iframe>`
                         break;
                 }
 
-                Post = Post +`</div>
-                    <div class="card-footer text-muted" style="background-color: #ECEAF5">
-                        <div class="d-flex flex-row">
+                Post = Post + `</div>
+                    <div class="card-footer text-muted bg-back fontcustom">
+                        <div class="d-flex flex-row flex-wrap">
                             <div id="reactions-${id}" class="me-auto d-inline-flex"> 
                                 <div class="d-flex flex-row"><i class="bi bi-heart-fill"></i> <div class="ms-1">${reactions.heart}</div> </div>
                                 <div class="d-flex flex-row ms-3"><i class="bi bi-heartbreak"></i><div class="ms-1">${reactions.heartbreak}</div></div>
@@ -199,13 +199,21 @@ const showPosts = (filter,offset,limit,append = false) => {
     })
 }
 
-$('#changeReactionsButton').on('click',() => {
+$('#changeReactionsForm').on('submit',(event) => {
+    event.preventDefault();
 
     let reactions = {
-        heart: $('#heart').val(),
-        heartbreak: $('#heartbreak').val(),
-        'thumbs-up': $('#thumbs-up').val(),
-        'thumbs-down': $('#thumbs-down').val(),
+        heart: parseInt($('#heart').val()),
+        heartbreak: parseInt($('#heartbreak').val()),
+        'thumbs-up': parseInt($('#thumbs-up').val()),
+        'thumbs-down': parseInt($('#thumbs-down').val()),
+    }
+
+    if(reactions.heart + reactions.heartbreak + reactions["thumbs-up"] + reactions["thumbs-down"] > 500) {
+        $('#toast-content').empty().html(`Puoi aggiungere al massimo 500 reactions`);
+        let toastList = inizializeToast();
+        toastList.forEach(toast => toast.show()); // This show them
+        return;
     }
 
     let allReactions = []
@@ -240,20 +248,19 @@ $('#changeReactionsButton').on('click',() => {
         })
     }
 
-    if(allReactions.length > 500) {
-        alert('Puoi aggiungere al massimo 500 reactions!!');
-        return;
-    }
-
     $.ajax({
         url: '/db/post/updateReaction',
         data: {user: User, reactions: JSON.stringify(allReactions), postId: post},
         type: 'put',
         success: (data) => {
             location.reload();
+        },
+        error: (error) => {
+            $('#toast-content').empty().html(error.responseJSON.mes);
+            let toastList = inizializeToast();
+            toastList.forEach(toast => toast.show()); // This show them
         }
     })
-
 })
 
 
@@ -303,6 +310,62 @@ $('#change-name').on('click', () => {
         }
     })
 })
+
+function inizializeToast() {
+    let toastElList = [].slice.call(document.querySelectorAll('.toast'))
+    return toastList = toastElList.map(function(toastEl) {
+        // Creates an array of toasts (it only initializes them)
+        return new bootstrap.Toast(toastEl) // No need for options; use the default options
+    });
+}
+
+function getReplies(parentID) {
+    $.ajax({
+        url: '/db/reply',
+        data: {parentid: parentID},
+        type: 'GET',
+        success: (replies) => {
+            let numberOfReplies = replies.length;
+            if(numberOfReplies === 0) {
+                console.log('porcodio')
+                $('#replies').empty().append(`<h4>Nessuna risposta per questo post</h4>`)
+                $('#postReplies').modal('show');
+                return
+            }
+
+            let html = `${$.map(replies, (reply) => {
+                let content = `
+                  <div id="reply-${reply._id}" class="card mt-3 w-100 border rounded border-black">
+                    <div id="header-${reply._id}" class="card-header d-flex flex align-items-center bg-primary">
+                        <div class="d-flex flex-column w-100">
+                            <div class="d-flex flex-row align-items-center justify-content-start w-100">
+                                <div class="fw-bold">@${reply.owner}</div>
+                                <div class="fw-bold ms-auto">${reply.dateOfCreation.split('T')[0]},
+                                ${reply.dateOfCreation.split('T')[1].split('.')[0]}</div>
+                                </div>
+                        </div>
+                    </div>
+                    <div class="card-body flex-row bg-back">
+                `
+
+                let parsedText = `${reply.content}`.replace(urlRegex, function (url) {
+                    return `<a class="fw-bold"  href="${url}" target="_blank">${url}</a>`;
+                })
+                content = content + `<span><p class='card-text lead' > ${parsedText} </p></span></div>`
+
+
+                content = content + `</div>`
+                return content;
+            }).join('\n')}`;
+
+
+            $('#replies').empty().append(html)
+
+
+            $('#postReplies').modal('show');
+        }
+    })
+}
 
 $(document).ready(() => {
     showChannel(ChannelName);

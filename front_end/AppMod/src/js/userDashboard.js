@@ -40,8 +40,6 @@ function getUsersNumber(filter) {
     })
 }
 
-//TODO SPOSTARLA NEL CLICK DEL BOTTONE (COSI' NESSUNO PUò CHIAAMRLA A LIVELLO CLIENT)
-
 function modifyUser(parameters) {
     parameters = JSON.parse(parameters);
     let maxQuota = {
@@ -92,9 +90,9 @@ function userTable (limit,offset,filter) {
                 return;
             }
 
-            let header = `<table class="table table-dark table-striped table-hover table-bordered" style="vertical-align: middle; text-align: center;">
+            let header = `<table class="table table-hover fontcustom border-black" style="vertical-align: middle; text-align: center;">
                         <!-- Header Tabella -->
-                        <thead>
+                        <thead class="bg-secondary">
                             <th> Nome </th>
                             <th> Quota Rimanente </th>
                             <th> Quota Massima </th>
@@ -142,14 +140,14 @@ function userTable (limit,offset,filter) {
             }).join('\n')}`
 
             if (offset !== 0) {
-                let previous = `<li class="page-item"><a class="page-link" onclick="userTable(LastCall.limit,LastCall.offset - LastCall.limit,LastCall.filter)">Previous</a></li>`
+                let previous = `<li class="page-item fontcustom" onclick="userTable(LastCall.limit,LastCall.offset - LastCall.limit,LastCall.filter)"><a class="page-link fontcustom text-black bg-secondary border-black fw-bold" ><-</a></li>`
                 $('#pages').append(previous);
             }
 
-            let page = `<li class="page-item"><a class="page-link">${LastCall.offset / LastCall.limit + 1}</a></li>`
+            let page = `<li class="page-item fontcustom"><a class="page-link fontcustom text-black bg-secondary border-black">${LastCall.offset / LastCall.limit + 1}</a></li>`
 
             if (offset + limit < LastCall.users) {
-                let next = `<li class="page-item"><a class="page-link" onclick="userTable(LastCall.limit,LastCall.limit+LastCall.offset,LastCall.filter)">Next</a></li>`
+                let next = `<li class="page-item fontcustom" onclick="userTable(LastCall.limit,LastCall.limit+LastCall.offset,LastCall.filter)"><a class="page-link fontcustom text-black bg-secondary border-black fw-bold">-></a></li>`
                 page = page + next;
             }
 
@@ -171,6 +169,38 @@ $('#modifyButton').click(() => {
         JSON.stringify(modifyParameters)
     );
 })
+
+$('#addUserForm').on('submit',(event) => {
+    event.preventDefault();
+
+    let newUser = {
+        name: $('#name').val(),
+        password: $('#password').val(),
+        type: $('#addUserForm .form-check-input:checked').val()
+    }
+
+    $.ajax({
+        url: '/db/user',
+        type: 'post',
+        data: newUser,
+        success: () => {
+            location.reload();
+        },
+        error: (error) => {
+            $('#toast-content').empty().html(error.responseText);
+            let toastList = inizializeToast();
+            toastList.forEach(toast => toast.show());
+        }
+    })
+})
+
+function inizializeToast() {
+    let toastElList = [].slice.call(document.querySelectorAll('.toast'))
+    return toastList = toastElList.map(function(toastEl) {
+        // Creates an array of toasts (it only initializes them)
+        return new bootstrap.Toast(toastEl) // No need for options; use the default options
+    });
+}
 
 $(document).ready(function() {
     getUsersNumber(LastCall.filter);

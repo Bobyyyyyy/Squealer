@@ -35,6 +35,7 @@ const getChannels = async (req,res) => {
         if(typeof error.statusCode === "undefined")
             res.status(400).send(error);
 
+        console.log(error)
         res.status(error.statusCode).send(error.message);
     }
 }
