@@ -14,6 +14,7 @@ function Home() {
     const [posts, setPosts] = useState([]);
     const currentOffset = useRef(POST_TO_GET);
     const lastRequestLenght = useRef(POST_TO_GET);
+    const lastHeightDiv = useRef(0);
 
     const fetchAllPosts = async () => {
         try {
@@ -27,7 +28,6 @@ function Home() {
             }
 
             let newPost = await res.json();
-            console.log(newPost);
             allPosts.current =  allPosts.current.concat(newPost);
             setPosts(allPosts.current);
             setIsLoading(false)
@@ -46,14 +46,13 @@ function Home() {
     }, []);
 
 
+    useEffect(() => {
+        window.scrollTo({ behavior: "instant", top: lastHeightDiv.current, left:0})
+    }, [posts]);
+
     const updatePost = async () => {
         setIsLoading(true);
         let newPosts = await getAllPost(currentOffset.current);
-        /*
-        allPosts.current =  allPosts.current.concat(newPosts);
-        console.log(allPosts.current);
-        setPosts(allPosts.current);
-         */
         currentOffset.current += newPosts.length;
         lastRequestLenght.current = newPosts.length;
         setPosts((prev) => [...prev, ...newPosts]);
@@ -62,13 +61,11 @@ function Home() {
 
     const scrollEndDetector = async (event) => {
         event.preventDefault();
-        console.log("entra");
         const postDiv = document.getElementById("postDiv");
 
         if (postDiv && window.innerHeight + window.scrollY >= postDiv.offsetHeight && lastRequestLenght.current >= POST_TO_GET) {
-            console.log(window.innerHeight, window.scrollY, postDiv.offsetHeight);
+            lastHeightDiv.current = window.scrollY;
             updatePost();
-            console.log("scrolling");
         }
     };
 

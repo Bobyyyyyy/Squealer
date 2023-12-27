@@ -191,6 +191,7 @@ const checkUserExists = async ({params}) => {
         maxQuota: sol.maxQuota,
         profilePicture: sol.profilePicture,
         username: sol.username,
+        typeUser: sol.typeUser
     }
     console.log("utente", sol, user);
     return user;
