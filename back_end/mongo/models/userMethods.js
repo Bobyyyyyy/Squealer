@@ -186,7 +186,6 @@ const getSingleUser = async (query) => {
     try {
         await connection.get()
         let findUser = await User.findOne({username: query.name}).lean();
-        console.log(findUser);
         if (!findUser) {
             throw createError("l'utente non esiste", 404);
         }
