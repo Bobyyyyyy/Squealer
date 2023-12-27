@@ -41,7 +41,6 @@ function Interval({name, value, setValue, min}) {
             <input type="number" id="number-input"
                    className="appearance-none w-20 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2"
                    placeholder="0"
-                   //defaultValue={min}
                    value={String(value)}
                    min={min}
                    onChange={(e) => {

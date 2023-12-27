@@ -7,12 +7,12 @@ function Body({post}) {
     if (post.contentType === "video") {
     }
     return (
-        <div className={"flex justify-center"}>
+        <div className={"flex justify-center md:max-h-[28rem]"}>
             {post.contentType === "text" &&
                 <p className="p-2 overflow-hidden break-words">{post.content}</p>
             }
             {post.contentType === "image" &&
-                <img className={"aspect-auto w-full object-cover overflow-hidden"} src={post.content} alt={"image"}/>
+                <img className="aspect-auto w-full object-cover overflow-hidden" src={post.content} alt={"image"}/>
             }
             {post.contentType === "geolocation" &&
                 <div className=" w-full h-96">

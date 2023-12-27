@@ -36,6 +36,8 @@ function AddPost(){
         </div>
     );
 
+    const nIntervId = useRef(null);
+    const geolocationSent = useRef(0);
 
     function parseDestinations(dests) {
         let finalDest = [];
@@ -73,6 +75,24 @@ function AddPost(){
         return currentQuota?.monthly < 0;
     }
 
+    const startSendingPosition = () => {
+        nIntervId.current = setInterval(handleSendPosition, frequencyMs.current);
+    }
+
+    const sendPosition = (n) => {
+        console.log("posizione", n);
+    }
+
+    function handleSendPosition() {
+        console.log("handle", geolocationSent.current, numberOfPosts)
+        if (geolocationSent.current < numberOfPosts) {
+            geolocationSent.current += 1;
+            sendPosition(geolocationSent.current)
+        } else {
+            clearInterval(nIntervId.current);
+            nIntervId.current = null;
+        }
+    }
 
     async function createPost() {
         let content2send;
@@ -119,7 +139,6 @@ function AddPost(){
             post.millis = frequencyMs.current;
             post.squealNumber = parseInt(numberOfPosts);
         }
-        console.log(post)
         return post;
     }
 
@@ -128,6 +147,12 @@ function AddPost(){
             if (canSendPost()) {
                 let post = await createPost();
                 console.log("post creato", post, currentQuota)
+
+                if (post.contentType === "geolocation" && post.hasOwnProperty("millis")) {
+                    console.log("start sending");
+                    startSendingPosition();
+                }
+
                 let res = await fetch("/db/post", {
                     method: "POST",
                     body: JSON.stringify({
@@ -138,20 +163,17 @@ function AddPost(){
                         "Content-Type": "application/json"
                     },
                 });
-                if (!res.ok) {
-                    console.log(res)
-                    throw res;
+                if (res.ok) {
+                    window.location.href = "/user/"
                 } else {
                     let data = await res.json();
-                    console.log(data.statusCode)
                     if (data.statusCode === 400) {
                         console.log(data.message);
                         window.alert("Non hai il prermesso di scrivere");
                     } else if (data.statusCode === 400) {
                         window.alert("Canale o utente non esiste");
-                    } else {
-                        window.location.href = "/user/"
                     }
+                    throw res;
                 }
             }
         } catch (e) {
