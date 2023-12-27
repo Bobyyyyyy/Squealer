@@ -152,7 +152,7 @@ function AddPost(){
                         console.log("start send")
                         startSendingPosition(frequencyMs.current, numberOfPosts, postID.current);
                     }
-                    //window.location.href = "/user/"
+                    window.location.href = "/user/"
                 } else {
                     let data = await res.json();
                     if (data.statusCode === 400) {

@@ -14,15 +14,6 @@ function MappaPost({stringCoor}){
         console.log(coordinatesArr.current)
     }
 
-    //let coordinatesString = stringCoor.split(",");
-    /*
-    const coordinates = [
-        parseFloat(coordinatesString[0]),
-        parseFloat(coordinatesString[1])
-    ];
-
-     */
-
     const IconMarker = new Icon({
         iconUrl: "/img/location.png",
         iconSize: [48, 48],
