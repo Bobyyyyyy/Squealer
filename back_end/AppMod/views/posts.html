@@ -56,44 +56,43 @@
 
     <div class="p-3 flex-column" id="div1" style="height: 100%; width: 100%">
 
-        <div class="d-flex flex-row align-items-center p-3 pe-0">
-
-            <div class="input-group w-25 border-black">
-                <span class="input-group-text bg-primary border-black" id="basic-addon1"><select class="select btn" id='search-type' autocomplete="off">
+        <div class="d-flex flex-row flex-wrap align-items-center p-3 pe-0">
+            <div class="input-group border-black d-flex flex-row flex-nowrap" style="width: 50vh">
+                <span class="input-group-text bg-primary border-black" id="basic-addon1"><select class="select btn fontcustom" id='search-type' autocomplete="off">
                         <option value="sender" selected>Mittente</option>
                         <option value="receiver">Destinatario</option>
                     </select></span>
-                <label for="filter" class="sr-only"></label><input class="form-control border-black bg-secondary" id="filter" type="text" style="width: 15%;" placeholder="Cerca.." autocomplete="off">
+                <label for="filter" class="sr-only"></label><input class="form-control border-black bg-secondary fontcustom" id="filter" type="text" placeholder="Cerca.." autocomplete="off">
             </div>
 
 
-            <div class="d-flex flex-row ms-auto">
+            <div class="d-flex flex-row flex-wrap ms-auto">
                 <div id="channel-visual" class="btn-group ms-3" role="group" aria-label="">
                     <input type="radio" class="btn-check" name="filters" id="filter-all" value="" autocomplete="off" checked>
-                    <label class="btn bg-secondary" for="filter-all">All</label>
+                    <label class="btn bg-secondary fontcustom" for="filter-all">All</label>
 
                     <input type="radio" class="btn-check" name="filters" id="filter-popular" value="popular" autocomplete="off">
-                    <label class="btn bg-secondary" for="filter-popular">Popular</label>
+                    <label class="btn bg-secondary fontcustom" for="filter-popular">Popular</label>
 
                     <input type="radio" class="btn-check" name="filters" id="filter-unpopular" value="unpopular" autocomplete="off">
-                    <label class="btn bg-secondary" for="filter-unpopular">Unpopular</label>
+                    <label class="btn bg-secondary fontcustom" for="filter-unpopular">Unpopular</label>
 
                     <input type="radio" class="btn-check" name="filters" id="filter-controversial" value="controversial" autocomplete="off">
-                    <label class="btn bg-secondary" for="filter-controversial">Controversial</label>
+                    <label class="btn bg-secondary fontcustom" for="filter-controversial">Controversial</label>
                 </div>
 
-                <div class="ms-3 d-flex flex-row justify-content-center align-self-center">
-                    <label class="fw-normal"> Ordina Per:
-                        <select class="select btn bg-secondary ms-2" id="orderby" autocomplete="off">
+                <div class="ms-3 d-flex flex-row flex-wrap justify-content-center align-self-center">
+                    <label class="fw-normal">
+                        <select class="select btn bg-secondary ms-2 fontcustom" id="orderby" autocomplete="off">
                             <option value="" disabled>Ordinamento</option>
                             <option value="publication" selected>Data di pubblicazione</option>
                             <option value="visuals">Numero di visualizzazioni</option>
                         </select>
                     </label>
                 </div>
-                <div class="ms-3 d-flex flex-row justify-content-center align-self-center me-2" id="options">
+                <div class="ms-3 d-flex flex-row flex-wrap justify-content-center align-self-center me-2" id="options">
                     <label for="order"></label>
-                    <select class="select btn bg-secondary" id="order" autocomplete="off">
+                    <select class="select btn bg-secondary fontcustom" id="order" autocomplete="off">
                         <option value="" disabled >Ordine</option>
                         <option value="più recente" selected>Piu' recenti</option>
                         <option value="meno recente">Meno recenti</option>

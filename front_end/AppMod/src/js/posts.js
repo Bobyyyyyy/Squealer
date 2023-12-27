@@ -78,7 +78,7 @@ const showPosts = (filters,append = false) => {
                 }
 
                 let Post =
-                    `<div id="post-${id}" class="card mt-5 w-50 border-black">
+                    `<div id="post-${id}" class="card mt-5 border-black fontcustom" style="width: 60vw;">
                     <div id="header-${id}" class="card-header d-flex flex align-items-center bg-primary">
                     <div class="d-flex flex-column">
                         <div class="d-flex flex-row align-items-center justify-content-start">
@@ -86,27 +86,28 @@ const showPosts = (filters,append = false) => {
                             <div class="ms-1 fw-light">/${post.popularity}</div> 
                         </div>
                         
-                        <div class="d-flex flex-row justify-content-start align-items-center" style="font-size: 10px">
+                        <div class="d-flex flex-row justify-content-start align-items-center fontcustom" style="">
                             <div class="fw-light">${destinationNames}</div>
                             <div class="ms-1 fw-light">${officialChannelNames}</div> 
                         </div>
                     </div>
                         
                         
-                        <div class="d-flex flex-row ms-auto">
-                        <button class="btn" onclick="getReplies('${post._id}')" data-bs-toggle="tooltip" data-bs-placement="top" title="Mostra risposte" ><i class="bi bi-chat-square-text-fill" ></i></button>
+                        <div class="d-flex flex-row ms-auto flex-wrap">
                             <div class="btn-group dropup">
-                                <button class="ms-2 btn"  data-bs-toggle="dropdown" aria-expanded="false">
+                                <button class="btn fontcustom" onclick="getReplies('${post._id}')" data-bs-toggle="tooltip" data-bs-placement="top" title="Mostra risposte" ><i class="bi bi-chat-square-text-fill" ></i></button>
+                                <button class="btn fontcustom"  data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="bi bi-three-dots"></i></i>
                                 </button>
                                 <ul class="dropdown-menu">
-                                    <li onclick = "post = '${post._id}'" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#changeReactions"> Modifica Reazioni</li>
-                                     <li onclick = "post = '${post._id}'" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#changeDestination"> Modifica Destinatari</li>
+                                    <li onclick = "post = '${post._id}'" class="dropdown-item fontcustom" data-bs-toggle="modal" data-bs-target="#changeReactions"> Modifica Reazioni</li>
                                 </ul>
+                                 <button class="btn fontcustom" id="delete-${id}"><i class="bi bi-trash"></i></button>
                             </div>
+                           
                         </div>
                 </div>
-                <div class="card-body flex-row bg-back">`
+                <div class="card-body d-flex flex-row bg-back">`
 
 
                 switch (`${post.contentType}`) {
@@ -114,11 +115,11 @@ const showPosts = (filters,append = false) => {
                         let parsedText = `${post.content}`.replace(urlRegex, function (url) {
                             return `<a class="fw-bold"  href="${url}" target="_blank">${url}</a>`;
                         })
-                        Post = Post + `<span><p class='card-text lead' > ${parsedText} </p></span>`
+                        Post = Post + `<span><p class='card-text lead' style="font-size: 3vh" > ${parsedText} </p></span>`
                         break;
 
                     case 'image':
-                        Post = Post + `<span><img src='${post.content}' class='card-img-top img-fluid' alt="content"></span>`
+                        Post = Post + `<span><img src='${post.content}' class='card-img-top img-fluid' alt="Immagine non valida"></span>`
                         break;
 
                     case 'geolocation':
@@ -127,13 +128,14 @@ const showPosts = (filters,append = false) => {
                         break;
 
                     case 'video':
-                        Post = Post + `<iframe src="${post.content}" class="w-100" allowfullscreen style="height: 60vh"></iframe>`
+
+                        Post = Post + `<iframe src="${post.content}" id="videoContent" allowfullscreen style="height: 50vh; width: 100%"></iframe>`
                         break;
                 }
 
                 Post = Post + `</div>
-                    <div class="card-footer text-muted bg-back">
-                        <div class="d-flex flex-row">
+                    <div class="card-footer text-muted bg-back fontcustom">
+                        <div class="d-flex flex-row flex-wrap">
                             <div id="reactions-${id}" class="me-auto d-inline-flex"> 
                                 <div class="d-flex flex-row"><i class="bi bi-heart-fill"></i> <div class="ms-1">${reactions.heart}</div> </div>
                                 <div class="d-flex flex-row ms-3"><i class="bi bi-heartbreak"></i><div class="ms-1">${reactions.heartbreak}</div></div>
@@ -161,7 +163,7 @@ const showPosts = (filters,append = false) => {
             }).join('\n')}`;
 
             if (filters.offset + filters.limit < LastCall.posts) {
-                $('#under_posts').html(`<div class="mx-auto"> <a id="load_posts" class="link-opacity-100 link-opacity-50-hover bg-secondary text-black rounded p-2"> Carica altri post </a></div>`)
+                $('#under_posts').html(`<div class="mx-auto"> <a id="load_posts" class="link-opacity-100 link-opacity-50-hover bg-secondary text-black rounded p-2 fontcustom"> Carica altri post </a></div>`)
             } else {
                 $('#under_posts').empty();
             }

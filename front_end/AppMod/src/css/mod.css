@@ -13,6 +13,10 @@ body {
     background-color: #232323;
 }
 
+.fontcustom {
+    font-size: 2vh;
+}
+
 .navbar {
     background-color: #232323;
 }

@@ -47,7 +47,7 @@ const addChannel = async (body) => {
         let findName = await Channel.findOne({name: name}).lean();
         let findUser = await User.findOne({name:name}).lean();
         if (findName || findUser) {
-            throw createError('Nome non utilizzabile',400)
+            throw createError('Nome già utilizzato',400)
         }
 
         let user = await User.findOne({username: body.creator});
@@ -181,20 +181,18 @@ const getChannelsNumber = async (filters) => {
         await connection.get()
         let filter = {
             //filtrare canale per nome
-            ...(filters.name) && {'name': filters.name},
+            ...(filters.name) && {'name': {$regex: filters.name, $options: 'i'}},
             //filtrare canali per tipo ['public','private']
             ...(filters.type) && {'type': filters.type},
             //filtrare canale per nome
-            ...(filters.creator) && {'creator': filters.creator},
-
-            ...(filters.filter) && {'name': {$regex: filters.filter, $options: 'i'}},
+            ...(filters.creator) && {'creator': {$regex: filters.creator, $options: 'i'}},
 
             ...(filters.hasAccess) && {$or: [{'name': filters.hasAccess},{'admins': {$in: [filters.hasAccess]}},{'followers': {$in: [filters.hasAccess]}}]}
         }
 
         let channels = await Channel.find(filter).lean();
 
-
+        console.log(channels.length)
         return {length: channels.length};
     }
     catch (Error){

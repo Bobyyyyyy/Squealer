@@ -61,6 +61,9 @@ app.use('/icons/settingsIcons',express.static(rootDir + '/back_end/assets/icons/
 app.use('/img',express.static(rootDir + '/public/img'))
 app.use('/scss',express.static(rootDir + '/public/assets'))
 
+app.get('/*',(req,res) => {
+    res.redirect('/');
+})
 
 
 /* CRON */

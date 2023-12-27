@@ -55,11 +55,11 @@
 
     <div class="p-5 flex-column text-white" id="div1" style="height: 100%; width: 100%">
         <div class="d-flex flex-column align-items-center justify-content-center w-100">
-        <h1> §<span id="channel-name" class="fw-bold">${name}</span> </h1>
-        <h6 class="fw-light"> creato da @<span id="channel-creator"></span></h6>
+        <h1 style="font-size: 6vh"> §<span id="channel-name" class="fw-bold">${name}</span> </h1>
+        <h6 class="fw-light fontcustom"> creato da @<span id="channel-creator"></span></h6>
         <div class="d-inline-flex flex-row align-items-center pt-3">
-            <div id="channel-description" class="p-2 rounded d-inline bg-white text-dark"></div>
-            <i id="modify-description" class="p-2 bi bi-pencil-fill"> Modifica </i>
+            <div id="channel-description" class="p-2 rounded d-inline bg-white text-dark fontcustom"></div>
+            <i id="modify-description" class="p-2 bi bi-pencil-fill fontcustom"> Modifica </i>
             <button id="modify-button" type="button" class="btn btn-success ms-2" style="display: none">
                 Fatto
             </button>
@@ -67,29 +67,29 @@
         </div>
 
         <!-- Modal Button -->
-        <div class="d-flex flex-row align-items-center pt-4">
+        <div class="d-flex flex-row align-items-center pt-4 flex-wrap">
             <div id="post-filters" class="btn-group text-black" role="group" aria-label="Radio toggle button for type of posts">
                 <input type="radio" class="btn-check " name="filters" id="filter-all" value="" checked>
-                <label class="btn bg-secondary" for="filter-all">Mostra tutti</label>
+                <label class="btn bg-secondary fontcustom" for="filter-all">Mostra tutti</label>
 
                 <input type="radio" class="btn-check" name="filters" id="filter-text" value="text">
-                <label class="btn bg-secondary" for="filter-text">Testo</label>
+                <label class="btn bg-secondary fontcustom" for="filter-text">Testo</label>
 
                 <input type="radio" class="btn-check" name="filters" id="filter-image" value="image">
-                <label class="btn bg-secondary" for="filter-image">Immagini</label>
+                <label class="btn bg-secondary fontcustom" for="filter-image">Immagini</label>
 
                 <input type="radio" class="btn-check" name="filters" id="filter-geo" value="geolocation">
-                <label class="btn bg-secondary" for="filter-geo">Geolocalizzazione</label>
+                <label class="btn bg-secondary fontcustom" for="filter-geo">Geolocalizzazione</label>
 
                 <input type="radio" class="btn-check" name="filters" id="filter-video" value="video">
-                <label class="btn bg-secondary" for="filter-video">Video</label>
+                <label class="btn bg-secondary fontcustom" for="filter-video">Video</label>
             </div>
 
                 <div class="ms-auto m-1">
-                    <button type="button" class="btn bg-secondary ms-auto text-black " data-bs-toggle="modal" data-bs-target="#addPost">
+                    <button type="button" class="btn bg-secondary ms-auto text-black fontcustom" data-bs-toggle="modal" data-bs-target="#addPost">
                         Aggiungi Post
                     </button>
-                    <button type="button" class="btn btn-danger text-black" data-bs-toggle="modal" data-bs-target="#deleteChannel">
+                    <button type="button" class="btn btn-danger text-black  fontcustom" data-bs-toggle="modal" data-bs-target="#deleteChannel">
                         Elimina Canale
                     </button>
                 </div>
@@ -97,7 +97,7 @@
 
         <div class="d-flex flex-row align-items-center">
             <div class="me-auto mt-2">
-                <p> Post trovati: <span id="post-trovati"></span> </p>
+                <p class="fontcustom"> Post trovati: <span id="post-trovati"></span> </p>
             </div>
         </div>
 

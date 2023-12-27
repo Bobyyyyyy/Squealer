@@ -1,6 +1,6 @@
 const channelsModel = require('../models/ChannelMethods');
 const {mongo} = require("mongoose");
-const createChannel = async (req,res,next) => {
+const createChannel = async (req,res) => {
     try {
         res.status(200).send(await channelsModel.addChannel(req.body))
     }
@@ -32,6 +32,9 @@ const getChannels = async (req,res) => {
         res.status(200).send(await channelsModel.getChannels(req.query))
     }
     catch (error){
+        if(typeof error.statusCode === "undefined")
+            res.status(400).send(error);
+
         res.status(error.statusCode).send(error.message);
     }
 }
@@ -41,6 +44,7 @@ const getChannelsNumber = async (req,res) => {
         res.status(200).send(await channelsModel.getChannelsNumber(req.query.filters))
     }
     catch (error) {
+        console.log(error);
         res.status(error.statusCode).send(error.message);
     }
 }
@@ -60,8 +64,7 @@ const getSingleChannel = async (req,res) => {
         res.status(200).send(await channelsModel.getSingleChannel(name,req.session.user));
     }
     catch (error) {
-        console.log(error)
-        res.status(error.statusCode).send(error.message);
+        res.status(error?.statusCode).send(error?.message);
     }
 }
 

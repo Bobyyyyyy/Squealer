@@ -8,7 +8,7 @@
 <body class="d-flex flex-column">
 
 <!-- NavBar -->
-<nav class="navbar navbar-expand-lg bg-dark navbar-dark sticky-top" style="height: 10%">
+<nav class="navbar navbar-expand-lg bg-dark navbar-dark sticky-top fontcustom" style="height: 10%">
     <div class="d-flex flex-row justify-content-between w-100 p-1" >
         <div class="navbar-collapse collapse dual-collapse2" style="flex-basis: 100%">
             <ul class="navbar-nav">
@@ -22,7 +22,7 @@
                     <a class="nav-link dropdown-toggle active" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         Channels
                     </a>
-                    <ul class="dropdown-menu">
+                    <ul class="dropdown-menu fontcustom">
                         <li><a class="dropdown-item" href="/mod/officialChannels">Official Channels</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="/mod/userChannels">Private Channels</a></li>
@@ -32,17 +32,17 @@
         </div>
 
         <div class="order-sm-first order-lg-0 mx-auto">
-            <a class="navbar-brand" href="/mod">SquealerMOD</a>
+            <a class="navbar-brand" style="font-size: 3.5vh" href="/mod">SquealerMOD</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".dual-collapse2">
-                <span class="navbar-toggler-icon"></span>
+                <span class="navbar-toggler-icon" style="width: 3.5vh;"></span>
             </button>
         </div>
 
         <div class="navbar-collapse collapse dual-collapse2" style="flex-basis: 100%">
             <div class="ms-auto"></div>
-            <span class="navbar-text text-white ms-auto me-2" >@${user}
+            <span class="navbar-text text-white ms-auto me-2 fontcustom" >@${user}
             </span>
-            <button class="btn btn-outline-light bg-accent" onclick="window.location.href = '/logout'">Logout</button>
+            <button class="btn btn-outline-light bg-accent fontcustom" onclick="window.location.href = '/logout'">Logout</button>
         </div>
     </div>
 </nav>
@@ -54,15 +54,15 @@
     <div class="p-3 flex-column" id="div1" style="height: 100%; width: 100%">
         <!-- Modal Button -->
         <div class="d-flex flex-row align-items-center p-3 pe-0">
-            <label for="filter"></label><input class="form-control" id="filter" type="text" style="height: 10%; width: 15%; background-color: lightgray" placeholder="Cerca Canale..">
-            <button type="button" class="btn bg-primary ms-auto " data-bs-toggle="modal" data-bs-target="#addChannel">
+            <label for="filter"></label><input class="form-control fontcustom" id="filter" type="text" style="height: 10%; width: 15%; background-color: lightgray" placeholder="Cerca Canale..">
+            <button type="button" class="btn bg-primary ms-auto" data-bs-toggle="modal" data-bs-target="#addChannel" style="font-size: 2.5vh">
                 Add Channel
             </button>
         </div>
 
-        <div class="mt-2 mx-auto bg-secondary d-flex flex-row align-items-center text-center" style="height:6vh; width: 90vw;">
-            <div class="" style="width: 50%"> Nome </div>
-            <div class="" style="width: 50%"> Creatore</div>
+        <div class="mt-2 mx-auto bg-secondary fw-bold d-flex flex-row align-items-center text-center" style="height:6vh; width: 90vw;">
+            <div class="" style="width: 50%; font-size: 2.5vh"> Nome </div>
+            <div class="" style="width: 50%; font-size: 2.5vh"> Creatore</div>
         </div>
         <div id="channels" class="d-flex flex-column align-items-center justify-content-center"></div>
 
