@@ -9,6 +9,7 @@ import {
 } from "../../utils/usefulFunctions.js";
 import {Toast} from "flowbite-react";
 import TimedPost from "./TimedPost.jsx";
+import {startSendingPosition} from "../../utils/geoFunctions.js";
 
 function AddPost(){
     const username = getUsernameFromSessionStore();
@@ -36,8 +37,7 @@ function AddPost(){
         </div>
     );
 
-    const nIntervId = useRef(null);
-    const geolocationSent = useRef(0);
+    const postID = useRef(null);
 
     function parseDestinations(dests) {
         let finalDest = [];
@@ -75,24 +75,6 @@ function AddPost(){
         return currentQuota?.monthly < 0;
     }
 
-    const startSendingPosition = () => {
-        nIntervId.current = setInterval(handleSendPosition, frequencyMs.current);
-    }
-
-    const sendPosition = (n) => {
-        console.log("posizione", n);
-    }
-
-    function handleSendPosition() {
-        console.log("handle", geolocationSent.current, numberOfPosts)
-        if (geolocationSent.current < numberOfPosts) {
-            geolocationSent.current += 1;
-            sendPosition(geolocationSent.current)
-        } else {
-            clearInterval(nIntervId.current);
-            nIntervId.current = null;
-        }
-    }
 
     async function createPost() {
         let content2send;
@@ -148,10 +130,6 @@ function AddPost(){
                 let post = await createPost();
                 console.log("post creato", post, currentQuota)
 
-                if (post.contentType === "geolocation" && post.hasOwnProperty("millis")) {
-                    console.log("start sending");
-                    startSendingPosition();
-                }
 
                 let res = await fetch("/db/post", {
                     method: "POST",
@@ -164,7 +142,17 @@ function AddPost(){
                     },
                 });
                 if (res.ok) {
-                    window.location.href = "/user/"
+                    //window.location.href = "/user/"
+                    res = await res.json();
+                    console.log(res, res.post._id)
+                    // per inviare la posizione al server
+                    if (post.contentType === "geolocation" && post.hasOwnProperty("millis")) {
+                        console.log("start sending");
+                        postID.current = res.post._id;
+                        console.log(postID.current)
+                        startSendingPosition(frequencyMs.current, numberOfPosts, postID.current);
+                    }
+
                 } else {
                     let data = await res.json();
                     if (data.statusCode === 400) {
@@ -184,10 +172,9 @@ function AddPost(){
 
     useEffect(() => {
         getQuotaByUsername(username)
-            .then((res) => {
-                setQuota(res);
-                setCurrentQuota(res);
-                console.log(res.characters)
+            .then((response) => {
+                setQuota(response);
+                setCurrentQuota(response);
             })
     }, []);
 

@@ -20,7 +20,9 @@ async function getQuotaByUsername(username) {
             method: 'GET'
         });
         if (res.ok) {
-            return await res.json();
+            let x = await res.json();
+            console.log(x)
+            return x;
         }
     } catch (e) {
         console.log(e);

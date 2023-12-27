@@ -456,6 +456,27 @@ const addDestination = async (destination,postID) => {
     }
 }
 
+const addPosition = async (newPosition, postID) => {
+    try {
+        await connection.get();
+        console.log("SONO DENTRO ADDP POSITION", postID, newPosition)
+        let post = await Post.findById(postID).lean();
+        console.log(post);
+        let oldPos = JSON.parse(post.content);
+        console.log(oldPos);
+        let newContent = [...oldPos, ...newPosition];
+
+        if (!post2) {
+            throw createError(`il post con id: ${postID} non esiste`,400);
+        }
+        await Post.findOneAndReplace(postID, {content: JSON.stringify(newContent)});
+    }
+    catch (error) {
+        throw error
+    }
+}
+
+
 const deletePost = async (postID) => {
     try{
         await connection.get()
@@ -656,5 +677,6 @@ module.exports = {
     getPostsDate,
     getReactionLast30days,
     postLength,
-    addDestination
+    addDestination,
+    addPosition
 }
