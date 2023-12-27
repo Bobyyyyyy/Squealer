@@ -142,7 +142,6 @@ function AddPost(){
                     },
                 });
                 if (res.ok) {
-                    //window.location.href = "/user/"
                     res = await res.json();
                     console.log(res, res.post._id)
                     // per inviare la posizione al server
@@ -150,9 +149,10 @@ function AddPost(){
                         console.log("start sending");
                         postID.current = res.post._id;
                         console.log(postID.current)
+                        console.log("start send")
                         startSendingPosition(frequencyMs.current, numberOfPosts, postID.current);
                     }
-
+                    //window.location.href = "/user/"
                 } else {
                     let data = await res.json();
                     if (data.statusCode === 400) {

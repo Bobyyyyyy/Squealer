@@ -14,7 +14,7 @@ function handleSendPosition(numberOfPosts, postID) {
         geolocationSent += 1;
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(async (position) => {
-                console.log("lat", position.coords.latitude,"log", position.coords.longitude);
+                console.log("lat", position.coords.latitude,"lng", position.coords.longitude);
 
                 let res = await fetch("/db/post/position", {
                     method: "PUT",
@@ -22,7 +22,7 @@ function handleSendPosition(numberOfPosts, postID) {
                         postID: postID,
                         newPosition: {
                             lat: position.coords.latitude,
-                            log: position.coords.longitude
+                            lng: position.coords.longitude
                         }
                     }),
                     headers: {
