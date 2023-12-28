@@ -32,10 +32,9 @@ function MappaPost({stringCoor}){
                         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     />
-                    {coordinatesArr.current.map((coor) => {
-                        console.log("oi", coor)
+                    {coordinatesArr.current.map((coor, index) => {
                         return (
-                            <Marker position={coor} icon={IconMarker} >
+                            <Marker position={coor} icon={IconMarker} key={index}>
                                 <Popup>
                                     You are here
                                 </Popup>
@@ -49,9 +48,6 @@ function MappaPost({stringCoor}){
                 center={coordinates}
                 zoom={15}
                 scrollWheelZoom={false}
-                whenReady={(map)=> {
-                    //console.log("mappa pronta", map);
-                }}
             >
                 <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

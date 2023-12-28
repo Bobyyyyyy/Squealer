@@ -2,7 +2,6 @@ import MappaPost from "./MappaPost.jsx";
 
 function Body({post}) {
     if (post.contentType === "geolocation") {
-        console.log(post.content)
     }
 
     return (

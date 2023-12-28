@@ -9,13 +9,10 @@ function startSendingPosition(frequencyMs, numberOfPosts, postID) {
 }
 
 function handleSendPosition(numberOfPosts, postID) {
-    console.log("handle", geolocationSent, numberOfPosts, postID)
     if (geolocationSent < numberOfPosts) {
         geolocationSent += 1;
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(async (position) => {
-                console.log("lat", position.coords.latitude,"lng", position.coords.longitude);
-
                 let res = await fetch("/db/post/position", {
                     method: "PUT",
                     body: JSON.stringify({
@@ -30,7 +27,7 @@ function handleSendPosition(numberOfPosts, postID) {
                     },
                 })
                 if (res.ok) {
-                    console.log(res);
+                    console.log("handle", geolocationSent, numberOfPosts, postID)
                 }
             }, handleErrorPosition);
         } else {
