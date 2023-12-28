@@ -57,7 +57,7 @@
     <div class="p-5 d-flex flex-column text-white" id="div1" style="height: 100%; width: 100%">
         <div class="d-flex flex-column justify-content-center align-items-center">
             <div class="d-flex flex-row justify-content-center align-items-center ">
-                <h1 style="font-size: 5vh"> §<span id="channel-name" class="fw-bold">${name}</span></h1>
+                <h1 style="font-size: 7vh"> §<span id="channel-name" class="fw-bold">${name}</span></h1>
                 <button class="btn bg-primary h-25 ms-2 fontcustom" data-bs-toggle="modal" data-bs-target="#changeName" > Rinomina </button>
             </div>
 
@@ -91,8 +91,10 @@
                     <input type="radio" class="btn-check" name="filters" id="filter-geo" value="geolocation">
                     <label class="btn fontcustom " for="filter-geo">Geolocalizzazione</label>
                 </div>
-
             <div class="ms-auto">
+                <button type="button" class="btn ms-auto fontcustom text-black bg-primary" data-bs-toggle="modal" data-bs-target="#addAdminModal">
+                    Add Admin
+                </button>
                 <div class="btn btn-danger fontcustom text-black" id="block-button"> </div>
             </div>
         </div>
@@ -198,6 +200,34 @@
     </div>
 </div>
 </div>
+
+<div class="modal fade" id="addAdminModal" tabindex="-1" aria-labelledby="addAdminModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <h1 class="modal-title fs-5">Aggiungi admin nel canale</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="addAdminForm">
+                <div class="modal-body">
+                    <div>
+                        <h5> Se l'utente è già admin, gli verrà revocato il ruolo</h5>
+                    </div>
+                    <div>
+                        <label for="user" class="form-label w-100"> Nome:
+                            <input type="text" class="form-control" name="user" id="user" placeholder="Nome utente" required>
+                        </label>
+                    </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn bg-secondary" data-bs-dismiss="modal">Chiudi</button>
+                    <button type="submit" class="btn bg-primary">Inserisci</button>
+                </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 
 
 

@@ -174,9 +174,11 @@ const getUsers = async (query) =>{
             // filtrare profili per nome
             ...(query.filter.name) && {'username': new RegExp(`^${query.filter.name}`)},
             // filtrare profili per tipo ['public','private']
-            ...(query.filter.type) && {'type': query.filter.type},
+            ...(query.filter.type) && {'typeUser': query.filter.type},
         }
-        return await User.find(filter).skip(offset).limit(limit).lean();
+
+        let users = await User.find(filter).skip(offset).limit(limit).lean();
+        return users;
     }
     catch (err){
         throw err;
@@ -200,7 +202,15 @@ const getSingleUser = async (query) => {
 const usersLength = async (query) => {
     try {
         await connection.get();
-        let users = await User.find({$or : [{username: {$regex: query.filter , $options: 'i'}},{email: {$regex: query.filter , $options: 'i'}},{typeUser: {$regex: query.filter , $options: 'i'}},]}).lean();
+
+        let filter = {
+            // filtrare profili per nome
+            ...(query.name) && {'username': new RegExp(`^${query.name}`)},
+            // filtrare profili per tipo ['public','private']
+            ...(query.type) && {'typeUser': query.type},
+        }
+
+        let users = await User.find(filter).lean();
 
         return {length: users.length};
     }

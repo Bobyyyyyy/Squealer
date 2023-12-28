@@ -256,7 +256,7 @@ const addAdmin = async function (username, adminName, channelName) {
         let creator = await User.findOne({username: adminName}).lean();
         let user = await User.findOne({username: username}).lean();
         if (!user || !creator) {
-            throw createError(`${user.username} non esiste`,500);
+            throw createError(`${username} non esiste`,500);
         }
         let channel;
 
@@ -282,9 +282,9 @@ const addAdmin = async function (username, adminName, channelName) {
             }
         }
 
-
         if(!channel)
             throw createError(`${admin.username} non ha i permessi necessari`,500);
+
     }
     catch (error) {
         throw error;

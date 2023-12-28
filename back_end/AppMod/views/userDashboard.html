@@ -49,6 +49,24 @@
     <div class="d-flex flex-row pb-3 pe-0 align-items-center">
         <label for="filter" class="form-label"></label>
         <input class="form-control fontcustom" id="filter" type="text" style="height: 10%; width: 15%; background-color: lightgray" placeholder="Cerca Utente..">
+
+        <div id="user-type" class="btn-group ms-3" role="group" aria-label="">
+            <input type="radio" class="btn-check" name="filters" id="filter-all" value="" autocomplete="off" checked>
+            <label class="btn bg-secondary fontcustom" for="filter-all">All</label>
+
+            <input type="radio" class="btn-check" name="filters" id="filter-user" value="user" autocomplete="off">
+            <label class="btn bg-secondary fontcustom" for="filter-user">User</label>
+
+            <input type="radio" class="btn-check" name="filters" id="filter-smm" value="smm" autocomplete="off">
+            <label class="btn bg-secondary fontcustom" for="filter-smm">Social Media Manager</label>
+
+            <input type="radio" class="btn-check" name="filters" id="filter-vip" value="vip" autocomplete="off">
+            <label class="btn bg-secondary fontcustom" for="filter-vip">Vip</label>
+
+            <input type="radio" class="btn-check" name="filters" id="filter-mod" value="mod" autocomplete="off">
+            <label class="btn bg-secondary fontcustom" for="filter-mod">Mod</label>
+        </div>
+
         <button type="button" class="btn bg-primary fontcustom ms-auto" data-bs-toggle="modal" data-bs-target="#addUser">
             Add User
         </button>

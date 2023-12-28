@@ -2,7 +2,8 @@ let LastCall = {
     limit : 5,
     offset: 0,
     users: 0,
-    filter: ''
+    filter: '',
+    type: '',
 
 }
 
@@ -21,21 +22,22 @@ function updateModifyParameters()  {
 }
 
 
-function updateLastCall(limit,offset,filter) {
+function updateLastCall(limit,offset,filter,type) {
     LastCall.limit = limit;
     LastCall.offset = offset;
     LastCall.filter = filter;
+    LastCall.type = type;
 }
 
 
-function getUsersNumber(filter) {
+function getUsersNumber(filter,type) {
     $.ajax({
         url:'/db/user/number',
-        data: {filter: filter},
+        data: {filter: filter,type: type},
         type: 'get',
         success: (data) => {
             LastCall.users = data.length;
-            userTable(LastCall.limit,LastCall.offset = 0,LastCall.filter);
+            userTable(LastCall.limit,LastCall.offset = 0,LastCall.filter,LastCall.type);
         }
     })
 }
@@ -76,11 +78,11 @@ function showUserModal(username,remainingQuota,maxQuota) {
     $('#modUser').modal("show");
 }
 
-function userTable (limit,offset,filter) {
-    updateLastCall(limit, offset, filter);
+function userTable (limit,offset,filter,type) {
+    updateLastCall(limit, offset, filter,type);
     $.ajax({
         url: '/db/user/all',
-        data: {filter: {name: filter}, limit: limit, offset: offset},
+        data: {filter: {name: filter,type: type}, limit: limit, offset: offset},
         type: 'get',
         success: (data) => {
             $('#pages').empty();
@@ -139,15 +141,18 @@ function userTable (limit,offset,filter) {
 
             }).join('\n')}`
 
+
             if (offset !== 0) {
-                let previous = `<li class="page-item fontcustom" onclick="userTable(LastCall.limit,LastCall.offset - LastCall.limit,LastCall.filter)"><a class="page-link fontcustom text-black bg-secondary border-black fw-bold" ><-</a></li>`
+                let previous = `<li class="page-item fontcustom" onclick="userTable(LastCall.limit,LastCall.offset - LastCall.limit,LastCall.filter,LastCall.type)"><a class="page-link fontcustom text-black bg-secondary border-black fw-bold" ><-</a></li>`
                 $('#pages').append(previous);
             }
 
             let page = `<li class="page-item fontcustom"><a class="page-link fontcustom text-black bg-secondary border-black">${LastCall.offset / LastCall.limit + 1}</a></li>`
 
+            console.log('Offset:', offset, 'Limit:', limit, 'Utenti:', LastCall.users)
+
             if (offset + limit < LastCall.users) {
-                let next = `<li class="page-item fontcustom" onclick="userTable(LastCall.limit,LastCall.limit+LastCall.offset,LastCall.filter)"><a class="page-link fontcustom text-black bg-secondary border-black fw-bold">-></a></li>`
+                let next = `<li class="page-item fontcustom" onclick="userTable(LastCall.limit,LastCall.limit+LastCall.offset,LastCall.filter,LastCall.type)"><a class="page-link fontcustom text-black bg-secondary border-black fw-bold">-></a></li>`
                 page = page + next;
             }
 
@@ -160,7 +165,7 @@ function userTable (limit,offset,filter) {
 $('#filter').on("keyup", () => {
     let value = $('#filter').val();
     LastCall.filter = value;
-    getUsersNumber(value);
+    getUsersNumber(value,LastCall.type);
 });
 
 $('#modifyButton').click(() => {
@@ -194,6 +199,14 @@ $('#addUserForm').on('submit',(event) => {
     })
 })
 
+
+$('#user-type').on('change',() => {
+    LastCall.type = $('#user-type input:checked').val();
+    getUsersNumber(LastCall.filter,LastCall.type);
+})
+
+
+
 function inizializeToast() {
     let toastElList = [].slice.call(document.querySelectorAll('.toast'))
     return toastList = toastElList.map(function(toastEl) {
@@ -203,5 +216,5 @@ function inizializeToast() {
 }
 
 $(document).ready(function() {
-    getUsersNumber(LastCall.filter);
+    getUsersNumber(LastCall.filter,LastCall.type);
 });

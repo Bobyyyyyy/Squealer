@@ -306,7 +306,9 @@ $('#change-name').on('click', () => {
             window.location.replace(newurl);
         },
         error: (error) => {
-            alert(error.responseJSON.mes);
+            $('#toast-content').empty().html(error.responseJSON.mes);
+            let toastList = inizializeToast();
+            toastList.forEach(toast => toast.show()); // This show them
         }
     })
 })
@@ -366,6 +368,26 @@ function getReplies(parentID) {
         }
     })
 }
+
+
+$('#addAdminForm').on('submit',(event) => {
+    event.preventDefault();
+
+    $.ajax({
+        url:'/db/channel/admin',
+        data: {channel: ChannelName, user: $('#user').val()},
+        type: 'post',
+        success: (post) => {
+            location.reload()
+        },
+        error: (error) => {
+            $('#toast-content').empty().html(error.responseText);
+            let toastList = inizializeToast();
+            toastList.forEach(toast => toast.show()); // This show them
+        }
+    })
+
+})
 
 $(document).ready(() => {
     showChannel(ChannelName);
