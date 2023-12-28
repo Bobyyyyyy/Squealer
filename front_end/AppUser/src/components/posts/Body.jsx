@@ -2,10 +2,8 @@ import MappaPost from "./MappaPost.jsx";
 
 function Body({post}) {
     if (post.contentType === "geolocation") {
-     //   console.log(post)
     }
-    if (post.contentType === "video") {
-    }
+
     return (
         <div className={"flex justify-center md:max-h-[28rem]"}>
             {post.contentType === "text" &&

@@ -20,7 +20,7 @@ function AddAdminModal({isOpen, setIsOpen, followers, channelName, hasUpdated, s
     }
 
     return (
-        <Modal  show={isOpen} onClose={()=>setIsOpen(false)}>
+        <Modal show={isOpen} onClose={()=>setIsOpen(false)}>
             <Modal.Header>
                 Promuovi followers ad admin
             </Modal.Header>
