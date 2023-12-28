@@ -16,7 +16,7 @@ function Home() {
     const lastRequestLenght = useRef(POST_TO_GET);
     const lastHeightDiv = useRef(0);
 
-    const fetchAllPosts = async () => {
+    const fetchFirstPosts = async () => {
         try {
             let res = await fetch(`/db/post/all?offset=0&limit=10`, {
                 method: 'GET'
@@ -37,7 +37,8 @@ function Home() {
 
     useEffect(() => {
         document.addEventListener('scroll', scrollEndDetector, true);
-        fetchAllPosts()
+        fetchFirstPosts()
+            .catch(console.error);
         return () => {
             document.removeEventListener('scroll', scrollEndDetector);
         }
@@ -63,7 +64,7 @@ function Home() {
 
         if (postDiv && window.innerHeight + window.scrollY >= postDiv.offsetHeight && lastRequestLenght.current >= POST_TO_GET) {
             lastHeightDiv.current = window.scrollY;
-            updatePost();
+            await updatePost();
         }
     };
 

@@ -23,7 +23,8 @@ function Channels () {
             name: channelName,
             type: visibility,
             creator: owner,
-            hasAccess: admin
+            hasAccess: admin,
+            both: (!!owner && !!admin)
         }
 
         setQueryFilter(JSON.stringify(filter))
@@ -35,7 +36,6 @@ function Channels () {
         const isCreator = creator === name;
         const isAdmin = admins.some((adm) => adm === name);
         const isFollower = followers.some((follower) => follower.user === name);
-        console.log(requests)
         const isPending = !!requests && requests.some((req) => req.user === name);
         return isCreator ? "creator" : (isAdmin ? "admin" : (isFollower ? "follower" : (isPending) ? "pending" : ""));
     }
@@ -47,7 +47,6 @@ function Channels () {
             .then((res) => {
                 res.json()
                     .then((res) => {
-                        console.log(res)
                         setChannels(res)
                         setNuovoCanale(false);
                     })

@@ -141,7 +141,6 @@ function AddPost(){
                 let post = await createPost();
                 console.log("post creato", post, currentQuota)
 
-
                 let res = await fetch("/db/post", {
                     method: "POST",
                     body: JSON.stringify({
