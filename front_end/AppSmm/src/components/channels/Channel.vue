@@ -27,7 +27,6 @@ const readyData = ref(false);
   }
 
   async function getDataOpenModal(){
-    console.log("entro");
 
     let res = await fetch(`/db/post/allReactionMonth?user=${currentVip.value}&channel=${props.name}`, {
       method: "GET",
@@ -77,7 +76,7 @@ const readyData = ref(false);
   <ChartChannel v-if="readyData" :reactions="readyReac" @closed="readyData = false" :channelName="name" />
 </template>
 
-<style>
+<style scoped>
 
   .lineDim{
     margin-right: 1%;

@@ -143,12 +143,12 @@ function getLength(reactions){
 }
 
 function parseReactionDate(reactions){
-    Object.keys(reactions).forEach(typeReac => {
+    Object.keys(reactions).forEach((typeReac) => {
         let reac30days = getLast30Days().reduce((accumulator, value) => {
             return {...accumulator, [value]: []};
         }, {});
         reactions[typeReac].forEach(reac => {
-            let monthDay = new Date(reac.date).toString().split(' ').slice(1,3).join(' ')
+            let monthDay = new Date(reac.date).toString().split(' ').slice(1,3).join(' ');
             reac30days[monthDay].push(reac);
         })
         reactions[typeReac] = reac30days;
