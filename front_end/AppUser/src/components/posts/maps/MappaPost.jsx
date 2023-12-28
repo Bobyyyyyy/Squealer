@@ -6,12 +6,10 @@ function MappaPost({stringCoor}){
     const isArr = useRef(false);
     const coordinatesArr = useRef([]);
     const coordinates = JSON.parse(stringCoor);
-    console.log("cord", coordinates);
 
     if (Array.isArray(coordinates)) {
         isArr.current = true;
         coordinatesArr.current = coordinates;
-        console.log(coordinatesArr.current)
     }
 
     const IconMarker = new Icon({

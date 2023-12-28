@@ -1,8 +1,6 @@
 import MappaPost from "./maps/MappaPost.jsx";
 
 function Body({post}) {
-    if (post.contentType === "geolocation") {
-    }
 
     return (
         <div className={"flex justify-center md:max-h-[28rem]"}>
