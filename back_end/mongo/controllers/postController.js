@@ -6,7 +6,7 @@ const {mongo} = require("mongoose");
 const createPost = async (req,res) => {
     try{
         let postSaved = await postModel.addPost(req.body.post, req.body.quota)
-        if (req.body.post?.timed) {
+        if (req.body.post?.timed && req.body.post.contentType !== "geolocation") {
             await CronController.createScheduledPost(postSaved.post._id, req.body.post.millis, req.body.post.squealNumber, req.body.post.content, req.body.post.contentType);
         }
         res.send(postSaved)
@@ -96,6 +96,15 @@ const addDestination = async(req,res) => {
     }
 }
 
+const addPosition = async(req,res) => {
+    try {
+        res.send(await postModel.addPosition(req.body.newPosition, req.body.postID));
+    }
+    catch (error) {
+        res.status(400).send(error);
+    }
+}
+
 module.exports = {
     createPost,
     getPosts,
@@ -105,5 +114,6 @@ module.exports = {
     getPostsDate,
     getReactionLast30days,
     postLength,
-    addDestination
+    addDestination,
+    addPosition
 }

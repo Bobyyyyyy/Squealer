@@ -1,44 +1,68 @@
-import {useEffect} from "react";
+import {useEffect, useRef, useState} from "react";
 import {Icon} from "leaflet";
 import {MapContainer, Marker, Popup, TileLayer} from "react-leaflet";
 
 function MappaPost({stringCoor}){
+    const isArr = useRef(false);
+    const coordinatesArr = useRef([]);
     const coordinates = JSON.parse(stringCoor);
-    //let coordinatesString = stringCoor.split(",");
-    /*
-    const coordinates = [
-        parseFloat(coordinatesString[0]),
-        parseFloat(coordinatesString[1])
-    ];
+    console.log("cord", coordinates);
 
-     */
+    if (Array.isArray(coordinates)) {
+        isArr.current = true;
+        coordinatesArr.current = coordinates;
+        console.log(coordinatesArr.current)
+    }
 
     const IconMarker = new Icon({
-        //iconUrl: MarkerPosition,
         iconUrl: "/img/location.png",
         iconSize: [48, 48],
     })
 
     return (
-        <MapContainer
-            center={coordinates}
-            zoom={15}
-            scrollWheelZoom={false}
-            whenReady={(map)=> {
-                //console.log("mappa pronta", map);
-            }}
-        >
-            <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            <Marker
-                position={coordinates}
-                icon={IconMarker}
+        <>
+        {isArr.current ? (
+            <>
+                <MapContainer
+                    center={coordinatesArr.current[0]}
+                    zoom={3}
+                    scrollWheelZoom={false}
+                >
+                    <TileLayer
+                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    />
+                    {coordinatesArr.current.map((coor, index) => {
+                        return (
+                            <Marker position={coor} icon={IconMarker} key={index}>
+                                <Popup>
+                                    You are here
+                                </Popup>
+                            </Marker>
+                        );
+                    })}
+                </MapContainer>
+            </>
+            ) : (
+            <MapContainer
+                center={coordinates}
+                zoom={15}
+                scrollWheelZoom={false}
             >
-                <Popup>You are here</Popup>
-            </Marker>
-        </MapContainer>
+                <TileLayer
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+
+                <Marker
+                    position={coordinates}
+                    icon={IconMarker}
+                >
+                    <Popup>You are here</Popup>
+                </Marker>
+            </MapContainer>
+        )}
+        </>
     );
 }
 export default MappaPost;
