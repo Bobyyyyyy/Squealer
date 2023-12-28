@@ -1,25 +1,12 @@
 <script setup>
 
-  const props = defineProps({
+  import {parseTime} from "../../utils/functions.js";
+  defineProps({
     name: String,
     dest: String,
     srcImg: String,
     dateCreation: Date
   })
-
-  function parseTime(){
-    let now = new Date().getTime()
-
-    let timePassed = (now - new Date(props.dateCreation).getTime()) / 1000
-
-    return timePassed < 60 ? `${Math.floor(timePassed)} s.` :
-              timePassed < 60*60 ? `${Math.floor(timePassed/60)} m.` :
-                 timePassed < 60*60*24 ? `${Math.floor(timePassed/(60*60))} h.` :
-                     timePassed < 60*60*24*7 ? `${Math.floor(timePassed/(60*60*24))} d.` :
-                         timePassed < 60*60*24*7*4 ? `${Math.floor(timePassed/(60*60*24*7))} w.` :
-                             timePassed < 60*60*24*7*4*12 ? `${Math.floor(timePassed/(60*60*24*7*4))} m.` :
-                                 `1+ y.`
-  }
 
 </script>
 
@@ -37,7 +24,7 @@
     </div>
     <div class="d-flex justify-content-end align-self-center flex-grow-1" style="width: 5rem">
       <h5 v-tooltip="dateCreation.toString()" class="mb-0 text-dark">
-        {{parseTime()}}
+        {{parseTime(dateCreation)}}
       </h5>
     </div>
   </div>

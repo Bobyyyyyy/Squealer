@@ -35,7 +35,7 @@ function ModalGeo({isOpen, setIsOpen, frequencyMs, numOfUpdates, startSending}) 
             <Modal.Body>
                 <div className="flex flex-col w-full gap-6">
                     <Progress
-                        progress={progress}
+                        progress={Math.ceil(progress)}
                         progressLabelPosition="inside"
                         textLabel="INVIO POSIZIONE"
                         textLabelPosition="outside"

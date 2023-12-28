@@ -114,9 +114,11 @@ const cast2millis = {
     'hours': 1000*60*60,
 }
 
+const CHANNEL_OFFSET = 36
+
 
 export {smm, sideBarElements, currentVip,
     postType, sortPosts, filterValues,
     reactionsIcons, QUALITY, MAX_WIDTH, MAX_HEIGHT,
     smartPhone, expanded, URLHTTPREGEX,
-    postTypeITAS, filterValuesITAS, cast2millis}
+    postTypeITAS, filterValuesITAS, cast2millis, CHANNEL_OFFSET}

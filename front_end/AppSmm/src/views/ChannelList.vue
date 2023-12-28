@@ -1,27 +1,46 @@
 
 <script setup>
-import {onMounted, reactive, ref} from "vue";
+import {computed, onMounted, reactive, ref, watch, watchEffect} from "vue";
 import {Modal} from "bootstrap";
 import AddChannelModal from "../components/channels/AddChannelModal.vue";
 import Channel from "../components/channels/Channel.vue";
-import {currentVip} from "../utils/config.js";
+import {currentVip, CHANNEL_OFFSET} from "../utils/config.js";
 import Select from "../components/Select.vue";
 
-let channels = []
-const channelsReady = ref(false);
+let offset = ref(0);
+let limit = ref(CHANNEL_OFFSET);
+const channels = ref([]);
+const searchChannel = ref('');
+
+const filters = computed(() => {
+  let filters = {}
+  if(roleFilter.value === '' || roleFilter.value === 'all') {
+    filters.hasAccess = currentVip.value;
+    filters.creator = currentVip.value;
+    filters.both = true;
+  }
+  else if(roleFilter.value === 'admin') filters.hasAccess = currentVip.value;
+  else filters.creator = currentVip.value;
+  if(visibilityFilter.value !== '' && visibilityFilter.value !== 'all') filters.type = visibilityFilter.value;
+  if(searchChannel.value !== '') filters.name = searchChannel.value;
+  return JSON.stringify(filters);
+})
+
+const query = computed( () => `/db/channel?filters=${filters.value}&limit=${limit.value}&offset=${offset.value}`);
+
 const visibilityFilter = ref('');
 const roleFilter = ref('');
-
 const modalState = reactive({Modal: null,})
-onMounted(async () => {
-  modalState.ChannelModal = new Modal('#AddChannelModal',{})
 
-  let res = await fetch(`/db/channel/list?vipName=${currentVip.value}`,{
+async function updateChannels(query){
+  let res = await fetch(query,{
     method:"GET"
   });
-  channels = await res.json();
-  console.log(channels);
-  channelsReady.value = true;
+  return await res.json();
+}
+
+onMounted(async () => {
+  modalState.ChannelModal = new Modal('#AddChannelModal',{})
 })
 
 function openChannelModal() {
@@ -31,15 +50,19 @@ function closeChannelModal() {
   modalState.ChannelModal.hide()
 }
 
+watchEffect(async () => {
+  console.log(query.value);
+  channels.value = await updateChannels(query.value);
+});
+
 </script>
 
 <template>
   <div class="centralDiv">
     <div class="marginCD">
-      <h1 class="text-center">Lista Canali</h1>
-      <div class="d-flex flex-row justify-content-between align-items-end">
+      <div class="d-flex flex-row justify-content-between align-items-end pt-4 pb-2">
         <div id="filterCh" class="input-group m-0">
-          <input  type="text" class="form-control " placeholder="Search..." aria-label="Username" aria-describedby="basic-addon1">
+          <input  type="text" class="form-control " placeholder="Cerca..." aria-label="channel search" aria-describedby="cerca canale" v-model="searchChannel">
           <button type="submit" class="btn btn-secondary">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
               <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
@@ -48,30 +71,32 @@ function closeChannelModal() {
         </div>
         <Select
             classButton="btn btn-secondary"
-            :updateRef="visibilityFilter"
+            updateRef="updateVisibility"
             :dropItems="['public', 'private', 'all']"
             :dropItemsName="['pubblico', 'privato', 'tutto']"
             label="visibilità"
-            def="tutto"
+            def="all"
+            @updateVisibility="(vis) => visibilityFilter = vis"
         />
         <Select
             classButton="btn btn-secondary"
-            :updateRef="roleFilter"
+            updateRef="updateRole"
             :dropItems="['creator', 'admin', 'all']"
-            :dropItemsName="['creatore', 'privato', 'tutti']"
+            :dropItemsName="['creatore', 'amministratore', 'tutti']"
             label="tipo utente"
-            def="tutti"
+            def="all"
+            @updateRole="(role) => roleFilter = role "
         />
         <div>
-          <button class="btn btn-secondary ms-2" @click="openChannelModal">Add</button>
+          <button class="btn btn-secondary ms-2" @click="openChannelModal">Crea</button>
         </div>
       </div>
-      <div v-if="channelsReady" class="d-flex justify-content-center flex-column shadow-sm w-100">
+      <div class="d-flex justify-content-center flex-column shadow-sm w-100">
         <Channel v-for="(ch,i) in channels"
                  :key="i"
                  :name="ch.name"
                  :description="ch.description"
-                 :isPublic="ch.isPublic"
+                 :isPublic="ch.type === 'public'"
                  :creator="ch.creator"
                  :admins="ch.admins"
                  channelPic="https://picsum.photos/id/1/300/300"
@@ -83,7 +108,7 @@ function closeChannelModal() {
 </template>
 
 
-<style>
+<style scoped>
 
 
   #filterCh{
