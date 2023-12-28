@@ -236,14 +236,14 @@ function Profile () {
                     </div>
                 </>
             }
-            {/*posts.map((post)=> {
+            {posts.map((post)=> {
                 return(
                     <Post
                         key={post._id}
                         post={post}
                     />
                 )})
-                */}
+            }
             {posts.length === 0 &&
             <div className="text-lg text-center mt-4">
                 Al momento non ci sono post!

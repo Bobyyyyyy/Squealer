@@ -1,18 +1,24 @@
 import Post from "../../components/posts/Post.jsx";
-import React, {Suspense, useEffect, useState} from "react";
+import React, { useEffect, useRef, useState} from "react";
 import {
-    getUsernameFromSessionStore,
-    setUsernameInSessionStore
+    getAllPost
 } from "../../utils/usefulFunctions.js";
 import {Spinner} from "flowbite-react";
 
 function Home() {
+
+    const POST_TO_GET = 10;
+
+    const allPosts = useRef([]);
     const [isLoading, setIsLoading] = useState(true);
     const [posts, setPosts] = useState([]);
+    const currentOffset = useRef(POST_TO_GET);
+    const lastRequestLenght = useRef(POST_TO_GET);
+    const lastHeightDiv = useRef(0);
 
     const fetchAllPosts = async () => {
         try {
-
+            console.log("fetch all posts")
             let res = await fetch(`/db/post/all?offset=0&limit=10`, {
                 method: 'GET'
             });
@@ -21,11 +27,9 @@ function Home() {
                console.log("errore nel fetching dei post");
             }
 
-            let allPosts = await res.json();
-            console.log(allPosts);
-            //console.log(allPosts)
-            setPosts(allPosts);
-            //console.log("num of post", allPosts.length)
+            let newPost = await res.json();
+            allPosts.current =  allPosts.current.concat(newPost);
+            setPosts(allPosts.current);
             setIsLoading(false)
 
         } catch (e) {
@@ -34,12 +38,36 @@ function Home() {
     };
 
     useEffect(() => {
-        setUsernameInSessionStore()
-            .then((res) => {
-                fetchAllPosts()
-                    .then()
-            })
+        document.addEventListener('scroll', scrollEndDetector, true);
+        fetchAllPosts()
+        return () => {
+            document.removeEventListener('scroll', scrollEndDetector);
+        }
     }, []);
+
+
+    useEffect(() => {
+        window.scrollTo({ behavior: "instant", top: lastHeightDiv.current, left:0})
+    }, [posts]);
+
+    const updatePost = async () => {
+        setIsLoading(true);
+        let newPosts = await getAllPost(currentOffset.current);
+        currentOffset.current += newPosts.length;
+        lastRequestLenght.current = newPosts.length;
+        setPosts((prev) => [...prev, ...newPosts]);
+        setIsLoading(false);
+    }
+
+    const scrollEndDetector = async (event) => {
+        event.preventDefault();
+        const postDiv = document.getElementById("postDiv");
+
+        if (postDiv && window.innerHeight + window.scrollY >= postDiv.offsetHeight && lastRequestLenght.current >= POST_TO_GET) {
+            lastHeightDiv.current = window.scrollY;
+            updatePost();
+        }
+    };
 
 
     return (
@@ -49,13 +77,15 @@ function Home() {
                     <Spinner aria-label="loading profile spinner" size="xl" color="pink" />
                 </div>
             ) : (
-                <div className={"flex flex-wrap w-full gap-8 items-center justify-center h-screen pb-20 overflow-y-scroll"}>
-                    {posts!==null && posts.map((post)=> {
-                        return(
-                            <Post
-                                post={post} key={post._id}
-                            />
-                    )})}
+                <div className="max-h-screen">
+                    <div className="flex flex-wrap w-full gap-8 items-center justify-center pb-20 overflow-y-scroll" id="postDiv">
+                        {posts!==null && posts.map((post)=> {
+                            return(
+                                <Post
+                                    post={post} key={post._id}
+                                />
+                        )})}
+                    </div>
                 </div>
             )}
          </>
@@ -63,4 +93,3 @@ function Home() {
 }
 
 export default Home;
-
