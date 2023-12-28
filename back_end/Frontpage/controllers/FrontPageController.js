@@ -101,7 +101,7 @@ const createSession = async(req,res) => {
 const createGuest = async(req,res,next) => {
     const digits = Math.floor(Math.random() * 9000000000) + 1000000000;
     req.response = {
-        username: 'guest-'+digits,
+        username: 'guest-' + digits,
         typeUser: 'guest',
     }
     next();
