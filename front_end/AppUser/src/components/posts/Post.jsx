@@ -23,8 +23,6 @@ function Post({post}) {
     const [activeButton, setActiveButton] = useState(lastReaction ? lastReaction.rtype : null);
 
     const [showRepliesModal, setShowRepliesModal] = useState(false);
-    const [hasUpdated, setHasUpdated] = useState(false);
-    const [replies, setReplies] = useState([]);
 
     async function changeActiveButton({id}) {
         setActiveButton((id === activeButton) ? undefined : id);
@@ -62,22 +60,6 @@ function Post({post}) {
         }
     }
 
-    const getReplies = async () => {
-        let res = await fetch(`/db/reply?parentid=${post._id}`, {
-            method:"GET"
-        })
-        if (res.ok) {
-            res = await res.json();
-            setReplies(res);
-            console.log("risposte", res);
-        }
-    }
-
-    useEffect(() => {
-        getReplies()
-            .catch(console.error);
-    }, [])
-
     return(
     <>
         <div className="w-full md:w-[32rem] border border-gray-200">
@@ -100,8 +82,7 @@ function Post({post}) {
                 </button>
             </div>
             <RepliesModal
-                isOpen={showRepliesModal} setIsOpen={setShowRepliesModal}
-                postID={post._id} replies={replies} setHasUpdated={setHasUpdated}
+                isOpen={showRepliesModal} setIsOpen={setShowRepliesModal} postID={post._id}
             />
         </div>
     </>

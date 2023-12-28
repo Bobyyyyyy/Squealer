@@ -459,7 +459,6 @@ const addDestination = async (destination,postID) => {
 const addPosition = async (newPosition, postID) => {
     try {
         await connection.get();
-        console.log("SONO DENTRO ADDP POSITION", postID, newPosition)
         let post = await Post.findById(postID).lean();
         let x = JSON.parse(post.content);
         console.log(x);
