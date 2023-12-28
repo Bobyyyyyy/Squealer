@@ -7,7 +7,6 @@ import {
 } from "../assets/index.jsx"
 
 import {getUsernameFromSessionStore} from "../../utils/usefulFunctions.js";
-import {Button} from "flowbite-react";
 import RepliesModal from "./RepliesModal.jsx";
 
 function Post({post}) {
@@ -42,7 +41,6 @@ function Post({post}) {
                 },
                 body:JSON.stringify({
                     postId: post._id,
-                    user: user,
                     reaction: id,
                 })
             })
@@ -54,7 +52,6 @@ function Post({post}) {
                 },
                 body:JSON.stringify({
                     postId: post._id,
-                    user: user,
                 })
             })
         }

@@ -73,8 +73,15 @@ function AddPost(){
         } else if (destinations.includes(username)) {
             setError("Non puoi inviare messaggi a te stesso")
             canSend = false;
+        } else if (containsUppercase(destinations)) {
+            setError("Non puoi inviare post ai canali ufficiali")
+            canSend = false;
         }
         return canSend;
+    }
+
+    function containsUppercase(str) {
+        return /[A-Z]/.test(str);
     }
 
     const isQuotaNegative = () => {
@@ -211,7 +218,7 @@ function AddPost(){
                     <input
                         type="text"
                         className="border-2 border-gray-500  rounded-md w-full focus:border-teal-500 focus:ring-teal-500 "
-                        placeholder="@Pippo42, §calcetto"
+                        placeholder="@pippo42, §calcetto"
                         onChange={e => setDestinations(e.target.value)}
                     />
                 </div>
