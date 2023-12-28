@@ -41,6 +41,7 @@ function Post({post}) {
                 },
                 body:JSON.stringify({
                     postId: post._id,
+                    user: user,
                     reaction: id,
                 })
             })
@@ -52,6 +53,7 @@ function Post({post}) {
                 },
                 body:JSON.stringify({
                     postId: post._id,
+                    user: user,
                 })
             })
         }
