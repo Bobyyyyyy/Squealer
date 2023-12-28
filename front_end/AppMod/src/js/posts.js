@@ -50,7 +50,6 @@ const showPosts = (filters,append = false) => {
                 return;
             }
             let html = `${$.map(posts, (post) => {
-                console.log(post.content)
                 let destinationNames = []
                 let officialChannelNames = [];
 
@@ -123,7 +122,7 @@ const showPosts = (filters,append = false) => {
                         break;
 
                     case 'geolocation':
-                        Post = Post + `<div class="align-self-center" style="height: 50vh"><div id="map-${id}" class="w-100 h-100" ></div></div>
+                        Post = Post + `<div class="align-self-center" style="height: 50vh; width: 75vw"><div id="map-${id}" class="w-100 h-100" ></div></div>
                           <script>showMap('map-${id}','${post.content}')</script>`
                         break;
 

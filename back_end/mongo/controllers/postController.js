@@ -28,7 +28,7 @@ const getPosts = async (req,res) => {
 const updateReaction = async (req,res) => {
     try {
         if(req.session.type === 'mod') {
-                await postModel.updateReac(req.body);
+                await postModel.updateReac({user: req.session.user, typeUser: req.session.type, reactions: req.body.reactions,postId: req.body.postId});
                 res.send('200');
         }
         else {

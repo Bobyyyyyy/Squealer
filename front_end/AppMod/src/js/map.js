@@ -94,7 +94,15 @@ function showMap(id,content) {
         animate: true,
         doubleClickZoom: false,
     }).addTo(map);
-    L.marker(position).addTo(map);
+
+    if(Array.isArray(position)) {
+        for (let i = 0;i < position.length; i++) {
+            L.marker(position[i]).addTo(map);
+        }
+    }
+    else
+        L.marker(position).addTo(map);
+
     L.circle(position, 3).addTo(map);
     map.setView(position,15);
 }
