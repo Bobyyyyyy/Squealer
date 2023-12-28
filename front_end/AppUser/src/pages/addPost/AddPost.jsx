@@ -55,23 +55,26 @@ function AddPost(){
     }
 
     const canSendPost = () => {
-        let x = true;
+        let canSend = true;
         if (!destinations && !content) {
             setError("Inserisci i destinatari e il contenuto")
-            x = false;
+            canSend = false;
         } else if (!content) {
             setError("Inserisci il contenuto")
-            x = false;
+            canSend = false;
         } else if (!destinations) {
             setError("Inserisci i destinatari")
-            x = false;
+            canSend = false;
         } else if (!(destinations.includes("§") || destinations.includes("@"))) {
             setError("Inserisci @ o § nei destinatari");
-            x = false;
+            canSend = false;
         } else if (isQuotaNegative()) {
-            x = false;
+            canSend = false;
+        } else if (destinations.includes(username)) {
+            setError("Non puoi inviare messaggi a te stesso")
+            canSend = false;
         }
-        return x;
+        return canSend;
     }
 
     const isQuotaNegative = () => {
@@ -107,9 +110,6 @@ function AddPost(){
         }
 
         let dests = parseDestinations(destinations);
-        if (dests.some((dest) => dest.name === username)) {
-            throw new Error("NON PUOI INIVIARE MESSAGGI A TE STESSO");
-        }
 
         let post = {
             contentType: type,

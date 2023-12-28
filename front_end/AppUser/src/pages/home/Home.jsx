@@ -85,6 +85,11 @@ function Home() {
                                     post={post} key={post._id}
                                 />
                         )})}
+                        {posts.length === 0 &&
+                            <div className="flex w-full items-center justify-center mt-8 text-2xl">
+                                Non ci sono ancora post!
+                            </div>
+                        }
                     </div>
                 </div>
             )}

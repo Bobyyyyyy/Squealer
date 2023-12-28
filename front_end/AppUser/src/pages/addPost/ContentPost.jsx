@@ -1,5 +1,5 @@
 import {useEffect, useRef, useState} from "react";
-import Mappa from "../../components/posts/Mappa.jsx";
+import Mappa from "../../components/posts/maps/Mappa.jsx";
 
 function ContentPost({type, quota, currentQuota, setCurrentQuota,
                      content, setContent, setImgAsFile, position, setPosition,

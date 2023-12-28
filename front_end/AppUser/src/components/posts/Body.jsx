@@ -1,4 +1,4 @@
-import MappaPost from "./MappaPost.jsx";
+import MappaPost from "./maps/MappaPost.jsx";
 
 function Body({post}) {
     if (post.contentType === "geolocation") {

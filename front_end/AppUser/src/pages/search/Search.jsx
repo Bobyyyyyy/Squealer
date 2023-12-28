@@ -1,4 +1,3 @@
-import Mappa from "../../components/posts/Mappa.jsx";
 import Searchbar from "./Searchbar.jsx";
 import {useEffect, useState} from "react";
 import {ProfilePic} from "../../components/assets/index.jsx";

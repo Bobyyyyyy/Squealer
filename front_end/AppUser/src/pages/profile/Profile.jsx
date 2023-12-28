@@ -143,7 +143,7 @@ function Profile () {
                     <p className={"text-xl"}>Quota mensile: {quota.characters.monthly < 0 ? 0 : quota.characters.monthly}/{quota.maxQuota.monthly}</p>
                 </div>
             </div>
-            <div className="flex flex-wrap justify-between gap-4 px-6 py-2">
+            <div className="flex flex-wrap justify-between gwap-4 px-6 py-2">
                 <button
                     className="bg-primary px-4 py-2  text-lg rounded"
                     onClick={handleLogout}

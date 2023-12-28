@@ -25,7 +25,7 @@ function MappaPost({stringCoor}){
             <>
                 <MapContainer
                     center={coordinatesArr.current[0]}
-                    zoom={3}
+                    zoom={13}
                     scrollWheelZoom={false}
                 >
                     <TileLayer
