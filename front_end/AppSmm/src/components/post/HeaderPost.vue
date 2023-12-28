@@ -12,8 +12,8 @@
 
 <template>
   <div class="d-flex justify-content-between header_post bg-secondary" style="width: 94%; margin-left: 3%; margin-right: 3%;" >
-    <div class="d-flex justify-content-start align-items-center w-100">
-      <div style="width: 13%">
+    <div class="d-flex justify-content-start align-items-center w-100 mt-2">
+      <div style="width: 13%; min-width: 13%;">
         <img :src=" srcImg " alt="immagine profilo" class="img-fluid rounded-circle" />
       </div>
       <div class="d-flex flex-column dimOverflowText flex-grow-1">
@@ -41,7 +41,7 @@
   }
 
   .dimOverflowText{
-    max-width: 40rem;
+    max-width: 24rem;
   }
 
   @media screen and (max-width: 768px){

@@ -77,14 +77,6 @@ const addChannel = async (body) => {
     }
 }
 
-const channelVipList = async (query) => {
-    try{
-        await connection.get()
-        return await Channel.find({ $or: [{ creator: query.vipName },{admins: {$in: [query.vipName] }}]});
-    }catch (e) {
-        throw(e);
-    }
-}
 
 /**
  * @param query
@@ -436,7 +428,6 @@ const blockChannel = async (user,channelName) => {
 
 module.exports = {
     addChannel,
-    channelVipList,
     checkUserChannel,
     getChannels,
     getChannelsNumber,

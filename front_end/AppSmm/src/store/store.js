@@ -3,10 +3,6 @@ import {createStore} from "vuex";
 export const store = createStore({
     state () {
         return {
-            currentChannel: {
-                chName: '',
-                chDescription: '',
-            },
             remainingQuota: {
                 daily: 0,
                 weekly: 0,
@@ -22,10 +18,6 @@ export const store = createStore({
         }
     },
     mutations: {
-        uploadChannel (state,channelInfo) {
-            state.currentChannel.chName = channelInfo.chName;
-            state.currentChannel.chDescription = channelInfo.chDescription;
-        },
         setQuota (state, quota) {
             state.remainingQuota.daily = quota.daily;
             state.remainingQuota.weekly = quota.weekly;

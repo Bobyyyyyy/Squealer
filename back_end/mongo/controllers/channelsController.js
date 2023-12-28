@@ -9,15 +9,6 @@ const createChannel = async (req,res,next) => {
     }
 }
 
-const getChannelList = async (req,res) => {
-    try {
-        res.send(await channelsModel.channelVipList(req.query))
-    }
-    catch(error) {
-        res.status(error.statusCode).send(error.message);
-    }
-}
-
 const checkUserInChannel = async (req,res) => {
     try {
         res.status(200).send(await channelsModel.checkUserChannel(req.query))
@@ -57,7 +48,8 @@ const changeChannelName = async (req,res) => {
 const getSingleChannel = async (req,res) => {
     try {
         let name = req.params.name;
-        res.status(200).send(await channelsModel.getSingleChannel(name,req.session.user));
+        let user = req.session.type === 'smm' ? req.session.vip : req.session.user;
+        res.status(200).send(await channelsModel.getSingleChannel(name,user));
     }
     catch (error) {
         console.log(error)
@@ -102,8 +94,8 @@ const handleRequest = async function (req,res) {
 
 const addAdmin = async function (req,res) {
     try {
-        let admin = req.session.user;
-        let user = req.body.user
+        let admin = req.session.type === 'smm' ? req.session.vip : req.session.user;
+        let user = req.body.user;
         let channel = req.body.channel;
         res.status(200).send(await channelsModel.addAdmin(user,admin,channel));
     }
@@ -114,7 +106,7 @@ const addAdmin = async function (req,res) {
 
 const handlePermission = async function (req, res) {
     try {
-        let admin = req.session.user;
+        let admin = req.session.type === 'smm' ? req.session.vip : req.session.user;
         let user = req.body.user;
         let channel = req.body.channel;
         let canWrite = req.body.canWrite;
@@ -127,7 +119,6 @@ const handlePermission = async function (req, res) {
 
 module.exports = {
     createChannel,
-    getChannelList,
     checkUserInChannel,
     getChannels,
     getChannelsNumber,
