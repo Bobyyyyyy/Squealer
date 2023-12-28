@@ -127,7 +127,7 @@ const addTimedPost = async (postId) => {
     try {
         await connection.get()
 
-        let post = await Post.findById(postId);
+        let post = await Post.findById(postId).lean();
         let userQuota = (await User.findOne({username: post.owner})).characters;
 
         let timedInfo = scheduledPostArr.find(el => el['id']===postId);
@@ -137,6 +137,7 @@ const addTimedPost = async (postId) => {
         let newPost = {
             creator: post.owner,
             destinations: post.destinationArray,
+            officialChannelsArray: post.officialChannelsArray,
             contentType: post.contentType,
             dateOfCreation: Date.now(),
             tags: post.tags,
@@ -176,7 +177,7 @@ const addPost = async (post,quota) => {
             throw createError('Non si è inserito nessun destinatario',400);
         }
         let postCategory = 'private';
-        let officialChannels = [];
+        let officialChannels = post?.officialChannelsArray ? post.officialChannelsArray : [];
         let creator = await User.findOne({username: post.creator});
         for (const destination of destinations) {
             if ( !['user', 'channel', 'official'].includes(destination.destType)){
@@ -271,7 +272,6 @@ const addPost = async (post,quota) => {
         return {post: newPost.toObject()};
     }
     catch(err){
-        console.log(err);
         throw err;
     }
 }
@@ -347,21 +347,22 @@ const getAllPost = async (query,sessionUser) =>{
             {$limit: parseInt(query.limit)},
         ])
 
-        // Update delle views e della categoria se necessario
-        let user = await User.findOne({username: sessionUser});
 
-        if(user.typeUser !== 'mod') {
+        // Update delle views e della categoria se necessario
+        if(sessionUser.typeUser !== 'mod') {
             for (const post of posts) {
-                let filteredArray = post.views.filter(user => {return user.name === sessionUser})
+                let filteredArray = post.views.filter(user => {return user.name === sessionUser.username})
                 if(filteredArray.length === 0) {
                     let NumberofViews = ++post.views.length;
                     let CriticalMass = post.criticalMass + (NumberofViews * CRITICAL_MASS_MULTIPLIER)
                     let view = {
-                        name: sessionUser,
+                        name: sessionUser.username,
                         date: new Date(),
                     }
                     let postToUpdate = await Post.findByIdAndUpdate(post._id,{$push: {'views': view} , 'criticalMass': parseInt(CriticalMass)});
-                    await UpdateCategory(postToUpdate,user._id);
+
+                    let creator = User.find({username: post.owner}).lean();
+                    await UpdateCategory(postToUpdate,creator._id);
                 }
             }
         }
@@ -495,11 +496,11 @@ const deletePost = async (postID) => {
 const updateReac = async (body) => {
     try{
         await connection.get()
-        let user = await User.findOne({username: body.user});
 
-        if(user.typeUser === 'mod') {
+        if(body.typeUser === 'mod') {
             let post = await Post.findByIdAndUpdate(body.postId, {$push:{reactions: {$each: JSON.parse(body.reactions)}}},{new: true});
-            await UpdateCategory(post,user._id);
+            let creator = await User.findOne({username: post.owner})
+            await UpdateCategory(post,creator._id);
             return body;
         }
 
@@ -510,7 +511,8 @@ const updateReac = async (body) => {
         }
 
         let post = await Post.findByIdAndUpdate(body.postId, {$push:{reactions: {rtype: body.reaction, user: body.user, date: new Date()}}});
-        await UpdateCategory(post,user._id);
+        let creator = await User.findOne({username: post.owner})
+        await UpdateCategory(post,creator._id);
 
         return body;
     }
@@ -560,37 +562,34 @@ const UpdateCategory = async (post, userID) => {
 
     if (positiveReactionsCount > criticalMass) {
         if (negativeReactionsCount > criticalMass) {
-            await Post.findByIdAndUpdate(post._id, {popularity: 'controversial'});
-            await addDestination({name: 'CONTROVERSIAL', destType: 'official'},post._id);
-            if (post.popularity === 'popular') {
-                await changePopularity(userID, 'popularity',false);
+
+            if(post.popularity !== 'controversial') {
+                await Post.findByIdAndUpdate(post._id, {popularity: 'controversial'});
+                await addDestination({name: 'CONTROVERSIAL', destType: 'official'},post._id);
             }
-            else if (post.popularity === 'unpopular'){
-                await changePopularity(userID, 'unpopularity',false);
-            }
+
         }
         else {
-            await Post.findByIdAndUpdate(post._id, {popularity: 'popular'});
-            await changePopularity(userID, 'popularity',true);
+            if(post.popularity !== 'popular') {
+                await Post.findByIdAndUpdate(post._id, {popularity: 'popular'});
+                await changePopularity(userID, 'popularity',true);
+            }
         }
         return true;
     }
 
     if (negativeReactionsCount > criticalMass) {
         if (positiveReactionsCount > criticalMass) {
-            await Post.findByIdAndUpdate(post._id, {popularity: 'controversial'});
-            await addDestination({name: 'CONTROVERSIAL', destType: 'official'},post._id);
-            if (post.popularity === 'popular') {
-                await changePopularity(userID, 'popularity',false);
-            }
-            else if (post.popularity === 'unpopular'){
-                await changePopularity(userID, 'unpopularity',false);
+            if(post.popularity !== 'controversial') {
+                await Post.findByIdAndUpdate(post._id, {popularity: 'controversial'});
+                await addDestination({name: 'CONTROVERSIAL', destType: 'official'},post._id);
             }
         }
         else {
-            await Post.findByIdAndUpdate(post._id, {popularity: 'unpopular'});
-            await changePopularity(userID,'unpopularity',true);
-
+            if(post.popularity !== 'unpopular') {
+                await Post.findByIdAndUpdate(post._id, {popularity: 'unpopular'});
+                await changePopularity(userID,'unpopularity',true);
+            }
         }
         return true;
     }

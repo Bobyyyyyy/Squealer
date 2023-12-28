@@ -3,11 +3,10 @@ const officialChannel = require('../models/officialChannelsMethods');
 /* Reserved Channel Methods */
 const createReservedChannel = async (req,res,next) => {
     try {
-        req.response = await officialChannel.addOfficialChannel(req.body,{name: req.session.user});
-        next();
+        res.status(200).send(await officialChannel.addOfficialChannel(req.body,{name: req.session.user}))
     }
     catch(error) {
-        res.send(error);
+        res.status(error.statusCode).send(error.message);
     }
 }
 const deleteCh = async (req,res) => {

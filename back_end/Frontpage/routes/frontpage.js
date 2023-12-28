@@ -10,6 +10,7 @@ router.get('/register',frontPageController.isSessionActive,frontPageController.r
 router.post('/register',userController.addUser,frontPageController.createSession);
 router.use('/mod',frontPageController.isMod,require('../../AppMod/routes/homepage'));
 router.get('/logout',frontPageController.logout);
+router.post('/guest',frontPageController.createGuest,frontPageController.createSession);
 
 const path = require('path');
 const {isUser} = require("../controllers/FrontPageController");

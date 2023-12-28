@@ -21,10 +21,10 @@ const addReply = async (req,res) => {
 
 const getReplies = async (req,res) => {
     try{
-        let parentID = req.query.parentid;
-        if(!parentID) throw createError('id post padre non valido', 404);
+        if(typeof req.query.parentid === "undefined")
+            throw createError('id post padre non valido', 404);
 
-        let response = await replyModel.getReplies(parentID);
+        let response = await replyModel.getReplies(req.query.parentid);
 
         res.status(200).send(response);
 

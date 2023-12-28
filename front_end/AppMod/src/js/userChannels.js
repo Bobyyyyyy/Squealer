@@ -39,11 +39,14 @@ function getChannels (limit,offset,filters) {
         type:'get',
         data: {limit: limit, offset: offset, filters: JSON.stringify(filters)},
         success: (data) => {
-            console.log(data);
-            console.log(filters);
             $('#pages').empty();
-            let html = `${$.map(data,(channel,index) => `
-            <div class="mt-3 mx-auto rounded d-flex flex-row align-items-center text-center channeldiv" onclick="window.location.replace(window.location.href + '/${channel.name}')" style="height:5vh; width: 90vw;">
+
+            if(data.length === 0) {
+                $('#channels').empty().append(`<h5 class="text-white mt-3">Nessun Canale Trovato</h5>`);
+                return;
+            }
+            let html = `${$.map(data,(channel) => `
+            <div class="mt-3 mx-auto rounded d-flex flex-row align-items-center text-center bg-back channeldiv fontcustom" onclick="window.location.href = window.location.href + '/${channel.name}'" style="height:7vh; width: 90vw;">
                 <div style="width: 50%;"> §${channel.name}</> </div>
                 <div style="width: 50%;"> @${channel.creator}</> </div>
                 <div style="width: 50%;"> ${channel.postNumber}</> </div> 
@@ -53,14 +56,14 @@ function getChannels (limit,offset,filters) {
 
             if (offset !== 0) {
 
-                let previous = `<li class="page-item"><a class="page-link" onclick="getChannels(LastCall.limit,LastCall.offset - LastCall.limit, LastCall.filter)">Previous</a></li>`
+                let previous = `<li class="page-item" onclick="getChannels(LastCall.limit,LastCall.offset - LastCall.limit, LastCall.filter)"><a class="page-link page-link bg-secondary border-black text-black fw-bold fontcustom" ><-</a></li>`
                 $('#pages').append(previous);
             }
 
-            let page = `<li class="page-item"><a class="page-link">${LastCall.offset / LastCall.limit + 1}</a></li>`
+            let page = `<li class="page-item"><a class="page-link page-link bg-secondary border-black text-black fontcustom">${LastCall.offset / LastCall.limit + 1}</a></li>`
 
             if (offset + limit < LastCall.channels) {
-                let next = `<li class="page-item"><a class="page-link" onclick="getChannels(LastCall.limit,LastCall.offset + LastCall.limit,LastCall.filter)">Next</a></li>`
+                let next = `<li class="page-item"  onclick="getChannels(LastCall.limit,LastCall.offset + LastCall.limit,LastCall.filter)"><a class="page-link page-link bg-secondary border-black text-black fw-bold fontcustom">-></a></li>`
                 page = page + next;
             }
 
@@ -80,27 +83,30 @@ $('#orderby').on('change',() => {
     let orderBy = $('#orderby option:selected').val();
 
     if(orderBy === 'popularity') {
-        let options = `<label for="order"></label><select class="select btn btn-success" id="order" autocomplete="off">
+        let options = `<label for="order"></label><select class="select btn bg-secondary fontcustom" id="order" autocomplete="off">
                                   <option value="" selected disabled>Ordine</option>
                                   <option value="popular">Piu' popolari</option>
                                   <option value="unpopular">Meno Popolari</option>
                               </select>`
         LastCall.filter.sortBy = orderBy;
+        LastCall.offset = 0;
         $('#options').empty().html(options);
     }
 
     else if(orderBy === 'posts') {
-        let options = `<label for="order"></label><select class="select btn btn-success" id="order" autocomplete="off">
+        let options = `<label for="order"></label><select class="select btn bg-secondary fontcustom"  id="order" autocomplete="off">
                                   <option value="" selected disabled>Ordine</option>
                                   <option value="ascending">Crescente</option>
                                   <option value="descending">Descrescente</option>
                               </select>`
         LastCall.filter.sortBy = orderBy;
+        LastCall.offset = 0;
         $('#options').empty().html(options);
     }
 
     $('#order').on('change', () => {
         LastCall.filter.sort = $('#order option:selected').val();
+        LastCall.offset = 0;
         getChannelsNumber(LastCall.filter)
     })
 
@@ -109,12 +115,14 @@ $('#orderby').on('change',() => {
 
 $('#order').on('change', () => {
     LastCall.filter.sort = $('#order option:selected').val();
+    LastCall.offset = 0;
     getChannelsNumber(LastCall.filter)
 })
 
 
 $('#channel-visual').on('change',() => {
     LastCall.filter.type = $('#channel-visual input:checked').val();
+    LastCall.offset = 0;
     getChannelsNumber(LastCall.filter)
 })
 
@@ -133,8 +141,47 @@ $('#filter').on("keyup", () => {
             LastCall.filter.creator = value;
     }
 
+    LastCall.offset = 0;
     getChannelsNumber(LastCall.filter);
 });
+
+$('#addChannelForm').on('submit', (event) => {
+    event.preventDefault();
+
+    let newChannel = {
+        name: $('#name').val(),
+        creator: $('#creator').val(),
+        description: $('#description').val(),
+        type: $('#public').is(':checked') ? $('#public').val() : $('#private').val()
+    }
+
+
+
+    $.ajax({
+        url:'/db/channel',
+        data: newChannel,
+        type: 'POST',
+        success: (data) => {
+            location.reload();
+        },
+        error: (error) => {
+            $('#toast-content').empty().html(error.responseText);
+            let toastList = inizializeToast();
+            toastList.forEach(toast => toast.show()); // This show them
+        }
+
+    })
+
+})
+
+function inizializeToast() {
+    let toastElList = [].slice.call(document.querySelectorAll('.toast'))
+    return toastList = toastElList.map(function(toastEl) {
+        // Creates an array of toasts (it only initializes them)
+        return new bootstrap.Toast(toastEl) // No need for options; use the default options
+    });
+}
+
 
 
 $(document).ready(() => {

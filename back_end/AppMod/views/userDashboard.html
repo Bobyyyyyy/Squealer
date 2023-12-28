@@ -8,10 +8,14 @@
 <body class="d-flex flex-column">
 
 <!-- NavBar -->
-<nav class="navbar navbar-expand-lg bg-dark navbar-dark sticky-top m">
-    <div class="d-flex flex-row justify-content-between w-100 p-1">
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark sticky-top fontcustom" style="height: 10%">
+    <div class="container-fluid" >
+        <a class="navbar-brand" style="font-size: 3vh" href="/mod">SquealerMOD</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".dual-collapse2">
+            <span class="navbar-toggler-icon" ></span>
+        </button>
         <div class="navbar-collapse collapse dual-collapse2" style="flex-basis: 100%">
-            <ul class="navbar-nav">
+            <ul class="navbar-nav me-auto mb-lg-0">
                 <li class="nav-item">
                     <a class="nav-link active" aria-current="page" href="/mod/users">Utenti</a>
                 </li>
@@ -19,32 +23,20 @@
                     <a class="nav-link" href="/mod/posts">Posts</a>
                 </li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <a class="nav-link dropdown-toggle " role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         Channels
                     </a>
-                    <ul class="dropdown-menu">
+                    <ul class="dropdown-menu fontcustom">
                         <li><a class="dropdown-item" href="/mod/officialChannels">Official Channels</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="/mod/userChannels">Private Channels</a></li>
                     </ul>
                 </li>
             </ul>
+            <span class="navbar-text text-white ms-auto me-2 fontcustom" >@<span id="session-user">${user}</span></span>
+            <button class="btn btn-outline-light bg-accent fontcustom" onclick="window.location.href = '/logout'">Logout</button>
         </div>
-
-        <div class="order-sm-first order-lg-0 mx-auto">
-                <a class="navbar-brand" href="/mod">SquealerMOD</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".dual-collapse2">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-        </div>
-
-        <div class="navbar-collapse collapse dual-collapse2" style="flex-basis: 100%">
-            <div class="ms-auto"></div>
-            <span class="navbar-text text-white ms-auto me-2" >@${user}
-            </span>
-            <button class="btn btn-light btn-outline-danger" onclick="window.location.href = '/logout'">Logout</button>
-        </div>
-        </div>
+    </div>
 </nav>
 
 
@@ -55,8 +47,26 @@
         <!-- Modal Button -->
     <div class="d-flex flex-row pb-3 pe-0 align-items-center">
         <label for="filter" class="form-label"></label>
-        <input class="form-control" id="filter" type="text" style="height: 10%; width: 15%; background-color: lightgray" placeholder="Cerca Utente..">
-        <button type="button" class="btn btn-primary ms-auto" data-bs-toggle="modal" data-bs-target="#addUser">
+        <input class="form-control fontcustom" id="filter" type="text" style="height: 10%; width: 15%; background-color: lightgray" placeholder="Cerca Utente..">
+
+        <div id="user-type" class="btn-group ms-3" role="group" aria-label="">
+            <input type="radio" class="btn-check" name="filters" id="filter-all" value="" autocomplete="off" checked>
+            <label class="btn bg-secondary fontcustom" for="filter-all">All</label>
+
+            <input type="radio" class="btn-check" name="filters" id="filter-user" value="user" autocomplete="off">
+            <label class="btn bg-secondary fontcustom" for="filter-user">User</label>
+
+            <input type="radio" class="btn-check" name="filters" id="filter-smm" value="smm" autocomplete="off">
+            <label class="btn bg-secondary fontcustom" for="filter-smm">Social Media Manager</label>
+
+            <input type="radio" class="btn-check" name="filters" id="filter-vip" value="vip" autocomplete="off">
+            <label class="btn bg-secondary fontcustom" for="filter-vip">Vip</label>
+
+            <input type="radio" class="btn-check" name="filters" id="filter-mod" value="mod" autocomplete="off">
+            <label class="btn bg-secondary fontcustom" for="filter-mod">Mod</label>
+        </div>
+
+        <button type="button" class="btn bg-primary fontcustom ms-auto" data-bs-toggle="modal" data-bs-target="#addUser">
             Add User
         </button>
     </div>
@@ -67,7 +77,7 @@
 
         <!-- User Table Pages -->
     <nav aria-label="User Table Pagination">
-        <ul class="pagination justify-content-end" id="pages"></ul>
+        <ul class="pagination justify-content-center" id="pages"></ul>
     </nav>
 
 
@@ -78,19 +88,19 @@
 <div class="modal fade" id="addUser" tabindex="-1" aria-labelledby="addUserModal" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header bg-primary">
                 <h1 class="modal-title fs-5" id="addUserLabel">Inserisci Dati Utente</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form method="post" action="/db/user">
+            <form id="addUserForm">
             <div class="modal-body">
                 <div>
                     <label for="name" class="form-label w-100"> Nome:
-                        <input type="text" class="form-control" name="name" id="name" placeholder="Inserisci nome"></label>
+                        <input type="text" class="form-control" name="name" id="name" placeholder="Inserisci nome" required autocomplete="off"></label>
                 </div>
                 <div>
                     <label for="password" class="form-label w-100"> Password:
-                        <input type="password" class="form-control" name="password" id="password" placeholder="Inserisci password"></label>
+                        <input type="password" class="form-control" name="password" id="password" placeholder="Inserisci password" required autocomplete="off"></label>
                 </div>
                 <div class="form-check form-check-inline">
                     <input class="form-check-input" type="radio" name="type" id="user" value="user" checked>
@@ -118,8 +128,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
-                <button type="submit" class="btn btn-primary">Inserisci</button>
+                <button type="button" class="btn bg-secondary" data-bs-dismiss="modal">Chiudi</button>
+                <button type="submit" class="btn bg-primary">Inserisci</button>
             </div>
             </form>
         </div>
@@ -130,34 +140,46 @@
     <div class="modal fade" id="modUser" tabindex="-1" aria-labelledby="modUserModal" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="modUserLabel"></h1>
+                <div class="modal-header bg-primary">
+                    <h1 class="modal-title fs-5 " id="modUserLabel"></h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                     <div class="modal-body">
                         <label for="daily" class="form-label w-50 fw-bold text-center">Giornalieri</label>
                         <div class="d-flex flex-row align-items-center">
-                            <input type="number" class="form-control w-50" name="daily" id="daily" min=0 placeholder="Inserisci caratteri giornalieri">
+                            <input type="number" class="form-control w-50" name="daily" id="daily" min=0 placeholder="Inserisci caratteri giornalieri" required>
                             <div class="mx-auto"><span class="fw-bold">Daily Max Quota: <span id="max-daily"></span> </span></div>
                         </div>
                         <label for="weekly" class="mt-2 form-label w-50 fw-bold text-center">Settimanali</label>
                         <div class="d-flex flex-row align-items-center">
-                            <input type="number" class="form-control w-50" name="weekly" id="weekly" min=0 placeholder="Inserisci caratteri giornalieri">
+                            <input type="number" class="form-control w-50" name="weekly" id="weekly" min=0 placeholder="Inserisci caratteri giornalieri" required>
                             <div class="mx-auto"><span class="fw-bold">Weekly Max Quota: <span id="max-weekly"></span> </span></div>
                         </div>
                         <label for="monthly" class="mt-2 form-label w-50 fw-bold text-center">Mensile</label>
                         <div class="d-flex flex-row align-items-center">
-                            <input type="number" class="form-control w-50" name="monthly" id="monthly" min=0 placeholder="Inserisci caratteri giornalieri">
+                            <input type="number" class="form-control w-50" name="monthly" id="monthly" min=0 placeholder="Inserisci caratteri giornalieri" required>
                             <div class="mx-auto"><span class="fw-bold">Monthly Max Quota: <span id="max-monthly"></span> </span></div>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
-                        <button class="btn btn-primary" id="modifyButton">Modifica</button>
+                        <button type="button" class="btn bg-secondary" data-bs-dismiss="modal">Chiudi</button>
+                        <button class="btn bg-primary" id="modifyButton">Modifica</button>
                     </div>
             </div>
         </div>
     </div>
+
+
+
+<div class="toast-container position-fixed top-0 end-0 p-3">
+    <div class="toast align-items-center text-bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body" id="toast-content">
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script src="/js/modHomepage.js"></script>

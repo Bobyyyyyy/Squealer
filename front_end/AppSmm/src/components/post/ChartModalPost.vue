@@ -1,7 +1,7 @@
 <script setup>
   import postReactionsChart from '../charts/postReactionsChart.vue'
   import {Modal} from "bootstrap";
-  import {computed, onMounted, reactive, ref, toRaw, watch, watchEffect} from "vue";
+  import {computed, onMounted, onUnmounted, reactive, ref, toRaw, watch, watchEffect} from "vue";
   import Popularity30days from "../charts/Popularity30days.vue";
 
 
@@ -11,6 +11,11 @@
     },
     idx: Number,
   })
+
+  function getId(){
+    return `chartPostModal${props.idx}`
+  }
+
 
   const DChart = ref();
   const LChart = ref()
@@ -43,11 +48,6 @@
   onMounted(()=> {
     modalStateChart.chartPost = new Modal(`#${getId()}`, {})
   })
-
-  function getId(){
-    return `chartPostModal${props.idx}`
-  }
-
   watch(props.reactions,(data)=>{
     if(Object.keys(data.value).length !== 0){
       liveReactions.value = data.value;

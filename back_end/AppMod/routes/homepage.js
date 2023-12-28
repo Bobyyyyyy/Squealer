@@ -5,15 +5,13 @@ const {homepageView, userDashboardView,officialChannelsView,userChannelsView,pos
 const router = express.Router();
 router.get('/',homepageView);
 router.get('/users',userDashboardView);
-
 router.get('/officialChannels',officialChannelsView);
 router.get('/officialChannels/:name',displayChannel)
-
-
 router.get('/userChannels',userChannelsView);
 router.get('/userChannels/:name',displayUserChannel)
-
-
-
 router.get('/posts',postsListView);
+
+router.get('/*',(req,res) => {
+    res.redirect('/mod');
+})
 module.exports = router;

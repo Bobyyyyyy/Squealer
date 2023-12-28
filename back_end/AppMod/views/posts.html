@@ -11,10 +11,14 @@
 <body class="d-flex flex-column">
 
 <!-- NavBar -->
-<nav class="navbar navbar-expand-lg navbar-dark sticky-top outline-1">
-    <div class="d-flex flex-row justify-content-between w-100 p-1" >
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark sticky-top fontcustom" style="height: 10%">
+    <div class="container-fluid" >
+        <a class="navbar-brand" style="font-size: 3vh" href="/mod">SquealerMOD</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".dual-collapse2">
+            <span class="navbar-toggler-icon" ></span>
+        </button>
         <div class="navbar-collapse collapse dual-collapse2" style="flex-basis: 100%">
-            <ul class="navbar-nav">
+            <ul class="navbar-nav me-auto mb-lg-0">
                 <li class="nav-item">
                     <a class="nav-link" aria-current="page" href="/mod/users">Utenti</a>
                 </li>
@@ -22,78 +26,66 @@
                     <a class="nav-link active" href="/mod/posts">Posts</a>
                 </li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <a class="nav-link dropdown-toggle " role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         Channels
                     </a>
-                    <ul class="dropdown-menu">
+                    <ul class="dropdown-menu fontcustom">
                         <li><a class="dropdown-item" href="/mod/officialChannels">Official Channels</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="/mod/userChannels">Private Channels</a></li>
                     </ul>
                 </li>
             </ul>
-        </div>
-
-        <div class="order-sm-first order-lg-0 mx-auto">
-            <a class="navbar-brand" href="/mod">SquealerMOD</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".dual-collapse2">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-        </div>
-
-        <div class="navbar-collapse collapse dual-collapse2" style="flex-basis: 100%">
-            <div class="ms-auto"></div>
-            <span class="navbar-text text-white ms-auto me-2"> @<span id="session-user">${user}</span>
-            </span>
-            <button class="btn btn-outline-light bg-accent" onclick="window.location.href = '/logout'">Logout</button>
+            <span class="navbar-text text-white ms-auto me-2 fontcustom" >@<span id="session-user">${user}</span></span>
+            <button class="btn btn-outline-light bg-accent fontcustom" onclick="window.location.href = '/logout'">Logout</button>
         </div>
     </div>
 </nav>
 
 
 
+
 <div class="d-flex flex-column">
 
-    <div class="p-5 flex-column" id="div1" style="height: 100%; width: 100%">
+    <div class="p-3 flex-column" id="div1" style="height: 100%; width: 100%">
 
-        <div class="d-flex flex-row align-items-center p-3 pe-0">
-
-            <div class="input-group w-25 border-black">
-                <span class="input-group-text bg-primary border-black" id="basic-addon1"><select class="select btn" id='search-type' autocomplete="off">
+        <div class="d-flex flex-row flex-wrap align-items-center p-3 pe-0">
+            <div class="input-group border-black d-flex flex-row flex-nowrap" style="width: 50vh">
+                <span class="input-group-text bg-primary border-black" id="basic-addon1"><select class="select btn fontcustom" id='search-type' autocomplete="off">
                         <option value="sender" selected>Mittente</option>
                         <option value="receiver">Destinatario</option>
                     </select></span>
-                <label for="filter" class="sr-only"></label><input class="form-control border-black bg-secondary" id="filter" type="text" style="width: 15%;" placeholder="Cerca.." autocomplete="off">
+                <label for="filter" class="sr-only"></label><input class="form-control border-black bg-secondary fontcustom" id="filter" type="text" placeholder="Cerca.." autocomplete="off">
             </div>
 
 
-            <div class="d-flex flex-row ms-auto">
-                <div id="channel-visual" class="btn-group ms-3 btn-group" role="group" aria-label="Basic radio toggle button group">
+            <div class="d-flex flex-row flex-wrap ms-auto">
+                <div id="channel-visual" class="btn-group ms-3" role="group" aria-label="">
                     <input type="radio" class="btn-check" name="filters" id="filter-all" value="" autocomplete="off" checked>
-                    <label class="btn bg-secondary" for="filter-all">All</label>
+                    <label class="btn bg-secondary fontcustom" for="filter-all">All</label>
 
                     <input type="radio" class="btn-check" name="filters" id="filter-popular" value="popular" autocomplete="off">
-                    <label class="btn bg-secondary" for="filter-popular">Popular</label>
+                    <label class="btn bg-secondary fontcustom" for="filter-popular">Popular</label>
 
                     <input type="radio" class="btn-check" name="filters" id="filter-unpopular" value="unpopular" autocomplete="off">
-                    <label class="btn bg-secondary" for="filter-unpopular">Unpopular</label>
+                    <label class="btn bg-secondary fontcustom" for="filter-unpopular">Unpopular</label>
 
                     <input type="radio" class="btn-check" name="filters" id="filter-controversial" value="controversial" autocomplete="off">
-                    <label class="btn bg-secondary" for="filter-controversial">Controversial</label>
+                    <label class="btn bg-secondary fontcustom" for="filter-controversial">Controversial</label>
                 </div>
 
-                <div class="ms-3 d-flex flex-row justify-content-center align-self-center">
-                    <label class="text-white fw-normal"> Ordina Per:
-                        <select class="select btn bg-secondary ms-2" id="orderby" autocomplete="off">
+                <div class="ms-3 d-flex flex-row flex-wrap justify-content-center align-self-center">
+                    <label class="fw-normal">
+                        <select class="select btn bg-secondary ms-2 fontcustom" id="orderby" autocomplete="off">
                             <option value="" disabled>Ordinamento</option>
                             <option value="publication" selected>Data di pubblicazione</option>
                             <option value="visuals">Numero di visualizzazioni</option>
                         </select>
                     </label>
                 </div>
-                <div class="ms-3 d-flex flex-row justify-content-center align-self-center me-2" id="options">
+                <div class="ms-3 d-flex flex-row flex-wrap justify-content-center align-self-center me-2" id="options">
                     <label for="order"></label>
-                    <select class="select btn bg-secondary" id="order" autocomplete="off">
+                    <select class="select btn bg-secondary fontcustom" id="order" autocomplete="off">
                         <option value="" disabled >Ordine</option>
                         <option value="più recente" selected>Piu' recenti</option>
                         <option value="meno recente">Meno recenti</option>
@@ -113,32 +105,38 @@
 <div class="modal fade" id="changeReactions" tabindex="-1" aria-labelledby="changeReactionsModal" aria-hidden="true" style="top:25%">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <h1 class="modal-title fs-5 fw-bold">Aggiungi reazioni</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="changeReactionsForm">
             <div class="modal-body d-flex flex-row">
                 <div class="d-flex flex-column align-items-center">
                     <label for="heart" class="form-label w-75"> <i class="bi bi-heart-fill"></i> Heart
-                        <input type="number" class="form-control" name="heart" id="heart" min="0" value="0">
+                        <input type="number" class="form-control" name="heart" id="heart" min="0" value="0"  autocomplete="off">
                     </label>
                 </div>
                 <div class="d-flex flex-column align-items-center">
                     <label for="heartbreak" class="form-label w-75"> <i class="bi bi-heartbreak"></i> Heartbreak
-                        <input type="number" class="form-control" name="heartbreak" id="heartbreak" min="0" value="0">
+                        <input type="number" class="form-control" name="heartbreak" id="heartbreak" min="0" value="0"  autocomplete="off">
                     </label>
                 </div>
                 <div class="d-flex flex-column align-items-center">
                     <label for="thumbs-up" class="form-label w-75"> <i class="bi bi-hand-thumbs-up-fill"></i> Thumbs-Up
-                        <input type="number" class="form-control" name="thumbs-up" id="thumbs-up" min="0"  value="0">
+                        <input type="number" class="form-control" name="thumbs-up" id="thumbs-up" min="0" value="0"  autocomplete="off">
                     </label>
                 </div>
                 <div class="d-flex flex-column align-items-center">
                     <label for="thumbs-down" class="form-label w-75"> <i class="bi bi-hand-thumbs-down"></i> Thumbs-Down
-                        <input type="number" class="form-control" name="thumbs-down" id="thumbs-down" min="0" pattern="[0-9]{10}" value="0">
+                        <input type="number" class="form-control" name="thumbs-down" id="thumbs-down" min="0" value="0"  autocomplete="off">
                     </label>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
-                <button class="btn btn-primary" id="changeReactionsButton">Modifica</button>
+                <button type="button" class="btn bg-secondary" data-bs-dismiss="modal">Chiudi</button>
+                <button type="submit" class="btn bg-primary" id="changeReactionsButton">Modifica</button>
             </div>
+            </form>
         </div>
     </div>
 </div>
@@ -146,13 +144,14 @@
 <div class="modal fade" id="changeDestination" tabindex="-1" aria-labelledby="changeDestinationModal" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header bg-info">
+            <div class="modal-header bg-primary">
                 <h1 class="modal-title fs-5 fw-bold">Aggiungi destinatario</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <form id="addDestinationForm">
+            <div class="modal-body d-flex flex-column">
                 <div>
-                    <select id="type-select" class="form-select" aria-label="Post type select" autocomplete="off">
+                    <select id="type-select" class="form-select" aria-label="Post type select" autocomplete="off" required>
                         <option value="user" selected>Utente</option>
                         <option value="channel">Canale</option>
                         <option value="official">Canale Ufficiale</option>
@@ -162,14 +161,35 @@
                 <div class="form-group d-flex align-items-center flex-column">
                     <div id="content" class="mt-2" style="width: 100%">
                         <label for="destination-name" class="form-label w-100" style>
-                            <textarea class="form-control" name="destination-name" id="destination-name" rows="1" placeholder="Inserisci nome della destinazione" style="resize: none" data-role="none" autocomplete="off"></textarea>
+                            <textarea class="form-control" name="destination-name" id="destination-name" rows="1" placeholder="Inserisci nome della destinazione" style="resize: none" data-role="none" autocomplete="off" required></textarea>
                         </label>
                     </div>
                 </div>
+
             </div>
+
+
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
-                <button type="submit" id="addDestinationButton" class="btn btn-primary">Inserisci</button>
+                <button type="button" class="btn bg-secondary" data-bs-dismiss="modal">Chiudi</button>
+                <button type="submit" id="addDestinationButton" class="btn bg-primary">Inserisci</button>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="postReplies" tabindex="-1" aria-labelledby="postRepliesModal" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <h1 class="modal-title fs-5 fw-bold">Risposte</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body d-flex flex-column bg-secondary rounded">
+                <div id="replies" class="d-flex flex-column align-items-center">
+
+                </div>
             </div>
         </div>
     </div>

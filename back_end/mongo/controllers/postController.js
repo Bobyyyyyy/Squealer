@@ -6,20 +6,19 @@ const {mongo} = require("mongoose");
 const createPost = async (req,res) => {
     try{
         let postSaved = await postModel.addPost(req.body.post, req.body.quota)
-        if (req.body.post?.timed && req.body.post.contentType !== "geolocation") {
-            await CronController.createScheduledPost(postSaved.post._id, req.body.post.millis, req.body.post.squealNumber, req.body.post.content, req.body.post.contentType);
+        if (typeof req.body.post.timed !== "undefined" && req.body.post.timed === "true" && req.body.post.contentType !== "geolocation") {
+            await CronController.createScheduledPost(postSaved.post._id, parseInt(req.body.post.millis), parseInt(req.body.post.squealNumber), req.body.post.content, req.body.post.contentType);
         }
         res.send(postSaved)
     }
     catch (error){
-        console.log(error)
         res.status(error.statusCode).send(error.message);
     }
 }
 
 const getPosts = async (req,res) => {
     try {
-        res.send(await postModel.getAllPost(req.query,req.session.user))
+        res.send(await postModel.getAllPost(req.query,{username: req.session.user, typeUser: req.session.type}));
     }
     catch(error) {
         res.send(error);
@@ -29,11 +28,11 @@ const getPosts = async (req,res) => {
 const updateReaction = async (req,res) => {
     try {
         if(req.session.type === 'mod') {
-                await postModel.updateReac(req.body);
+                await postModel.updateReac({user: req.session.user, typeUser: req.session.type, reactions: req.body.reactions,postId: req.body.postId});
                 res.send('200');
         }
         else {
-            await postModel.updateReac(req.body);
+            await postModel.updateReac({user: req.session.user, typeUser: req.session.type, reaction: req.body.reaction, postId: req.body.postId});
             res.send('200');
         }
     }

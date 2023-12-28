@@ -4,9 +4,7 @@ const userController = require('../controllers/userController');
 const router = express.Router();
 
 /* User Methods */
-router.post('/',userController.addUser,(req,res) => {
-    res.redirect('/mod/users');
-});
+router.post('/',userController.addUser);
 router.put('/',userController.modifyUser);
 router.get('/profilePic', userController.getUserProfileByName);
 router.put('/profilePic', userController.updateUserProfilePic);

@@ -12,6 +12,6 @@ router.put('/name',channelsController.changeChannelName);
 router.post('/follower',channelsController.addFollower);
 router.put('/requests',channelsController.handleRequest);
 router.put('/permissions',channelsController.handlePermission);
-router.post('/admin',channelsController.addAdmin);
+router.put('/admin',channelsController.addAdmin);
 
 module.exports = router

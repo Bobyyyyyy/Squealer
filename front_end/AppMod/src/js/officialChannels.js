@@ -33,25 +33,25 @@ function getChannels (limit,offset,filter) {
             $('#pages').empty();
 
             if(data.length === 0) {
-                $('#channels').empty().append(`<h4 class="text-white">Nessun Canale Trovato</h4>`);
+                $('#channels').empty().append(`<h4 class="text-white mt-5">Nessun Canale Trovato</h4>`);
                 return;
             }
 
             let html = `${$.map(data,(channel,index) => `
-            <div class="mt-3 mx-auto rounded d-flex flex-row align-items-center text-center channeldiv" onclick="window.location.href = 'officialChannels/${channel.name}'" style="height:6vh; width: 90vw;">
-                <div style="width: 50%;"> §${channel.name}</> </div>
-                <div style="width: 50%;"> @${channel.creator}</> </div> 
+            <div class="mt-3 mx-auto rounded d-flex flex-row bg-back align-items-center text-center channeldiv" onclick="window.location.href = window.location.href + '/${channel.name}'" style="height:7vh; width: 90vw;">
+                <div style="width: 50%;" class="fontcustom"> §${channel.name}</> </div>
+                <div style="width: 50%;" class="fontcustom"> @${channel.creator}</> </div> 
             </div>`).join('\n')}`;
 
             if (offset !== 0) {
-                let previous = `<li class="page-item"><a class="page-link" onclick="getChannels(LastCall.limit,LastCall.offset - LastCall.limit,LastCall.filter)">Previous</a></li>`
+                let previous = `<li class="page-item" onclick="getChannels(LastCall.limit,LastCall.offset - LastCall.limit,LastCall.filter)"><a class="page-link bg-secondary border-black text-black fw-bold fontcustom"><-</a></li>`
                 $('#pages').append(previous);
             }
 
-            let page = `<li class="page-item"><a class="page-link">${LastCall.offset / LastCall.limit + 1}</a></li>`
+            let page = `<li class="page-item"><a class="page-link bg-secondary border-black text-black fontcustom">${LastCall.offset / LastCall.limit + 1}</a></li>`
 
             if (offset + limit < LastCall.channels) {
-                let next = `<li class="page-item"><a class="page-link" onclick="getChannels(LastCall.limit,LastCall.limit+LastCall.offset,LastCall.filter)">Next</a></li>`
+                let next = `<li class="page-item" onclick="getChannels(LastCall.limit,LastCall.limit+LastCall.offset,LastCall.filter)" ><a class="page-link bg-secondary border-black text-black fw-bold fontcustom"">-></a></li>`
                 page = page + next;
             }
 
@@ -67,6 +67,40 @@ $('#filter').on("keyup", () => {
     getChannelsNumber(value);
 });
 
+$('#channelform').on("submit",(event) => {
+    event.preventDefault();
+    console.log($('#silenceable').is(':checked'));
+    let newChannel = {
+        name: $('#name').val(),
+        description: $('#description').val(),
+        silenceable: $('#silenceable').is(':checked') === true ? $('#silenceable').val() : undefined,
+    }
+
+    $.ajax({
+        url:'/db/official',
+        data: newChannel,
+        type: 'POST',
+        success: () => {
+            location.reload();
+        },
+        error: (error) => {
+            $('#toast-content').empty().html(error.responseText);
+            let toastList = inizializeToast();
+            toastList.forEach(toast => toast.show()); // This show them
+        }
+    })
+
+
+    console.log(newChannel);
+})
+
+function inizializeToast() {
+    let toastElList = [].slice.call(document.querySelectorAll('.toast'))
+    return toastList = toastElList.map(function(toastEl) {
+        // Creates an array of toasts (it only initializes them)
+        return new bootstrap.Toast(toastEl) // No need for options; use the default options
+    });
+}
 
 $(document).ready(() => {
     getChannelsNumber(LastCall.filter);

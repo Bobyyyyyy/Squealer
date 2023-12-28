@@ -13,6 +13,10 @@ body {
     background-color: #232323;
 }
 
+.fontcustom {
+    font-size: 2vh;
+}
+
 .navbar {
     background-color: #232323;
 }
@@ -22,20 +26,25 @@ body {
 }
 
 th {
-    background-color: steelblue !important;
+    background-color: #F5DEB3 !important;
 }
 
 td {
     width: 20vw;
     height: 10vh;
+    background-color: #D8D6D6 !important;
 }
 
+a {
+    cursor:pointer;
+    text-decoration: none;
+}
 .channeldiv {
     background-color: white;
 }
 
 .channeldiv:hover {
-    background-color: wheat;
+    background-color: #EA7F28 ;
     opacity: 100%;
 }
 

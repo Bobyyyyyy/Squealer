@@ -45,12 +45,11 @@ const showPosts = (filters,append = false) => {
         type: 'get',
         success: (posts) => {
             if (posts.length === 0) {
-                $('#posts').empty().append(`<h4>Nessun Post Trovato</h4>`);
+                $('#posts').empty().append(`<h4 class="mt-5 text-white fw-bold">Nessun Post Trovato</h4>`);
                 $('#under_posts').empty();
                 return;
             }
             let html = `${$.map(posts, (post) => {
-                console.log(post.content)
                 let destinationNames = []
                 let officialChannelNames = [];
 
@@ -78,7 +77,7 @@ const showPosts = (filters,append = false) => {
                 }
 
                 let Post =
-                    `<div id="post-${id}" class="card mt-5 w-50 border-black">
+                    `<div id="post-${id}" class="card mt-5 border-black fontcustom" style="width: 60vw;">
                     <div id="header-${id}" class="card-header d-flex flex align-items-center bg-primary">
                     <div class="d-flex flex-column">
                         <div class="d-flex flex-row align-items-center justify-content-start">
@@ -86,28 +85,28 @@ const showPosts = (filters,append = false) => {
                             <div class="ms-1 fw-light">/${post.popularity}</div> 
                         </div>
                         
-                        <div class="d-flex flex-row justify-content-start align-items-center" style="font-size: 10px">
+                        <div class="d-flex flex-row justify-content-start align-items-center fontcustom" style="">
                             <div class="fw-light">${destinationNames}</div>
                             <div class="ms-1 fw-light">${officialChannelNames}</div> 
                         </div>
                     </div>
                         
                         
-                        <div class="d-flex flex-row ms-auto">
+                        <div class="d-flex flex-row ms-auto flex-wrap">
                             <div class="btn-group dropup">
-                                <button class="ms-2 btn"  data-bs-toggle="dropdown" aria-expanded="false">
+                                <button class="btn fontcustom" onclick="getReplies('${post._id}')" data-bs-toggle="tooltip" data-bs-placement="top" title="Mostra risposte" ><i class="bi bi-chat-square-text-fill" ></i></button>
+                                <button class="btn fontcustom"  data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="bi bi-three-dots"></i></i>
                                 </button>
                                 <ul class="dropdown-menu">
-                                    <li onclick = "post = '${post._id}'" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#changeReactions"> Modifica Reazioni</li>
-                                     <li onclick = "post = '${post._id}'" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#changeDestination"> Modifica Destinatari</li>
+                                    <li onclick = "post = '${post._id}'" class="dropdown-item fontcustom" data-bs-toggle="modal" data-bs-target="#changeReactions"> Modifica Reazioni</li>
                                 </ul>
+                                 <button class="btn fontcustom" id="delete-${id}"><i class="bi bi-trash"></i></button>
                             </div>
-                            
-                            <button class="btn" id="delete-${id}"><i  class="bi bi-trash"></i></button>
+                           
                         </div>
                 </div>
-                <div class="card-body flex-row bg-back">`
+                <div class="card-body d-flex flex-row bg-back align-items-center justify-content-center">`
 
 
                 switch (`${post.contentType}`) {
@@ -115,22 +114,27 @@ const showPosts = (filters,append = false) => {
                         let parsedText = `${post.content}`.replace(urlRegex, function (url) {
                             return `<a class="fw-bold"  href="${url}" target="_blank">${url}</a>`;
                         })
-                        Post = Post + `<span><p class='card-text lead' > ${parsedText} </p></span>`
+                        Post = Post + `<span><p class='card-text lead' style="font-size: 3vh" > ${parsedText} </p></span>`
                         break;
 
                     case 'image':
-                        Post = Post + `<span><img src='${post.content}' class='card-img-top img-fluid' alt="content"></span>`
+                        Post = Post + `<span><img src='${post.content}' class='card-img-top img-fluid' alt="Immagine non valida"></span>`
                         break;
 
                     case 'geolocation':
-                        Post = Post + `<div class="align-self-center" style="height: 50vh"><div id="map-${id}" class="w-100 h-100" ></div></div>
+                        Post = Post + `<div class="align-self-center" style="height: 50vh; width: 75vw"><div id="map-${id}" class="w-100 h-100" ></div></div>
                           <script>showMap('map-${id}','${post.content}')</script>`
+                        break;
+
+                    case 'video':
+
+                        Post = Post + `<iframe src="${post.content}" id="videoContent" allowfullscreen style="height: 50vh; width: 100%"></iframe>`
                         break;
                 }
 
                 Post = Post + `</div>
-                    <div class="card-footer text-muted bg-back">
-                        <div class="d-flex flex-row">
+                    <div class="card-footer text-muted bg-back fontcustom">
+                        <div class="d-flex flex-row flex-wrap">
                             <div id="reactions-${id}" class="me-auto d-inline-flex"> 
                                 <div class="d-flex flex-row"><i class="bi bi-heart-fill"></i> <div class="ms-1">${reactions.heart}</div> </div>
                                 <div class="d-flex flex-row ms-3"><i class="bi bi-heartbreak"></i><div class="ms-1">${reactions.heartbreak}</div></div>
@@ -158,7 +162,7 @@ const showPosts = (filters,append = false) => {
             }).join('\n')}`;
 
             if (filters.offset + filters.limit < LastCall.posts) {
-                $('#under_posts').html(`<div class="mx-auto"> <a id="load_posts" class="link-opacity-100 link-opacity-50-hover"> Carica altri post </a></div>`)
+                $('#under_posts').html(`<div class="mx-auto"> <a id="load_posts" class="link-opacity-100 link-opacity-50-hover bg-secondary text-black rounded p-2 fontcustom"> Carica altri post </a></div>`)
             } else {
                 $('#under_posts').empty();
             }
@@ -186,7 +190,7 @@ $('#orderby').on('change',() => {
 
     if(orderBy === 'publication') {
         let options = `<label for="order"></label>
-                                <select class="select btn btn-success" id="order" autocomplete="off">
+                                <select class="select btn bg-secondary" id="order" autocomplete="off">
                                     <option value="" disabled selected>Ordine</option>
                                     <option value="più recente" >Piu' recenti</option>
                                     <option value="meno recente">Meno recenti</option>
@@ -195,7 +199,7 @@ $('#orderby').on('change',() => {
     }
 
     else if(orderBy === 'visuals') {
-        let options = `<label for="order"></label><select class="select btn btn-success" id="order" autocomplete="off">
+        let options = `<label for="order"></label><select class="select btn bg-secondary" id="order" autocomplete="off">
                                   <option value="" selected disabled>Ordine</option>
                                   <option value="più visual">Decrescente</option>
                                   <option value="meno visual">Crescente</option>
@@ -205,7 +209,7 @@ $('#orderby').on('change',() => {
 
     $('#order').on('change', () => {
         LastCall.filters.sort = $('#order option:selected').val();
-        console.log(LastCall.filters)
+        LastCall.filters.offset = 0;
         getPostsNumber(LastCall.filters)
     })
 
@@ -216,12 +220,14 @@ $('#orderby').on('change',() => {
 
 $('#order').on('change', () => {
     LastCall.filters.sort = $('#order option:selected').val();
+    LastCall.filters.offset = 0;
     getPostsNumber(LastCall.filters);
 })
 
 
 $('#channel-visual').on('change',() => {
     LastCall.filters.popularity = $('#channel-visual input:checked').val();
+    LastCall.filters.offset = 0;
     getPostsNumber(LastCall.filters);
 })
 
@@ -239,17 +245,26 @@ $('#filter').on("keyup", () => {
             break;
     }
 
+    LastCall.filters.offset = 0;
     getPostsNumber(LastCall.filters);
 });
 
 
-$('#changeReactionsButton').on('click',() => {
+$('#changeReactionsForm').on('submit',(event) => {
+    event.preventDefault();
 
     let reactions = {
-        heart: $('#heart').val(),
-        heartbreak: $('#heartbreak').val(),
-        'thumbs-up': $('#thumbs-up').val(),
-        'thumbs-down': $('#thumbs-down').val(),
+        heart: parseInt($('#heart').val()),
+        heartbreak: parseInt($('#heartbreak').val()),
+        'thumbs-up': parseInt($('#thumbs-up').val()),
+        'thumbs-down': parseInt($('#thumbs-down').val()),
+    }
+
+    if(reactions.heart + reactions.heartbreak + reactions["thumbs-up"] + reactions["thumbs-down"] > 500) {
+        $('#toast-content').empty().html(`Puoi aggiungere al massimo 500 reactions`);
+        let toastList = inizializeToast();
+        toastList.forEach(toast => toast.show()); // This show them
+        return;
     }
 
     let allReactions = []
@@ -284,22 +299,25 @@ $('#changeReactionsButton').on('click',() => {
         })
     }
 
-    if(allReactions.length > 500) {
-        alert('Puoi aggiungere al massimo 500 reactions!!');
-        return;
-    }
-
     $.ajax({
         url: '/db/post/updateReaction',
         data: {user: User, reactions: JSON.stringify(allReactions), postId: post},
         type: 'put',
         success: (data) => {
             location.reload();
+        },
+        error: (error) => {
+            $('#toast-content').empty().html(error.responseJSON.mes);
+            let toastList = inizializeToast();
+            toastList.forEach(toast => toast.show()); // This show them
         }
     })
+
+
 })
 
-$('#addDestinationButton').on('click',() => {
+$('#addDestinationForm').on('submit',(event) => {
+    event.preventDefault();
     let destination = {
         destType: $('#type-select option:selected').val(),
         name: $('#destination-name').val(),
@@ -316,7 +334,7 @@ $('#addDestinationButton').on('click',() => {
             $('#toast-content').empty().html(error.responseJSON.mes);
             let toastList = inizializeToast();
             toastList.forEach(toast => toast.show()); // This show them
-            }
+        }
     })
 
 })
@@ -330,8 +348,77 @@ function inizializeToast() {
     });
 }
 
+function inizializeToolTips() {
+    let tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    return tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+}
+
+function getReplies(parentID) {
+    $.ajax({
+        url: '/db/reply',
+        data: {parentid: parentID},
+        type: 'GET',
+        success: (replies) => {
+            let numberOfReplies = replies.length;
+            console.log(numberOfReplies)
+            if(numberOfReplies === 0) {
+                $('#replies').empty().append(`<h4>Nessuna risposta per questo post</h4>`)
+                $('#postReplies').modal('show');
+                return
+            }
+
+            let html = `${$.map(replies, (reply) => {
+                let content = `
+                  <div id="reply-${reply._id}" class="card mt-3 w-100 border rounded border-black">
+                    <div id="header-${reply._id}" class="card-header d-flex flex align-items-center bg-primary">
+                        <div class="d-flex flex-column w-100">
+                            <div class="d-flex flex-row align-items-center justify-content-start w-100">
+                                <div class="fw-bold">@${reply.owner}</div>
+                                <div class="fw-bold ms-auto">${reply.dateOfCreation.split('T')[0]},
+                                ${reply.dateOfCreation.split('T')[1].split('.')[0]}</div>
+                                </div>
+                        </div>
+                    </div>
+                    <div class="card-body flex-row bg-back">
+                `
+                
+                let parsedText = `${reply.content}`.replace(urlRegex, function (url) {
+                    return `<a class="fw-bold"  href="${url}" target="_blank">${url}</a>`;
+                })
+                content = content + `<span><p class='card-text lead' > ${parsedText} </p></span></div>`
+                
+                
+                content = content + `</div>`
+                return content;
+            }).join('\n')}`;
+
+
+            $('#replies').empty().append(html)
+
+
+            $('#postReplies').modal('show');
+        }
+    })
+}
+
+
+// Usata per testare
+function addReply(parent) {
+    $.ajax({
+        url: '/db/reply',
+        data: {owner: User, content: "Ciao bel post di merda https://www.youtube.com/", parentid: parent},
+        type: 'POST',
+        success: (data) => {
+        }
+    })
+}
+
+
 
 $(document).ready(() => {
     getPostsNumber(LastCall.filters)
+    inizializeToolTips();
 })
 

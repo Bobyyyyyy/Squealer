@@ -8,10 +8,14 @@
 <body class="d-flex flex-column">
 
 <!-- NavBar -->
-<nav class="navbar navbar-expand-lg bg-dark navbar-dark sticky-top" style="height: 10%">
-    <div class="d-flex flex-row justify-content-between w-100 p-1" >
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark sticky-top fontcustom" style="height: 10%">
+    <div class="container-fluid" >
+        <a class="navbar-brand" style="font-size: 3vh" href="/mod">SquealerMOD</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".dual-collapse2">
+            <span class="navbar-toggler-icon" ></span>
+        </button>
         <div class="navbar-collapse collapse dual-collapse2" style="flex-basis: 100%">
-            <ul class="navbar-nav">
+            <ul class="navbar-nav me-auto mb-lg-0">
                 <li class="nav-item">
                     <a class="nav-link" aria-current="page" href="/mod/users">Utenti</a>
                 </li>
@@ -22,30 +26,19 @@
                     <a class="nav-link dropdown-toggle active" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         Channels
                     </a>
-                    <ul class="dropdown-menu">
+                    <ul class="dropdown-menu fontcustom">
                         <li><a class="dropdown-item" href="/mod/officialChannels">Official Channels</a></li>
-                            <li><hr class="dropdown-divider"></li>
+                        <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="/mod/userChannels">Private Channels</a></li>
                     </ul>
                 </li>
             </ul>
-        </div>
-
-        <div class="order-sm-first order-lg-0 mx-auto">
-            <a class="navbar-brand" href="/mod">SquealerMOD</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".dual-collapse2">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-        </div>
-
-        <div class="navbar-collapse collapse dual-collapse2" style="flex-basis: 100%">
-            <div class="ms-auto"></div>
-            <span class="navbar-text text-white ms-auto me-2" >@${user}
-            </span>
-            <button class="btn btn-light btn-outline-danger" onclick="window.location.href = '/logout'">Logout</button>
+            <span class="navbar-text text-white ms-auto me-2 fontcustom" >@<span id="session-user">${user}</span></span>
+            <button class="btn btn-outline-light bg-accent fontcustom" onclick="window.location.href = '/logout'">Logout</button>
         </div>
     </div>
 </nav>
+
 
 
 
@@ -53,66 +46,67 @@
 
     <div class="p-5 flex-column" id="div1" style="height: 100%; width: 100%">
         <!-- Modal Button -->
-        <div class="d-flex flex-row align-items-center p-3 pe-0">
-
-            <div class="input-group w-25">
-                <span class="input-group-text " id="basic-addon1"><select class="select btn" id='search-type' autocomplete="off">
-                        <option value="name" selected>Canale</option>
-                        <option value="creator">Creatore</option>
+        <div class="d-flex flex-row flex-wrap align-items-center p-3 pe-0">
+                <div class="input-group d-flex flex-row flex-nowrap" style="width: 50vh;">
+                    <span class="input-group-text bg-primary border-black" id="basic-addon1"><select class="select btn fontcustom" id='search-type' autocomplete="off">
+                            <option value="name" selected>Canale</option>
+                            <option value="creator">Creatore</option>
                     </select></span>
-                <label for="filter" class="sr-only"></label><input class="form-control" id="filter" type="text" style="width: 15%; background-color: lightgray" placeholder="Cerca.." autocomplete="off">
-            </div>
-
-
-            <div class="d-flex flex-row ms-auto">
-                <div id="channel-visual" class="btn-group ms-3 btn-group" role="group" aria-label="Basic radio toggle button group">
-                    <input type="radio" class="btn-check" name="filters" id="filter-all" value="" checked autocomplete="off">
-                    <label class="btn btn-success" for="filter-all">All</label>
-
-                    <input type="radio" class="btn-check" name="filters" id="filter-public" value="public" autocomplete="off">
-                    <label class="btn btn-success" for="filter-public">Public</label>
-
-                    <input type="radio" class="btn-check" name="filters" id="filter-private" value="private" autocomplete="off">
-                    <label class="btn btn-success" for="filter-private">Private</label>
+                    <label for="filter" class="sr-only"></label><input class="form-control fontcustom border-black bg-secondary" id="filter" type="text" style="background-color: lightgray" placeholder="Cerca.." autocomplete="off">
                 </div>
 
-                <div class="ms-3 d-flex flex-row justify-content-center align-self-center">
-                    <label class="text-white fw-normal"> Ordina Per:
-                        <select class="select btn btn-success ms-2" id="orderby" autocomplete="off">
+
+            <div class="d-flex flex-row flex-wrap ms-auto">
+                <div id="channel-visual" class="btn-group ms-3 bg-secondary" role="group" aria-label="Filters radio buttons">
+                    <input type="radio" class="btn-check" name="filters" id="filter-all" value="" checked autocomplete="off">
+                    <label class="btn fontcustom" for="filter-all">All</label>
+
+                    <input type="radio" class="btn-check" name="filters" id="filter-public" value="public" autocomplete="off">
+                    <label class="btn fontcustom" for="filter-public">Public</label>
+
+                    <input type="radio" class="btn-check" name="filters" id="filter-private" value="private" autocomplete="off">
+                    <label class="btn fontcustom" for="filter-private">Private</label>
+                </div>
+
+                <div class="ms-3 d-flex flex-row flex-wrap justify-content-center align-self-center">
+                    <label class="fw-normal">
+                        <select class="select btn bg-secondary fontcustom" id="orderby" autocomplete="off">
                             <option value="popularity" selected>Popolarita'</option>
                             <option value="posts">Numero di post</option>
                         </select>
                     </label>
                 </div>
-                <div class="ms-3 d-flex flex-row justify-content-center align-self-center me-2" id="options">
+                <div class="ms-3 d-flex flex-row flex-wrap justify-content-center align-self-center me-2" id="options">
                     <label for="order"></label>
-                        <select class="select btn btn-success" id="order" autocomplete="off">
+                        <select class="select btn bg-secondary fontcustom" id="order" autocomplete="off">
                             <option value="" disabled>Ordine</option>
                             <option value="popular" selected>Piu' popolari</option>
                             <option value="unpopular">Meno Popolari</option>
                         </select>
                 </div>
-                <button type="button" class="btn btn-primary ms-auto" data-bs-toggle="modal" data-bs-target="#addChannel">
+                <div>
+                <button type="button" class="btn ms-auto fontcustom bg-primary" data-bs-toggle="modal" data-bs-target="#addChannel">
                     Add Channel
                 </button>
+                </div>
             </div>
 
 
 
         </div>
 
-        <div class="mt-2 mx-auto text-white d-flex flex-row align-items-center text-center" style="background-color: mediumpurple; height:4vh; width: 90vw;">
+        <div class="mt-2 mx-auto fw-bold d-flex flex-row align-items-center text-center bg-secondary" style="height:6vh; width: 90vw; font-size: 2.5vh">
             <div class="" style="width: 50%"> Nome </div>
             <div class="" style="width: 50%"> Creatore</div>
             <div class="" style="width: 50%"> Post</div>
             <div class="" style="width: 50%"> Popolarita'</div>
             <div class="" style="width: 50%"> Visibilita'</div>
         </div>
-        <div id="channels"></div>
+        <div id="channels" class="d-flex flex-column justify-content-center align-items-center"></div>
 
         <!-- Channel table Pages -->
         <nav class="p-3" aria-label="User Table Pagination">
-            <ul class="pagination justify-content-end" id="pages"></ul>
+            <ul class="pagination justify-content-center" id="pages"></ul>
         </nav>
     </div>
 </div>
@@ -122,23 +116,23 @@
 <div class="modal fade" id="addChannel" tabindex="-1" aria-labelledby="addChannelModal" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header bg-primary">
                 <h1 class="modal-title fs-5">Inserisci dati canale</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form method="post" action="/db/channel" id="channelform">
+            <form id="addChannelForm">
                 <div class="modal-body">
                     <div>
                         <label for="name" class="form-label w-100"> Nome:
-                            <input type="text" class="form-control" name="name" id="name" placeholder="nome_canale"></label>
+                            <input type="text" class="form-control" name="name" id="name" placeholder="nome_canale" required></label>
                     </div>
                     <div>
                         <label for="creator" class="form-label w-100"> Creatore:
-                            <input type="text" class="form-control" name="creator" id="creator" placeholder="nome creatore"></label>
+                            <input type="text" class="form-control" name="creator" id="creator" placeholder="nome creatore" autocomplete="off" required></label>
                     </div>
                     <div class="form-group">
                         <label for="description" class="form-label w-100"> Descrizione:
-                            <textarea class="form-control" id="description" name="description" rows="3" form="channelform" placeholder="Inserisci descrizione del canale...." maxlength="150" style="resize: none" data-role="none"></textarea></label>
+                            <textarea class="form-control" id="description" name="description" rows="3" form="channelform" placeholder="Inserisci descrizione del canale...." maxlength="150" style="resize: none" data-role="none" autocomplete="off" required></textarea></label>
                     </div>
                     <div class="form-check form-check-inline">
                         <input class="form-check-input" type="radio" name="type" id="public" value="public" checked>
@@ -154,13 +148,26 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
-                    <button type="submit" class="btn btn-primary">Inserisci</button>
+                    <button type="button" class="btn bg-secondary" data-bs-dismiss="modal">Chiudi</button>
+                    <button type="submit" class="btn bg-primary">Inserisci</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
+
+<div class="toast-container position-fixed top-0 end-0 p-3">
+    <div class="toast align-items-center text-bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body" id="toast-content">
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
+
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script src="/js/userChannels.js"></script>

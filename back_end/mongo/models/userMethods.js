@@ -167,15 +167,18 @@ const getUsers = async (query) =>{
         let offset = parseInt(query.offset);
         let limit = parseInt(query.limit);
 
-        query.filter = JSON.parse(query.filter);
+        if(typeof query.filter === "string")
+            query.filter = JSON.parse(query.filter);
 
         let filter = {
             // filtrare profili per nome
             ...(query.filter.name) && {'username': new RegExp(`^${query.filter.name}`)},
             // filtrare profili per tipo ['public','private']
-            ...(query.filter.type) && {'type': query.filter.type},
+            ...(query.filter.type) && {'typeUser': query.filter.type},
         }
-        return await User.find(filter).skip(offset).limit(limit).lean();
+
+        let users = await User.find(filter).skip(offset).limit(limit).lean();
+        return users;
     }
     catch (err){
         throw err;
@@ -198,7 +201,15 @@ const getSingleUser = async (query) => {
 const usersLength = async (query) => {
     try {
         await connection.get();
-        let users = await User.find({$or : [{username: {$regex: query.filter , $options: 'i'}},{email: {$regex: query.filter , $options: 'i'}},{typeUser: {$regex: query.filter , $options: 'i'}},]}).lean();
+
+        let filter = {
+            // filtrare profili per nome
+            ...(query.name) && {'username': new RegExp(`^${query.name}`)},
+            // filtrare profili per tipo ['public','private']
+            ...(query.type) && {'typeUser': query.type},
+        }
+
+        let users = await User.find(filter).lean();
 
         return {length: users.length};
     }
@@ -326,7 +337,7 @@ const resetQuota = async (type, user = 'ALL_USER') => {
  */
 
 const changePopularity = async (userID, valueToModify, increaseValue) => {
-    let user = await User.findById(userID, 'popularity');
+    let user = await User.findById(userID, 'username popularity unpopularity');
 
     if(valueToModify === 'popularity') {
         let popularity = user.popularity;
@@ -337,6 +348,10 @@ const changePopularity = async (userID, valueToModify, increaseValue) => {
         else {
             popularity--;
             await User.findByIdAndUpdate(userID, {'popularity': popularity});
+        }
+
+        if(popularity % 10 === 0) {
+            await updateMaxQuota(1,user.username);
         }
     }
 
@@ -350,7 +365,12 @@ const changePopularity = async (userID, valueToModify, increaseValue) => {
             unpopularity--;
             await User.findByIdAndUpdate(userID, {'unpopularity': unpopularity});
         }
+
+        if(unpopularity % 3 === 0) {
+            await updateMaxQuota(-1,user.username);
+        }
     }
+
 }
 
 

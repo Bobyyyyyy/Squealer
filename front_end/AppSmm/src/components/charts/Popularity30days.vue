@@ -24,7 +24,6 @@ onMounted(()=>{
   if (!(props.post)){
     let tmp = parseReactionDate(toRaw(props.reactions)?.value ? toRaw(props.reactions).value : toRaw(props.reactions));
     dataChart.value = getLength(tmp);
-
     ready.value = true;
   }
 })

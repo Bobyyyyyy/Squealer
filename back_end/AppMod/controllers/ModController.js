@@ -31,7 +31,7 @@ const displayChannel = async (req,res) => {
         res.render('officialChannelProfile',{locals : {user: req.session.user, name: channel.name}});
     }
     catch (error) {
-        res.send(error);
+        res.redirect('/mod/officialChannels');
     }
 }
 
@@ -42,7 +42,7 @@ const displayUserChannel = async (req,res) => {
         res.render('userChannelProfile',{locals: {user: req.session.user, name: channel.name}});
     }
     catch (error) {
-        res.status(400).send('No');
+        res.redirect('/mod/userChannels');
     }
 }
 

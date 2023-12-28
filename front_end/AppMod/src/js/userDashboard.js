@@ -2,7 +2,8 @@ let LastCall = {
     limit : 5,
     offset: 0,
     users: 0,
-    filter: ''
+    filter: '',
+    type: '',
 
 }
 
@@ -21,26 +22,25 @@ function updateModifyParameters()  {
 }
 
 
-function updateLastCall(limit,offset,filter) {
+function updateLastCall(limit,offset,filter,type) {
     LastCall.limit = limit;
     LastCall.offset = offset;
     LastCall.filter = filter;
+    LastCall.type = type;
 }
 
 
-function getUsersNumber(filter) {
+function getUsersNumber(filter,type) {
     $.ajax({
         url:'/db/user/number',
-        data: {filter: filter},
+        data: {filter: filter,type: type},
         type: 'get',
         success: (data) => {
             LastCall.users = data.length;
-            userTable(LastCall.limit,LastCall.offset = 0,LastCall.filter);
+            userTable(LastCall.limit,LastCall.offset = 0,LastCall.filter,LastCall.type);
         }
     })
 }
-
-//TODO SPOSTARLA NEL CLICK DEL BOTTONE (COSI' NESSUNO PUò CHIAAMRLA A LIVELLO CLIENT)
 
 function modifyUser(parameters) {
     parameters = JSON.parse(parameters);
@@ -78,11 +78,11 @@ function showUserModal(username,remainingQuota,maxQuota) {
     $('#modUser').modal("show");
 }
 
-function userTable (limit,offset,filter) {
-    updateLastCall(limit, offset, filter);
+function userTable (limit,offset,filter,type) {
+    updateLastCall(limit, offset, filter,type);
     $.ajax({
         url: '/db/user/all',
-        data: {limit: limit, offset: offset, filter: filter},
+        data: {filter: {name: filter,type: type}, limit: limit, offset: offset},
         type: 'get',
         success: (data) => {
             $('#pages').empty();
@@ -92,9 +92,9 @@ function userTable (limit,offset,filter) {
                 return;
             }
 
-            let header = `<table class="table table-dark table-striped table-hover table-bordered" style="vertical-align: middle; text-align: center;">
+            let header = `<table class="table table-hover fontcustom border-black" style="vertical-align: middle; text-align: center;">
                         <!-- Header Tabella -->
-                        <thead>
+                        <thead class="bg-secondary">
                             <th> Nome </th>
                             <th> Quota Rimanente </th>
                             <th> Quota Massima </th>
@@ -141,15 +141,18 @@ function userTable (limit,offset,filter) {
 
             }).join('\n')}`
 
+
             if (offset !== 0) {
-                let previous = `<li class="page-item"><a class="page-link" onclick="userTable(LastCall.limit,LastCall.offset - LastCall.limit,LastCall.filter)">Previous</a></li>`
+                let previous = `<li class="page-item fontcustom" onclick="userTable(LastCall.limit,LastCall.offset - LastCall.limit,LastCall.filter,LastCall.type)"><a class="page-link fontcustom text-black bg-secondary border-black fw-bold" ><-</a></li>`
                 $('#pages').append(previous);
             }
 
-            let page = `<li class="page-item"><a class="page-link">${LastCall.offset / LastCall.limit + 1}</a></li>`
+            let page = `<li class="page-item fontcustom"><a class="page-link fontcustom text-black bg-secondary border-black">${LastCall.offset / LastCall.limit + 1}</a></li>`
+
+            console.log('Offset:', offset, 'Limit:', limit, 'Utenti:', LastCall.users)
 
             if (offset + limit < LastCall.users) {
-                let next = `<li class="page-item"><a class="page-link" onclick="userTable(LastCall.limit,LastCall.limit+LastCall.offset,LastCall.filter)">Next</a></li>`
+                let next = `<li class="page-item fontcustom" onclick="userTable(LastCall.limit,LastCall.limit+LastCall.offset,LastCall.filter,LastCall.type)"><a class="page-link fontcustom text-black bg-secondary border-black fw-bold">-></a></li>`
                 page = page + next;
             }
 
@@ -162,7 +165,7 @@ function userTable (limit,offset,filter) {
 $('#filter').on("keyup", () => {
     let value = $('#filter').val();
     LastCall.filter = value;
-    getUsersNumber(value);
+    getUsersNumber(value,LastCall.type);
 });
 
 $('#modifyButton').click(() => {
@@ -172,6 +175,46 @@ $('#modifyButton').click(() => {
     );
 })
 
+$('#addUserForm').on('submit',(event) => {
+    event.preventDefault();
+
+    let newUser = {
+        name: $('#name').val(),
+        password: $('#password').val(),
+        type: $('#addUserForm .form-check-input:checked').val()
+    }
+
+    $.ajax({
+        url: '/db/user',
+        type: 'post',
+        data: newUser,
+        success: () => {
+            location.reload();
+        },
+        error: (error) => {
+            $('#toast-content').empty().html(error.responseText);
+            let toastList = inizializeToast();
+            toastList.forEach(toast => toast.show());
+        }
+    })
+})
+
+
+$('#user-type').on('change',() => {
+    LastCall.type = $('#user-type input:checked').val();
+    getUsersNumber(LastCall.filter,LastCall.type);
+})
+
+
+
+function inizializeToast() {
+    let toastElList = [].slice.call(document.querySelectorAll('.toast'))
+    return toastList = toastElList.map(function(toastEl) {
+        // Creates an array of toasts (it only initializes them)
+        return new bootstrap.Toast(toastEl) // No need for options; use the default options
+    });
+}
+
 $(document).ready(function() {
-    getUsersNumber(LastCall.filter);
+    getUsersNumber(LastCall.filter,LastCall.type);
 });

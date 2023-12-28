@@ -41,13 +41,18 @@ const addChannel = async (body) => {
         // trasformare il nome in una forma ragionevole
         let name = body.name.toLowerCase();
         name = name.trim();
+        name = name.replace('§',"");
+        name = name.replace('@',"");
         name = name.replace(/\s/g, "_");
         name = name.replace('/','_');
+        if(!isNaN(parseInt(body.name))) {
+            throw createError('Nome non valido',400);
+        }
         //check if channel exists already
         let findName = await Channel.findOne({name: name}).lean();
         let findUser = await User.findOne({name:name}).lean();
         if (findName || findUser) {
-            throw createError('Nome non utilizzabile',400)
+            throw createError('Nome già utilizzato',400)
         }
 
         let user = await User.findOne({username: body.creator});
@@ -72,19 +77,10 @@ const addChannel = async (body) => {
         return newChannel;
     }
     catch(err){
-        await mongoose.connection.close();
         throw err;
     }
 }
 
-const channelVipList = async (query) => {
-    try{
-        await connection.get()
-        return await Channel.find({ $or: [{ creator: query.vipName },{admins: {$in: [query.vipName] }}]});
-    }catch (e) {
-        throw(e);
-    }
-}
 
 /**
  * @param query
@@ -134,7 +130,13 @@ const getChannels = async (query) => {
         }
 
 
-        let channels = await Channel.find(filter).skip(offset).limit(limit).sort(sort).lean();
+        let channels = await Channel.aggregate([
+            {$match: filter},
+            {$sort: sort},
+            {$skip: offset},
+            {$limit: limit}
+        ])
+
 
         return channels;
 }
@@ -179,19 +181,16 @@ const getChannelsNumber = async (filters) => {
         await connection.get()
         let filter = {
             //filtrare canale per nome
-            ...(filters.name) && {'name': filters.name},
+            ...(filters.name) && {'name': {$regex: filters.name, $options: 'i'}},
             //filtrare canali per tipo ['public','private']
             ...(filters.type) && {'type': filters.type},
             //filtrare canale per nome
-            ...(filters.creator) && {'creator': filters.creator},
-
-            ...(filters.filter) && {'name': {$regex: filters.filter, $options: 'i'}},
+            ...(filters.creator) && {'creator': {$regex: filters.creator, $options: 'i'}},
 
             ...(filters.hasAccess) && {$or: [{'name': filters.hasAccess},{'admins': {$in: [filters.hasAccess]}},{'followers': {$in: [filters.hasAccess]}}]}
         }
 
         let channels = await Channel.find(filter).lean();
-
 
         return {length: channels.length};
     }
@@ -253,7 +252,7 @@ const addAdmin = async function (username, adminName, channelName) {
         let creator = await User.findOne({username: adminName}).lean();
         let user = await User.findOne({username: username}).lean();
         if (!user || !creator) {
-            throw createError(`${user.username} non esiste`,500);
+            throw createError(`${username} non esiste`,500);
         }
         let channel;
 
@@ -279,9 +278,9 @@ const addAdmin = async function (username, adminName, channelName) {
             }
         }
 
-
         if(!channel)
             throw createError(`${admin.username} non ha i permessi necessari`,500);
+
     }
     catch (error) {
         throw error;
@@ -436,7 +435,6 @@ const blockChannel = async (user,channelName) => {
 
 module.exports = {
     addChannel,
-    channelVipList,
     checkUserChannel,
     getChannels,
     getChannelsNumber,
