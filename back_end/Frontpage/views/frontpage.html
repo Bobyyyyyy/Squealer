@@ -50,8 +50,22 @@
     <div class="button-container">
         <button onclick="window.location.href='/register'" class="button">Registrati</button>
     </div>
+    <button class="btn" id="guestbutton"> Entra come ospite </button>
 </div>
+
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script>
+    $('#guestbutton').on('click',() => {
+        $.ajax({
+            url:'/guest',
+            type: 'post',
+            success: () => {
+                location.reload();
+            }
+        })
+    })
+</script>
 <script src="/js/debug.js"></script>
 </body>
 </html>

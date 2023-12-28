@@ -18,7 +18,7 @@ const createPost = async (req,res) => {
 
 const getPosts = async (req,res) => {
     try {
-        res.send(await postModel.getAllPost(req.query,req.session.user))
+        res.send(await postModel.getAllPost(req.query,{username: req.session.user, typeUser: req.session.type}));
     }
     catch(error) {
         res.send(error);
@@ -32,7 +32,7 @@ const updateReaction = async (req,res) => {
                 res.send('200');
         }
         else {
-            await postModel.updateReac(req.body);
+            await postModel.updateReac({user: req.session.user, typeUser: req.session.type, reaction: req.body.reaction, postId: req.body.postId});
             res.send('200');
         }
     }

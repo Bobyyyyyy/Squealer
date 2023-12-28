@@ -22,7 +22,7 @@ const login  = async (req,res,next) => {
 }
 
 const isUser = (req,res,next) => {
-    if(req.session.authenticated && (req.session.type === 'user' || req.session.type === 'vip') ) {
+    if(req.session.authenticated && (req.session.type === 'user' || req.session.type === 'vip' || req.session.type === 'guest') ) {
         next();
     }
     else {
@@ -55,6 +55,8 @@ const isSessionActive = (req,res,next) => {
     else {
         switch (req.session.type) {
             case 'user':
+            case 'vip':
+            case 'guest':
                 res.redirect('/user')
                 break;
 
@@ -79,6 +81,7 @@ const createSession = async(req,res) => {
         switch (req.response.typeUser) {
             case 'user':
             case 'vip':
+            case 'guest':
                 res.redirect('/user');
                 break;
 
@@ -95,6 +98,14 @@ const createSession = async(req,res) => {
     });
 }
 
+const createGuest = async(req,res,next) => {
+    const digits = Math.floor(Math.random() * 9000000000) + 1000000000;
+    req.response = {
+        username: 'guest-'+digits,
+        typeUser: 'guest',
+    }
+    next();
+}
 
 const logout = (req,res) => {
     req.session.destroy();
@@ -111,4 +122,5 @@ module.exports = {
     isSessionActive,
     createSession,
     logout,
+    createGuest
 };

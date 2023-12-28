@@ -337,7 +337,7 @@ const resetQuota = async (type, user = 'ALL_USER') => {
  */
 
 const changePopularity = async (userID, valueToModify, increaseValue) => {
-    let user = await User.findById(userID, 'popularity');
+    let user = await User.findById(userID, 'username popularity unpopularity');
 
     if(valueToModify === 'popularity') {
         let popularity = user.popularity;
@@ -348,6 +348,10 @@ const changePopularity = async (userID, valueToModify, increaseValue) => {
         else {
             popularity--;
             await User.findByIdAndUpdate(userID, {'popularity': popularity});
+        }
+
+        if(popularity % 10 === 0) {
+            await updateMaxQuota(1,user.username);
         }
     }
 
@@ -361,7 +365,12 @@ const changePopularity = async (userID, valueToModify, increaseValue) => {
             unpopularity--;
             await User.findByIdAndUpdate(userID, {'unpopularity': unpopularity});
         }
+
+        if(unpopularity % 3 === 0) {
+            await updateMaxQuota(-1,user.username);
+        }
     }
+
 }
 
 

@@ -41,7 +41,7 @@ function Channels () {
     }
 
     useEffect(() => {
-        fetch(`/db/channel/?offset=0&filters=${queryFilter}`, {
+        fetch(`/db/channel/?offset=0&limit=10000&filters=${queryFilter}`, {
             method: 'GET'
         })
             .then((res) => {
