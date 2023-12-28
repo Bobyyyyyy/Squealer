@@ -376,7 +376,7 @@ $('#addAdminForm').on('submit',(event) => {
     $.ajax({
         url:'/db/channel/admin',
         data: {channel: ChannelName, user: $('#user').val()},
-        type: 'post',
+        type: 'put',
         success: (post) => {
             location.reload()
         },
