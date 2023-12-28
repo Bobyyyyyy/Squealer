@@ -108,10 +108,14 @@ const getChannels = async (query) => {
                 ...(query.filters.name) && {'name': {$regex: query.filters.name, $options: 'i'}},
                 //filtrare canali per tipo ['public','private']
                 ...(query.filters.type) && {'type': query.filters.type},
-                //filtrare canale per nome
-                ...(query.filters.creator) && {'creator': {$regex: query.filters.creator, $options: 'i'}},
 
-                ...(query.filters.hasAccess) && {'admins': {$in: [query.filters.hasAccess]}}
+                ...(query.filters.both) && {
+                        $or : [{'creator': query.filters.creator}, {'admins': {$in:[query.filters.hasAccess]}}]
+                    },
+
+                ...(!query.filters.both && query.filters.creator) && {'creator': {$regex: query.filters.creator, $options: 'i'}},
+
+                ...(!query.filters.both && query.filters.hasAccess) && {'admins': {$in: [query.filters.hasAccess]}}
         }
 
         if (query.filters.sortBy) {

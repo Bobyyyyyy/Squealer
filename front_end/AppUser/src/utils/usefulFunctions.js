@@ -20,7 +20,9 @@ async function getQuotaByUsername(username) {
             method: 'GET'
         });
         if (res.ok) {
-            return await res.json();
+            let x = await res.json();
+            console.log(x)
+            return x;
         }
     } catch (e) {
         console.log(e);
@@ -52,6 +54,21 @@ async function getPostByChannelName(channelName){
         console.log(e);
     }
 }
+
+async function getAllPost(offset) {
+    try {
+        let res = await fetch(`/db/post/all?offset=${offset}&limit=10`, {
+            method: 'GET'
+        });
+
+        if (res.ok) {
+            return await res.json();
+        }
+    } catch (e) {
+        console.log(e);
+    }
+}
+
 
 async function getProfilePicByUsername (username) {
     try {
@@ -176,6 +193,7 @@ const checkUserExists = async ({params}) => {
         maxQuota: sol.maxQuota,
         profilePicture: sol.profilePicture,
         username: sol.username,
+        typeUser: sol.typeUser
     }
     console.log("utente", sol, user);
     return user;
@@ -196,5 +214,6 @@ export {
     checkChannelExists,
     checkUserExists,
     getUserInfoByUsername,
-    getPostByChannelName
+    getPostByChannelName,
+    getAllPost
 }

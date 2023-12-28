@@ -9,6 +9,8 @@ import {
 } from "../../utils/usefulFunctions.js";
 import {Toast} from "flowbite-react";
 import TimedPost from "./TimedPost.jsx";
+import {startSendingPosition} from "../../utils/geoFunctions.js";
+import ModalGeo from "./ModalGeo.jsx";
 
 function AddPost(){
     const username = getUsernameFromSessionStore();
@@ -20,9 +22,13 @@ function AddPost(){
     const [quota,setQuota] = useState();
     const [currentQuota, setCurrentQuota] = useState();
     const [error, setError] = useState('');
+
     const [isTimed, setIsTimed] = useState(false);
-    const frequencyMs = useRef(0);
+    const [frequencyMs, setFrequencyMs] = useState(0);
     const [numberOfPosts, setNumberOfPosts] = useState(1)
+    const [showModalGeo, setShowModalGeo] = useState(false);
+    const [startSending, setStartSending] = useState(false);
+
 
     const infoNum = "{NUM}";
     const infoTime = "{TIME}";
@@ -35,7 +41,6 @@ function AddPost(){
             <span> <span className="font-semibold">{infoDate}</span> data di pubblicazione dello squeal</span>
         </div>
     );
-
 
     function parseDestinations(dests) {
         let finalDest = [];
@@ -116,10 +121,10 @@ function AddPost(){
 
         if (isTimed) {
             post.timed = true;
-            post.millis = frequencyMs.current;
+            console.log(frequencyMs, typeof frequencyMs);
+            post.millis = frequencyMs;
             post.squealNumber = parseInt(numberOfPosts);
         }
-        console.log(post)
         return post;
     }
 
@@ -128,6 +133,8 @@ function AddPost(){
             if (canSendPost()) {
                 let post = await createPost();
                 console.log("post creato", post, currentQuota)
+
+
                 let res = await fetch("/db/post", {
                     method: "POST",
                     body: JSON.stringify({
@@ -138,20 +145,31 @@ function AddPost(){
                         "Content-Type": "application/json"
                     },
                 });
-                if (!res.ok) {
-                    console.log(res)
-                    throw res;
+                if (res.ok) {
+                    res = await res.json();
+                    if (post.contentType === "geolocation" && post.hasOwnProperty("millis")) {
+                        console.log("start sending");
+                        setStartSending(true);
+                        setShowModalGeo(true);
+                        startSendingPosition(frequencyMs, numberOfPosts, res.post._id);
+                        const wait = frequencyMs * numberOfPosts + 500;
+                        console.log("wait", wait)
+                        setTimeout(()=> {
+                            setShowModalGeo(false);
+                            window.location.href = "/user/"
+                        }, wait)
+                    } else {
+                        window.location.href = "/user/"
+                    }
                 } else {
                     let data = await res.json();
-                    console.log(data.statusCode)
                     if (data.statusCode === 400) {
                         console.log(data.message);
                         window.alert("Non hai il prermesso di scrivere");
                     } else if (data.statusCode === 400) {
                         window.alert("Canale o utente non esiste");
-                    } else {
-                        window.location.href = "/user/"
                     }
+                    throw res;
                 }
             }
         } catch (e) {
@@ -162,10 +180,9 @@ function AddPost(){
 
     useEffect(() => {
         getQuotaByUsername(username)
-            .then((res) => {
-                setQuota(res);
-                setCurrentQuota(res);
-                console.log(res.characters)
+            .then((response) => {
+                setQuota(response);
+                setCurrentQuota(response);
             })
     }, []);
 
@@ -174,6 +191,10 @@ function AddPost(){
             setError('')
         }
     }, [content, destinations]);
+
+    useEffect(()=> {
+        console.log("num post:", numberOfPosts)
+    }, [numberOfPosts])
 
     return (
         <main className="flex flex-col items-center justify-center m-4 pb-8">
@@ -232,15 +253,20 @@ function AddPost(){
                         </label>
                 </div>
             </div>
-            {isTimed && type === "text" &&
-                <>
-                    {infoTimedText}
-                </>
+            {isTimed && type === "text" && <>{infoTimedText}</>}
+            {isTimed && type === "geolocation" &&
+                <div className="flex flex-col flex-wrap w-full mb-4 text-md font-normal justify-center items-center">
+                    <p>
+                        Mentre condividi la posizione <span className="font-semibold">non puoi lasciare questa pagina</span>,
+                        altrimenti la <span className="font-semibold">condivisione verrà intrerrotta</span>
+                    </p>
+                </div>
             }
-            {isTimed && <TimedPost frequency={frequencyMs} numberOfPosts={numberOfPosts} setNumberOfPosts={setNumberOfPosts}/>}
-            {!!error && <div className="flex w-full justify-start text-xl text-red-600 mb-4">
-                {error}
-            </div>}
+            {isTimed && <TimedPost frequency={frequencyMs} setFrequencyMs={setFrequencyMs} numberOfPosts={numberOfPosts} setNumberOfPosts={setNumberOfPosts} type={type}/>}
+            {!!error &&
+                <div className="flex w-full justify-start text-xl text-red-600 mb-4">
+                    {error}
+                </div>}
             <button
                 className="flex w-full align-center justify-center items-center gap-2 bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded"
                 type="submit"
@@ -252,6 +278,10 @@ function AddPost(){
                 Submit
                 {SubmitIcon}
             </button>
+            <ModalGeo
+                isOpen={showModalGeo} setIsOpen={setShowModalGeo} startSending={startSending}
+                frequencyMs={frequencyMs} numOfUpdates={numberOfPosts}
+            />
         </main>
     );
     /*

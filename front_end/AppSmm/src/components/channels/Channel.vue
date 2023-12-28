@@ -7,7 +7,6 @@ import {parseReactionType} from "../../utils/functions.js";
 
 const store = useStore();
 
-const displayChart = ref(false)
 const readyReac = ref({});
 const readyData = ref(false);
 
@@ -59,7 +58,7 @@ const readyData = ref(false);
         </router-link>
       </div>
     </div>
-    <div class="d-flex flex-column sameWidth justify-content-center">
+    <div class="d-flex flex-row sameWidth justify-content-around">
       <div class="text-center bordEl" >
         <span v-if="creator === currentVip" class="badge rounded-pill text-bg-primary"> creatore </span>
         <span v-else-if="admins.includes(currentVip)" class="badge rounded-pill text-bg-warning"> admin </span>

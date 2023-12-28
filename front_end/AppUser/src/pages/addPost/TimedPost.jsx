@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
 
-function TimedPost({frequency, numberOfPosts, setNumberOfPosts}) {
+function TimedPost({frequency, numberOfPosts, setNumberOfPosts, type, setFrequencyMs}) {
 
     const [seconds, setSeconds] = useState(0);
     const [minutes, setMinutes] = useState(0);
@@ -16,12 +16,12 @@ function TimedPost({frequency, numberOfPosts, setNumberOfPosts}) {
     }
 
     useEffect(() => {
-        frequency.current = parseInMs();
+        setFrequencyMs(parseInMs());
     }, [seconds, minutes, hours, days]);
 
     return (
         <div className="flex flex-col justify-between w-full gap-2 mb-4">
-            <Interval name={"Numero di post"} min={1} value={numberOfPosts} setValue={setNumberOfPosts} />
+            <Interval name={`${type === "geolocation" ? "Aggiornamenti mappa" : "Numero di post"}`} min={1} value={numberOfPosts} setValue={setNumberOfPosts} />
             <span className="text-xl text-center">Frequenza</span>
             <div className="flex flex-wrap w-full gap-4 justify-between items-center">
                 <Interval name={"secondi"} min={0} value={seconds} setValue={setSeconds} />
@@ -29,7 +29,6 @@ function TimedPost({frequency, numberOfPosts, setNumberOfPosts}) {
                 <Interval name={"ore"} min={0} value={hours} setValue={setHours} />
                 <Interval name={"giorni"} min={0} value={days} setValue={setDays} />
             </div>
-
         </div>
     );
 }
@@ -41,7 +40,6 @@ function Interval({name, value, setValue, min}) {
             <input type="number" id="number-input"
                    className="appearance-none w-20 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2"
                    placeholder="0"
-                   //defaultValue={min}
                    value={String(value)}
                    min={min}
                    onChange={(e) => {
