@@ -4,7 +4,7 @@ import {CheckIcon} from "../../../components/assets/index.jsx";
 function AddAdminModal({isOpen, setIsOpen, followers, channelName, hasUpdated, setHasUpdated}) {
     const promote2admin = (name) => {
         fetch("/db/channel/admin", {
-            method: 'POST',
+            method: 'PUT',
             headers: {
                 "Content-Type": "application/json",
             },
