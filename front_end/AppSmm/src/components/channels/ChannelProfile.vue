@@ -1,5 +1,5 @@
 <script setup>
-  import {computed, onMounted, onUnmounted, ref} from "vue";
+  import {computed, onMounted, onUnmounted, ref, getCurrentInstance} from "vue";
   import Post from "../post/Post.vue";
   import Select from "../Select.vue";
   import {currentVip, postType, postTypeITAS, sortPosts} from "../../utils/config.js";
@@ -7,6 +7,7 @@
   import {useStore} from "vuex";
   import Spinner from "../Spinner.vue";
   import PermissionHandler from "./PermissionHandler.vue";
+  import AdminHandler from "./AdminHandler.vue";
 
   const store = useStore();
 
@@ -21,10 +22,16 @@
   const readyChannel = ref(false);
 
   const permissionModal = ref();
+  const addAdminModal = ref();
 
   let query = ''
 
   let lastRequestLength = 12;
+
+  const updateAfterInsert = (admin) => {
+    channel.value.admins.push(admin);
+    channel.value.followers.splice(channel.value.followers.map(follower => follower.user).indexOf(admin),1);
+  }
 
   async function updateSortFilter(newText){
     readyPosts.value=false
@@ -116,6 +123,8 @@
         <div class="d-flex flex-row">
           <button type="button" class="btn btn-primary" @click="permissionModal.openModal">Permessi</button>
           <button v-if="channel.type === 'private'" type="button"  class="btn btn-primary ms-2">Richieste</button>
+          <button v-if="channel.creator === currentVip" type="button" class="btn btn-primary ms-2" @click="addAdminModal.openModal">Aggiungi admin</button>
+          <button v-if="channel.creator === currentVip" type="button" class="btn btn-primary ms-2">Rimuovi admin</button>
         </div>
 
         <div class="d-flex flex-row justify-content-end">
@@ -151,7 +160,8 @@
     </div>
     <Spinner v-else />
   </div>
-  <PermissionHandler ref="permissionModal" :followers="channel.followers" :chname="channel.name" />
+  <AdminHandler ref="addAdminModal" :followers="channel.followers" :chname="channel.name" @updateAdmin="admin => updateAfterInsert(admin)" />
+  <PermissionHandler ref="permissionModal" :followers="channel.followers" :chname="channel.name"/>
 </template>
 
 <style>
