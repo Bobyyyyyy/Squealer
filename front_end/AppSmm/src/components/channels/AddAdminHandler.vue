@@ -90,14 +90,15 @@ const confirmAdmins = async () =>  {
           </div>
           <div class="modal-body">
             <div class="input-group">
-              <input type="text" class="form-control" placeholder="inserisci utente..." :list="getIDlist()" v-model="selected" @keydown.enter="addInListAdmin">
+              <input class="form-control" placeholder="inserisci utente..." :list="getIDlist()" v-model="selected" @keydown.enter="addInListAdmin">
+              <datalist :id="getIDlist()">
+                <option v-for="(follower,i) in remFollowers?.sort((a, b) => a.localeCompare(b))"
+                        :key="i"
+                        :value="follower" />
+              </datalist>
               <button class="btn btn-primary" @click="addInListAdmin">aggiungi</button>
             </div>
-            <datalist :id="getIDlist()">
-              <option v-for="(follower,i) in remFollowers?.sort((a, b) => a.localeCompare(b))"
-                      :key="i"
-                      :value="follower" />
-            </datalist>
+
             <h5 class="m-0 mt-3 text-center">utenti selezionati:</h5>
             <div class="d-flex flex-column align-items-center" >
               <div v-for="(user,i) in selectedUsers" :key="user+i" class="w-50 d-flex flex-row justify-content-around mt-2">

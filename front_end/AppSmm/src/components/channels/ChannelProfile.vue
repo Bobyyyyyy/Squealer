@@ -7,7 +7,8 @@
   import {useStore} from "vuex";
   import Spinner from "../Spinner.vue";
   import PermissionHandler from "./PermissionHandler.vue";
-  import AdminHandler from "./AdminHandler.vue";
+  import AddAdminHandler from "./AddAdminHandler.vue";
+  import DeleteAdminHandler from "./DeleteAdminHandler.vue";
 
   const store = useStore();
 
@@ -23,6 +24,7 @@
 
   const permissionModal = ref();
   const addAdminModal = ref();
+  const deleteAdminModal = ref();
 
   let query = ''
 
@@ -31,6 +33,10 @@
   const updateAfterInsert = (admin) => {
     channel.value.admins.push(admin);
     channel.value.followers.splice(channel.value.followers.map(follower => follower.user).indexOf(admin),1);
+  }
+  const updateAfterDelete = user => {
+    channel.value.followers.push({user:user, canWrite: true});
+    channel.value.admins.splice(channel.value.admins.indexOf(user),1);
   }
 
   async function updateSortFilter(newText){
@@ -124,7 +130,7 @@
           <button type="button" class="btn btn-primary" @click="permissionModal.openModal">Permessi</button>
           <button v-if="channel.type === 'private'" type="button"  class="btn btn-primary ms-2">Richieste</button>
           <button v-if="channel.creator === currentVip" type="button" class="btn btn-primary ms-2" @click="addAdminModal.openModal">Aggiungi admin</button>
-          <button v-if="channel.creator === currentVip" type="button" class="btn btn-primary ms-2">Rimuovi admin</button>
+          <button v-if="channel.creator === currentVip" type="button" class="btn btn-primary ms-2" @click="deleteAdminModal.openModal">Rimuovi admin</button>
         </div>
 
         <div class="d-flex flex-row justify-content-end">
@@ -160,7 +166,8 @@
     </div>
     <Spinner v-else />
   </div>
-  <AdminHandler ref="addAdminModal" :followers="channel.followers" :chname="channel.name" @updateAdmin="admin => updateAfterInsert(admin)" />
+  <DeleteAdminHandler ref="deleteAdminModal" :chname="channel.name" :admins="channel.admins" @updateAdmin="admin => updateAfterDelete(admin)"/>
+  <AddAdminHandler ref="addAdminModal" :followers="channel.followers" :chname="channel.name" @updateAdmin="admin => updateAfterInsert(admin)" />
   <PermissionHandler ref="permissionModal" :followers="channel.followers" :chname="channel.name"/>
 </template>
 
