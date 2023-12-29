@@ -6,7 +6,7 @@ const {mongo} = require("mongoose");
 const createPost = async (req,res) => {
     try{
         let postSaved = await postModel.addPost(req.body.post, req.body.quota)
-        if (typeof req.body.post.timed !== "undefined" && req.body.post.timed === "true" && req.body.post.contentType !== "geolocation") {
+        if (typeof req.body.post.timed !== "undefined" && (req.body.post.timed === "true" || req.body.post.timed === true) && req.body.post.contentType !== "geolocation") {
             await CronController.createScheduledPost(postSaved.post._id, parseInt(req.body.post.millis), parseInt(req.body.post.squealNumber), req.body.post.content, req.body.post.contentType);
         }
         res.send(postSaved)

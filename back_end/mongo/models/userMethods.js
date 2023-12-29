@@ -37,6 +37,7 @@ const addUser = async (body) => {
             maxQuota: body.type === 'mod' ? {daily: null, weekly: null, monthly: null} : quota,
             popularity: body.type === 'mod' ? null : 0,
             unpopularity: body.type === 'mod' ? null : 0,
+            backupAnswer: body.answer.trim(),
         });
 
 
@@ -51,6 +52,21 @@ const addUser = async (body) => {
         throw err;
     }
 }
+
+const checkSecurityAnswer = async function(username,answer,newPassword) {
+    try{
+        await connection.get();
+        let getAnswer = User.findOne({'username': username}).lean();
+        if(answer.trim() !== getAnswer.backupAnswer) {
+            throw createError('Risposta errata',400);
+        }
+        await changePwsd(username,getAnswer.password,newPassword);
+    }
+    catch(error){
+        throw error;
+    }
+}
+
 
 const loginUser = async (query) =>{
     try{
@@ -138,25 +154,20 @@ const searchByUsername = async (query) =>{
 }
 
 //PUT
-const changePwsd = async(body) =>{
+const changePwsd = async(username,password,newPassword) =>{
     try{
         await connection.get();
-        let user = await User.find({email: body.email});    //query o body??
 
-        if (user.length === 0) {
-            let err = new Error("Mail inesistente");
-            err.statusCode = 400;
-            console.log(err);
+        let user = await User.findOne({'username':username}).lean();
 
-            return err;
+        if(user.password !== password) {
+            throw createError('Password non corretta',400);
         }
-        user.password = await bcrypt.hash(body.password,saltRounds);
 
-        await user.save();
+        newPassword = await bcrypt.hash(newPassword,saltRounds);
+        await User.findOneAndUpdate({'username': user.username},{password: newPassword}).lean();
     }
     catch (err) {
-
-        console.log(err);
         throw err;
     }
 }
