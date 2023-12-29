@@ -91,7 +91,9 @@ const addDestination = async(req,res) => {
         res.send(await postModel.addDestination(req.body.destination, req.body.postID));
     }
     catch (error) {
-        res.status(400).send(error);
+        console.log(error)
+
+        res.status(error.statusCode).send(error.message);
     }
 }
 

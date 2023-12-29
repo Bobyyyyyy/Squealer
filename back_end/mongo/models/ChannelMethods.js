@@ -254,7 +254,11 @@ const addAdmin = async function (username, adminName, channelName) {
         if (!user || !creator) {
             throw createError(`${username} non esiste`,500);
         }
-        let channel;
+        let channel = await Channel.findOne({'name': channelName}).lean();
+
+        if(channel.creator === user.username) {
+            throw createError(`${user.username} è il creatore del canale`,500);
+        }
 
         let checkAdmin = await Channel.findOne({$and: [{name: channelName},{'admins': user.username}]}).lean();
         if (checkAdmin) {

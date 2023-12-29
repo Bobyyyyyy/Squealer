@@ -100,8 +100,8 @@ const showPosts = (filters,append = false) => {
                                 </button>
                                 <ul class="dropdown-menu">
                                     <li onclick = "post = '${post._id}'" class="dropdown-item fontcustom" data-bs-toggle="modal" data-bs-target="#changeReactions"> Modifica Reazioni</li>
+                                    <li  onclick = "post = '${post._id}'" class="dropdown-item fontcustom" data-bs-toggle="modal" data-bs-target="#changeDestination"> Aggiungi destinatario </li>
                                 </ul>
-                                 <button class="btn fontcustom" id="delete-${id}"><i class="bi bi-trash"></i></button>
                             </div>
                            
                         </div>
@@ -331,7 +331,8 @@ $('#addDestinationForm').on('submit',(event) => {
             location.reload();
         },
         error: (error) => {
-            $('#toast-content').empty().html(error.responseJSON.mes);
+            console.log(error);
+            $('#toast-content').empty().html(error.responseText);
             let toastList = inizializeToast();
             toastList.forEach(toast => toast.show()); // This show them
         }

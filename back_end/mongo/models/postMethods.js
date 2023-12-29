@@ -412,6 +412,7 @@ const addDestination = async (destination,postID) => {
     try {
         await connection.get();
         let checkDestination = await Post.findOne({$and: [{$or: [{'destinationArray.name': destination.name},{'officialChannelsArray': destination.name}]}, {_id: postID}]});
+        destination.name = destination.name.trim();
         if (checkDestination) {
             throw createError('Destinazione gia nel post',400);
         }
