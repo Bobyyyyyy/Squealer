@@ -19,13 +19,6 @@ const readyData = ref(false);
     channelPic: String,
   })
 
-
-
-
-  function changeChannel(){
-    store.commit('uploadChannel',{chName: props.name, chDescription: props.description})
-  }
-
   async function getDataOpenModal(){
 
     let res = await fetch(`/db/post/allReactionMonth?user=${currentVip.value}&channel=${props.name}`, {
@@ -51,7 +44,6 @@ const readyData = ref(false);
       <div class="text-start bordEl" >
         <router-link :to="{path: `/AppSmm/Canali/${name.split(' ').join('')}`}"
                      class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"
-                     @click="changeChannel()"
         >
           {{ name }}
         </router-link>

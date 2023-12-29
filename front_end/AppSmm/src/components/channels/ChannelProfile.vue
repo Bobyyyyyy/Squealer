@@ -9,6 +9,7 @@
   import PermissionHandler from "./PermissionHandler.vue";
   import AddAdminHandler from "./AddAdminHandler.vue";
   import DeleteAdminHandler from "./DeleteAdminHandler.vue";
+  import RequestHandler from "./RequestHandler.vue";
 
   const store = useStore();
 
@@ -25,6 +26,7 @@
   const permissionModal = ref();
   const addAdminModal = ref();
   const deleteAdminModal = ref();
+  const requestModal = ref();
 
   let query = ''
 
@@ -37,6 +39,10 @@
   const updateAfterDelete = user => {
     channel.value.followers.push({user:user, canWrite: true});
     channel.value.admins.splice(channel.value.admins.indexOf(user),1);
+  }
+  const updateRequests = (user,accepted) => {
+    channel.value.requests.splice(channel.value.requests.indexOf(user),1);
+    if(accepted) channel.value.followers.push({user:user, canWrite: true});
   }
 
   async function updateSortFilter(newText){
@@ -87,6 +93,7 @@
       method:'GET'
     });
     channel.value = await res.json();
+    channel.value.requests = channel.value.requests.map(obj => obj.user);
     readyChannel.value = true;
     query =`name=${currentVip.value}&channel=${name}&smm=${true}&limit=12`;
 
@@ -128,7 +135,7 @@
       <div class="d-flex flex-row justify-content-between align-items-end">
         <div class="d-flex flex-row">
           <button type="button" class="btn btn-primary" @click="permissionModal.openModal">Permessi</button>
-          <button v-if="channel.type === 'private'" type="button"  class="btn btn-primary ms-2">Richieste</button>
+          <button v-if="channel.type === 'private'" type="button"  class="btn btn-primary ms-2" @click="requestModal.openModal">Richieste</button>
           <button v-if="channel.creator === currentVip" type="button" class="btn btn-primary ms-2" @click="addAdminModal.openModal">Aggiungi admin</button>
           <button v-if="channel.creator === currentVip" type="button" class="btn btn-primary ms-2" @click="deleteAdminModal.openModal">Rimuovi admin</button>
         </div>
@@ -166,6 +173,7 @@
     </div>
     <Spinner v-else />
   </div>
+  <RequestHandler ref="requestModal" :chname="channel.name" :requests="channel.requests" @updateFollowers="(user,accepted) => updateRequests(user,accepted)" />
   <DeleteAdminHandler ref="deleteAdminModal" :chname="channel.name" :admins="channel.admins" @updateAdmin="admin => updateAfterDelete(admin)"/>
   <AddAdminHandler ref="addAdminModal" :followers="channel.followers" :chname="channel.name" @updateAdmin="admin => updateAfterInsert(admin)" />
   <PermissionHandler ref="permissionModal" :followers="channel.followers" :chname="channel.name"/>

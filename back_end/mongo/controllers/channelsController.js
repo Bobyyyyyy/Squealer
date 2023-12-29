@@ -85,7 +85,7 @@ const addFollower = async function (req,res){
 
 const handleRequest = async function (req,res) {
     try {
-        let admin = req.session.user;
+        let admin =  req.session.type === 'smm' ? req.session.vip : req.session.user;
         let user = req.body.user
         let channel = req.body.channel;
         let accepted = req.body.accepted;
