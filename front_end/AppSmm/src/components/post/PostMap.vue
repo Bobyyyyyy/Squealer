@@ -5,11 +5,12 @@ const DEFAULT_RADIOUS = 3;
 let map;
 
 const props = defineProps({
-  latlng:{},
+  latlng:String,
   mapID: String,
 })
 
 onMounted(()=> {
+  let position = JSON.parse(props.latlng);
   map = L.map(props.mapID).fitWorld();
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
@@ -17,9 +18,18 @@ onMounted(()=> {
     animate: true,
     doubleClickZoom: false,
   }).addTo(map);
-  L.marker(props.latlng).addTo(map);
-  L.circle(props.latlng, DEFAULT_RADIOUS).addTo(map);
-  map.setView(props.latlng,15);
+  if(Array.isArray(position)){
+    position.forEach((pos,idx) => {
+      L.marker(pos).addTo(map);
+      L.circle(pos, DEFAULT_RADIOUS).addTo(map);
+      if(idx === position.length - 1) map.setView(pos,15);
+    })
+  }
+  else{
+    L.marker(position).addTo(map);
+    L.circle(position, DEFAULT_RADIOUS).addTo(map);
+    map.setView(position,15);
+  }
 })
 </script>
 

@@ -30,7 +30,7 @@ const sideBarElements = [
 ]
 const postType = ['geolocation','text','image','all']
 const postTypeITAS = ['geolocazione','testo','immagine', 'tutto']
-const sortPosts = ['più recente', 'meno recente', 'meno visual', 'più visual', 'reaction positive', 'reaction negative']
+const sortPosts = ['più recente', 'meno recente', 'meno visual', 'più visual']
 const filterValues =['public', 'private', 'user', 'keyword', 'all']
 const filterValuesITAS =['pubblico', 'privato', 'utenti', 'keyword', 'tutti']
 const reactionsIcons = [

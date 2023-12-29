@@ -44,7 +44,7 @@
       <div class="d-flex flex-row justify-content-center text-center align-items-center h-100 text-dark">
         <img v-if="post.contentType==='image'" :src="post.content"  alt="silly cat" class="img-fluid" />
         <postMap v-if="post.contentType==='geolocation'"
-                 :latlng = "JSON.parse(post.content)"
+                 :latlng = "post.content"
                  :mapID = "getIdMap()"
         />
         <div v-if="post.contentType === 'text'" class="mb-0 m-2 mb-2 align-self-center w-100" v-html="htmlContent"></div>
