@@ -179,6 +179,24 @@ const checkChannelExists = async ({params}) => {
     }
     return await res.json();
 }
+// FARE SOLO UNA FUNZIONE E CONTROLLARE SE IL NOME E' UPPERCASE
+// E FARE DUE COMPONENTI PER LA SINGOLA PAGINA DEL CANALE
+
+const checkOfficialChannelExists = async ({params}) => {
+    const {nome} = params;
+
+    const res = await fetch(`/db/official/?name=${nome}`)
+    console.log("res off", res)
+    if (!res.ok) {
+        throw Error(`Non esiste il canale ${nome}`);
+    } else {
+        let channel = await res.json();
+        if (channel.statusCode === 400) {
+            throw Error(`Non esiste il canale ${nome}`);
+        }
+        return channel;
+    }
+}
 
 const checkUserExists = async ({params}) => {
     const {username} = params;
@@ -215,5 +233,6 @@ export {
     checkUserExists,
     getUserInfoByUsername,
     getPostByChannelName,
-    getAllPost
+    getAllPost,
+    checkOfficialChannelExists
 }

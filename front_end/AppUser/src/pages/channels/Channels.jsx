@@ -1,14 +1,18 @@
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {ProfilePic} from "../../components/assets/index.jsx"
 import Searchbar from "../search/Searchbar.jsx";
 import {Link} from "react-router-dom";
 import CreateChannelModal from "./modals/CreateChannelModal.jsx";
 import FiltersModal from "./modals/FiltersModal.jsx";
 import {getUsernameFromSessionStore} from "../../utils/usefulFunctions.js";
+import {Spinner} from "flowbite-react";
 
 function Channels () {
 
+    const [isLoading, setIsLoading] = useState(true);
+
     const [channels, setChannels] = useState([]);
+    const [officialChannels, setOfficialChannels] = useState([]);
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [showFilterModal, setShowFilterModal] = useState(false);
     const [nuovoCanale, setNuovoCanale] = useState(false)
@@ -41,20 +45,51 @@ function Channels () {
     }
 
     useEffect(() => {
-        fetch(`/db/channel/?offset=0&limit=10000&filters=${queryFilter}`, {
-            method: 'GET'
-        })
-            .then((res) => {
-                res.json()
-                    .then((res) => {
-                        setChannels(res)
-                        setNuovoCanale(false);
-                    })
-                    .catch(()=>{
-                        setChannels([])
-                    })
-            })
+       fetchChannels()
+           .catch(console.error)
     }, [nuovoCanale, queryFilter]);
+
+    const getChannels = async () => {
+        try {
+            let res = await  fetch(`/db/channel/?offset=0&limit=10000&filters=${queryFilter}`, {
+                method: 'GET'
+            });
+            if (res.ok) {
+                return await res.json();
+            }
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
+    const getOfficialChannels = async () => {
+        try {
+            let res = await  fetch(`/db/official/all?offset=0&limit=10000&filter=${channelName}`, {
+                method: 'GET'
+            });
+            if (res.ok) {
+                let x = await res.json();
+                console.log(x)
+                return x;
+            } else {
+                return [];
+            }
+        } catch (e) {
+            console.log(e);
+            return [];
+        }
+    }
+
+    const fetchChannels = async () => {
+        setIsLoading(true);
+        let resChannel = await getChannels();
+        setChannels(resChannel);
+        setNuovoCanale(false);
+        let resOfficialChannels = await getOfficialChannels();
+        console.log(resOfficialChannels)
+        setOfficialChannels(resOfficialChannels);
+        setIsLoading(false);
+    }
 
     return (
         <>
@@ -74,28 +109,52 @@ function Channels () {
                     admin={admin} setAdmin={setAdmin}
                     handleSearch={handleFilters}
                 />
-                <div className="flex flex-wrap w-full h-fit max-h-[580px] overflow-y-scroll mt-2 gap-4">
-                    {channels!==null && channels.map((channel) => {
-                        const role = checkRole(channel.admins, channel.followers, channel.creator, channel.requests);
-                        return (
-                            <Link className="w-full" to={`/channels/${channel.name}`} key={channel._id} >
-                                <div className="flex w-full justify-start gap-4 border-2 border-black">
-                                    <img src={ProfilePic} alt="immagine canale" className="w-14 h-14"/>
-                                    <div className="flex flex-col overflow-x-hidden  mx-2 w-full">
-                                        <div className="flex justify-between">
-                                            <span className="font-semibold text-lg">{channel.name}</span>
-                                            <span className="font-medium text-base text-red-600">{channel.type}</span>
-                                            <span className="font-medium text-base text-green-600">{role}</span>
+                {isLoading ? (
+                    <div className="flex items-center justify-center py-8 mt-4">
+                        <Spinner aria-label="loading profile spinner" size="xl" color="pink" />
+                    </div>
+                ) : (
+                    <div className="flex flex-wrap w-full h-fit max-h-[580px] overflow-y-scroll mt-2 gap-4">
+                        {channels!==null && channels.map((channel) => {
+                            const role = checkRole(channel.admins, channel.followers, channel.creator, channel.requests);
+                            return (
+                                <Link className="w-full" to={`/channels/${channel.name}`} key={channel._id} >
+                                    <div className="flex w-full justify-start gap-4 border-2 border-black">
+                                        <img src={ProfilePic} alt="immagine canale" className="w-14 h-14"/>
+                                        <div className="flex flex-col overflow-x-hidden  mx-2 w-full">
+                                            <div className="flex justify-between">
+                                                <span className="font-semibold text-lg">{channel.name}</span>
+                                                <span className="font-medium text-base text-red-600">{channel.type}</span>
+                                                <span className="font-medium text-base text-green-600">{role}</span>
+                                            </div>
+                                            <p className="font-thin truncate text-base">{channel.description}</p>
                                         </div>
-                                        <p className="font-thin truncate text-base">{channel.description}</p>
                                     </div>
-                                </div>
-                            </Link>
-                        );
-                    })}
-                    {channels.length === 0 &&
-                        <div>Non ci sono canali</div>}
-                </div>
+                                </Link>
+                            );
+                        })}
+                        {officialChannels!==null && officialChannels.map((channel) => {
+                            console.log(channel)
+
+                            return (
+                                <Link className="w-full" to={`/officialchannels/${channel.name}`} key={channel._id} >
+                                    <div className="flex w-full justify-start gap-4 border-2 border-black">
+                                        <img src={ProfilePic} alt="immagine canale" className="w-14 h-14"/>
+                                        <div className="flex flex-col overflow-x-hidden  mx-2 w-full">
+                                            <div className="flex justify-between">
+                                                <span className="font-semibold text-lg">{channel.name}</span>
+                                                <span className="font-medium text-base text-red-600">ufficiale</span>
+                                            </div>
+                                            <p className="font-thin truncate text-base">{channel.description}</p>
+                                        </div>
+                                    </div>
+                                </Link>
+                            );
+                        })}
+                        {channels.length === 0 && officialChannels.length === 0 &&
+                            <div>Non ci sono canali</div>}
+                    </div>
+                )}
                 <button
                     className="py-3 mt-4 bg-primary rounded text-lg font-medium"
                     onClick={()=> setShowCreateModal(true)}
