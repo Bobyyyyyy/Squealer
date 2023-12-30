@@ -173,28 +173,26 @@ const getEmbed = (url) => {
 
 const checkChannelExists = async ({params}) => {
     const {nome} = params;
-    const res = await fetch(`/db/channel/${nome}`)
-    if (!res.ok) {
-        throw Error(`Non esiste il canale ${nome}`);
-    }
-    return await res.json();
-}
-// FARE SOLO UNA FUNZIONE E CONTROLLARE SE IL NOME E' UPPERCASE
-// E FARE DUE COMPONENTI PER LA SINGOLA PAGINA DEL CANALE
 
-const checkOfficialChannelExists = async ({params}) => {
-    const {nome} = params;
-
-    const res = await fetch(`/db/official/?name=${nome}`)
-    console.log("res off", res)
-    if (!res.ok) {
-        throw Error(`Non esiste il canale ${nome}`);
+    if (nome.toUpperCase() === nome) {
+        // e' un canale ufficiale
+        const res = await fetch(`/db/official/?name=${nome}`);
+        console.log("res off", res)
+        if (!res.ok) {
+            throw Error(`Non esiste il canale ${nome}`);
+        } else {
+            let channel = await res.json();
+            if (channel.statusCode === 400) {
+                throw Error(`Non esiste il canale ${nome}`);
+            }
+            return channel;
+        }
     } else {
-        let channel = await res.json();
-        if (channel.statusCode === 400) {
+        const res = await fetch(`/db/channel/${nome}`);
+        if (!res.ok) {
             throw Error(`Non esiste il canale ${nome}`);
         }
-        return channel;
+        return await res.json();
     }
 }
 
@@ -234,5 +232,4 @@ export {
     getUserInfoByUsername,
     getPostByChannelName,
     getAllPost,
-    checkOfficialChannelExists
 }

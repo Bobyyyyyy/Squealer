@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from "react";
 import {ProfilePic} from "../../components/assets/index.jsx"
-import Searchbar from "../search/Searchbar.jsx";
 import {Link} from "react-router-dom";
 import CreateChannelModal from "./modals/CreateChannelModal.jsx";
 import FiltersModal from "./modals/FiltersModal.jsx";
@@ -21,6 +20,7 @@ function Channels () {
     const [owner, setOwner] = useState('');
     const [admin, setAdmin] = useState('');
     const [queryFilter, setQueryFilter] = useState('');
+    const [activeOfficialChannel, setActiveOfficialChannel] = useState(true);
 
     const handleFilters = () => {
         const filter = {
@@ -30,7 +30,9 @@ function Channels () {
             hasAccess: admin,
             both: (!!owner && !!admin)
         }
-
+        if (!!visibility || !!owner || !!admin) {
+            setActiveOfficialChannel(false);
+        }
         setQueryFilter(JSON.stringify(filter))
         setShowFilterModal(false)
     }
@@ -57,8 +59,10 @@ function Channels () {
             if (res.ok) {
                 return await res.json();
             }
+            return [];
         } catch (e) {
             console.log(e);
+            return [];
         }
     }
 
@@ -68,12 +72,9 @@ function Channels () {
                 method: 'GET'
             });
             if (res.ok) {
-                let x = await res.json();
-                console.log(x)
-                return x;
-            } else {
-                return [];
+                return await res.json();
             }
+            return [];
         } catch (e) {
             console.log(e);
             return [];
@@ -85,9 +86,10 @@ function Channels () {
         let resChannel = await getChannels();
         setChannels(resChannel);
         setNuovoCanale(false);
-        let resOfficialChannels = await getOfficialChannels();
-        console.log(resOfficialChannels)
-        setOfficialChannels(resOfficialChannels);
+        if (activeOfficialChannel) {
+            let resOfficialChannels = await getOfficialChannels();
+            setOfficialChannels(resOfficialChannels);
+        }
         setIsLoading(false);
     }
 
@@ -108,6 +110,8 @@ function Channels () {
                     visibility={visibility} setVisibility={setVisibility}
                     admin={admin} setAdmin={setAdmin}
                     handleSearch={handleFilters}
+                    activeOfficialChannel={activeOfficialChannel}
+                    setActiveOfficialChanel={setActiveOfficialChannel}
                 />
                 {isLoading ? (
                     <div className="flex items-center justify-center py-8 mt-4">
@@ -133,11 +137,9 @@ function Channels () {
                                 </Link>
                             );
                         })}
-                        {officialChannels!==null && officialChannels.map((channel) => {
-                            console.log(channel)
-
+                        {activeOfficialChannel && officialChannels!==null && officialChannels.map((channel) => {
                             return (
-                                <Link className="w-full" to={`/officialchannels/${channel.name}`} key={channel._id} >
+                                <Link className="w-full" to={`/channels/${channel.name}`} key={channel._id} >
                                     <div className="flex w-full justify-start gap-4 border-2 border-black">
                                         <img src={ProfilePic} alt="immagine canale" className="w-14 h-14"/>
                                         <div className="flex flex-col overflow-x-hidden  mx-2 w-full">
@@ -151,7 +153,7 @@ function Channels () {
                                 </Link>
                             );
                         })}
-                        {channels.length === 0 && officialChannels.length === 0 &&
+                        {channels.length === 0 && (officialChannels.length === 0 || !activeOfficialChannel) &&
                             <div>Non ci sono canali</div>}
                     </div>
                 )}

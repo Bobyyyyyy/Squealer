@@ -15,16 +15,14 @@ import {
 } from "react-router-dom";
 import React, {useEffect} from "react";
 import RootLayout from "./layouts/RootLayout.jsx";
-import SinglePageNormalChannel from "./pages/channels/SinglePageNormalChannel.jsx";
 import {
     checkChannelExists,
-    checkOfficialChannelExists,
     checkUserExists,
     setUsernameInSessionStore
 } from "./utils/usefulFunctions.js";
 import ErrorPage from "./pages/ErrorPage.jsx";
 import PageProfileByName from "./pages/profile/PageProfileByName.jsx";
-import SinglePageOfficialChannel from "./pages/channels/SinglePageOfficialChannel.jsx";
+import SinglePageChannel from "./pages/channels/SinglePageChannel.jsx";
 function App() {
 
     useEffect(() => {
@@ -50,15 +48,9 @@ function App() {
                 <Route  path="channels" element={<Channels />} />
                 <Route
                     path="channels/:nome"
-                    element={<SinglePageNormalChannel />}
+                    element={<SinglePageChannel />}
                     errorElement={<ErrorPage />}
                     loader={checkChannelExists}
-                />
-                <Route
-                    path="officialchannels/:nome"
-                    element={<SinglePageOfficialChannel />}
-                    errorElement={<ErrorPage />}
-                    loader={checkOfficialChannelExists}
                 />
                 <Route  path="settings" element={<Settings />} />
                 <Route  path="addpost" element={<AddPost />} />

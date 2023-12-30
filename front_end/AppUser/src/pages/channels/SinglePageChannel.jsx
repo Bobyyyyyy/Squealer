@@ -1,4 +1,6 @@
 import {useParams} from "react-router-dom";
+import SinglePageNormalChannel from "./SinglePageNormalChannel.jsx";
+import SinglePageOfficialChannel from "./SinglePageOfficialChannel.jsx";
 
 function SinglePageChannel() {
     const {nome} = useParams();
@@ -6,9 +8,9 @@ function SinglePageChannel() {
     return (
         <>
             {isOfficial ? (
-                //canale ufficiale
+                <SinglePageOfficialChannel nome={nome} />
             ) : (
-                //canale normale
+                <SinglePageNormalChannel nome={nome} />
             )}
         </>
     );

@@ -1,5 +1,4 @@
-import {useLoaderData, useParams} from "react-router-dom";
-import React, {Suspense, useEffect, useRef, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {getPostByChannelName, getUsernameFromSessionStore} from "../../utils/usefulFunctions.js";
 import Post from "../../components/posts/Post.jsx";
 import {FollowIcon, DontFollow} from "../../components/assets/index.jsx";
@@ -9,8 +8,7 @@ import FollowersModal from "./modals/FollowersModal.jsx";
 import AddAdminModal from "./modals/AddAdminModal.jsx";
 import RmAdminModal from "./modals/RmAdminModal.jsx";
 
-function SinglePageNormalChannel() {
-    const {nome} = useParams();
+function SinglePageNormalChannel({nome}) {
 
     const [type, setType] = useState();
     const [isLoading, setIsLoading] = useState(true);
