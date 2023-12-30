@@ -7,7 +7,9 @@ const createReservedChannel = async (req,res,next) => {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 const deleteCh = async (req,res) => {
@@ -16,7 +18,9 @@ const deleteCh = async (req,res) => {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -26,7 +30,9 @@ const getChannelsNumber = async (req,res) => {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -36,7 +42,9 @@ const getChannel = async (req,res) => {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -46,7 +54,9 @@ const modifyDesc = async (req,res) => {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -56,7 +66,9 @@ const channel = async (req,res) => {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 

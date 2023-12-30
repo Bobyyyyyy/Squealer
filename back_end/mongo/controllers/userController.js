@@ -10,7 +10,9 @@ const addUser = async (req, res) => {
     } catch (Error) {
         if(typeof Error.statusCode === 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 const searchUser = async (req,res) => {
@@ -19,7 +21,9 @@ const searchUser = async (req,res) => {
     } catch (Error) {
         if(typeof Error.statusCode === 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -33,7 +37,9 @@ const getSessionUser = async (req,res) => {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -43,7 +49,9 @@ const getUserProfileByName = async (req,res) => {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -53,7 +61,9 @@ const updateUserProfilePic = async (req, res) => {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -65,7 +75,9 @@ const updateSessionVip = async (req,res) => {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 const getSessionVip = async (req,res) => {
@@ -78,7 +90,9 @@ const modifyUser = async(req,res) => {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -88,7 +102,9 @@ const getAllUsers = async (req,res) => {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -98,7 +114,9 @@ const getSingleUser = async (req, res) => {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -108,7 +126,9 @@ const getUsersNumber = async (req,res) => {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -118,7 +138,9 @@ const getVips = async (req,res) => {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -129,7 +151,9 @@ const getQuota = async (req,res) => {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -162,7 +186,9 @@ const updateMaxQuota = async(req,res) => {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -181,7 +207,9 @@ const updateRemainingQuota = async(req,res) => {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -191,7 +219,9 @@ const getFollnPosts = async(req,res)=> {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -202,7 +232,9 @@ const getLastPost = async(req,res)=> {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -214,7 +246,9 @@ const clearDB = async (req,res) => {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -224,7 +258,9 @@ const getAllSmm = async (req, res) => {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -237,7 +273,9 @@ const hireSmm = async (req, res) => {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 

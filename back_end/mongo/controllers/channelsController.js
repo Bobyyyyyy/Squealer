@@ -4,9 +4,12 @@ const createChannel = async (req,res) => {
     try {
         res.status(200).send(await channelsModel.addChannel(req.body))
     } catch (Error) {
-        if(typeof Error.statusCode !== 'undefined')
+        if((typeof Error.statusCode) !== 'undefined') {
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        }
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -16,7 +19,9 @@ const checkUserInChannel = async (req,res) => {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -26,7 +31,9 @@ const getChannels = async (req,res) => {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -36,7 +43,9 @@ const getChannelsNumber = async (req,res) => {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -46,7 +55,9 @@ const changeChannelName = async (req,res) => {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -58,7 +69,9 @@ const getSingleChannel = async (req,res) => {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -70,7 +83,9 @@ const blockChannel = async (req,res) => {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -82,7 +97,9 @@ const addFollower = async function (req,res){
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -96,7 +113,9 @@ const handleRequest = async function (req,res) {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -109,7 +128,9 @@ const addAdmin = async function (req,res) {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -123,7 +144,9 @@ const handlePermission = async function (req, res) {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
