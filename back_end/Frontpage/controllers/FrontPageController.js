@@ -8,15 +8,14 @@ const registerView = (req, res) => {
 
 
 const frontpageView = (req,res) => {
-        res.render("frontpage",{
+        res.render('frontpage',{
     });
 }
 
 const login  = async (req,res,next) => {
     try {
         req.response = await loginUser(req.body, mongoCredentials);
-        if(req.response.ok) next();
-        else throw req.response;
+        next();
     } catch (err) {
         res.status(err.statusCode).send(err.mes);
     }

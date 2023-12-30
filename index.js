@@ -53,6 +53,7 @@ app.get(['/user','/user/*'], isUser, (req,res) => {
     res.sendFile(rootDir + '/front_end/AppUser/index.html');
 })
 
+app.use('/jsFP', express.static(rootDir+ '/back_end/Frontpage/views'))
 app.use('/js' ,express.static(rootDir + '/front_end/AppMod/src/js'));
 app.use('/css',express.static(rootDir + '/front_end/AppMod/src/css'));
 app.use('/icons/reactionIcons',express.static(rootDir + '/back_end/assets/icons/reactionIcons'))

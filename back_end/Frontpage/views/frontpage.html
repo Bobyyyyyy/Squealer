@@ -109,7 +109,7 @@
             </div>
         </div>
         <div class="d-flex flex-column align-self-center justify-content-center w-lg-50 mt-5 mb-5 mt-lg-0 mb-lg-0 sameW">
-            <form class="d-flex flex-column align-self-center w-lg-50" id="login-form" action="/login" method="POST">
+            <form class="d-flex flex-column align-self-center w-lg-50" id="login-form">
                 <h2 class="text-center fs-login">LOGIN</h2>
                 <input class="form-control form-control-lg mb-4 mb-lg-3" type="text" placeholder="Utente" name="user" required>
                 <input class="form-control form-control-lg mb-4 mb-lg-3" type="password" placeholder="Password" name="password" required>
@@ -124,43 +124,7 @@
 </div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-<script>
-    /*
-    $('#login-form').on('submit', event => {
-       event.preventDefault();
-       $.ajax({
-           url:'/login',
-           type:'post',
-           contentType: "application/json; charset=utf-8",
-           data:{
-               user: $('input[name="user"]'),
-               password: $('input[name="password"]'),
-           },
-
-           error: (xhr, textStatus, error) => {
-                if(error.mes === 'password errata'){
-                    $('input[name="password"]').after('<span class="link" style="color: #bb0000">${error.mes}</span>');
-                }
-                else{
-                    $('input[name="user"]').after('<span class="link" style="color: #bb0000">${error.mes}</span>');
-                }
-            }
-
-
-       })
-    });
-*/
-    $('#guestbutton').on('click',() => {
-        $.ajax({
-            url:'/guest',
-            type: 'post',
-            success: () => {
-                location.reload();
-            }
-        })
-    })
-
-</script>
+<script src="/jsFP/index.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 </body>
 </html>
