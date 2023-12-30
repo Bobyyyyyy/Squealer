@@ -5,130 +5,38 @@
     <link rel="icon" href="/img/logo.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <link href='https://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet'>
-    <style>
-        * {
-            border: solid red 1px
-        }
-        body {
-            font-family: 'Montserrat',serif;
-            font-weight: bold;
-        }
-
-        .logo-container{
-            width: 35rem;
-            aspect-ratio: 1;
-        }
-        .link{
-            color: #EA7F28 !important;
-        }
-
-        .btn-primary{
-            background-color: #EA7F28 !important;
-            border-color: #EA7F28 !important;
-        }
-        .btn-secondary{
-            background-color: #F5DEB3 !important;
-            border-color: #F5DEB3 !important;
-            color:black !important;
-        }
-        .form-control:focus {
-            border-color: #EA7F28 !important;
-            box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(234, 127, 40, 0.6) !important;
-        }
-        .titleSize{
-            font-size: 3rem !important;
-        }
-        .w-lg-50{
-            width: 100% !important;
-        }
-
-        .dim{
-            width: 70% !important;
-            height: 100%;
-        }
-        @media screen and (max-width: 926px) and (min-width: 326px){
-            .form-control-lg, .btn-lg {
-                min-height: 6rem !important;
-                font-size: 2rem !important;
-            }
-
-            .form {
-                 width: 100% !important;
-            }
-
-            .link{
-                font-size: 2rem !important;
-            }
-            .fs-title{
-                font-size: 5rem !important;
-            }
-            .fs-login{
-                font-size: 3rem !important;
-            }
-
-            .container-form {
-                width: 100% !important;
-
-            }
-        }
-
-
-        @media screen and (min-width: 927px){
-            .form-control-lg, .btn-lg {
-                min-height: 3rem !important;
-                font-size: 1rem !important;
-            }
-            .fs-title{
-                font-size: 3rem !important;
-                font-weight: bolder;
-            }
-            .fs-login{
-                font-size: 2.2rem !important;
-                font-weight: bolder;
-            }
-            .link{
-                font-size: 1rem;
-            }
-
-            a {
-                cursor:pointer;
-            }
-
-            .container-form {
-                width: 50% !important;
-            }
-
-            .form {
-                width: 75% !important;
-            }
-
-        }
-
-
-
-    </style>
+    <link href="/css/style.css" rel='stylesheet'>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body class="vh-100 vw-100">
 
+<body class="">
     <div class="d-flex flex-column align-items-center justify-content-center justify-content-sm-start w-100 h-100">
-        <div class="mb-3">
-            <h1 class="text-center m-0 titleSize fs-title">Squealer</h1>
+        <div class="container-title">
+            <div class="logo-container-mobile">
+                <img src="/img/logo.png" alt="logo" class="img-fluid">
+            </div>
+            <h1 class="text-center m-0 titleSize">Squealer</h1>
         </div>
-        <div class="d-flex flex-row w-100 h-100 align-items-center justify-content-center flex-sm-wrap-reverse">
+        <div class="container-img-and-form">
             <div class="logo-container">
                 <img src="/img/logo.png" alt="logo" class="img-fluid">
             </div>
-            <div class="d-flex flex-row justify-content-center align-items-center container-form">
-                <form class="d-flex flex-column form" id="login-form">
+            <div class="container-form">
+                <form class="form" id="login-form">
                     <h2 class="text-center fs-login">Login</h2>
-                    <input class="form-control form-control-lg mb-4 mb-lg-3" type="text" placeholder="Utente" name="user" required>
-                    <input class="form-control form-control-lg mb-4 mb-lg-3" type="password" placeholder="Password" name="password" required>
-                    <span id="error" class="link mb-2" style="color: #ea0000 !important;"></span>
-                    <button class="btn btn-primary btn-lg mb-4" type="submit" name="login">Entra!</button>
-                    <a href="/" class="text-center link mt-lg-1 ">Password dimenticata</a>
-                    <hr>
-                    <button onclick="window.location.href='/register'" class="btn btn-secondary btn-lg">Crea nuovo account</button>
-                    <a id="guestbutton" class="link mt-4 mt-lg-2 text-center">Entra come ospite</a>
+                    <div class="form-input">
+                        <input class="input-text" type="text" placeholder="Utente" name="user" required>
+                        <input class="input-text" type="password" placeholder="Password" name="password" required>
+                    </div>
+                    <span id="error" class="link" style="color: #ea0000 !important;"></span>
+                    <div class="form-input">
+                        <button class="button btn-primary" type="submit" name="login">Entra!</button>
+                        <a href="/" class="button-underlined link">Password dimenticata</a>
+                    </div>
+                    <div class="form-input">
+                        <button onclick="window.location.href='/register'" class="button btn-secondary">Crea nuovo account</button>
+                        <a id="guestbutton" class="button-underlined link">Entra come ospite</a>
+                    </div>
                 </form>
             </div>
         </div>
