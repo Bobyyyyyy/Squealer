@@ -35,20 +35,6 @@ function Home() {
         }
     };
 
-    useEffect(() => {
-        document.addEventListener('scroll', scrollEndDetector, true);
-        fetchFirstPosts()
-            .catch(console.error);
-        return () => {
-            document.removeEventListener('scroll', scrollEndDetector);
-        }
-    }, []);
-
-
-    useEffect(() => {
-        window.scrollTo({ behavior: "instant", top: lastHeightDiv.current, left:0})
-    }, [posts]);
-
     const updatePost = async () => {
         setIsLoading(true);
         let newPosts = await getAllPost(currentOffset.current);
@@ -67,6 +53,21 @@ function Home() {
             await updatePost();
         }
     };
+
+    useEffect(() => {
+        document.addEventListener('scroll', scrollEndDetector, true);
+        fetchFirstPosts()
+            .catch(console.error);
+        return () => {
+            document.removeEventListener('scroll', scrollEndDetector);
+        }
+    }, []);
+
+
+    useEffect(() => {
+        window.scrollTo({ behavior: "instant", top: lastHeightDiv.current, left:0})
+    }, [posts]);
+
 
 
     return (

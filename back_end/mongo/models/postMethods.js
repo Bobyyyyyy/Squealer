@@ -189,20 +189,20 @@ const addPost = async (post,quota) => {
             /* ERROR HANDLING */
             /* utente non esiste  */
             if (destinationType === 'user' && !(await User.findOne({username: destination.name}))) {
-                throw createError("utente non esistente!", 422);
+                throw createError("utente non esistente!", 400);
             }
             /* canale non esiste  */
             else if (destinationType === 'channel' && !channel) {
-                throw createError("canale non esistente!", 422);
+                throw createError("canale non esistente!", 400);
             }
             /* canale ufficiale non esiste e l'utente non mod*/
             else if (destinationType === 'official' && (!(await ReservedChannel.findOne({name: destination.name}))
                 || creator.typeUser !== 'mod')) {
-                throw createError("canale ufficiale non esistente o utente non moderatore!", 422);
+                throw createError("canale ufficiale non esistente o utente non moderatore!", 400);
             }
             /* tipo di destinatario non inserito */
             else if (destinationType === 'receiver') {
-                throw createError("Inserisci il tipo di destinatario!", 422);
+                throw createError("Inserisci il tipo di destinatario!", 400);
             }
 
             if (destinationType === 'official') {
@@ -234,11 +234,20 @@ const addPost = async (post,quota) => {
                 }
                 //update post number in channel schema
                 channel = await Channel.findOneAndUpdate({'name': channel.name}, {'postNumber': channel.postNumber+1});
-                let newNotification = channel.followers.filter((follower) => follower.user !== creator.username).map((follower) => {
+                let newFollowerNotification = channel.followers.filter((follower) => follower.user !== creator.username).map((follower) => {
                     return {user: follower.user, sender: creator.username, channel: channel._id};
                 });
 
-               await Notification.insertMany(newNotification);
+                let newAdminNotification = channel.admins.filter((admin) => admin !== creator.username).map((admin) => {
+                    return {user: admin, sender: creator.username, channel: channel._id};
+                });
+
+                let creatorNotification = (creator.username !== channel.creator) ?
+                    [{user: channel.creator, sender: creator.username, channel: channel._id}] : [];
+                let allNotification = [...newFollowerNotification, ...newAdminNotification, ...creatorNotification];
+
+                await Notification.insertMany(allNotification);
+
             }
         }
 
@@ -272,6 +281,7 @@ const addPost = async (post,quota) => {
         return {post: newPost.toObject()};
     }
     catch(err){
+        console.log("ERRORE:",  err)
         throw err;
     }
 }
@@ -385,7 +395,7 @@ const removeDestination = async (destination,postID)=> {
         let checkOfficialDestination = await Post.findByIdAndUpdate(postID, {$pull: { officialChannelsArray: destination}}, {new: true});
 
         if(!checkArrayDestination && !checkOfficialDestination) {
-            throw createError("Destinazione non nel post", 422);
+            throw createError("Destinazione non nel post", 400);
         }
 
         if(checkArrayDestination) {
@@ -412,6 +422,7 @@ const addDestination = async (destination,postID) => {
     try {
         await connection.get();
         let checkDestination = await Post.findOne({$and: [{$or: [{'destinationArray.name': destination.name},{'officialChannelsArray': destination.name}]}, {_id: postID}]});
+        destination.name = destination.name.trim();
         if (checkDestination) {
             throw createError('Destinazione gia nel post',400);
         }
@@ -435,10 +446,18 @@ const addDestination = async (destination,postID) => {
                 await Channel.findByIdAndUpdate(channel._id,[{$set: {'postNumber': {$add: ['$postNumber',1]}}}]).lean();
                 await Post.findByIdAndUpdate(postID,{$push: {destinationArray: destination}},{new : true}).lean();
 
-                let newNotification = channel.followers.map((follower) => {
+                let newFollowerNotification = channel.followers.map((follower) => {
                     return {user: follower.user, sender: 'mod', channel: channel._id};
                 });
-                await Notification.insertMany(newNotification);
+
+                let newAdminNotification = channel.admins.map((follower) => {
+                    return {user: follower.user, sender: 'mod', channel: channel._id};
+                });
+
+                let creatorNotification = [{user: channel.creator, sender: 'mod', channel: channel._id}];
+                let allNotification = [...newFollowerNotification, ...newAdminNotification, ...creatorNotification];
+
+                await Notification.insertMany(allNotification);
                 break;
 
             case 'official':

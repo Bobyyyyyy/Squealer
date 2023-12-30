@@ -181,7 +181,8 @@ $('#addUserForm').on('submit',(event) => {
     let newUser = {
         name: $('#name').val(),
         password: $('#password').val(),
-        type: $('#addUserForm .form-check-input:checked').val()
+        type: $('#addUserForm .form-check-input:checked').val(),
+        answer: $('#answer').val()
     }
 
     $.ajax({

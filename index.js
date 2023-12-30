@@ -16,8 +16,6 @@ const {isUser} = require("./back_end/Frontpage/controllers/FrontPageController")
 const storeSession = MongoStore.create({
     mongoUrl: 'mongodb://localhost:27017',
     dbName: dbname,
-    clear_interval: 660,
-    ttl: 600,
     stringify: false,
 })
 

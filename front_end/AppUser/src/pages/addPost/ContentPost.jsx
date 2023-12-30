@@ -1,15 +1,21 @@
-import {useEffect, useRef, useState} from "react";
+import React, {useEffect, useState} from "react";
 import Mappa from "../../components/posts/maps/Mappa.jsx";
-
+import {ArrowRightIcon} from "../../components/assets/index.jsx";
 function ContentPost({type, quota, currentQuota, setCurrentQuota,
-                     content, setContent, setImgAsFile, position, setPosition,
-                     destinations, setError, isQuotaNegative}) {
+                         content, setContent, setImgAsFile, position, setPosition,
+                         destinations, setError, isQuotaNegative}) {
 
     const [isLink, setIsLink] = useState(false)
     const [preview, setPreview] = useState(false);
     const [counterActive, setCounterActive] = useState(false);
     const [showCounter, setShowCounter] = useState(false);
+
+    const [hasLink, setHasLink] = useState(false);
+    const [isShorterLink, setIsShorterLink] = useState(false);
+    const [textLink, setTextLink] = useState([]);
+
     const quotaForImg = 125;
+    const URLHTTPREGEX = /(http|ftp|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-])/g
 
     const handleQuotaChange = (e, type) => {
         if (has2removeQuota()) {
@@ -38,7 +44,23 @@ function ContentPost({type, quota, currentQuota, setCurrentQuota,
         });
     }
 
+    async function insertShorter() {
+        let oldLink = textLink[0];
+        let res = await fetch(`https://csclub.uwaterloo.ca/~phthakka/1pt/addURL.php?url=${oldLink}`);
+        if (res.ok) {
+            let newLInk = `https://1pt.co/${(await res.json()).short}`;
+            let newContent = content.replace(oldLink, newLInk);
+            setContent(newContent);
+            if (has2removeQuota()) {
+                updateQuota(newContent.length)
+            }
+        }
+    }
+
     useEffect(() => {
+        setTextLink([]);
+        setHasLink(false);
+        setIsShorterLink(false);
         if (has2removeQuota()) {
             if (type === "geolocation") {
                 updateQuota(quotaForImg);
@@ -80,16 +102,45 @@ function ContentPost({type, quota, currentQuota, setCurrentQuota,
                 }
             </div>
             {type === "text" &&
-                <textarea
-                    value={content}
-                    rows="4"
-                    className="border-2 border-gray-500  rounded-md w-full focus:border-teal-500 focus:ring-teal-500 "
-                    placeholder="Raccontaci qualcosa..."
-                    onChange={e => {
-                        setContent(e.target.value);
-                        handleQuotaChange(e, "text");
-                    }}
-                />
+                <>
+                    <textarea
+                        value={content}
+                        rows="4"
+                        className="border-2 border-gray-500  rounded-md w-full focus:border-teal-500 focus:ring-teal-500 "
+                        placeholder="Raccontaci qualcosa..."
+                        onChange={e => {
+                            setContent(e.target.value);
+                            console.log(e.target.value.match(URLHTTPREGEX));
+                            let linkExists = e.target.value.match(URLHTTPREGEX);
+                            if (linkExists !== null) {
+                                setTextLink(linkExists);
+                                setHasLink(true);
+                            } else {
+                                setIsShorterLink(false);
+                                setHasLink(false);
+                            }
+                            handleQuotaChange(e, "text");
+                        }}
+                    />
+                    {hasLink &&
+                        <div className="flex w-full justify-start items-center gap-4 my-2">
+                            <input
+                                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                                type="checkbox"
+                                checked={isShorterLink}
+                                onChange={async ()=> {
+                                    setIsShorterLink((prev) => !prev);
+                                    await insertShorter();
+                                }}
+                            />
+                            <label
+                                className="flex w-full items-center gap-2 text-lg md:text-2xl"
+                            >
+                                Link corrente <span className="w-5 h-5">{ArrowRightIcon}</span> Link abbreviato
+                            </label>
+                        </div>
+                    }
+                </>
             }
             {type === "image" &&
                 <>
@@ -138,13 +189,13 @@ function ContentPost({type, quota, currentQuota, setCurrentQuota,
                     {!!content &&
                         <>
                             <label className="relative inline-flex items-center cursor-pointer mt-2">
-                            <input
-                                type="checkbox"
-                                className="sr-only peer"
-                                onClick={()=> setPreview(!preview)}
-                            />
-                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                            <span className="ms-3 text-sm font-medium">Visualizza foto</span>
+                                <input
+                                    type="checkbox"
+                                    className="sr-only peer"
+                                    onClick={()=> setPreview(!preview)}
+                                />
+                                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                                <span className="ms-3 text-sm font-medium">Visualizza foto</span>
                             </label>
                             {preview && <img
                                 className="h-auto w-auto mx-auto mt-2 "

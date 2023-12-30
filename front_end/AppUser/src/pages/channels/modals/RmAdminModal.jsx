@@ -4,7 +4,7 @@ import {DenyIcon} from "../../../components/assets/index.jsx";
 function RmAdminModal({isOpen, setIsOpen, admins, channelName, hasUpdated, setHasUpdated}) {
     const promote2admin = (name) => {
         fetch("/db/channel/admin", {
-            method: 'POST',
+            method: 'PUT',
             headers: {
                 "Content-Type": "application/json",
             },

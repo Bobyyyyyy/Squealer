@@ -5,6 +5,7 @@ const User = require("../schemas/User");
 const connection = require('../ConnectionSingle');
 const {createError} = require("./utils");
 const Channel = require("../schemas/Channel");
+const {create} = require("connect-mongo");
 
 
 //POST
@@ -90,9 +91,7 @@ const searchByChannelName = async (query) =>{
         let ChannelName = query.name.trim().toUpperCase();
         let channel = await ReservedChannel.findOne({name: ChannelName}).lean();
         if (!channel) {
-            let err = new Error("Nessun canale trovato!");
-            err.statusCode = 400;       // 400 ??;
-            throw err;
+            throw createError('Canale non trovato',404);
         }
         return channel;
     }
@@ -106,11 +105,8 @@ const modifyDescription = async (body) => {
         await connection.get();
         let channel = await ReservedChannel.findOneAndUpdate({name: body.channel},
             {description : body.description},{new: true}).lean();
-
         if (!channel) {
-            let err = new Error("Nessun canale trovato!");
-            err.statusCode = 400;       // 400 ??
-            throw err;
+            throw createError('Canale non trovato',404);
         }
         
     }

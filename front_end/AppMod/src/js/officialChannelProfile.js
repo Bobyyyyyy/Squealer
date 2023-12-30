@@ -402,7 +402,7 @@ $('#timedButton').on('change', () => {
                                      </div>
                                      <div class=" ms-1 d-flex flex-column align-items-center">
                                     <label for="squealNumber" class="form-label w-75 "> Squeal Number
-                                    <input type="number" class="form-control" name="squealFrequency" id="squealNumber" min="1"  value="1">
+                                    <input type="number" class="form-control" name="squealFrequency" id="squealNumber" min="2"  value="2" >
                                     </label>
                                      </div>
                                     `)

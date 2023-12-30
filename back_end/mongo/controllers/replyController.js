@@ -14,8 +14,12 @@ const addReply = async (req,res) => {
         let response = await replyModel.addReply(content, user, parentID);
 
         res.status(200).send(response);
-    }catch(err){
-        res.status(err.statusCode).send({message: err.message})
+    } catch (Error) {
+        if(typeof Error.statusCode !== 'undefined')
+            res.status(Error.statusCode).send(Error.message);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -28,8 +32,12 @@ const getReplies = async (req,res) => {
 
         res.status(200).send(response);
 
-    }catch (err){
-        res.status(err.statusCode).send({message: err.message})
+    } catch (Error) {
+        if(typeof Error.statusCode !== 'undefined')
+            res.status(Error.statusCode).send(Error.message);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 

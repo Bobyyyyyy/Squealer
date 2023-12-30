@@ -81,7 +81,13 @@ const UserSchema = new mongoose.Schema({
         required: function(){
             return this.typeUser !== 'mod';
         },
+    },
+
+    backupAnswer: {
+        type: String,
+        required: true
     }
+
 })
 
 const User = mongoose.model("User", UserSchema);
