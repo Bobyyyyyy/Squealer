@@ -15,9 +15,10 @@ const frontpageView = (req,res) => {
 const login  = async (req,res,next) => {
     try {
         req.response = await loginUser(req.body, mongoCredentials);
-        next();
-    } catch (Error) {
-        res.redirect('/register');
+        if(req.response.ok) next();
+        else throw req.response;
+    } catch (err) {
+        res.status(err.statusCode).send(err.mes);
     }
 }
 

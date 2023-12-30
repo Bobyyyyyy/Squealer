@@ -2,60 +2,154 @@
 <html>
 <head>
     <title>Homepage Squealer</title>
+    <link rel="icon" href="/img/logo.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link href='https://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet'>
     <style>
         body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
+            font-family: 'Montserrat',serif;
+            font-weight: bold;
         }
 
-        .form-container {
-            text-align: center;
+        .logo-container{
+            width: 85%;
+            aspect-ratio: 1;
+        }
+        .link{
+            color: #EA7F28 !important;
         }
 
-        .button-container {
-            margin-top: 20px;
+        .btn-primary{
+            background-color: #EA7F28 !important;
+            border-color: #EA7F28 !important;
+        }
+        .btn-secondary{
+            background-color: #F5DEB3 !important;
+            border-color: #F5DEB3 !important;
+            color:black !important;
+        }
+        .form-control:focus {
+            border-color: #EA7F28 !important;
+            box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(234, 127, 40, 0.6) !important;
+        }
+        .titleSize{
+            font-size: 3rem !important;
+        }
+        .w-lg-50{
+            width: 100% !important;
         }
 
-        .button {
-            margin: 10px;
-            padding: 10px 20px;
-            font-size: 16px;
-            background-color: #007BFF;
-            color: #FFFFFF;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
+        .dim{
+            width: 70% !important;
+            height: 100%;
+        }
+        @media screen and (max-width: 991px){
+            .form-control-lg, .btn-lg {
+                min-height: 6rem !important;
+                font-size: 2.8rem !important;
+            }
+            .link{
+                font-size: 2rem !important;
+            }
+            .mt-logo{
+                margin-top: 4rem !important;
+            }
+            .fs-title{
+                font-size: 5rem !important;
+            }
+            .fs-login{
+                font-size: 3rem !important;
+            }
+            .flex-grow-sm-1{
+                flex-grow: 1;
+            }
         }
 
-        .input-field {
-            margin: 10px;
-            padding: 10px;
-            width: 300px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+
+        @media screen and (min-width: 992px){
+            .form-control-lg, .btn-lg {
+                min-height: 7rem !important;
+                font-size: 3rem !important;
+            }
+            .w-lg-50{
+                width: 50% !important;
+            }
+            .dim{
+                width: 75% !important;
+                height: 75% !important;
+            }
+            .fs-title{
+                font-size: 6rem !important;
+            }
+            .fs-login{
+                font-size: 3.5rem !important;
+            }
+            .sameW{
+                flex: 1 1 0;
+            }
+            .link{
+                font-size: 2.3rem;
+            }
         }
+
+
+
     </style>
 </head>
-<body>
-<h1> Pagina login</h1>
-<div class="form-container">
-    <form method="post" action="/login">
-        <input class="input-field" type="text" placeholder="Utente" name="user" required><br>
-        <input class="input-field" type="password" placeholder="Password" name="password" required><br>
-        <input type="submit" name="login">
-    </form>
-    <div class="button-container">
-        <button onclick="window.location.href='/register'" class="button">Registrati</button>
-    </div>
-    <button class="btn" id="guestbutton"> Entra come ospite </button>
+<body class="vh-100 vw-100">
+<div class="mb-1 w-100">
+    <h1 class="text-center m-0 titleSize mt-3 fs-title">SQUEALER</h1>
 </div>
 
+<div class="d-flex flex-column h-100">
+    <div class="d-flex flex-lg-row flex-column-reverse align-self-center justify-content-around dim ">
+        <div class="d-flex align-self-center justify-content-center justify-content-lg-end flex-grow-sm-1 mt-logo sameW">
+            <div class="logo-container">
+                <img src="/img/logo.png" alt="logo" class="img-fluid">
+            </div>
+        </div>
+        <div class="d-flex flex-column align-self-center justify-content-center w-lg-50 mt-5 mb-5 mt-lg-0 mb-lg-0 sameW">
+            <form class="d-flex flex-column align-self-center w-lg-50" id="login-form" action="/login" method="POST">
+                <h2 class="text-center fs-login">LOGIN</h2>
+                <input class="form-control form-control-lg mb-4 mb-lg-3" type="text" placeholder="Utente" name="user" required>
+                <input class="form-control form-control-lg mb-4 mb-lg-3" type="password" placeholder="Password" name="password" required>
+                <button class="btn btn-primary btn-lg mb-4" type="submit" name="login">Entra!</button>
+                <a href="/" class="text-center link mt-lg-1 ">Password dimenticata</a>
+                <hr>
+                <button onclick="window.location.href='/register'" class="btn btn-secondary btn-lg">Crea nuovo account</button>
+                <a href="/guest" class="link mt-4 mt-lg-2 text-center">Entra come ospite</a>
+            </form>
+        </div>
+    </div>
+</div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script>
+    /*
+    $('#login-form').on('submit', event => {
+       event.preventDefault();
+       $.ajax({
+           url:'/login',
+           type:'post',
+           contentType: "application/json; charset=utf-8",
+           data:{
+               user: $('input[name="user"]'),
+               password: $('input[name="password"]'),
+           },
+
+           error: (xhr, textStatus, error) => {
+                if(error.mes === 'password errata'){
+                    $('input[name="password"]').after('<span class="link" style="color: #bb0000">${error.mes}</span>');
+                }
+                else{
+                    $('input[name="user"]').after('<span class="link" style="color: #bb0000">${error.mes}</span>');
+                }
+            }
+
+
+       })
+    });
+*/
     $('#guestbutton').on('click',() => {
         $.ajax({
             url:'/guest',
@@ -65,7 +159,8 @@
             }
         })
     })
+
 </script>
-<script src="/js/debug.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 </body>
 </html>

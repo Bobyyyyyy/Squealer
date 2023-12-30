@@ -59,29 +59,18 @@ const loginUser = async (query) =>{
         let user = await User.findOne({username: query.user}).lean();
         //check if user exists
         if (!user){
-            let err = new Error("Nessun utente trovato!");
-            err.statusCode = 400;       // 400 ??
-            console.log(err);
-
-            throw err;
+            throw createError('utente non esiste', 404);
         }
 
         //check if passwd is right
         const match = await bcrypt.compare(query.password, user.password);
 
         if (!match){
-            let err = new Error("Password Sbagliata!");
-            err.statusCode = 400;       // 400 ??
-            console.log(err);
-
-            throw err;
+            throw createError('password errata', 404);
         }
-
-
         return user;
     }
     catch (err){
-
         throw err;
     }
 }
