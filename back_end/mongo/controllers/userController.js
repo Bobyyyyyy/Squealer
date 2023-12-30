@@ -8,14 +8,18 @@ const addUser = async (req, res) => {
     try {
         res.status(200).send(await userModel.addUser(req.body))
     } catch (Error) {
-        res.status(Error.statusCode).send(Error.message);
+        if(typeof Error.statusCode === 'undefined')
+            res.status(Error.statusCode).send(Error.message);
+        res.status(500).send(Error);
     }
 }
 const searchUser = async (req,res) => {
     try {
         res.send(await userModel.searchByUsername(req.body));
-    } catch (err) {
-        res.status(err.statusCode).send(err.message);
+    } catch (Error) {
+        if(typeof Error.statusCode === 'undefined')
+            res.status(Error.statusCode).send(Error.message);
+        res.status(500).send(Error);
     }
 }
 
@@ -26,24 +30,30 @@ const changePassword = async (req,res) => {
 const getSessionUser = async (req,res) => {
     try {
         res.send({username: req.session.user});
-    } catch (err) {
-        res.status(err.statusCode).send(err.message);
+    } catch (Error) {
+        if(typeof Error.statusCode !== 'undefined')
+            res.status(Error.statusCode).send(Error.message);
+        res.status(500).send(Error);
     }
 }
 
 const getUserProfileByName = async (req,res) => {
     try {
         res.send(await userModel.getUserProfilePicture(req.query.name));
-    } catch (err) {
-        res.status(err.statusCode).send(err.message);
+    } catch (Error) {
+        if(typeof Error.statusCode !== 'undefined')
+            res.status(Error.statusCode).send(Error.message);
+        res.status(500).send(Error);
     }
 }
 
 const updateUserProfilePic = async (req, res) => {
     try {
         res.send(await userModel.updateProfilePicture(req.session.user, req.body.newProfilePic));
-    } catch (err) {
-        res.status(400).send("errore nel cambiamento dell'immagine");
+    } catch (Error) {
+        if(typeof Error.statusCode !== 'undefined')
+            res.status(Error.statusCode).send(Error.message);
+        res.status(500).send(Error);
     }
 }
 
@@ -52,8 +62,10 @@ const updateSessionVip = async (req,res) => {
         req.session.vip = req.body.vipName;
         req.session.save();
         res.send({vip: req.session.vip})
-    }catch (e) {
-        console.log(e)
+    } catch (Error) {
+        if(typeof Error.statusCode !== 'undefined')
+            res.status(Error.statusCode).send(Error.message);
+        res.status(500).send(Error);
     }
 }
 const getSessionVip = async (req,res) => {
@@ -63,44 +75,50 @@ const getSessionVip = async (req,res) => {
 const modifyUser = async(req,res) => {
     try{
         res.send(await userModel.altUser(req.body));
-    }
-    catch(error) {
-        res.send(error);
+    } catch (Error) {
+        if(typeof Error.statusCode !== 'undefined')
+            res.status(Error.statusCode).send(Error.message);
+        res.status(500).send(Error);
     }
 }
 
 const getAllUsers = async (req,res) => {
     try {
         res.status(200).send(await userModel.getUsers(req.query));
-    }
-    catch (error) {
-        res.status(error.statusCode).send(error.message);
+    } catch (Error) {
+        if(typeof Error.statusCode !== 'undefined')
+            res.status(Error.statusCode).send(Error.message);
+        res.status(500).send(Error);
     }
 }
 
 const getSingleUser = async (req, res) => {
     try {
         res.status(200).send(await userModel.getSingleUser(req.query));
-    } catch (error) {
-        res.status(error.statusCode).send(error.message);
+    } catch (Error) {
+        if(typeof Error.statusCode !== 'undefined')
+            res.status(Error.statusCode).send(Error.message);
+        res.status(500).send(Error);
     }
 }
 
 const getUsersNumber = async (req,res) => {
     try {
         res.send(await userModel.usersLength(req.query));
-    }
-    catch (error) {
-        res.send(error);
+    } catch (Error) {
+        if(typeof Error.statusCode !== 'undefined')
+            res.status(Error.statusCode).send(Error.message);
+        res.status(500).send(Error);
     }
 }
 
 const getVips = async (req,res) => {
     try {
         res.send(await userModel.getHandledVip(req.query));
-    }
-    catch (error) {
-        res.send(error);
+    } catch (Error) {
+        if(typeof Error.statusCode !== 'undefined')
+            res.status(Error.statusCode).send(Error.message);
+        res.status(500).send(Error);
     }
 }
 
@@ -108,9 +126,10 @@ const getQuota = async (req,res) => {
     try {
         let username = req.query.user;
         res.send(await userModel.getUserQuota(username));
-    }
-    catch (error) {
-        res.send(error);
+    } catch (Error) {
+        if(typeof Error.statusCode !== 'undefined')
+            res.status(Error.statusCode).send(Error.message);
+        res.status(500).send(Error);
     }
 }
 
@@ -140,9 +159,10 @@ const updateMaxQuota = async(req,res) => {
                 message:'upgrade avvenuto con successo!',
                 newMaxQuota: response.maxQuota,
             });
-    }
-    catch(err){
-        res.status(err.statusCode).send({message: err.message});
+    } catch (Error) {
+        if(typeof Error.statusCode !== 'undefined')
+            res.status(Error.statusCode).send(Error.message);
+        res.status(500).send(Error);
     }
 }
 
@@ -158,18 +178,20 @@ const updateRemainingQuota = async(req,res) => {
             message:`quota ${type === 'D' ? 'giornaliera' : type === 'W' ? 'settimanale' : 'mensile'} resettata con successo`,
             newQuota: response}
         );
-    }
-    catch (err) {
-        res.status(err.statusCode).send(err.message);
+    } catch (Error) {
+        if(typeof Error.statusCode !== 'undefined')
+            res.status(Error.statusCode).send(Error.message);
+        res.status(500).send(Error);
     }
 }
 
 const getFollnPosts = async(req,res)=> {
     try {
         res.send(await userModel.get_n_FollnPosts(req.query));
-    }
-    catch (error) {
-        res.send(error);
+    } catch (Error) {
+        if(typeof Error.statusCode !== 'undefined')
+            res.status(Error.statusCode).send(Error.message);
+        res.status(500).send(Error);
     }
 }
 
@@ -177,8 +199,10 @@ const getLastPost = async(req,res)=> {
     try {
         let response = await postModel.getLastPostUser(req.query)
         res.send({post: response});
-    } catch (error) {
-        res.send(error);
+    } catch (Error) {
+        if(typeof Error.statusCode !== 'undefined')
+            res.status(Error.statusCode).send(Error.message);
+        res.status(500).send(Error);
     }
 }
 
@@ -187,17 +211,20 @@ const clearDB = async (req,res) => {
     try{
         await userModel.clearDB();
         res.status(200).send('PIPPO');
-    }
-    catch (err) {
-        res.status(500).send(err);
+    } catch (Error) {
+        if(typeof Error.statusCode !== 'undefined')
+            res.status(Error.statusCode).send(Error.message);
+        res.status(500).send(Error);
     }
 }
 
 const getAllSmm = async (req, res) => {
     try {
         res.status(200).send(await userModel.getAllSmm(req.query));
-    } catch (error) {
-        res.send(error);
+    } catch (Error) {
+        if(typeof Error.statusCode !== 'undefined')
+            res.status(Error.statusCode).send(Error.message);
+        res.status(500).send(Error);
     }
 }
 
@@ -207,8 +234,10 @@ const hireSmm = async (req, res) => {
         let smmUsername = req.body.smmUsername;
         let isHiring = req.body.isHiring;
         res.status(200).send(await userModel.hireSmm(vipUsername, smmUsername, isHiring));
-    } catch (error) {
-        res.send(error);
+    } catch (Error) {
+        if(typeof Error.statusCode !== 'undefined')
+            res.status(Error.statusCode).send(Error.message);
+        res.status(500).send(Error);
     }
 }
 

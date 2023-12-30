@@ -24,7 +24,7 @@ const addUser = async (body) => {
         let findName = await User.findOne({username: body.name}).lean();
         let findChannel = await User.findOne({name: body.name}).lean();
         if (findName || findChannel) {
-            throw createError("Nome non disponibile",404);
+            throw createError("Nome non disponibile",400);
         }
 
 
@@ -75,22 +75,14 @@ const loginUser = async (query) =>{
         let user = await User.findOne({username: query.user}).lean();
         //check if user exists
         if (!user){
-            let err = new Error("Nessun utente trovato!");
-            err.statusCode = 400;       // 400 ??
-            console.log(err);
-
-            throw err;
+            throw createError('Utente non esiste',400);
         }
 
         //check if passwd is right
         const match = await bcrypt.compare(query.password, user.password);
 
         if (!match){
-            let err = new Error("Password Sbagliata!");
-            err.statusCode = 400;       // 400 ??
-            console.log(err);
-
-            throw err;
+            throw createError('Password sbagliata',400);
         }
 
 
@@ -107,7 +99,7 @@ const updateProfilePicture = async (username, newProfilePic) => {
         await connection.get();
         let user = await User.findOneAndUpdate({username: username}, {profilePicture: newProfilePic});
         if (!user) {
-            throw new Error("utente non trovato");
+            throw createError('Utente non esiste',400);
         }
         return true;
     } catch (err) {
@@ -139,11 +131,7 @@ const searchByUsername = async (query) =>{
         await connection.get();
         let user = await User.findOne({username: query.username}).lean();
         if (!user) {
-            let err = new Error("Nessun utente trovato!");
-            err.statusCode = 400;       // 400 ??
-            console.log(err);
-
-            throw err;
+            throw createError('Utente non esiste',400);
         }
         return user;
     }

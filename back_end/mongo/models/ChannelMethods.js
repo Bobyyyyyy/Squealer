@@ -171,7 +171,6 @@ const changeChannelName = async (channelName,newName,username) => {
 
     }
     catch (error) {
-        console.log(error);
         throw error
     }
 }
@@ -252,12 +251,12 @@ const addAdmin = async function (username, adminName, channelName) {
         let creator = await User.findOne({username: adminName}).lean();
         let user = await User.findOne({username: username}).lean();
         if (!user || !creator) {
-            throw createError(`${username} non esiste`,500);
+            throw createError(`${username} non esiste`,400);
         }
         let channel = await Channel.findOne({'name': channelName}).lean();
 
         if(channel.creator === user.username) {
-            throw createError(`${user.username} è il creatore del canale`,500);
+            throw createError(`${user.username} è il creatore del canale`,400);
         }
 
         let checkAdmin = await Channel.findOne({$and: [{name: channelName},{'admins': user.username}]}).lean();
@@ -283,7 +282,7 @@ const addAdmin = async function (username, adminName, channelName) {
         }
 
         if(!channel)
-            throw createError(`${admin.username} non ha i permessi necessari`,500);
+            throw createError(`${admin.username} non ha i permessi necessari`,400);
 
     }
     catch (error) {
@@ -307,11 +306,11 @@ const handleRequest = async function(adminName,userRequest,channelName,accepted)
         let admin = await User.findOne({username: adminName}).lean();
         let channel = await Channel.findOne({$and: [{name: channelName},{$or: [{'admins': adminName},{'creator': adminName}]}]}).lean();
         if(!channel)
-            throw createError(`${admin.username} non ha i permessi necessari`,500);
+            throw createError(`${admin.username} non ha i permessi necessari`,400);
 
         let request = await Channel.findOne({$and: [{name: channelName}, {'requests.user': userRequest}]});
         if (!request)
-            throw createError(`Non c'e' nessuna richiesta dell'utente ${userRequest}`,500);
+            throw createError(`Non c'e' nessuna richiesta dell'utente ${userRequest}`,400);
 
         if (accepted) {
             await Channel.findOneAndUpdate({name: channelName}, {$push: {'followers': {'user': userRequest, 'canWrite':true}}});
@@ -418,13 +417,13 @@ const blockChannel = async (user,channelName) => {
         let name = await User.findOne({username: user});
 
         if(!name || name.typeUser !== 'mod') {
-            throw createError('User not found or not moderator',400)
+            throw createError('User not found or not moderator',404)
         }
 
         let channel = await Channel.findOneAndUpdate({name: channelName}, [{$set: {isBlocked: {$not: '$isBlocked'}}}]);
 
         if(!channel) {
-            throw createError('Channel not found',400);
+            throw createError('Channel not found',404);
         }
 
         return true;

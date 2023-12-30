@@ -189,20 +189,20 @@ const addPost = async (post,quota) => {
             /* ERROR HANDLING */
             /* utente non esiste  */
             if (destinationType === 'user' && !(await User.findOne({username: destination.name}))) {
-                throw createError("utente non esistente!", 422);
+                throw createError("utente non esistente!", 400);
             }
             /* canale non esiste  */
             else if (destinationType === 'channel' && !channel) {
-                throw createError("canale non esistente!", 422);
+                throw createError("canale non esistente!", 400);
             }
             /* canale ufficiale non esiste e l'utente non mod*/
             else if (destinationType === 'official' && (!(await ReservedChannel.findOne({name: destination.name}))
                 || creator.typeUser !== 'mod')) {
-                throw createError("canale ufficiale non esistente o utente non moderatore!", 422);
+                throw createError("canale ufficiale non esistente o utente non moderatore!", 400);
             }
             /* tipo di destinatario non inserito */
             else if (destinationType === 'receiver') {
-                throw createError("Inserisci il tipo di destinatario!", 422);
+                throw createError("Inserisci il tipo di destinatario!", 400);
             }
 
             if (destinationType === 'official') {
@@ -385,7 +385,7 @@ const removeDestination = async (destination,postID)=> {
         let checkOfficialDestination = await Post.findByIdAndUpdate(postID, {$pull: { officialChannelsArray: destination}}, {new: true});
 
         if(!checkArrayDestination && !checkOfficialDestination) {
-            throw createError("Destinazione non nel post", 422);
+            throw createError("Destinazione non nel post", 400);
         }
 
         if(checkArrayDestination) {

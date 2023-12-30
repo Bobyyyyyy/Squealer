@@ -10,18 +10,20 @@ const createPost = async (req,res) => {
             await CronController.createScheduledPost(postSaved.post._id, parseInt(req.body.post.millis), parseInt(req.body.post.squealNumber), req.body.post.content, req.body.post.contentType);
         }
         res.send(postSaved)
-    }
-    catch (error){
-        res.status(error.statusCode).send(error.message);
+    } catch (Error) {
+        if(typeof Error.statusCode !== 'undefined')
+            res.status(Error.statusCode).send(Error.message);
+        res.status(500).send(Error);
     }
 }
 
 const getPosts = async (req,res) => {
     try {
         res.send(await postModel.getAllPost(req.query,{username: req.session.user, typeUser: req.session.type}));
-    }
-    catch(error) {
-        res.send(error);
+    } catch (Error) {
+        if(typeof Error.statusCode !== 'undefined')
+            res.status(Error.statusCode).send(Error.message);
+        res.status(500).send(Error);
     }
 }
 
@@ -35,74 +37,80 @@ const updateReaction = async (req,res) => {
             await postModel.updateReac({user: req.session.user, typeUser: req.session.type, reaction: req.body.reaction, postId: req.body.postId});
             res.send('200');
         }
-    }
-    catch(error) {
-        res.send(error);
+    } catch (Error) {
+        if(typeof Error.statusCode !== 'undefined')
+            res.status(Error.statusCode).send(Error.message);
+        res.status(500).send(Error);
     }
 }
 
 const deleteReaction = async (req,res) => {
     try {
         res.send(await postModel.deleteReac(req.body))
-    }
-    catch(error) {
-        res.send(error);
+    } catch (Error) {
+        if(typeof Error.statusCode !== 'undefined')
+            res.status(Error.statusCode).send(Error.message);
+        res.status(500).send(Error);
     }
 }
 
 const removePost = async (req,res) => {
     try {
         res.send(await postModel.removeDestination(req.body.destination,req.body.postID))
-    }
-    catch(error) {
-        res.send(error);
+    } catch (Error) {
+        if(typeof Error.statusCode !== 'undefined')
+            res.status(Error.statusCode).send(Error.message);
+        res.status(500).send(Error);
     }
 }
 
 const getPostsDate = async (req,res) => {
     try{
         await res.send(await postModel.getPostsDate(req.query.user, req.query.onlyMonth));
-    }
-    catch (e) {
-        throw e;
+    } catch (Error) {
+        if(typeof Error.statusCode !== 'undefined')
+            res.status(Error.statusCode).send(Error.message);
+        res.status(500).send(Error);
     }
 }
 
 const getReactionLast30days = async (req,res) => {
     try{
         await res.send(await postModel.getReactionLast30days(req.query.user, req.query?.channel));
-    }
-    catch (e) {
-        throw e;
+    } catch (Error) {
+        if(typeof Error.statusCode !== 'undefined')
+            res.status(Error.statusCode).send(Error.message);
+        res.status(500).send(Error);
     }
 }
 
 const postLength = async (req,res) => {
     try {
         res.send(await postModel.postLength(req.query.filter))
-    }
-    catch (error) {
-        res.send(error);
+    } catch (Error) {
+        if(typeof Error.statusCode !== 'undefined')
+            res.status(Error.statusCode).send(Error.message);
+        res.status(500).send(Error);
     }
 }
 
 const addDestination = async(req,res) => {
     try {
         res.send(await postModel.addDestination(req.body.destination, req.body.postID));
-    }
-    catch (error) {
-        console.log(error)
-
-        res.status(error.statusCode).send(error.message);
+    } catch (Error) {
+        if(typeof Error.statusCode !== 'undefined')
+            res.status(Error.statusCode).send(Error.message);
+        res.status(500).send(Error);
     }
 }
 
 const addPosition = async(req,res) => {
     try {
         res.send(await postModel.addPosition(req.body.newPosition, req.body.postID));
-    }
-    catch (error) {
-        res.status(400).send(error);
+    } catch (Error) {
+        if(typeof Error.statusCode !== 'undefined')
+            res.status(Error.statusCode).send(Error.message);
+        res.status(500).send(Error);
     }
 }
 
