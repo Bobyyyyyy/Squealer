@@ -15,14 +15,19 @@ import {
 } from "react-router-dom";
 import React, {useEffect} from "react";
 import RootLayout from "./layouts/RootLayout.jsx";
-import SinglePageChannel from "./pages/channels/SinglePageChannel.jsx";
-import {checkChannelExists, checkUserExists, setUsernameInSessionStore} from "./utils/usefulFunctions.js";
+import {
+    checkChannelExists,
+    checkUserExists,
+    setUsernameInSessionStore
+} from "./utils/usefulFunctions.js";
 import ErrorPage from "./pages/ErrorPage.jsx";
 import PageProfileByName from "./pages/profile/PageProfileByName.jsx";
+import SinglePageChannel from "./pages/channels/SinglePageChannel.jsx";
 function App() {
 
     useEffect(() => {
         setUsernameInSessionStore()
+            .catch(console.error);
     }, []);
 
     const router = createBrowserRouter(

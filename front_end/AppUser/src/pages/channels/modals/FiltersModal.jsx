@@ -1,9 +1,11 @@
-import { Modal, Button, Radio, Label, Checkbox } from 'flowbite-react';
+import {Modal, Button, Radio, Label, Checkbox, ToggleSwitch} from 'flowbite-react';
 import React from "react";
 import {getUsernameFromSessionStore} from "../../../utils/usefulFunctions.js";
 
 function FiltersModal({isOpen, setIsOpen, channelName, setChannelName, visibility,
-                          setVisibility, owner, setOwner, admin, setAdmin,handleSearch}) {
+                          setVisibility, owner, setOwner, admin, setAdmin,handleSearch,
+                          activeOfficialChannel, setActiveOfficialChanel
+    }) {
 
     return (
       <Modal show={isOpen} onClose={()=>setIsOpen(false)}>
@@ -18,7 +20,7 @@ function FiltersModal({isOpen, setIsOpen, channelName, setChannelName, visibilit
                           type="text"
                           className="border border-gray-300 rounded px-3 py-2 w-full"
                           value={channelName}
-                          onChange={(e)=>setChannelName(e.target.value)}
+                          onChange={(e) => setChannelName(e.target.value)}
                       />
                   </div>
                   <div className="flex justify-start items-center gap-8">
@@ -45,12 +47,12 @@ function FiltersModal({isOpen, setIsOpen, channelName, setChannelName, visibilit
                           </span>
                       </Label>
                   </div>
-                  <div className="flex items-center gap-2 mb-4">
+                  <div className="flex items-center gap-2 ">
                       <input
                           type="checkbox"
                           id="creator"
                           checked={!!owner}
-                          onChange={()=>setOwner((!owner)? getUsernameFromSessionStore() : '')}
+                          onChange={() => setOwner((!owner)? getUsernameFromSessionStore() : '')}
                       />
                       <Label>Sono il creatore</Label>
                       <input
@@ -61,6 +63,13 @@ function FiltersModal({isOpen, setIsOpen, channelName, setChannelName, visibilit
                       />
                       <Label>Sono l'admin</Label>
                   </div>
+                  <div className="flex items-center gap-2 mb-4">
+                      <ToggleSwitch
+                          checked={activeOfficialChannel}
+                          onChange={setActiveOfficialChanel}
+                          label={"Mostra canali ufficiali"}
+                      />
+                  </div>
                   <Button
                     className="w-fit"
                     onClick={() => {
@@ -68,6 +77,7 @@ function FiltersModal({isOpen, setIsOpen, channelName, setChannelName, visibilit
                         setVisibility('');
                         setOwner('');
                         setAdmin('');
+                        setActiveOfficialChanel(true);
                     }}
                   >
                       Rimuovi filtri

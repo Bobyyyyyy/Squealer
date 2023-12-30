@@ -173,11 +173,27 @@ const getEmbed = (url) => {
 
 const checkChannelExists = async ({params}) => {
     const {nome} = params;
-    const res = await fetch(`/db/channel/${nome}`)
-    if (!res.ok) {
-        throw Error(`Non esiste il canale ${nome}`);
+
+    if (nome.toUpperCase() === nome) {
+        // e' un canale ufficiale
+        const res = await fetch(`/db/official/?name=${nome}`);
+        console.log("res off", res)
+        if (!res.ok) {
+            throw Error(`Non esiste il canale ${nome}`);
+        } else {
+            let channel = await res.json();
+            if (channel.statusCode === 400) {
+                throw Error(`Non esiste il canale ${nome}`);
+            }
+            return channel;
+        }
+    } else {
+        const res = await fetch(`/db/channel/${nome}`);
+        if (!res.ok) {
+            throw Error(`Non esiste il canale ${nome}`);
+        }
+        return await res.json();
     }
-    return await res.json();
 }
 
 const checkUserExists = async ({params}) => {
@@ -215,5 +231,5 @@ export {
     checkUserExists,
     getUserInfoByUsername,
     getPostByChannelName,
-    getAllPost
+    getAllPost,
 }
