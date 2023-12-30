@@ -1,6 +1,6 @@
 import { Outlet, NavLink } from "react-router-dom";
 import '../index.css'
-import React from "react";
+import React, {useEffect, useState} from "react";
 import {
     AddIcon,
     ChannelIcon,
@@ -8,9 +8,13 @@ import {
     SearchIcon,
     UserIcon
 } from "../components/assets/index.jsx"
+import {getUsernameFromSessionStore} from "../utils/usefulFunctions.js";
+import NotificationButton from "./NotificationButton.jsx";
 
 
 export default function RootLayout() {
+
+    const [notifications, setNotifications] = useState([]);
     const navigationButtons = [
         {
             id: 0,
@@ -44,8 +48,24 @@ export default function RootLayout() {
             route: "profile"
         },
     ];
-    // {id: 5, icon: SettingIcon, name: "settings", route: "settings"}
-    // va messo anche log out
+
+    const getNotification = async () => {
+        let res = await fetch(`/db/notification?user=${getUsernameFromSessionStore()}`, {
+            method:'GET'
+        });
+        if (res.ok) {
+            res = await res.json();
+            console.log("not", res, "user", getUsernameFromSessionStore())
+            if (Object.keys(res).length !== 0) {
+                setNotifications(res);
+            }
+        }
+
+    }
+
+    useEffect(() => {
+        getNotification();
+    }, []);
 
 
     return (
@@ -66,6 +86,9 @@ export default function RootLayout() {
                         ))}
                     </div>
                 </nav>
+                {notifications.length !== 0 &&
+                    <NotificationButton notifications={notifications} setNotifications={setNotifications} />
+                }
             </header>
             <main>
                 <Outlet />

@@ -234,11 +234,20 @@ const addPost = async (post,quota) => {
                 }
                 //update post number in channel schema
                 channel = await Channel.findOneAndUpdate({'name': channel.name}, {'postNumber': channel.postNumber+1});
-                let newNotification = channel.followers.filter((follower) => follower.user !== creator.username).map((follower) => {
+                let newFollowerNotification = channel.followers.filter((follower) => follower.user !== creator.username).map((follower) => {
                     return {user: follower.user, sender: creator.username, channel: channel._id};
                 });
 
-               await Notification.insertMany(newNotification);
+                let newAdminNotification = channel.admins.filter((admin) => admin !== creator.username).map((admin) => {
+                    return {user: admin, sender: creator.username, channel: channel._id};
+                });
+
+                let creatorNotification = (creator.username !== channel.creator) ?
+                    [{user: channel.creator, sender: creator.username, channel: channel._id}] : [];
+                let allNotification = [...newFollowerNotification, ...newAdminNotification, ...creatorNotification];
+
+                await Notification.insertMany(allNotification);
+
             }
         }
 
@@ -272,6 +281,7 @@ const addPost = async (post,quota) => {
         return {post: newPost.toObject()};
     }
     catch(err){
+        console.log("ERRORE:",  err)
         throw err;
     }
 }
@@ -436,10 +446,18 @@ const addDestination = async (destination,postID) => {
                 await Channel.findByIdAndUpdate(channel._id,[{$set: {'postNumber': {$add: ['$postNumber',1]}}}]).lean();
                 await Post.findByIdAndUpdate(postID,{$push: {destinationArray: destination}},{new : true}).lean();
 
-                let newNotification = channel.followers.map((follower) => {
+                let newFollowerNotification = channel.followers.map((follower) => {
                     return {user: follower.user, sender: 'mod', channel: channel._id};
                 });
-                await Notification.insertMany(newNotification);
+
+                let newAdminNotification = channel.admins.map((follower) => {
+                    return {user: follower.user, sender: 'mod', channel: channel._id};
+                });
+
+                let creatorNotification = [{user: channel.creator, sender: 'mod', channel: channel._id}];
+                let allNotification = [...newFollowerNotification, ...newAdminNotification, ...creatorNotification];
+
+                await Notification.insertMany(allNotification);
                 break;
 
             case 'official':

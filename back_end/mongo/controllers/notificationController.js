@@ -13,7 +13,8 @@ const getNotifications = async(req,res) => {
 }
 const deleteNotifications = async(req,res) => {
     try{
-        if(req.body.user) res.send(await notificationModel.deleteNotification(req.body.user));
+        let user = req.session.type === 'smm' ? req.session.vip : req.session.user;
+        if(user) res.send(await notificationModel.deleteNotification(user));
         else throw createError('insert user', 404);
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
