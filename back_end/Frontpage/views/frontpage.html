@@ -6,13 +6,16 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <link href='https://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet'>
     <style>
+        * {
+            border: solid red 1px
+        }
         body {
             font-family: 'Montserrat',serif;
             font-weight: bold;
         }
 
         .logo-container{
-            width: 85%;
+            width: 35rem;
             aspect-ratio: 1;
         }
         .link{
@@ -43,16 +46,18 @@
             width: 70% !important;
             height: 100%;
         }
-        @media screen and (max-width: 991px){
+        @media screen and (max-width: 926px) and (min-width: 326px){
             .form-control-lg, .btn-lg {
                 min-height: 6rem !important;
-                font-size: 2.8rem !important;
-            }
-            .link{
                 font-size: 2rem !important;
             }
-            .mt-logo{
-                margin-top: 4rem !important;
+
+            .form {
+                 width: 100% !important;
+            }
+
+            .link{
+                font-size: 2rem !important;
             }
             .fs-title{
                 font-size: 5rem !important;
@@ -60,36 +65,43 @@
             .fs-login{
                 font-size: 3rem !important;
             }
-            .flex-grow-sm-1{
-                flex-grow: 1;
+
+            .container-form {
+                width: 100% !important;
+
             }
         }
 
 
-        @media screen and (min-width: 992px){
+        @media screen and (min-width: 927px){
             .form-control-lg, .btn-lg {
-                min-height: 7rem !important;
-                font-size: 3rem !important;
-            }
-            .w-lg-50{
-                width: 50% !important;
-            }
-            .dim{
-                width: 75% !important;
-                height: 75% !important;
+                min-height: 3rem !important;
+                font-size: 1rem !important;
             }
             .fs-title{
-                font-size: 6rem !important;
+                font-size: 3rem !important;
+                font-weight: bolder;
             }
             .fs-login{
-                font-size: 3.5rem !important;
-            }
-            .sameW{
-                flex: 1 1 0;
+                font-size: 2.2rem !important;
+                font-weight: bolder;
             }
             .link{
-                font-size: 2.3rem;
+                font-size: 1rem;
             }
+
+            a {
+                cursor:pointer;
+            }
+
+            .container-form {
+                width: 50% !important;
+            }
+
+            .form {
+                width: 75% !important;
+            }
+
         }
 
 
@@ -97,34 +109,33 @@
     </style>
 </head>
 <body class="vh-100 vw-100">
-<div class="mb-1 w-100">
-    <h1 class="text-center m-0 titleSize mt-3 fs-title">SQUEALER</h1>
-</div>
 
-<div class="d-flex flex-column h-100">
-    <div class="d-flex flex-lg-row flex-column-reverse align-self-center justify-content-around dim ">
-        <div class="d-flex align-self-center justify-content-center justify-content-lg-end flex-grow-sm-1 mt-logo sameW">
+    <div class="d-flex flex-column align-items-center justify-content-center justify-content-sm-start w-100 h-100">
+        <div class="mb-3">
+            <h1 class="text-center m-0 titleSize fs-title">Squealer</h1>
+        </div>
+        <div class="d-flex flex-row w-100 h-100 align-items-center justify-content-center flex-sm-wrap-reverse">
             <div class="logo-container">
                 <img src="/img/logo.png" alt="logo" class="img-fluid">
             </div>
-        </div>
-        <div class="d-flex flex-column align-self-center justify-content-center w-lg-50 mt-5 mb-5 mt-lg-0 mb-lg-0 sameW">
-            <form class="d-flex flex-column align-self-center w-lg-50" id="login-form">
-                <h2 class="text-center fs-login">LOGIN</h2>
-                <input class="form-control form-control-lg mb-4 mb-lg-3" type="text" placeholder="Utente" name="user" required>
-                <input class="form-control form-control-lg mb-4 mb-lg-3" type="password" placeholder="Password" name="password" required>
-                <button class="btn btn-primary btn-lg mb-4" type="submit" name="login">Entra!</button>
-                <a href="/" class="text-center link mt-lg-1 ">Password dimenticata</a>
-                <hr>
-                <button onclick="window.location.href='/register'" class="btn btn-secondary btn-lg">Crea nuovo account</button>
-                <a href="/guest" class="link mt-4 mt-lg-2 text-center">Entra come ospite</a>
-            </form>
+            <div class="d-flex flex-row justify-content-center align-items-center container-form">
+                <form class="d-flex flex-column form" id="login-form">
+                    <h2 class="text-center fs-login">Login</h2>
+                    <input class="form-control form-control-lg mb-4 mb-lg-3" type="text" placeholder="Utente" name="user" required>
+                    <input class="form-control form-control-lg mb-4 mb-lg-3" type="password" placeholder="Password" name="password" required>
+                    <span id="error" class="link mb-2" style="color: #ea0000 !important;"></span>
+                    <button class="btn btn-primary btn-lg mb-4" type="submit" name="login">Entra!</button>
+                    <a href="/" class="text-center link mt-lg-1 ">Password dimenticata</a>
+                    <hr>
+                    <button onclick="window.location.href='/register'" class="btn btn-secondary btn-lg">Crea nuovo account</button>
+                    <a id="guestbutton" class="link mt-4 mt-lg-2 text-center">Entra come ospite</a>
+                </form>
+            </div>
         </div>
     </div>
-</div>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-<script src="/jsFP/index.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="/jsFP/index.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 </body>
 </html>
