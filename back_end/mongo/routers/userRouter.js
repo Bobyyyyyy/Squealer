@@ -18,6 +18,7 @@ router.put('/maxquota', userController.updateMaxQuota);
 router.put('/quota', userController.updateRemainingQuota)
 router.put('/sessionVip',userController.updateSessionVip);
 router.get('/sessionVip', userController.getSessionVip);
+router.put('/smm2user', userController.smm2userSession);
 router.get('/info',userController.getFollnPosts);
 router.get('/lastPost',userController.getLastPost);
 router.get('/allSmm', userController.getAllSmm);

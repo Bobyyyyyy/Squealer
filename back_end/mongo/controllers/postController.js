@@ -13,7 +13,9 @@ const createPost = async (req,res) => {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -23,7 +25,9 @@ const getPosts = async (req,res) => {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -40,7 +44,9 @@ const updateReaction = async (req,res) => {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -50,7 +56,9 @@ const deleteReaction = async (req,res) => {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -60,7 +68,9 @@ const removePost = async (req,res) => {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -70,7 +80,9 @@ const getPostsDate = async (req,res) => {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -80,7 +92,9 @@ const getReactionLast30days = async (req,res) => {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -90,7 +104,9 @@ const postLength = async (req,res) => {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -100,7 +116,9 @@ const addDestination = async(req,res) => {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -110,7 +128,9 @@ const addPosition = async(req,res) => {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 

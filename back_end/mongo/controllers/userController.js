@@ -4,22 +4,32 @@ const {createError} = require("../models/utils");
 const {createMaxQuotaJob} = require("./CronController");
 
 
-const addUser = async (req, res) => {
+const addUser = async (req, res,next) => {
     try {
-        res.status(200).send(await userModel.addUser(req.body))
+        req.response = (await userModel.addUser(req.body));
+        if(typeof req.session.user === 'undefined') {
+            next();
+        }
+        else {
+            res.status(200).send(req.response);
+        }
     } catch (Error) {
-        if(typeof Error.statusCode === 'undefined')
+        if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 const searchUser = async (req,res) => {
     try {
         res.send(await userModel.searchByUsername(req.body));
     } catch (Error) {
-        if(typeof Error.statusCode === 'undefined')
+        if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -33,7 +43,9 @@ const getSessionUser = async (req,res) => {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -43,7 +55,9 @@ const getUserProfileByName = async (req,res) => {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -53,7 +67,9 @@ const updateUserProfilePic = async (req, res) => {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -65,9 +81,27 @@ const updateSessionVip = async (req,res) => {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
+
+const smm2userSession = async (req,res) => {
+    try{
+        req.session.type = 'user'
+        req.session.save();
+        res.status(200).send({});
+    }
+    catch(err){
+        if(typeof err.statusCode !== 'undefined')
+            res.status(err.statusCode).send(err.message);
+        else {
+            res.status(500).send(err);
+        }
+    }
+}
+
 const getSessionVip = async (req,res) => {
     res.send({vip: req.session.vip})
 }
@@ -78,7 +112,9 @@ const modifyUser = async(req,res) => {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -88,7 +124,9 @@ const getAllUsers = async (req,res) => {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -98,7 +136,9 @@ const getSingleUser = async (req, res) => {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -108,7 +148,9 @@ const getUsersNumber = async (req,res) => {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -118,7 +160,9 @@ const getVips = async (req,res) => {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -129,7 +173,9 @@ const getQuota = async (req,res) => {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -162,7 +208,9 @@ const updateMaxQuota = async(req,res) => {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -181,7 +229,9 @@ const updateRemainingQuota = async(req,res) => {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -191,7 +241,9 @@ const getFollnPosts = async(req,res)=> {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -202,7 +254,9 @@ const getLastPost = async(req,res)=> {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -214,7 +268,9 @@ const clearDB = async (req,res) => {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -224,7 +280,9 @@ const getAllSmm = async (req, res) => {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -237,7 +295,9 @@ const hireSmm = async (req, res) => {
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
-        res.status(500).send(Error);
+        else {
+            res.status(500).send(Error);
+        }
     }
 }
 
@@ -248,6 +308,7 @@ module.exports = {
     changePassword,
     getSessionUser,
     updateSessionVip,
+    smm2userSession,
     getSessionVip,
     modifyUser,
     getAllUsers,

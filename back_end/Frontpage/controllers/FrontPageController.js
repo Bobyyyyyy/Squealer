@@ -8,7 +8,7 @@ const registerView = (req, res) => {
 
 
 const frontpageView = (req,res) => {
-        res.render("frontpage",{
+        res.render('frontpage',{
     });
 }
 
@@ -16,8 +16,8 @@ const login  = async (req,res,next) => {
     try {
         req.response = await loginUser(req.body, mongoCredentials);
         next();
-    } catch (Error) {
-        res.redirect('/register');
+    } catch (err) {
+        res.status(err.statusCode).send(err.mes);
     }
 }
 
@@ -65,7 +65,9 @@ const isSessionActive = (req,res,next) => {
                 break;
 
             case 'smm':
-                res.redirect('/assets_vue/index.html');
+                if (process.env.NODE_ENV === 'production')res.redirect('/assets_vue')
+                else res.redirect('/AppSmm/');
+                break;
         }
     }
 }
@@ -92,7 +94,6 @@ const createSession = async(req,res) => {
             case 'smm':
                 if (process.env.NODE_ENV === 'production')res.redirect('/assets_vue')
                 else res.redirect('/AppSmm/');
-
                 break;
         }
     });

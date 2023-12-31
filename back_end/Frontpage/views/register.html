@@ -1,105 +1,67 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
+    <title>Homepage Squealer</title>
+    <link rel="icon" href="/img/logo.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link href='https://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet'>
+    <link href="/css/style.css" rel='stylesheet'>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registrazione</title>
-    <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f2f2f2;
-        }
-
-        .registration-form {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-
-        .registration-form h2 {
-            margin-bottom: 20px;
-            color: #333;
-        }
-
-        .registration-form label {
-            display: block;
-            margin-bottom: 10px;
-            font-weight: bold;
-        }
-
-        .registration-form input[type="text"],
-        .registration-form input[type="password"],
-        .registration-form input[type="email"],
-        .registration-form input[type="checkbox"] {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 3px;
-            font-size: 16px;
-        }
-
-        .registration-form input[type="checkbox"] {
-            width: auto;
-        }
-
-        .registration-form input[type="submit"] {
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
-            font-size: 18px;
-            border-radius: 3px;
-            cursor: pointer;
-        }
-
-        .registration-form input[type="submit"]:hover {
-            background-color: #0056b3;
-        }
-    </style>
 </head>
-<body>
-<div class="registration-form">
-    <h2>Registrazione</h2>
-    <form action="/register" method="post">
-        <div>
-            <label for="name">Nome:</label>
-            <input type="text" id="name" name="name" required>
-        </div>
-        <div>
-            <label for="password">password:</label>
-            <input type="password" id="password" name="password" required>
-        </div>
-        <div>
-            <label for="vip">Sono un utente VIP </label>
-            <input type="radio" id="vip" name="type" value="vip">
-        </div>
-        <div>
-            <label for="smm">Sono un social media manager</label>
-            <input type="radio" id="smm" name="type" value="smm">
-        </div>
-        <div>
-            <label for="mod">Sono un mod</label>
-            <input type="radio" id="mod" name="type" value="mod">
-        </div>
 
-        <div>
-            <label for="answer">Quale è il nome del tuo paese natale?</label>
-            <input type="text" id="answer" name="answer" required>
+<body class="">
+<div class="d-flex flex-column align-items-center justify-content-center justify-content-sm-start w-100 h-100">
+    <div class="container-title">
+        <div class="logo-container-mobile">
+            <img src="/img/logo.png" alt="logo" class="img-fluid">
         </div>
-        <div>
-            <input type="submit" value="Registrati">
+        <h1 class="text-center m-0 titleSize">Squealer</h1>
+    </div>
+    <div class="container-img-and-form">
+        <div class="logo-container">
+            <img src="/img/logo.png" alt="logo" class="img-fluid">
         </div>
-        <div>
-            <button onclick="window.location.href='/'"> Go back </button>
+        <div class="container-form">
+            <form class="form" id="register-form">
+                <h2 class="text-center fs-login">Registrati</h2>
+                <div class="form-input">
+                    <input class="input-text" type="text" placeholder="Utente" name="user" required>
+                    <input class="input-text" type="password" placeholder="Password" name="password" required>
+                    <label for="answer" class="fs-label">Domanda di sicurezza: Quale è il nome del tuo paese natale? </label>
+                    <input class="input-text" type="text" placeholder="Risposta" name="answer" required>
+                </div>
+
+                <div class="d-flex flex-row align-items-center justify-content-around">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="type" id="user" value="user">
+                        <label class="form-check-label" for="type">Utente</label>
+                    </div>
+                    <div class="form-check ">
+                        <input class="form-check-input" type="radio" name="type" id="vip" value="vip">
+                        <label class="form-check-label" for="type">Vip</label>
+                    </div>
+                    <div class="form-check ">
+                        <input class="form-check-input" type="radio" name="type" id="smm" value="smm">
+                        <label class="form-check-label" for="type">SMM</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="type" id="mod" value="mod">
+                        <label class="form-check-label" for="type">Mod</label>
+                    </div>
+                </div>
+
+                <span id="error" class="link" style="color: #ea0000 !important;"></span>
+                <div class="form-input">
+                    <button class="button btn-primary" type="submit" name="register">Registrati!</button>
+                    <button onclick="window.location.href='/'" class="button btn-secondary">Accedi</button>
+                </div>
+            </form>
         </div>
-    </form>
+    </div>
 </div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="/jsFP/index.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 </body>
 </html>

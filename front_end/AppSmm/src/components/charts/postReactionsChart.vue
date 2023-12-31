@@ -51,7 +51,7 @@
 <template>
   <Doughnut v-if="ready"
             :data="{
-    labels: ['heart', 'thumbs-up', 'thumbs-down', 'heartbreak'],
+    labels: ['cuori', 'pollici su', 'pollici giù', 'cuori spezzati'],
     datasets: [
         {
           backgroundColor: ['#FF0000','#0000FF','#00FF00','#000000'],
