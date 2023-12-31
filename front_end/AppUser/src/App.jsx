@@ -45,7 +45,7 @@ function App() {
             .catch(console.error);
     }, []);
 
-    const router = createBrowserRouter(
+    const routerUserLogged = createBrowserRouter(
         createRoutesFromElements(
             <Route path="/" element={<RootLayout />} >
                 <Route index element={<Home />} />
@@ -84,7 +84,7 @@ function App() {
         ) : (
             <>
                 {hasLogged ? (
-                    <RouterProvider router={router} />
+                    <RouterProvider router={routerUserLogged} />
                 ) : (
                     <div>non hai loggato</div>
                 )}

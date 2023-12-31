@@ -97,7 +97,7 @@ function Profile () {
             <>
             <div className={"flex flex-col h-fit"}>
                 {/* HEADER */}
-                <div className={"flex items-center justify-start p-4 border border-b-black"}>
+                <div className="flex items-center justify-start p-4 border border-b-black">
                     <button
                         onClick={()=>setShowChangePicModal(!showChangePicModal)}
                     >

@@ -2,17 +2,17 @@ import {useLoaderData, useParams} from "react-router-dom";
 import {Spinner} from "flowbite-react";
 import React, {useEffect, useState} from "react";
 import Post from "../../components/posts/Post.jsx";
-import {getPostByChannelName} from "../../utils/usefulFunctions.js";
+import { getPostByOfficialChannelName} from "../../utils/usefulFunctions.js";
 
 function SinglePageOfficialChannel() {
     const channel = useLoaderData();
-    console.log(channel)
     const [isLoading, setIsLoading] = useState(true);
     const [posts, setPosts] = useState([]);
 
     const fetchPost = async () => {
         setIsLoading(true);
-        const resPost = await getPostByChannelName(channel.name);
+        const resPost = await getPostByOfficialChannelName(channel.name);
+        console.log(resPost)
         setPosts(resPost);
         setIsLoading(false)
     }
@@ -21,7 +21,6 @@ function SinglePageOfficialChannel() {
         fetchPost()
     }, []);
 
-    console.log(channel);
     return (
         <>
             {isLoading ? (

@@ -55,6 +55,19 @@ async function getPostByChannelName(channelName){
     }
 }
 
+async function getPostByOfficialChannelName(channelName){
+    try {
+        let res = await fetch(`/db/post/all?offset=0&limit=10&official=${channelName}`,{
+            method: 'GET',
+        });
+        if (res.ok) {
+            return await res.json();
+        }
+    } catch (e) {
+        console.log(e);
+    }
+}
+
 async function getAllPost(offset) {
     try {
         let res = await fetch(`/db/post/all?offset=${offset}&limit=10`, {
@@ -232,4 +245,5 @@ export {
     getUserInfoByUsername,
     getPostByChannelName,
     getAllPost,
+    getPostByOfficialChannelName
 }
