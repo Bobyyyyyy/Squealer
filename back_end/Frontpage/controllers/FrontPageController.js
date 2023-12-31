@@ -65,7 +65,9 @@ const isSessionActive = (req,res,next) => {
                 break;
 
             case 'smm':
-                res.redirect('/assets_vue/index.html');
+                if (process.env.NODE_ENV === 'production')res.redirect('/assets_vue')
+                else res.redirect('/AppSmm/');
+                break;
         }
     }
 }
@@ -92,7 +94,6 @@ const createSession = async(req,res) => {
             case 'smm':
                 if (process.env.NODE_ENV === 'production')res.redirect('/assets_vue')
                 else res.redirect('/AppSmm/');
-
                 break;
         }
     });

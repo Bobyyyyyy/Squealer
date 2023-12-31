@@ -4,11 +4,17 @@ const {createError} = require("../models/utils");
 const {createMaxQuotaJob} = require("./CronController");
 
 
-const addUser = async (req, res) => {
+const addUser = async (req, res,next) => {
     try {
-        res.status(200).send(await userModel.addUser(req.body))
+        req.response = (await userModel.addUser(req.body));
+        if(typeof req.session.user === 'undefined') {
+            next();
+        }
+        else {
+            res.status(200).send(req.response);
+        }
     } catch (Error) {
-        if(typeof Error.statusCode === 'undefined')
+        if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
         else {
             res.status(500).send(Error);
@@ -19,7 +25,7 @@ const searchUser = async (req,res) => {
     try {
         res.send(await userModel.searchByUsername(req.body));
     } catch (Error) {
-        if(typeof Error.statusCode === 'undefined')
+        if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
         else {
             res.status(500).send(Error);
