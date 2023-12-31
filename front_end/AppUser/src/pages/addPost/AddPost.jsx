@@ -2,11 +2,16 @@ import ContentPost from "./ContentPost.jsx";
 import {useEffect, useRef, useState} from "react";
 import {SubmitIcon} from "../../components/assets/index.jsx";
 import {
-    blob2base64,
-    compressBlob, getEmbed,
     getQuotaByUsername,
     getUsernameFromSessionStore
 } from "../../utils/usefulFunctions.js";
+
+import {
+    blob2base64,
+    compressBlob,
+    getEmbed
+} from "../../utils/imageFunctions.js";
+
 import {Toast} from "flowbite-react";
 import TimedPost from "./TimedPost.jsx";
 import {startSendingPosition} from "../../utils/geoFunctions.js";

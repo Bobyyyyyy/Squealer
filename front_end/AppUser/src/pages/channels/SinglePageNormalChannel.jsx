@@ -87,7 +87,6 @@ function SinglePageNormalChannel({nome}) {
             .catch(console.error);
     }, [canSeePosts]);
 
-    console.log(role)
     return (
         <>
             {isLoading ? (

@@ -36,6 +36,7 @@ function Profile () {
         let res = await fetch("/logout");
         window.location.href= res.url;
         localStorage.clear();
+        sessionStorage.clear();
     }
 
     const getSmm = async () => {

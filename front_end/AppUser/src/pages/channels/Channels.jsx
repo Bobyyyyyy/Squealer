@@ -46,11 +46,6 @@ function Channels () {
         return isCreator ? "creator" : (isAdmin ? "admin" : (isFollower ? "follower" : (isPending) ? "pending" : ""));
     }
 
-    useEffect(() => {
-       fetchChannels()
-           .catch(console.error)
-    }, [nuovoCanale, queryFilter]);
-
     const getChannels = async () => {
         try {
             let res = await  fetch(`/db/channel/?offset=0&limit=10000&filters=${queryFilter}`, {
@@ -92,6 +87,11 @@ function Channels () {
         }
         setIsLoading(false);
     }
+
+    useEffect(() => {
+        fetchChannels()
+            .catch(console.error)
+    }, [nuovoCanale, queryFilter]);
 
     return (
         <>

@@ -4,13 +4,14 @@ function ErrorPage() {
     const error = useRouteError()
 
     return (
-        <div className="flex flex-col w-full h-full justify-start items-center gap-8">
-            <h2 className="text-4xl font-extrabold mt-8">ERRORE</h2>
-            <p className="text-2xl font-semibold">{error.message}</p>
+        <div className="flex flex-col w-full h-full justify-start items-center gap-8 mt-8">
+            <h2 className="text-4xl font-extrabold text-center">ERRORE</h2>
+            <p className="text-2xl font-semibold text-center">{error.message}</p>
             <Link
-                className="p-4 bg-primary rounded-md text-xl font-medium"
+                className="button uppercase"
                 to="/"
-            >Back to the Homepage
+            >
+                Back to the Homepage
             </Link>
         </div>
     )

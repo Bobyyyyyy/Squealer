@@ -1,18 +1,14 @@
-import {getProfilePicByUsername, getUsernameFromSessionStore, parseTime} from "../../utils/usefulFunctions.js";
-import React, {Suspense, useEffect, useState} from "react";
+import {getProfilePicByUsername, getUsernameFromSessionStore} from "../../utils/usefulFunctions.js";
+
+import React, {useEffect, useState} from "react";
 import {Link} from "react-router-dom";
+import {parseTime} from "../../utils/timeFunctions.js";
 
 function Title({post}) {
 
     const [profilePic, setProfilePic] = useState();
     const tempo = parseTime(post);
-    /*
-    const allDest = post.destinationArray.map((dest) => {
-        return `${dest.destType === "user" ? "@" : "§"}${dest.name}`;
-    })
-
-     */
-
+    
     useEffect(()=> {
         getProfilePicByUsername(post.owner)
             .then((res)=>{

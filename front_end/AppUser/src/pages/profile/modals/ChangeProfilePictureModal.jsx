@@ -1,6 +1,6 @@
 import {Modal, ToggleSwitch} from "flowbite-react";
-import {blob2base64, compressBlob, getUsernameFromSessionStore} from "../../../utils/usefulFunctions.js";
-import React, {useEffect, useState} from "react";
+import {blob2base64, compressBlob} from "../../../utils/imageFunctions.js";
+import React, { useState} from "react";
 
 let imageObj = null;
 
