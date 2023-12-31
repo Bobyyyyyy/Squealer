@@ -6,7 +6,7 @@ const connection = require('../ConnectionSingle');
 const {createError} = require("./utils");
 const Channel = require("../schemas/Channel");
 const {create} = require("connect-mongo");
-
+const {removeDestination} = require("./postMethods");
 
 //POST
 const addOfficialChannel = async (body,creator) => {
@@ -49,15 +49,15 @@ const deleteChannel = async (body) => {
         await connection.get();
         let findName = await ReservedChannel.findOneAndDelete({name: body.name}).lean();
         if (!findName) {
-            let err = new Error("Nessun Canale Con questo nome");
-            err.statusCode = 400;
-            throw err;
+            throw createError('Nessun canale con questo nome',400);
         }
-        await Post.deleteMany({'officialChannelsArray': body.name});
-        
+        let posts = await Post.find({'officialChannelsArray': body.name});
+
+        for (let post of posts) {
+            await removeDestination(body.name, post._id);
+        }
     }
     catch(err){
-        console.log(err);
         throw err;
     }
 }

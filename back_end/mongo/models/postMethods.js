@@ -1,5 +1,6 @@
 const Post = require("../schemas/Post");
 const User = require("../schemas/User");
+const Reply = require("../schemas/Reply");
 const Channel = require("../schemas/Channel");
 const Notification = require("../schemas/Notification")
 const ReservedChannel = require("../schemas/officialChannels");
@@ -402,7 +403,7 @@ const removeDestination = async (destination,postID)=> {
             await Channel.findOneAndUpdate({name: destination},[{$set: {'postNumber': {$subtract: ['$postNumber',1]}}}]);
         }
 
-        if(checkArrayDestination.destinationArray.length === 0 && checkOfficialDestination.officialChannelsArray.length === 0) {
+        if(checkArrayDestination.destinationArray.length === 0 && checkOfficialDestination.officialChannelsArray.length === 0 && checkArrayDestination.tags.length === 0) {
             await deletePost(postID);
         }
     }
@@ -502,7 +503,9 @@ const addPosition = async (newPosition, postID) => {
 const deletePost = async (postID) => {
     try{
         await connection.get()
-        return await Post.findByIdAndRemove(postID).lean();
+        let post = await Post.findByIdAndRemove(postID).lean();
+        await Reply.deleteMany({'parent': postID});
+        return post;
     }
     catch(err){
         throw err;

@@ -274,6 +274,18 @@ const clearDB = async (req,res) => {
     }
 }
 
+const deleteUser = async (req,res) => {
+    try{
+        res.status(200).send(await userModel.deleteUser(req.body.username));
+    } catch (Error) {
+        if(typeof Error.statusCode !== 'undefined')
+            res.status(Error.statusCode).send(Error.message);
+        else {
+            res.status(500).send(Error);
+        }
+    }
+}
+
 const getAllSmm = async (req, res) => {
     try {
         res.status(200).send(await userModel.getAllSmm(req.query));
@@ -324,5 +336,6 @@ module.exports = {
     clearDB,
     updateRemainingQuota,
     getAllSmm,
-    hireSmm
+    hireSmm,
+    deleteUser
 }

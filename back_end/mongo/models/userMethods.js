@@ -1,13 +1,16 @@
 const mongoose = require('mongoose');
 const bcrypt = require("bcryptjs");
 const Channel = require("../schemas/Channel")
+const Notification = require("../schemas/Notification")
 const User = require("../schemas/User");
+const Reply = require("../schemas/Reply");
 const {saltRounds,quota, createError} = require("./utils");
 const {json} = require("express");
 const Post = require("../schemas/Post");
 const {start} = require("@popperjs/core");
 const {scheduledFnOne} = require("../controllers/utils");
 const connection = require('../ConnectionSingle');
+const {removeDestination} = require("./postMethods");
 
 
 //POST
@@ -486,6 +489,36 @@ const hireSmm = async (vipUsername, smmUsername, isHiring) => {
 }
 
 
+const deleteUser = async(name) => {
+    try {
+        await connection.get();
+
+        let user = await User.findOneAndDelete({'username': name}).lean();
+        if(!user) {
+            throw createError('utente non esiste',400);
+        }
+
+        await Channel.deleteMany({'creator': name}).lean();
+        await Channel.updateMany({'admins': name}, {$pull: {'admins': name}}).lean();
+        await Channel.updateMany({followers:{$elemMatch:{user: name}}}, [{$set: {'followerNumber': {$subtract: ['$followerNumber',1]}}}]).lean();
+        await Channel.updateMany({followers:{$elemMatch:{user: name}}}, {$pull: {'followers': {'user': name}}}).lean();
+        await User.updateMany({'typeUser': 'smm', 'vipHandled': name},{$pull: {'vipHandled': name}}).lean();
+        await Notification.deleteMany({'user': name}).lean();
+        await Post.deleteMany({'owner': name}).lean();
+        let posts = await Post.find({'destinationArray.name': name});
+        for (let post of posts) {
+            await removeDestination(name, post._id);
+        }
+
+        await Post.updateMany({reactions:{$elemMatch:{user: name}}}, {$pull: {'reactions': {'user':name}}});
+        await Reply.deleteMany({'owner': name}).lean();
+
+    } catch (e) {
+        throw e;
+    }
+}
+
+
 /*      DEPLOY    */
 
 const clearDB = async () => {
@@ -498,6 +531,7 @@ const clearDB = async () => {
 
 
 }
+
 
 
 module.exports = {
@@ -519,5 +553,6 @@ module.exports = {
     updateProfilePicture,
     getAllSmm,
     clearDB,
-    hireSmm
+    hireSmm,
+    deleteUser
 }

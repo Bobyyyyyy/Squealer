@@ -12,6 +12,17 @@ const {dbname, mongoCredentials} = require("./back_end/mongo/models/utils");
 const mongoose = require('mongoose');
 const path = require('path');
 const {isUser} = require("./back_end/Frontpage/controllers/FrontPageController");
+const mongouri = `mongodb://${mongoCredentials.user}:${mongoCredentials.pwd}@${mongoCredentials.site}/${dbname}?authSource=admin&writeConcern=majority`;
+
+/*
+const storeSession = MongoStore.create({
+    mongoUrl: mongouri,
+    dbName: dbname,
+    clear_interval: 660,
+    ttl: 600,
+    stringify: false,
+})
+*/
 
 const storeSession = MongoStore.create({
     mongoUrl: 'mongodb://localhost:27017',

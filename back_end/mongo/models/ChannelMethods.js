@@ -2,11 +2,14 @@ const {connectdb, createError} = require("./utils");
 const Channel = require("../schemas/Channel");
 const User = require("../schemas/User");
 const Post = require("../schemas/Post");
+const Notification = require("../schemas/Notification");
 const mongoose = require("mongoose");
 const connection = require('../ConnectionSingle');
 const {ObjectId} = require("mongodb");
 const {create} = require("connect-mongo");
 let {channel} = require("../controllers/officialChannelsController");
+const ReservedChannel = require("../schemas/officialChannels");
+const {removeDestination} = require("./postMethods");
 
 const channelRoles = {
     '0': 'Creator',
@@ -214,13 +217,15 @@ const addFollower = async function (userName, channelName) {
 
         let checkFollow = await Channel.findOne({name: channelName, 'followers.user': userName});
         if(checkFollow) {
+            // se sei gia' follower lo toglie
             await Channel.findOneAndUpdate({name: channelName}, {$pull: {'followers': {'user': userName}}});
+            await Channel.findOneAndUpdate({name: channelName}, [{$set: {'followerNumber': {$subtract: ['$followerNumber',1]}}}]);
             return;
         }
 
         if (channel.type === 'public') {
-            // se sei gia' follower lo toglie
             await Channel.findByIdAndUpdate(channel._id,{$push: {'followers': {user: user.username, canWrite: true}}});
+            await Channel.findOneAndUpdate({name: channelName}, [{$set: {'followerNumber': {$add: ['$followerNumber',1]}}}]);
         }
         else {
             let checkRequest = await Channel.findOne({name: channelName, 'requests.user': userName});
@@ -291,6 +296,29 @@ const addAdmin = async function (username, adminName, channelName) {
 }
 
 
+const deleteChannel = async (name) => {
+    try{
+        await connection.get();
+        let findName = await Channel.findOneAndDelete({name: name}).lean();
+        if (!findName) {
+            throw createError('Nessun canale con questo nome',400);
+        }
+        let posts = await Post.find({'destinationArray.name': name});
+
+        for (let post of posts) {
+            await removeDestination(name, post._id);
+        }
+
+        await Notification.deleteMany({'sender': name});
+
+    }
+    catch(err){
+        throw err;
+    }
+}
+
+
+
 /**
  * @param adminName
  * @param userRequest
@@ -314,6 +342,7 @@ const handleRequest = async function(adminName,userRequest,channelName,accepted)
 
         if (accepted) {
             await Channel.findOneAndUpdate({name: channelName}, {$push: {'followers': {'user': userRequest, 'canWrite':true}}});
+            await Channel.findOneAndUpdate({name: channelName}, [{$set: {'followerNumber': {$add: ['$followerNumber',1]}}}]);
         }
 
         await Channel.findOneAndUpdate({name: channelName}, {$pull: {'requests': {'user': userRequest}}});
@@ -476,5 +505,6 @@ module.exports = {
     addAdmin,
     handlePermission,
     getChannelProfilePicByName,
-    updateChannelProfilePic
+    updateChannelProfilePic,
+    deleteChannel
 }

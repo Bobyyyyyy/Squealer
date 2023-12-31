@@ -216,6 +216,25 @@ function inizializeToast() {
     });
 }
 
+
+function deleteUser(name) {
+
+    console.log(name)
+    $.ajax({
+        url: '/db/user/delete',
+        type: 'delete',
+        data: {username: name},
+        success: () => {
+            location.reload();
+        },
+        error: (error) => {
+            $('#toast-content').empty().html(error.responseText);
+            let toastList = inizializeToast();
+            toastList.forEach(toast => toast.show());
+        }
+    })
+}
+
 $(document).ready(function() {
     getUsersNumber(LastCall.filter,LastCall.type);
 });
