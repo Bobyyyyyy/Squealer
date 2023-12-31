@@ -15,6 +15,7 @@ export const store = createStore({
             },
             currentSqueals: [],
             offsetSqueals: 0,
+            notifications: [],
         }
     },
     mutations: {
@@ -46,6 +47,14 @@ export const store = createStore({
         },
         updateOffset(state){
             state.offsetSqueals += 12;
+        },
+        setNotification(state, notifications){
+            notifications.forEach(not => {
+                if(! state.notifications.map(noti => noti._id).includes(not._id)) state.notifications.push(not)
+            })
+        },
+        deleteNotifications(state){
+            state.notifications = [];
         }
     },
     getters:{
@@ -60,6 +69,9 @@ export const store = createStore({
         },
         getOffset(state){
             return state.offsetSqueals;
+        },
+        getNotifications(state){
+            return state.notifications;
         }
     }
 })

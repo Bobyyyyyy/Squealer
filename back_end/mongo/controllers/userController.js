@@ -86,6 +86,22 @@ const updateSessionVip = async (req,res) => {
         }
     }
 }
+
+const smm2userSession = async (req,res) => {
+    try{
+        req.session.type = 'user'
+        req.session.save();
+        res.status(200).send({});
+    }
+    catch(err){
+        if(typeof err.statusCode !== 'undefined')
+            res.status(err.statusCode).send(err.message);
+        else {
+            res.status(500).send(err);
+        }
+    }
+}
+
 const getSessionVip = async (req,res) => {
     res.send({vip: req.session.vip})
 }
@@ -292,6 +308,7 @@ module.exports = {
     changePassword,
     getSessionUser,
     updateSessionVip,
+    smm2userSession,
     getSessionVip,
     modifyUser,
     getAllUsers,
