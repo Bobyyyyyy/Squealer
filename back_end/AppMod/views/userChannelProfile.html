@@ -90,9 +90,11 @@
                     Add Admin
                 </button>
                 <div class="btn btn-danger fontcustom text-black" id="block-button"> </div>
+                <button type="button" class="btn btn-danger text-white  fontcustom" data-bs-toggle="modal" data-bs-target="#deleteChannel">
+                    Elimina Canale
+                </button>
             </div>
         </div>
-
 
 
 
@@ -139,6 +141,22 @@
                     <button type="submit" class="btn bg-primary" id="changeReactionsButton">Modifica</button>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteChannel" tabindex="-1" aria-labelledby="deleteChannelModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="text-dark">
+                    Stai per eliminare il canale, sei sicuro?
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
+                <button type="submit" class="btn btn-danger" id="delete-button">Elimina</button>
+            </div>
         </div>
     </div>
 </div>

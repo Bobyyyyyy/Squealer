@@ -1,5 +1,6 @@
 const channelsModel = require('../models/ChannelMethods');
 const {mongo} = require("mongoose");
+const officialChannel = require("../models/officialChannelsMethods");
 const createChannel = async (req,res) => {
     try {
         res.status(200).send(await channelsModel.addChannel(req.body))
@@ -119,6 +120,18 @@ const handleRequest = async function (req,res) {
     }
 }
 
+const deleteChannel = async (req,res) => {
+    try {
+        res.send(await channelsModel.deleteChannel(req.body.name));
+    } catch (Error) {
+        if(typeof Error.statusCode !== 'undefined')
+            res.status(Error.statusCode).send(Error.message);
+        else {
+            res.status(500).send(Error);
+        }
+    }
+}
+
 const addAdmin = async function (req,res) {
     try {
         let admin = req.session.type === 'smm' ? req.session.vip : req.session.user;
@@ -161,5 +174,6 @@ module.exports = {
     addFollower,
     handleRequest,
     handlePermission,
-    addAdmin
+    addAdmin,
+    deleteChannel
 }

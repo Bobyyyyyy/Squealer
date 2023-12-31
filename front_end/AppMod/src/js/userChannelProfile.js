@@ -321,6 +321,17 @@ function inizializeToast() {
     });
 }
 
+$('#delete-button').on('click', () => {
+    $.ajax({
+        url: '/db/channel/delete',
+        type: 'post',
+        data: {name: ChannelName},
+        success: () => {
+            location.reload();
+        }
+    })
+})
+
 function getReplies(parentID) {
     $.ajax({
         url: '/db/reply',
