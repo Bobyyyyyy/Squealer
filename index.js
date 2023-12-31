@@ -14,21 +14,20 @@ const path = require('path');
 const {isUser} = require("./back_end/Frontpage/controllers/FrontPageController");
 const mongouri = `mongodb://${mongoCredentials.user}:${mongoCredentials.pwd}@${mongoCredentials.site}/${dbname}?authSource=admin&writeConcern=majority`;
 
-/*
 const storeSession = MongoStore.create({
     mongoUrl: mongouri,
     dbName: dbname,
-    clear_interval: 660,
-    ttl: 600,
     stringify: false,
 })
-*/
 
+/*
 const storeSession = MongoStore.create({
     mongoUrl: 'mongodb://localhost:27017',
     dbName: dbname,
     stringify: false,
 })
+
+ */
 
 let app = express();
 
@@ -56,12 +55,6 @@ app.set('view engine','html');
 //il sito inizia dando il controllo al router della frontpage
 app.use('/', require('./back_end/Frontpage/routes/frontpage'));
 app.use('/db',require('./back_end/mongo/routers/mongoRouter'));
-
-
-app.get(['/user','/user/*'], isUser, (req,res) => {
-    res.sendFile(rootDir + '/front_end/AppUser/index.html');
-})
-
 app.use('/jsFP', express.static(rootDir+ '/back_end/Frontpage/views'))
 app.use('/js' ,express.static(rootDir + '/front_end/AppMod/src/js'));
 app.use('/css',express.static(rootDir + '/front_end/AppMod/src/css'));
