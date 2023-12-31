@@ -6,7 +6,6 @@ function Body({post}) {
 
     const URLHTTPREGEX = /(http|ftp|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-])/g
     const ACCOUNTREGEX = /\@\w+/g
-    console.log(post.content.match(ACCOUNTREGEX))
 
     const parseContentText = (content, linkRegex, userRegex) => {
         // Initialize arrays to store links and users

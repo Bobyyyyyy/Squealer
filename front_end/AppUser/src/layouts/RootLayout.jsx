@@ -55,7 +55,6 @@ export default function RootLayout() {
         });
         if (res.ok) {
             res = await res.json();
-            console.log("not", res, "user", getUsernameFromSessionStore())
             if (Object.keys(res).length !== 0) {
                 setNotifications(res);
             }

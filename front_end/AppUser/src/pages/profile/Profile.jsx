@@ -56,7 +56,6 @@ function Profile () {
         setQuota(quotaRes);
         user.current = await getUserInfoByUsername(name);
         const postRes = await getPostByUsername(name);
-        console.log("post:", postRes);
         setPosts(postRes);
         setIsLoading(false);
     }

@@ -13,7 +13,7 @@ import {
     createRoutesFromElements,
     RouterProvider
 } from "react-router-dom";
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import RootLayout from "./layouts/RootLayout.jsx";
 import {
     checkChannelExists,
@@ -23,10 +23,25 @@ import {
 import ErrorPage from "./pages/ErrorPage.jsx";
 import PageProfileByName from "./pages/profile/PageProfileByName.jsx";
 import SinglePageChannel from "./pages/channels/SinglePageChannel.jsx";
+import {Spinner} from "flowbite-react";
 function App() {
+    const GUESTREGEX = /guest-\d+/g
+    const [isLoading, setIsLoading] = useState(true);
+    const [hasLogged, setHasLogged] = useState(false);
+    const getUsername = async () => {
+        setIsLoading(true);
+        let usernameRes = await setUsernameInSessionStore();
+        console.log("has logged res", usernameRes);
+        if (usernameRes.username.match(GUESTREGEX)) {
+            setHasLogged(false);
+        } else {
+            setHasLogged(true);
+        }
+        setIsLoading(false);
+    }
 
     useEffect(() => {
-        setUsernameInSessionStore()
+        getUsername()
             .catch(console.error);
     }, []);
 
@@ -61,7 +76,21 @@ function App() {
         });
 
     return (
-        <RouterProvider router={router} />
+        <>
+        {isLoading ? (
+            <div className="flex h-screen items-center justify-center">
+                <Spinner aria-label="loading profile spinner" size="xl" color="pink" />
+            </div>
+        ) : (
+            <>
+                {hasLogged ? (
+                    <RouterProvider router={router} />
+                ) : (
+                    <div>non hai loggato</div>
+                )}
+            </>
+        )}
+        </>
     );
 }
 

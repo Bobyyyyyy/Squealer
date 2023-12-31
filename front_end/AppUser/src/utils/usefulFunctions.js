@@ -8,7 +8,9 @@ async function setUsernameInSessionStore() {
     try {
         let res = await fetch("/db/user/session");
         res = await res.json();
+        console.log("username", res);
         sessionStorage.setItem("username", res.username);
+        return res;
     } catch (e) {
         console.log("errore nel settare l'user nel local storage: ", e);
     }
@@ -20,9 +22,7 @@ async function getQuotaByUsername(username) {
             method: 'GET'
         });
         if (res.ok) {
-            let x = await res.json();
-            console.log(x)
-            return x;
+            return await res.json();
         }
     } catch (e) {
         console.log(e);
