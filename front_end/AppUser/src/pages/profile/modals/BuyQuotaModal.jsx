@@ -77,7 +77,7 @@ function BuyQuotaModal({isOpen, setIsOpen, setHasUpdated}) {
             <Modal.Footer>
                 <div className="flex justify-around items-center w-full">
                     <button
-                        className="flex justify-center gap-3 w-full font-semibold uppercase bg-primary p-2 text-white rounded-xl"
+                        className="button-action"
                         onClick={handleBuyQuota}
                     >
                         Acquista {EuroIcon}

@@ -48,9 +48,11 @@ function HireSmmModal({isOpen, setIsOpen, setHasUpdated, smm, hasSMM}) {
                                 <div className="flex gap-4">
                                     <span className="text-lg">gestisce {smm[0].vipHandled.length} vips</span>
                                 </div>
-                                <Button onClick={() => hireSmm(smm[0].username, false)}>
+                                <button
+                                    className="button-warning"
+                                    onClick={() => hireSmm(smm[0].username, false)}>
                                     licenzia
-                                </Button>
+                                </button>
                             </div>
                         </div>
                     ) : (
@@ -71,9 +73,11 @@ function HireSmmModal({isOpen, setIsOpen, setHasUpdated, smm, hasSMM}) {
                                             <div className="flex gap-4">
                                                 <span className="text-lg">gestisce {smmUser.vipHandled.length} vips</span>
                                             </div>
-                                            <Button onClick={() => hireSmm(smmUser.username, true)}>
+                                            <button
+                                                className="button"
+                                                onClick={() => hireSmm(smmUser.username, true)}>
                                                 assumi
-                                            </Button>
+                                            </button>
                                         </div>
                                     </div>
                                 );

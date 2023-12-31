@@ -6,6 +6,7 @@ import {getPostByChannelName} from "../../utils/usefulFunctions.js";
 
 function SinglePageOfficialChannel() {
     const channel = useLoaderData();
+    console.log(channel)
     const [isLoading, setIsLoading] = useState(true);
     const [posts, setPosts] = useState([]);
 
@@ -31,8 +32,12 @@ function SinglePageOfficialChannel() {
                 <div className="flex flex-col w-full justify-center items-center gap-4">
                     <h3 className="text-center text-2xl font-extrabold mt-4">§{channel.name}</h3>
                     <p className="w-full h-fit p-2 break-words">{channel.description}</p>
+                    {channel.silenceable &&
+                        <div>
+                            silenziabile
+                        </div>
+                    }
                     {posts!==null && posts.map((post)=> {
-                        //console.log("id",post._id)
                         return(
                             <Post
                                 key={post._id}

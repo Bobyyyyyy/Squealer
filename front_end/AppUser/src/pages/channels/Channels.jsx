@@ -96,9 +96,9 @@ function Channels () {
     return (
         <>
             <div className="flex flex-col p-4">
-                <h1 className="text-xl uppercase">Lista canali:</h1>
+                <h1 className="text-xl font-semibold uppercase">Lista canali :</h1>
                 <button
-                    className="py-3 mt-4 bg-primary rounded text-lg font-medium"
+                    className="mt-4 button-action"
                     onClick={()=>setShowFilterModal(true)}
                 >
                     Filtra canali
@@ -158,7 +158,7 @@ function Channels () {
                     </div>
                 )}
                 <button
-                    className="py-3 mt-4 bg-primary rounded text-lg font-medium"
+                    className="mt-4 button-action"
                     onClick={()=> setShowCreateModal(true)}
                 >
                     Crea canale

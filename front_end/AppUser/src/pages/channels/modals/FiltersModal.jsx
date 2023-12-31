@@ -68,10 +68,12 @@ function FiltersModal({isOpen, setIsOpen, channelName, setChannelName, visibilit
                           checked={activeOfficialChannel}
                           onChange={setActiveOfficialChanel}
                           label={"Mostra canali ufficiali"}
+                          color={"blue"}
+                          sizing={"md"}
                       />
                   </div>
-                  <Button
-                    className="w-fit"
+                  <button
+                    className="button-warning"
                     onClick={() => {
                         setChannelName('');
                         setVisibility('');
@@ -81,16 +83,16 @@ function FiltersModal({isOpen, setIsOpen, channelName, setChannelName, visibilit
                     }}
                   >
                       Rimuovi filtri
-                  </Button>
+                  </button>
               </div>
           </Modal.Body>
           <Modal.Footer>
-              <Button
-                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 w-full sm:w-auto"
+              <button
+                  className="button-action bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 w-full sm:w-auto md:w-auto"
                   onClick={handleSearch}
               >
                   Cerca
-              </Button>
+              </button>
           </Modal.Footer>
       </Modal>
     );

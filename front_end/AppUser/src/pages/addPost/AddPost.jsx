@@ -274,11 +274,11 @@ function AddPost(){
                     {error}
                 </div>}
             <button
-                className="flex w-full align-center justify-center items-center gap-2 bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded"
+                className="button-submit flex w-full align-center justify-center items-center gap-2 bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded"
                 type="submit"
-                onClick={(e) => {
+                onClick={async (e) => {
                     e.preventDefault();
-                    onSubmit()
+                    await onSubmit()
                 }}
             >
                 Submit

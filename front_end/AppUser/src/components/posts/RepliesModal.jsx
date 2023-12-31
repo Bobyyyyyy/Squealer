@@ -92,7 +92,7 @@ function RepliesModal({isOpen, setIsOpen, postID}) {
                 </>
             </Modal.Body>
             <Modal.Footer>
-                <div className="flex w-full gap-2">
+                <div className="flex flex-col w-full gap-2">
                     <textarea
                         value={comment}
                         rows="2"
@@ -102,11 +102,12 @@ function RepliesModal({isOpen, setIsOpen, postID}) {
                             setComment(e.target.value);
                         }}
                     />
-                    <Button
+                    <button
+                        className="button-action"
                         onClick={addComment}
                     >
                         Pubblica
-                    </Button>
+                    </button>
                 </div>
             </Modal.Footer>
         </Modal>

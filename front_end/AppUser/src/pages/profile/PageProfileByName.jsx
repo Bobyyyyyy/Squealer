@@ -57,14 +57,9 @@ function PageProfileByName() {
 
                                 <div className="flex flex-col w-full justify-between gap-3">
                                     <span className="text-4xl font-extrabold">{user.username}</span>
-                                    <div className="flex flex-wrap justify-start w-full gap-x-8 gap-y-2 text-lg font-normal ">
-                                        <span>Squeals:
-                                            <span className="ml-1 font-medium">{posts.length}</span>
-                                        </span>
-                                        <span>Seguiti:
-                                            <span className="ml-1 font-medium">{posts.length}</span>
-                                        </span>
-                                    </div>
+                                    <span className="text-lg font-normal">Squeals:
+                                        <span className="ml-1 font-medium">{posts.length}</span>
+                                    </span>
                                 </div>
                             </div>
                             {posts.map((post)=> {

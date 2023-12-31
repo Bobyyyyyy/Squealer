@@ -309,7 +309,7 @@ const getAllPost = async (query,sessionUser) =>{
     try{
         let filter = {
                 /* Per i canali non mi serve l'id dell'utente che fa la richiesta, a meno che non sia AppSmm*/
-            ...((query.smm || !query.channel) && query.name) && {'owner':  {$regex: query.name}},
+            ...((query.smm || !query.channel) && query.name) && {'owner': query.name},
                 /* FILTRO PER TIPO DI POST */
             ... (query.typeFilter && query.typeFilter !== 'all') && {'contentType': query.typeFilter},
 

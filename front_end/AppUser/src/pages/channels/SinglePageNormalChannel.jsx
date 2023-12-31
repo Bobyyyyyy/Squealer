@@ -87,7 +87,7 @@ function SinglePageNormalChannel({nome}) {
             .catch(console.error);
     }, [canSeePosts]);
 
-
+    console.log(role)
     return (
         <>
             {isLoading ? (
@@ -99,23 +99,23 @@ function SinglePageNormalChannel({nome}) {
                     <h3 className="text-center text-2xl font-extrabold mt-4">§{nome}</h3>
                     <p className="w-full h-fit p-2 break-words">{description}</p>
                     {role === "Creator" || role === "Admin" ? (
-                            <div className="flex flex-wrap justify-between items-center gap-4 px-8 w-full">
-                                <Button
+                            <div className="flex flex-wrap justify-around items-center gap-4 px-4 w-full">
+                               <button className="button"
                                     onClick={()=>setShowFollowerModal(true)}
                                 >
-                                    Gestisci follower
-                                </Button>
+                                    Followers
+                                </button>
                                 <FollowersModal
                                         channelName={nome} followers={followers} isOpen={showFollowerModal} setIsOpen={setShowFollowerModal}
                                         hasUpdated={hasUpdatedFol} setHasUpdated={setHasUpdatedFol}
                                 />
                                 {type === "private" &&
                                     <>
-                                        <Button
+                                       <button className="button"
                                             onClick={()=>setShowRequestModal(true)}
                                         >
-                                            Gestisci richieste
-                                        </Button>
+                                             Richieste
+                                        </button>
                                         <RequestModal
                                             channelName={nome} requests={requests} isOpen={showRequestModal} setIsOpen={setShowRequestModal}
                                             hasUpdated={hasUpdatedReq} setHasUpdated={setHasUpdatedReq}
@@ -124,21 +124,21 @@ function SinglePageNormalChannel({nome}) {
                                 }
                                 {role === "Creator" &&
                                     <>
-                                        <Button
+                                       <button className="button"
                                             onClick={()=>setShowAddAdimnModal(true)}
                                         >
                                             Aggiungi admin
-                                        </Button>
+                                        </button>
                                         <AddAdminModal
                                             channelName={nome} followers={followers} isOpen={showAddAdminModal} setIsOpen={setShowAddAdimnModal}
                                             hasUpdated={hasUpdatedAddAdm} setHasUpdated={setHasUpdatedAddAdm}
                                         />
 
-                                        <Button
+                                       <button className="button"
                                             onClick={()=>setShowRmAdminModal(true)}
                                         >
                                             Rimuovi admin
-                                        </Button>
+                                        </button>
                                         <RmAdminModal
                                             channelName={nome} admins={admins} isOpen={showRmAdminModal} setIsOpen={setShowRmAdminModal}
                                             hasUpdated={hasUpdatedRmAdm} setHasUpdated={setHasUpdatedRmAdm}
@@ -147,31 +147,31 @@ function SinglePageNormalChannel({nome}) {
                                 }
                             </div>
                         ) :
-                        <>
+                        <div className="mx-auto">
                         {role === "Follower" || role === "Writer" ? (
-                            <Button  onClick={handleFollow}>
-                                {DontFollow}
+                           <button className="button-delete"  onClick={handleFollow}>
                                 <span className="pl-2">
                                     Disicriviti
                                 </span>
-                            </Button>
+                                {DontFollow}
+                            </button>
                         ): (role === "Not Follower" ? (
-                            <Button  onClick={handleFollow}>
-                                {FollowIcon}
+                           <button className="button-action"  onClick={handleFollow}>
                                 <span className="pl-2">
                                     Segui
                                 </span>
-                            </Button>
+                                {FollowIcon}
+                            </button>
                         ) : (
-                            <Button  onClick={handleFollow}>
-                                {DontFollow}
+                           <button className="button-delete"  onClick={handleFollow}>
                                 <span className="pl-2">
                                     Annulla
                                 </span>
-                            </Button>
+                                {DontFollow}
+                            </button>
                         ))
                         }
-                        </>
+                        </div>
                     }
                     <div className={"flex flex-wrap w-full gap-8 items-center justify-center h-full pb-20 mt-4 overflow-y-scroll"}>
                         {type === "private" && (role === "Not Follower" || role === "Pending")? (
