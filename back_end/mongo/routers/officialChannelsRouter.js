@@ -10,4 +10,7 @@ router.post('/delete',officialChannelsController.deleteCh);
 router.get('/number',officialChannelsController.getChannelsNumber);
 router.get('/all',officialChannelsController.getChannel);
 
+router.get('/channelPic', officialChannelsController.getChannelProfilePicByName);
+router.put('/channelPic', officialChannelsController.updateChannelProfilePic);
+
 module.exports = router;

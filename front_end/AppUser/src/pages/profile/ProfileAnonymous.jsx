@@ -17,7 +17,7 @@ function ProfileAnonymous() {
                 Effettua il login per accedere a tutte le funzionalità di Squealer
             </span>
             <button
-                className="button"
+                className="button uppercase font-bold"
                 onClick={handleLogout}
             >
                 Accedi

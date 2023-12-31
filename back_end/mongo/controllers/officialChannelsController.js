@@ -1,4 +1,5 @@
 const officialChannel = require('../models/officialChannelsMethods');
+const channelsModel = require("../models/ChannelMethods");
 
 /* Reserved Channel Methods */
 const createReservedChannel = async (req,res,next) => {
@@ -72,6 +73,29 @@ const channel = async (req,res) => {
     }
 }
 
+const getChannelProfilePicByName = async (req,res) => {
+    try {
+        res.send(await channelsModel.getChannelProfilePicByName(req.query.channelName));
+    } catch (Error) {
+        if(typeof Error.statusCode !== 'undefined')
+            res.status(Error.statusCode).send(Error.message);
+        else {
+            res.status(500).send(Error);
+        }
+    }
+}
+
+const updateChannelProfilePic = async (req, res) => {
+    try {
+        res.send(await channelsModel.updateChannelProfilePic(req.body.channelName, req.body.newProfilePic));
+    } catch (Error) {
+        if(typeof Error.statusCode !== 'undefined')
+            res.status(Error.statusCode).send(Error.message);
+        else {
+            res.status(500).send(Error);
+        }
+    }
+}
 
 module.exports = {
     createReservedChannel,
@@ -79,5 +103,7 @@ module.exports = {
     getChannelsNumber,
     getChannel,
     modifyDesc,
-    channel
+    channel,
+    getChannelProfilePicByName,
+    updateChannelProfilePic
 }

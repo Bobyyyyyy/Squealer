@@ -1,5 +1,9 @@
 import React, {useEffect, useState} from "react";
-import {getPostByChannelName, getUsernameFromSessionStore} from "../../utils/usefulFunctions.js";
+import {
+    getChannelPicByChannelName,
+    getPostByChannelName,
+    getUsernameFromSessionStore
+} from "../../utils/usefulFunctions.js";
 import Post from "../../components/posts/Post.jsx";
 import {FollowIcon, DontFollow} from "../../components/assets/index.jsx";
 import {Button, Spinner} from "flowbite-react";
@@ -7,6 +11,8 @@ import RequestModal from "./modals/RequestModal.jsx";
 import FollowersModal from "./modals/FollowersModal.jsx";
 import AddAdminModal from "./modals/AddAdminModal.jsx";
 import RmAdminModal from "./modals/RmAdminModal.jsx";
+import ChangeProfilePictureModal from "../profile/modals/ChangeProfilePictureModal.jsx";
+import ChangeChannelPictureModal from "./modals/ChangeChannelPictureModal.jsx";
 
 function SinglePageNormalChannel({nome}) {
 
@@ -15,11 +21,13 @@ function SinglePageNormalChannel({nome}) {
     const [posts, setPosts] = useState([]);
     const [description, setDescription] = useState("");
     const [role, setRole] = useState("");
-
+    const [channelPic, setChannelPic] = useState(null);
+    
     const [showRequestModal, setShowRequestModal] = useState(false);
     const [showFollowerModal, setShowFollowerModal] = useState(false);
     const [showAddAdminModal, setShowAddAdimnModal] = useState(false);
     const [showRmAdminModal, setShowRmAdminModal] = useState(false);
+    const [showChangePicModal, setShowChangePicModal] = useState(false);
 
     const [hasUpdatedReq, setHasUpdatedReq] = useState(false);
     const [hasUpdatedFol, setHasUpdatedFol] = useState(false);
@@ -51,6 +59,8 @@ function SinglePageNormalChannel({nome}) {
 
     const fetchPost = async () => {
         setIsLoading(true);
+        const picChannelRes = await getChannelPicByChannelName(nome);
+        setChannelPic(picChannelRes.profilePicture);
         if (canSeePosts) {
             const resPost = await getPostByChannelName(nome);
             setPosts(resPost);
@@ -94,9 +104,18 @@ function SinglePageNormalChannel({nome}) {
                     <Spinner aria-label="loading profile spinner" size="xl" color="pink" />
                 </div>
                 ) : (
-                <div className="flex flex-col w-full justify-center items-center gap-4">
-                    <h3 className="text-center text-2xl font-extrabold mt-4">§{nome}</h3>
-                    <p className="w-full h-fit p-2 break-words">{description}</p>
+                <div className="flex flex-col w-full justify-center items-center gap-4 mt-2">
+                    <div className="flex flex-col items-center justify-start px-4 gap-2 w-full">
+                        <div className="flex justify-center gap-3 w-full items-center">
+                            <img
+                                src={channelPic}
+                                alt={`foto canale ${nome}`}
+                                className={"w-20 h-20 rounded-full object-cover"}
+                            />
+                            <h3 className="text-center text-2xl font-extrabold">§{nome}</h3>
+                        </div>
+                        <p className="text-center px-2 break-words text-sm">{description}</p>
+                    </div>
                     {role === "Creator" || role === "Admin" ? (
                             <div className="flex flex-wrap justify-around items-center gap-4 px-4 w-full">
                                <button className="button"
@@ -142,6 +161,12 @@ function SinglePageNormalChannel({nome}) {
                                             channelName={nome} admins={admins} isOpen={showRmAdminModal} setIsOpen={setShowRmAdminModal}
                                             hasUpdated={hasUpdatedRmAdm} setHasUpdated={setHasUpdatedRmAdm}
                                         />
+                                        <button className="button"
+                                                onClick={()=>setShowChangePicModal(true)}
+                                        >
+                                            Cambia foto canale
+                                        </button>
+                                        <ChangeChannelPictureModal isOpen={showChangePicModal} setIsOpen={setShowChangePicModal} channelName={nome} />
                                     </>
                                 }
                             </div>

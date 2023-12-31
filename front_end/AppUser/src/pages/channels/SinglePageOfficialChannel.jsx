@@ -28,9 +28,19 @@ function SinglePageOfficialChannel() {
                 <Spinner aria-label="loading profile spinner" size="xl" color="pink" />
             </div>
             ) : (
-                <div className="flex flex-col w-full justify-center items-center gap-4">
-                    <h3 className="text-center text-2xl font-extrabold mt-4">§{channel.name}</h3>
-                    <p className="w-full h-fit p-2 break-words">{channel.description}</p>
+                    <div className="flex flex-col w-full justify-center items-center gap-4 mt-2">
+                        <div className="flex flex-col items-center justify-start px-4 gap-2 w-full">
+                            <div className="flex justify-center items-center gap-3 w-full ">
+                                <img
+                                    src={channel.profilePicture}
+                                    alt={`foto canale ${channel.name}`}
+                                    className={"w-20 h-20 rounded-full object-cover"}
+                                />
+                                <h3 className="text-center text-2xl font-extrabold">§{channel.name}</h3>
+                            </div>
+                            <p className="text-center px-2 break-words text-sm">{channel.description}</p>
+                        </div>
+
                     {channel.silenceable &&
                         <div>
                             silenziabile

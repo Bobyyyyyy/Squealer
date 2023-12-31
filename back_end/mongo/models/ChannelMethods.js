@@ -434,7 +434,34 @@ const blockChannel = async (user,channelName) => {
     }
 }
 
+const getChannelProfilePicByName = async (channelName) => {
+    try {
+        await connection.get();
+        console.log("channel NAME:", channelName)
+        let channel = await Channel.findOne({name: channelName}).lean();
+        if (!channel) {
+            throw createError('Canale non esiste',400);
+        }
+        return {profilePicture: channel.profilePicture};
 
+    } catch (err) {
+        console.log(err);
+        throw err;
+    }
+}
+
+const updateChannelProfilePic = async (channelName, newProfilePic) => {
+    try {
+        await connection.get();
+        let channel = await Channel.findOneAndUpdate({name: channelName}, {profilePicture: newProfilePic});
+        if (!channel) {
+            throw createError('Canale non esiste',400);
+        }
+        return true;
+    } catch (err) {
+        throw err;
+    }
+}
 
 module.exports = {
     addChannel,
@@ -447,5 +474,7 @@ module.exports = {
     addFollower,
     handleRequest,
     addAdmin,
-    handlePermission
+    handlePermission,
+    getChannelProfilePicByName,
+    updateChannelProfilePic
 }

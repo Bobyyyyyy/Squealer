@@ -109,6 +109,18 @@ async function getProfilePicByUsername (username) {
     }
 }
 
+async function getChannelPicByChannelName (channelName) {
+    try {
+        let res = await fetch(`/db/channel/channelPic?channelName=${channelName}`);
+        if (res.ok) {
+            return await res.json();
+        }
+    }
+    catch (e) {
+        console.log(e)
+    }
+}
+
 async function getUserInfoByUsername (username) {
     try {
         let res = await fetch(`/db/user/singleuser?name=${username}`)
@@ -180,6 +192,7 @@ export {
     getQuotaByUsername,
     getPostByUsername,
     getProfilePicByUsername,
+    getChannelPicByChannelName,
     checkChannelExists,
     checkUserExists,
     getUserInfoByUsername,

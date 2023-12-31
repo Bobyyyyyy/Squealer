@@ -115,6 +115,34 @@ const modifyDescription = async (body) => {
     }
 }
 
+const getChannelProfilePicByName = async (channelName) => {
+    try {
+        await connection.get();
+        console.log("channel NAME:", channelName)
+        let channel = await Channel.findOne({name: channelName}).lean();
+        if (!channel) {
+            throw createError('Canale non esiste',400);
+        }
+        return {profilePicture: channel.profilePicture};
+
+    } catch (err) {
+        console.log(err);
+        throw err;
+    }
+}
+
+const updateChannelProfilePic = async (channelName, newProfilePic) => {
+    try {
+        await connection.get();
+        let channel = await Channel.findOneAndUpdate({name: channelName}, {profilePicture: newProfilePic});
+        if (!channel) {
+            throw createError('Canale non esiste',400);
+        }
+        return true;
+    } catch (err) {
+        throw err;
+    }
+}
 
 //manca un delete per provare le principali API
 
@@ -124,5 +152,7 @@ module.exports = {
     getChannels,
     channelsLength,
     searchByChannelName,
-    modifyDescription
+    modifyDescription,
+    getChannelProfilePicByName,
+    updateChannelProfilePic
 }

@@ -116,8 +116,9 @@ const getUserProfilePicture = async (username) => {
     try {
         await connection.get();
         let user = await User.findOne({username: username}).lean();
-        //if (mongoose.connection.base.connections.length === 0) {
-
+        if (!user) {
+            throw createError('Utente non esiste',400);
+        }
         return {profilePic: user.profilePicture};
     } catch (err) {
         console.log(err);
