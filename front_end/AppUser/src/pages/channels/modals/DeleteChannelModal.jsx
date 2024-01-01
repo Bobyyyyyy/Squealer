@@ -1,25 +1,35 @@
 import {Modal} from "flowbite-react";
 import {getUsernameFromSessionStore} from "../../../utils/usefulFunctions.js";
 
-function DeleteAccountModal({isOpen, setIsOpen}) {
-    const deleteAccount = async () => {
-        console.log("eliminato")
+function DeleteChannelModal({isOpen, setIsOpen, channelName}) {
+    const DeleteChannel = async () => {
+        console.log(channelName, typeof channelName)
+        try {
+            await fetch(`/db/channel/delete`,{
+                method: 'POST',
+                body: {
+                    name: channelName
+                }
+            });
+        } catch (e) {
+            console.log(e);
+        }
     }
 
     return (
         <Modal  show={isOpen} onClose={()=>setIsOpen(false)}>
             <Modal.Header>
-                Eliminazione Account
+                Eliminazione Canale
             </Modal.Header>
             <Modal.Body>
                 <div className="flex flex-col gap-6 w-full">
                     <div className="flex flex-col w-full justify-center gap-0.5 items-center overflow-x-hidden">
                         <p className="text-center font-bold text-xl">
-                            Sei sicuro di eliminare l'account
+                            Sei sicuro di eliminare il canale
                         </p>
                         <div className="flex gap-2">
                             <span className="font-extrabold text-2xl">
-                                {getUsernameFromSessionStore()}
+                                {channelName}
                             </span>
                             <span className="font-extrabold text-2xl">
                                 ?
@@ -34,7 +44,7 @@ function DeleteAccountModal({isOpen, setIsOpen}) {
                             non
                         </span>
                         <span>
-                            sarà possibile ripristinare l'account
+                            sarà possibile ripristinare il canale
                         </span>
 
                     </div>
@@ -43,7 +53,7 @@ function DeleteAccountModal({isOpen, setIsOpen}) {
             <Modal.Footer>
                 <button
                     className="button-delete"
-                    onClick={deleteAccount}
+                    onClick={DeleteChannel}
                 >
                     CONFERMO
                 </button>
@@ -52,4 +62,4 @@ function DeleteAccountModal({isOpen, setIsOpen}) {
     );
 }
 
-export default DeleteAccountModal;
+export default DeleteChannelModal;

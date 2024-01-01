@@ -43,7 +43,11 @@ function Search ()  {
                     return (
                         <Link className="w-full" to={`/search/${user.username}`} key={user._id} >
                             <div className="flex w-full justify-start items-center gap-4">
-                                <img src={user.profilePicture} alt={`${user.username}'s profile picture`} className="object-cover w-14 h-14 rounded-full"/>
+                                <img
+                                    src={user.profilePicture}
+                                    alt={`${user.username}'s profile picture`}
+                                    className="w-14 h-14 object-cover rounded-full"
+                                />
                                 <div className="flex flex-col justify-between overflow-x-hidden w-full">
                                     <span className="font-semibold text-lg truncate">{user.username}</span>
                                     <span className="font-normal text-base text-gray-600">{user.typeUser}</span>
