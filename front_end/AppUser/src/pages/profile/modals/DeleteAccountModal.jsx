@@ -1,9 +1,18 @@
 import {Modal} from "flowbite-react";
-import {getUsernameFromSessionStore} from "../../../utils/usefulFunctions.js";
+import {getUsernameFromSessionStore, handleLogout} from "../../../utils/usefulFunctions.js";
 
 function DeleteAccountModal({isOpen, setIsOpen}) {
     const deleteAccount = async () => {
         console.log("eliminato")
+        try {
+            await fetch(`/db/user/delete/${getUsernameFromSessionStore()}`,{
+                method: 'DELETE',
+            });
+            setIsOpen(false);
+            await handleLogout();
+        } catch (e) {
+            console.log(e);
+        }
     }
 
     return (

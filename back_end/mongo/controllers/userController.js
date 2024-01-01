@@ -276,7 +276,7 @@ const clearDB = async (req,res) => {
 
 const deleteUser = async (req,res) => {
     try{
-        res.status(200).send(await userModel.deleteUser(req.body.username));
+        res.status(200).send(await userModel.deleteUser(req.params.username));
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);

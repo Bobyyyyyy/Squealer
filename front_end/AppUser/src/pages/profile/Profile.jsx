@@ -2,11 +2,12 @@ import {
     getUsernameFromSessionStore,
     getPostByUsername,
     getUserInfoByUsername,
-    getQuotaByUsername
+    getQuotaByUsername,
+    handleLogout
 } from "../../utils/usefulFunctions.js";
 import React, {useEffect, useRef, useState} from "react";
 import Post from "../../components/posts/Post.jsx";
-import {Button, Spinner} from "flowbite-react";
+import {Spinner} from "flowbite-react";
 import BuyQuotaModal from "./modals/BuyQuotaModal.jsx";
 import HireSmmModal from "./modals/HireSmmModal.jsx";
 import DeleteAccountModal from "./modals/DeleteAccountModal.jsx";
@@ -30,14 +31,6 @@ function Profile () {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
 
     const user = useRef(null);
-
-
-    const handleLogout = async () => {
-        let res = await fetch("/logout");
-        window.location.href= res.url;
-        localStorage.clear();
-        sessionStorage.clear();
-    }
 
     const getSmm = async () => {
         let filter = JSON.stringify({

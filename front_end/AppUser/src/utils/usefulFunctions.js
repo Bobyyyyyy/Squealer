@@ -182,6 +182,12 @@ const checkUserExists = async ({params}) => {
     };
 }
 
+const handleLogout = async () => {
+    let res = await fetch("/logout");
+    window.location.href= res.url;
+    localStorage.clear();
+    sessionStorage.clear();
+}
 
 
 export {
@@ -197,5 +203,6 @@ export {
     getPostByChannelName,
     getAllPost,
     getPostByOfficialChannelName,
-    getAllOfficialChannelPost
+    getAllOfficialChannelPost,
+    handleLogout
 }
