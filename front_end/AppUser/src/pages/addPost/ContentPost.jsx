@@ -3,7 +3,7 @@ import Mappa from "../../components/posts/maps/Mappa.jsx";
 import {ArrowRightIcon} from "../../components/assets/index.jsx";
 function ContentPost({type, quota, currentQuota, setCurrentQuota,
                          content, setContent, setImgAsFile, position, setPosition,
-                         destinations, setError, isQuotaNegative}) {
+                         destinations, handleError, isQuotaNegative}) {
 
     const [isLink, setIsLink] = useState(false)
     const [preview, setPreview] = useState(false);
@@ -33,7 +33,7 @@ function ContentPost({type, quota, currentQuota, setCurrentQuota,
         let remainingWquota = quota.characters.weekly + ((remainingDquota < 0) ? remainingDquota : 0);
         let remainingMquota = quota.characters.monthly + ((remainingWquota < 0) ? remainingWquota : 0);
 
-        setError(remainingMquota < 0? "hai finito la quota mensile" : "");
+        handleError(remainingMquota < 0? "hai finito la quota mensile" : "");
 
         remainingDquota = (remainingDquota < 0) ? 0 : remainingDquota;
         remainingWquota = (remainingWquota < 0) ? 0 : remainingWquota;

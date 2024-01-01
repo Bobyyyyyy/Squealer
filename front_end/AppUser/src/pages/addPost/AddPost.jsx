@@ -38,6 +38,10 @@ function AddPost(){
         </div>
     );
 
+    const handleError = (data) => {
+        setError(data);
+    }
+
     function parseDestinations(dests) {
         let finalDest = [];
         let allDest = dests.replaceAll(" ", "").split(",");
@@ -52,7 +56,9 @@ function AddPost(){
 
     const canSendPost = () => {
         let canSend = true;
-        if (!destinations && !content) {
+        if (!!error) {
+            canSend = false;
+        } else if (!destinations && !content) {
             setError("Inserisci i destinatari e il contenuto")
             canSend = false;
         } else if (!content) {
@@ -243,7 +249,7 @@ function AddPost(){
                         type={type} content={content} setContent={setContent} destinations={destinations}
                         quota={quota} currentQuota={currentQuota} setCurrentQuota={setCurrentQuota}
                         setImgAsFile={setImgAsFile} position={position} setPosition={setPosition}
-                        setError={setError} isQuotaNegative={isQuotaNegative}
+                        handleError={handleError}  isQuotaNegative={isQuotaNegative}
                     />
                 }
                 <div className="flex items-center gap-4 mt-4">
@@ -268,7 +274,7 @@ function AddPost(){
                     </p>
                 </div>
             }
-            {isTimed && <TimedPost frequency={frequencyMs} setFrequencyMs={setFrequencyMs} numberOfPosts={numberOfPosts} setNumberOfPosts={setNumberOfPosts} type={type}/>}
+            {isTimed && <TimedPost setFrequencyMs={setFrequencyMs} numberOfPosts={numberOfPosts} setNumberOfPosts={setNumberOfPosts} type={type} handleError={handleError} />}
             {!!error &&
                 <div className="flex w-full justify-start text-xl text-red-600 mb-4">
                     {error}
