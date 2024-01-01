@@ -1,18 +1,9 @@
 import ContentPost from "./ContentPost.jsx";
-import {useEffect, useRef, useState} from "react";
+import {useEffect, useState} from "react";
 import {SubmitIcon} from "../../components/assets/index.jsx";
-import {
-    getQuotaByUsername,
-    getUsernameFromSessionStore
-} from "../../utils/usefulFunctions.js";
+import {getQuotaByUsername, getUsernameFromSessionStore} from "../../utils/usefulFunctions.js";
 
-import {
-    blob2base64,
-    compressBlob,
-    getEmbed
-} from "../../utils/imageFunctions.js";
-
-import {Toast} from "flowbite-react";
+import {blob2base64, compressBlob, getEmbed} from "../../utils/imageFunctions.js";
 import TimedPost from "./TimedPost.jsx";
 import {startSendingPosition} from "../../utils/geoFunctions.js";
 import ModalGeo from "./ModalGeo.jsx";
@@ -75,7 +66,7 @@ function AddPost(){
             canSend = false;
         } else if (isQuotaNegative()) {
             canSend = false;
-        } else if (destinations.includes(username)) {
+        } else if (isMyUsername(destinations)) {
             setError("Non puoi inviare messaggi a te stesso")
             canSend = false;
         } else if (containsUppercaseChannel(destinations)) {
@@ -89,10 +80,14 @@ function AddPost(){
         return /§[A-Z]/.test(str);
     }
 
+    function isMyUsername(dest) {
+        let reg = new RegExp(`@${username}$`, "gm");
+        return dest.match(reg);
+    }
+
     const isQuotaNegative = () => {
         return currentQuota?.monthly < 0;
     }
-
 
     async function createPost() {
         let content2send;
