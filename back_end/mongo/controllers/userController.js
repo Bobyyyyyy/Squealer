@@ -21,6 +21,24 @@ const addUser = async (req, res,next) => {
         }
     }
 }
+const resetPswd = async (req,res) => {
+    try {
+        let user = req.body.user;
+        let answer = req.body.answer;
+        let password = req.body.password;
+
+        if(!user || !answer || !password) throw createError('bad request', 400);
+
+        res.status(200).send(await userModel.checkSecurityAnswer(user,answer,password));
+    } catch (Error) {
+        if(typeof Error.statusCode !== 'undefined')
+            res.status(Error.statusCode).send(Error.message);
+        else {
+            res.status(500).send(Error);
+        }
+    }
+}
+
 const searchUser = async (req,res) => {
     try {
         res.send(await userModel.searchByUsername(req.body));
@@ -316,6 +334,7 @@ const hireSmm = async (req, res) => {
 
 module.exports = {
     addUser,
+    resetPswd,
     searchUser,
     changePassword,
     getSessionUser,

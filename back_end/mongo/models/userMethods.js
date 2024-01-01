@@ -59,7 +59,7 @@ const addUser = async (body) => {
 const checkSecurityAnswer = async function(username,answer,newPassword) {
     try{
         await connection.get();
-        let getAnswer = User.findOne({'username': username}).lean();
+        let getAnswer = await User.findOne({'username': username}).lean();
         if(answer.trim() !== getAnswer.backupAnswer) {
             throw createError('Risposta errata',400);
         }
@@ -536,6 +536,7 @@ const clearDB = async () => {
 
 module.exports = {
     addUser,
+    checkSecurityAnswer,
     searchByUsername,
     changePwsd,
     loginUser,

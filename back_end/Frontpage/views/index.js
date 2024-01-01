@@ -56,20 +56,27 @@ $('#password_recovery').on('click', () => {
 $('#change_password_form').on('submit', event => {
     event.preventDefault();
 
-    let user = $('#recovery_username').val();
-    let answer = $('#recovery_answer').val();
-
-    console.log(newUser)
+    let data = {
+        user: $('#recovery_username').val(),
+        answer: $('#recovery_answer').val(),
+        password: $('#recovery_pass').val()
+    }
 
     $.ajax({
-        url: '/register',
-        type: 'post',
-        data: newUser,
+        url: '/db/user/resetpswd',
+        type: 'put',
+        data: data,
         success: () => {
-            location.reload();
+            $('#recoveryModal').modal('hide');
         }
     })
         .fail((error) => {
-            $('#error').empty().html(error.responseText);
+            $('#message').empty().html(error.responseText);
         })
+});
+
+$('#recovery_pass, #recovery_pass_conf').on('keyup',  () => {
+    if ($('#recovery_pass').val() != $('#recovery_pass_conf').val())
+        $('#message').html('Password non coincidono!').css('color', 'red');
+    else  $('#message').html('')
 });

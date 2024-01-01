@@ -54,12 +54,18 @@
                         <label for="recovery_username" class="form-label">Username</label>
                         <input type="text" placeholder="pippo" class="form-control mb-3" id="recovery_username">
                         <span>Quale è il nome del tuo paese natale?</span><br>
-                        <input type="text" placeholder="Roma, Bologna ..." class="form-control" id="recovery_answer">
+                        <input type="text" placeholder="Roma, Bologna ..." class="form-control mb-3" id="recovery_answer">
+                        <label for="recovery_pass" class="form-label">Nuova password</label>
+                        <input type="password" class="form-control mb-3" id="recovery_pass">
+                        <label for="recovery_pass_conf" class="form-label">Conferma nuova password</label>
+                        <input type="password" class="form-control mb-3" id="recovery_pass_conf">
+                        <span id="message" class="mb-3"></span>
+                        <hr>
+                        <div class="d-flex flex-row justify-content-between">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
+                            <button type="submit" class="btn btn-primary">Cambia Password</button>
+                        </div>
                     </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
-                    <button type="submit" class="btn btn-primary">Cambia Password</button>
                 </div>
             </div>
         </div>

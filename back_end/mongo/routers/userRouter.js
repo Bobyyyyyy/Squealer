@@ -24,6 +24,7 @@ router.get('/lastPost',userController.getLastPost);
 router.get('/allSmm', userController.getAllSmm);
 router.put('/hireSmm', userController.hireSmm);
 router.delete('/delete', userController.deleteUser);
+router.put('/resetpswd', userController.resetPswd);
 
 //router.put('/session', userController.modifyUser);
 router.delete('/clearDB', userController.clearDB);
