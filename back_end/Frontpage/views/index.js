@@ -48,3 +48,28 @@ $('#guestbutton').on('click',() => {
         }
     })
 })
+
+$('#password_recovery').on('click', () => {
+    $('#recoveryModal').modal('show');
+})
+
+$('#change_password_form').on('submit', event => {
+    event.preventDefault();
+
+    let user = $('#recovery_username').val();
+    let answer = $('#recovery_answer').val();
+
+    console.log(newUser)
+
+    $.ajax({
+        url: '/register',
+        type: 'post',
+        data: newUser,
+        success: () => {
+            location.reload();
+        }
+    })
+        .fail((error) => {
+            $('#error').empty().html(error.responseText);
+        })
+});

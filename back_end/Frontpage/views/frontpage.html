@@ -31,13 +31,36 @@
                     <span id="error" class="link" style="color: #ea0000 !important;"></span>
                     <div class="form-input">
                         <button class="button btn-primary" type="submit" name="login">Entra!</button>
-                        <a href="/" class="button-underlined link">Password dimenticata</a>
+                        <a type="button" id="password_recovery" class="button-underlined link">Password dimenticata</a>
                     </div>
                     <div class="form-input">
                         <button onclick="window.location.href='/register'" class="button btn-secondary">Crea nuovo account</button>
-                        <a id="guestbutton" class="button-underlined link">Entra come ospite</a>
+                        <a type="button" id="guestbutton" class="button-underlined link">Entra come ospite</a>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="recoveryModal" class="modal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">cambio password</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="change_password_form">
+                        <label for="recovery_username" class="form-label">Username</label>
+                        <input type="text" placeholder="pippo" class="form-control mb-3" id="recovery_username">
+                        <span>Quale è il nome del tuo paese natale?</span><br>
+                        <input type="text" placeholder="Roma, Bologna ..." class="form-control" id="recovery_answer">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
+                    <button type="submit" class="btn btn-primary">Cambia Password</button>
+                </div>
             </div>
         </div>
     </div>
