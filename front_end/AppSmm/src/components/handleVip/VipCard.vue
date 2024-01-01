@@ -42,7 +42,7 @@
         NON CI SONO POST
       </div>
     </div>
-    <div class="d-flex justify-content-center">
+    <div class="d-flex justify-content-center mb-2">
       <button type="button" class="btn btn-primary" @click="$emit('setModal', username)"> Gestisci </button>
     </div>
   </div>

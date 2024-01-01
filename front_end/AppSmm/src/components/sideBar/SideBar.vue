@@ -144,7 +144,7 @@
     padding-bottom: 2vh;
     padding-left: 1vh;
     width: 12vw;
-    background-color: var($secondary);
+    background-color: #232323;
     z-index: 1;
   }
   .nameUser{

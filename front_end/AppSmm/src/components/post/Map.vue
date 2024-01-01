@@ -106,7 +106,7 @@ onMounted(()=> {
     <div id="map" class="flex-fill mb-2">
     </div>
     <div class="input-group">
-      <input  type="text" class="form-control " placeholder="Search..." aria-label="Username" aria-describedby="basic-addon1"
+      <input  type="text" class="form-control " placeholder="cerca..." aria-label="Username" aria-describedby="basic-addon1"
               v-model="positionName" @keyup.enter="go2loc()">
       <button type="button" class="btn btn-primary" @click="go2loc()">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">

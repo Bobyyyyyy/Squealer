@@ -60,8 +60,8 @@ watchEffect(async () => {
 <template>
   <div class="centralDiv">
     <div class="marginCD">
-      <div class="d-flex flex-row justify-content-between align-items-end pt-4 pb-2">
-        <div id="filterCh" class="input-group m-0">
+      <div class="d-flex flex-row flex-wrap justify-content-between align-items-end pt-4 pb-2 mb-2 m-lg-0">
+        <div id="filterCh" class="input-group mb-2 m-lg-0">
           <input  type="text" class="form-control " placeholder="Cerca..." aria-label="channel search" aria-describedby="cerca canale" v-model="searchChannel">
           <button type="submit" class="btn btn-secondary">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
@@ -70,7 +70,6 @@ watchEffect(async () => {
           </button>
         </div>
         <Select
-            classButton="btn btn-secondary"
             updateRef="updateVisibility"
             :dropItems="['public', 'private', 'all']"
             :dropItemsName="['pubblico', 'privato', 'tutto']"
@@ -79,7 +78,6 @@ watchEffect(async () => {
             @updateVisibility="(vis) => visibilityFilter = vis"
         />
         <Select
-            classButton="btn btn-secondary"
             updateRef="updateRole"
             :dropItems="['creator', 'admin', 'all']"
             :dropItemsName="['creatore', 'amministratore', 'tutti']"
@@ -118,7 +116,7 @@ watchEffect(async () => {
 
   @media screen and (max-width: 768px) {
     #filterCh{
-      width: auto;
+      width: 100%;
     }
   }
 

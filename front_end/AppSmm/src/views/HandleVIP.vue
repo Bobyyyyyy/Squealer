@@ -46,10 +46,12 @@
 <template>
   <Spinner v-if="!readyPage" />
   <NavBar v-show="readyPage"
-          center-text="Scegli account da gestire"
+          center-text="SQUEALER"
           :welcomingPage="true"
           @imgLoaded="console.log('ENTRO');readyPage = true"/>
-  <div v-show="readyPage"  class="d-flex flex-row flex-wrap justify-content-evenly" v-if="requestCompleted">
+  <h2 class="mt-3 mb-0">Scegli account da gestire:</h2>
+
+  <div v-show="readyPage"  class="d-flex flex-row mb-5 flex-wrap justify-content-evenly" v-if="requestCompleted">
     <VipCard v-for="(vip,index) in vips"
             :key="index"
             :followers="100"

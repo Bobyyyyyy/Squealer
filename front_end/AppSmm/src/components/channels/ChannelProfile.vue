@@ -132,8 +132,8 @@
           </div>
         </div>
       </div>
-      <div class="d-flex flex-row justify-content-between align-items-end">
-        <div class="d-flex flex-row">
+      <div class="d-flex flex-column flex-lg-row justify-content-between align-items-center align-items-lg-end">
+        <div class="d-flex flex-row flex-wrap justify-content-around gap-2 mt-2">
           <button type="button" class="btn btn-primary" @click="permissionModal.openModal">Permessi</button>
           <button v-if="channel.type === 'private'" type="button"  class="btn btn-primary ms-2" @click="requestModal.openModal">Richieste</button>
           <button v-if="channel.creator === currentVip" type="button" class="btn btn-primary ms-2" @click="addAdminModal.openModal">Aggiungi admin</button>
@@ -179,8 +179,13 @@
   <PermissionHandler ref="permissionModal" :followers="channel.followers" :chname="channel.name"/>
 </template>
 
-<style>
+<style scoped>
   .maxWidth{
     max-width:  20vh;
+  }
+  @media screen and (max-width: 768px){
+    .btn{
+      width: 10rem !important;
+    }
   }
 </style>

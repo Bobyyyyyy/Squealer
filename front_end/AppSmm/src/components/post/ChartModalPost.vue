@@ -68,8 +68,8 @@
             <button type="button" class="btn-close" @click="closeModal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <div class="d-flex flex-row align-items-center justify-content-around p-2 ">
-              <postReactionsChart ref="DChart" :reactions="liveReactions" />
+            <div class="d-flex flex-column flex-lg-row align-items-center justify-content-around p-2 ">
+              <postReactionsChart ref="DChart" :reactions="liveReactions" class="mb-5 mb-lg-0" />
               <Popularity30days ref="LChart" :reactions="liveReactions" :post="true" class="h-50" />
             </div>
           </div>

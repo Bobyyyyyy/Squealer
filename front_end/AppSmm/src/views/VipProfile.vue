@@ -138,7 +138,7 @@ import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
      <p class="m-0 text-center text-white mt-1 mb-0">{{n_post}} Squeal </p>
 
       <div class="d-flex flex-column align-items-start">
-        <div class="d-flex flex-row justify-content-around align-items-end">
+        <div class="d-flex flex-row justify-content-around align-items-end wrap-md">
 
           <Select class="buttonDropDown"
                     :dropItems="filterValues"
@@ -169,14 +169,14 @@ import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
                      :def="sortPosts[0]"
                      @updateSort = updateSortFilter
           />
-          <div v-if="keyWordFilter && !smartPhone" class="input-group ms-3">
-            <input type="text" class="form-control" placeholder="Keyword" aria-label="Keyword's search" v-model="keyWord" aria-describedby="button-addon2">
-            <button class="btn btn-secondary" type="button" id="button-addon2" @click="updateTagPosts">Cerca</button>
+          <div v-if="keyWordFilter && !smartPhone" class="input-group ms-3 keyword-dim">
+            <input type="text" class="form-control" placeholder="Keyword..." aria-label="Keyword's search" v-model="keyWord">
+            <button class="btn btn-secondary" type="button" @click="updateTagPosts">Cerca</button>
           </div>
         </div>
-        <div v-if="keyWordFilter && smartPhone" class="input-group ms-3">
-          <input type="text" class="form-control" placeholder="Keyword" aria-label="Keyword's search" aria-describedby="button-addon2">
-          <button class="btn btn-secondary" type="button" id="button-addon2" @click="updateTagPosts">Cerca</button>
+        <div v-if="keyWordFilter && smartPhone" class="input-group">
+          <input type="text" class="form-control" placeholder="Keyword..." aria-label="Keyword's search" >
+          <button class="btn btn-secondary" type="button" @click="updateTagPosts">Cerca</button>
         </div>
       </div>
       <div id="postContainer" v-if="readyPosts" class="d-flex flex-row flex-wrap justify-content-around mt-3">
@@ -196,8 +196,20 @@ import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
   .profileDim{
     max-height: 30vh;
   }
+  .keyword-dim{
+    width: 30rem;
+    max-width: 40rem;
+  }
 
   @media screen and (max-width: 768px) {
+
+    .keyword-dim{
+      width: 100%;
+    }
+
+    .wrap-md{
+      flex-wrap: wrap;
+    }
 
     .profileDim{
       max-height: 15vh;

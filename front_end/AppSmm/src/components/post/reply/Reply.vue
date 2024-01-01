@@ -39,4 +39,10 @@
   width: 32rem;
   height: auto;
 }
+
+@media screen and (max-width: 768px){
+  .replyDim{
+    width: 100% !important;
+  }
+}
 </style>
