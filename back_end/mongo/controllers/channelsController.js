@@ -122,7 +122,7 @@ const handleRequest = async function (req,res) {
 
 const deleteChannel = async (req,res) => {
     try {
-        res.send(await channelsModel.deleteChannel(req.body.name));
+        res.send(await channelsModel.deleteChannel(req.params.name));
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);

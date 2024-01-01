@@ -5,12 +5,11 @@ function DeleteChannelModal({isOpen, setIsOpen, channelName}) {
     const DeleteChannel = async () => {
         console.log(channelName, typeof channelName)
         try {
-            await fetch(`/db/channel/delete`,{
-                method: 'POST',
-                body: {
-                    name: channelName
-                }
+            await fetch(`/db/channel/${channelName}`,{
+                method: 'DELETE',
             });
+            setIsOpen(false);
+            window.location.href = "/user/";
         } catch (e) {
             console.log(e);
         }
