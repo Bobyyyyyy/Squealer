@@ -59,9 +59,9 @@ function NotificationModal({isOpen, setIsOpen, notifications, setNotifications})
                                     <div key={index} className="flex flex-col w-full my-2">
                                         <div className="flex gap-1.5">
                                             In
-                                            <span className="font-semibold">
+                                            <Link to={`/channels/${notification.channel}`} className="font-semibold">
                                                 §{notification.channel}
-                                            </span>
+                                            </Link>
                                             ci sono
                                             <span className="font-semibold">
                                                 {notification.names.length} nuovi post

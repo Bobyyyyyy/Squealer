@@ -6,13 +6,13 @@ import {
 } from "../../utils/usefulFunctions.js";
 import Post from "../../components/posts/Post.jsx";
 import {FollowIcon, DontFollow} from "../../components/assets/index.jsx";
-import {Button, Spinner} from "flowbite-react";
+import {Spinner} from "flowbite-react";
 import RequestModal from "./modals/RequestModal.jsx";
 import FollowersModal from "./modals/FollowersModal.jsx";
 import AddAdminModal from "./modals/AddAdminModal.jsx";
 import RmAdminModal from "./modals/RmAdminModal.jsx";
-import ChangeProfilePictureModal from "../profile/modals/ChangeProfilePictureModal.jsx";
 import ChangeChannelPictureModal from "./modals/ChangeChannelPictureModal.jsx";
+import DeleteChannelModal from "./modals/DeleteChannelModal.jsx";
 
 function SinglePageNormalChannel({nome}) {
 
@@ -28,6 +28,8 @@ function SinglePageNormalChannel({nome}) {
     const [showAddAdminModal, setShowAddAdimnModal] = useState(false);
     const [showRmAdminModal, setShowRmAdminModal] = useState(false);
     const [showChangePicModal, setShowChangePicModal] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+
 
     const [hasUpdatedReq, setHasUpdatedReq] = useState(false);
     const [hasUpdatedFol, setHasUpdatedFol] = useState(false);
@@ -107,11 +109,26 @@ function SinglePageNormalChannel({nome}) {
                 <div className="flex flex-col w-full justify-center items-center gap-4 mt-2">
                     <div className="flex flex-col items-center justify-start px-4 gap-2 w-full">
                         <div className="flex justify-center gap-3 w-full items-center">
-                            <img
-                                src={channelPic}
-                                alt={`foto canale ${nome}`}
-                                className={"w-20 h-20 rounded-full object-cover"}
-                            />
+                            {role === "Creator" ? (
+                                <>
+                                    <button
+                                            onClick={()=>setShowChangePicModal(true)}
+                                    >
+                                        <img
+                                            src={channelPic}
+                                            alt={`foto canale ${nome}`}
+                                            className={"w-20 h-20 rounded-full object-cover"}
+                                        />
+                                    </button>
+                                    <ChangeChannelPictureModal isOpen={showChangePicModal} setIsOpen={setShowChangePicModal} channelName={nome} />
+                                </>
+                            ) : (
+                                <img
+                                    src={channelPic}
+                                    alt={`foto canale ${nome}`}
+                                    className={"w-20 h-20 rounded-full object-cover"}
+                                />
+                            )}
                             <h3 className="text-center text-2xl font-extrabold">§{nome}</h3>
                         </div>
                         <p className="text-center px-2 break-words text-sm">{description}</p>
@@ -152,7 +169,7 @@ function SinglePageNormalChannel({nome}) {
                                             hasUpdated={hasUpdatedAddAdm} setHasUpdated={setHasUpdatedAddAdm}
                                         />
 
-                                       <button className="button"
+                                       <button className="button-warning"
                                             onClick={()=>setShowRmAdminModal(true)}
                                         >
                                             Rimuovi admin
@@ -161,12 +178,13 @@ function SinglePageNormalChannel({nome}) {
                                             channelName={nome} admins={admins} isOpen={showRmAdminModal} setIsOpen={setShowRmAdminModal}
                                             hasUpdated={hasUpdatedRmAdm} setHasUpdated={setHasUpdatedRmAdm}
                                         />
-                                        <button className="button"
-                                                onClick={()=>setShowChangePicModal(true)}
+                                        <button
+                                            className="button-warning"
+                                            onClick={() => setShowDeleteModal((prev) => !prev)}
                                         >
-                                            Cambia foto canale
+                                            Elimina canale
                                         </button>
-                                        <ChangeChannelPictureModal isOpen={showChangePicModal} setIsOpen={setShowChangePicModal} channelName={nome} />
+                                        <DeleteChannelModal setIsOpen={setShowDeleteModal} isOpen={showDeleteModal} channelName={nome}/>
                                     </>
                                 }
                             </div>

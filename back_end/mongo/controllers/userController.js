@@ -34,7 +34,18 @@ const searchUser = async (req,res) => {
 }
 
 const changePassword = async (req,res) => {
-    res.send(await userModel.changePwsd(req.body));
+    try {
+        let username = req.body.username;
+        let currentPsw = req.body.currentPsw;
+        let newPsw = req.body.newPsw
+        res.send(await userModel.changePwsd(username, currentPsw, newPsw));
+    } catch (Error) {
+        if(typeof Error.statusCode !== 'undefined')
+            res.status(Error.statusCode).send(Error.message);
+        else {
+            res.status(500).send(Error);
+        }
+    }
 }
 
 const getSessionUser = async (req,res) => {
@@ -276,7 +287,7 @@ const clearDB = async (req,res) => {
 
 const deleteUser = async (req,res) => {
     try{
-        res.status(200).send(await userModel.deleteUser(req.body.username));
+        res.status(200).send(await userModel.deleteUser(req.params.username));
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);

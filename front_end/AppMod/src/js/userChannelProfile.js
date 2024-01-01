@@ -323,9 +323,8 @@ function inizializeToast() {
 
 $('#delete-button').on('click', () => {
     $.ajax({
-        url: '/db/channel/delete',
-        type: 'post',
-        data: {name: ChannelName},
+        url: `/db/channel/${ChannelName}`,
+        type: 'delete',
         success: () => {
             location.reload();
         }

@@ -2,15 +2,17 @@ import {
     getUsernameFromSessionStore,
     getPostByUsername,
     getUserInfoByUsername,
-    getQuotaByUsername
+    getQuotaByUsername,
+    handleLogout
 } from "../../utils/usefulFunctions.js";
 import React, {useEffect, useRef, useState} from "react";
 import Post from "../../components/posts/Post.jsx";
-import {Button, Spinner} from "flowbite-react";
+import {Spinner} from "flowbite-react";
 import BuyQuotaModal from "./modals/BuyQuotaModal.jsx";
 import HireSmmModal from "./modals/HireSmmModal.jsx";
 import DeleteAccountModal from "./modals/DeleteAccountModal.jsx";
 import ChangeProfilePictureModal from "./modals/ChangeProfilePictureModal.jsx";
+import ChangePswModal from "./modals/ChangePswModal.jsx";
 
 
 function Profile () {
@@ -28,16 +30,9 @@ function Profile () {
     const [showChangePicModal, setShowChangePicModal] = useState(false);
     const [showSmmModal, setShowSmmModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
 
     const user = useRef(null);
-
-
-    const handleLogout = async () => {
-        let res = await fetch("/logout");
-        window.location.href= res.url;
-        localStorage.clear();
-        sessionStorage.clear();
-    }
 
     const getSmm = async () => {
         let filter = JSON.stringify({
@@ -134,6 +129,13 @@ function Profile () {
                     Elimina account
                 </button>
                 <DeleteAccountModal setIsOpen={setShowDeleteModal} isOpen={showDeleteModal} />
+                <button
+                    className="button"
+                    onClick={() => setShowChangePasswordModal((prev) => !prev)}
+                >
+                    Cambia password
+                </button>
+                <ChangePswModal setIsOpen={setShowChangePasswordModal} isOpen={showChangePasswordModal} />
                 {user.current.typeUser === "vip" &&
                 <>
                     <button
@@ -154,11 +156,6 @@ function Profile () {
                         setHasUpdated={setUpdatedSmm} smm={smm} hasSMM={hasSMM}
                     />
                 </>}
-                <button
-                    className="button"
-                >
-                    Cambia password
-                </button>
             </div>
             {posts.map((post)=> {
                 return(

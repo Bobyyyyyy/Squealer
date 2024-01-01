@@ -321,12 +321,12 @@ const getAllPost = async (query,sessionUser) =>{
 
 
                 /* PER IL CANALE SINGOLO */
-            ... (query.channel) && {'destinationArray.name': {$regex: query.channel}},
+            ... (query.channel) && {'destinationArray.name': query.channel},
 
                 /* PER IL CANALE UFFICIALE */
-            ...(query.official) && {'officialChannelsArray': {$regex: query.official}},
+            ...(query.official) && {'officialChannelsArray': query.official},
 
-            ... (query.user) && {$or: [{'destinationArray.name': {$regex: query.user}}]},
+            ... (query.user) && {$or: [{'destinationArray.name': query.user}]},
 
             ...(query?.keyword) && {tags: {$regex: query.keyword}},
 

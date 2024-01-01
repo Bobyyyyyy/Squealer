@@ -95,7 +95,7 @@ function Channels () {
 
     return (
         <>
-            <div className="flex flex-col p-4">
+            <div className="flex flex-col p-4 max-h-screen pb-20">
                 <h1 className="text-xl font-semibold uppercase">Lista canali :</h1>
                 <button
                     className="mt-4 button-action"
@@ -118,13 +118,17 @@ function Channels () {
                         <Spinner aria-label="loading profile spinner" size="xl" color="pink" />
                     </div>
                 ) : (
-                    <div className="flex flex-wrap w-full h-fit max-h-[580px] overflow-y-scroll mt-2 gap-4">
+                    <div className="flex flex-wrap w-full h-fit  overflow-y-scroll mt-2 gap-4">
                         {channels!==null && channels.map((channel) => {
                             const role = checkRole(channel.admins, channel.followers, channel.creator, channel.requests);
                             return (
                                 <Link className="w-full" to={`/channels/${channel.name}`} key={channel._id} >
-                                    <div className="flex w-full justify-start gap-4">
-                                        <img src={channel.profilePicture} alt="immagine canale" className="w-14 h-14 object-cover rounded-full"/>
+                                    <div className="flex w-full justify-start items-center gap-4">
+                                        <img
+                                            src={channel.profilePicture}
+                                            alt={`immagine canale ${channel.name}`}
+                                            className="w-14 h-14 rounded-full"
+                                        />
                                         <div className="flex flex-col overflow-x-hidden  mx-2 w-full">
                                             <div className="flex justify-between items-center">
                                                 <span className="font-semibold text-lg">{channel.name}</span>
@@ -140,8 +144,12 @@ function Channels () {
                         {activeOfficialChannel && officialChannels!==null && officialChannels.map((channel) => {
                             return (
                                 <Link className="w-full" to={`/channels/${channel.name}`} key={channel._id} >
-                                    <div className="flex w-full justify-start gap-4">
-                                        <img src={channel.profilePicture} alt="immagine canale" className="w-14 h-14 object-cover rounded-full"/>
+                                    <div className="flex w-full justify-start items-center gap-4">
+                                        <img
+                                            src={channel.profilePicture}
+                                            alt={`immagine canale ${channel.name}`}
+                                            className="w-14 h-14 object-cover rounded-full"
+                                        />
                                         <div className="flex flex-col overflow-x-hidden  mx-2 w-full">
                                             <div className="flex justify-between">
                                                 <span className="font-semibold text-lg">{channel.name}</span>

@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const channelsController = require('../controllers/channelsController');
-const officialChannelsController = require("../controllers/officialChannelsController");
 
 router.post('/',channelsController.createChannel);
 router.get('/',channelsController.getChannels);
+router.delete('/:name',channelsController.deleteChannel);
 router.get('/check',channelsController.checkUserInChannel);
 router.get('/number',channelsController.getChannelsNumber);
 router.get('/channelPic', channelsController.getChannelProfilePicByName);
@@ -16,7 +16,6 @@ router.post('/follower',channelsController.addFollower);
 router.put('/requests',channelsController.handleRequest);
 router.put('/permissions',channelsController.handlePermission);
 router.put('/admin',channelsController.addAdmin);
-router.post('/delete',channelsController.deleteChannel);
 
 
 module.exports = router

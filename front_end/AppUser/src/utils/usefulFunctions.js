@@ -172,18 +172,22 @@ const checkUserExists = async ({params}) => {
         throw Error(`Non esiste l'utente ${username}`);
     }
     const sol = await res.json();
-    const user = {
+    return {
         _id: sol._id,
         characters: sol.characters,
         maxQuota: sol.maxQuota,
         profilePicture: sol.profilePicture,
         username: sol.username,
         typeUser: sol.typeUser
-    }
-    console.log("utente", sol, user);
-    return user;
+    };
 }
 
+const handleLogout = async () => {
+    let res = await fetch("/logout");
+    window.location.href= res.url;
+    localStorage.clear();
+    sessionStorage.clear();
+}
 
 
 export {
@@ -199,5 +203,6 @@ export {
     getPostByChannelName,
     getAllPost,
     getPostByOfficialChannelName,
-    getAllOfficialChannelPost
+    getAllOfficialChannelPost,
+    handleLogout
 }

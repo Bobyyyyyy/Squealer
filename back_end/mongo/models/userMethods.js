@@ -151,13 +151,14 @@ const changePwsd = async(username,password,newPassword) =>{
         await connection.get();
 
         let user = await User.findOne({'username':username}).lean();
+        const match = await bcrypt.compare(password, user.password);
 
-        if(user.password !== password) {
+        if(!match) {
             throw createError('Password non corretta',400);
         }
 
-        newPassword = await bcrypt.hash(newPassword,saltRounds);
-        await User.findOneAndUpdate({'username': user.username},{password: newPassword}).lean();
+        let newPasswordCrypt = await bcrypt.hash(newPassword, saltRounds);
+        await User.findOneAndUpdate({'username': user.username},{password: newPasswordCrypt}).lean();
     }
     catch (err) {
         throw err;
@@ -503,7 +504,7 @@ const deleteUser = async(name) => {
         await Channel.updateMany({followers:{$elemMatch:{user: name}}}, [{$set: {'followerNumber': {$subtract: ['$followerNumber',1]}}}]).lean();
         await Channel.updateMany({followers:{$elemMatch:{user: name}}}, {$pull: {'followers': {'user': name}}}).lean();
         await User.updateMany({'typeUser': 'smm', 'vipHandled': name},{$pull: {'vipHandled': name}}).lean();
-        await Notification.deleteMany({'user': name}).lean();
+        await Notification.deleteMany({$or: [{'sender': name}, {'user': name}]}).lean();
         await Post.deleteMany({'owner': name}).lean();
         let posts = await Post.find({'destinationArray.name': name});
         for (let post of posts) {

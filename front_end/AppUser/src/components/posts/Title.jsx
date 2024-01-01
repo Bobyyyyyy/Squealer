@@ -41,6 +41,13 @@ function Title({post}) {
                                     </Link>
                                 )})
                             }
+                            {post.officialChannelsArray.map((dest) => {
+                                return(
+                                    <Link to={`/channels/${dest}`} key={dest}>
+                                        <span>§{dest}</span>
+                                    </Link>
+                                )})
+                            }
                         </h2>
                     </div>
                 </div>
