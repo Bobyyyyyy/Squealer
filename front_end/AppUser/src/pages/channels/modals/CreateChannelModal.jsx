@@ -98,7 +98,7 @@ function CreateChannelModal({ isOpen, setIsOpen, setNuovoCanale}) {
                         className="button-action"
                         onClick={handleSubmit}
                     >
-                        Submit
+                        conferma
                     </button>
                 </Modal.Footer>
             </Modal.Body>
