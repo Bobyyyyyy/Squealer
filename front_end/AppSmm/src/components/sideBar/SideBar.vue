@@ -65,6 +65,7 @@
             class="setW100"
             :welcomingPage = "false"
             centerText="Squealer"
+            @openNotificationModal="openNotificationModal"
     />
   </div>
 
