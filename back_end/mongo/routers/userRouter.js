@@ -23,6 +23,7 @@ router.get('/info',userController.getFollnPosts);
 router.get('/lastPost',userController.getLastPost);
 router.get('/allSmm', userController.getAllSmm);
 router.put('/hireSmm', userController.hireSmm);
+router.put('/resetpswd', userController.resetPswd);
 router.put('/changePsd', userController.changePassword)
 router.delete('/delete/:username', userController.deleteUser);
 
