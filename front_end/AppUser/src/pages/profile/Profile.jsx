@@ -12,6 +12,7 @@ import BuyQuotaModal from "./modals/BuyQuotaModal.jsx";
 import HireSmmModal from "./modals/HireSmmModal.jsx";
 import DeleteAccountModal from "./modals/DeleteAccountModal.jsx";
 import ChangeProfilePictureModal from "./modals/ChangeProfilePictureModal.jsx";
+import ChangePswModal from "./modals/ChangePswModal.jsx";
 
 
 function Profile () {
@@ -29,6 +30,7 @@ function Profile () {
     const [showChangePicModal, setShowChangePicModal] = useState(false);
     const [showSmmModal, setShowSmmModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
 
     const user = useRef(null);
 
@@ -127,6 +129,13 @@ function Profile () {
                     Elimina account
                 </button>
                 <DeleteAccountModal setIsOpen={setShowDeleteModal} isOpen={showDeleteModal} />
+                <button
+                    className="button"
+                    onClick={() => setShowChangePasswordModal((prev) => !prev)}
+                >
+                    Cambia password
+                </button>
+                <ChangePswModal setIsOpen={setShowChangePasswordModal} isOpen={showChangePasswordModal} />
                 {user.current.typeUser === "vip" &&
                 <>
                     <button
@@ -147,11 +156,6 @@ function Profile () {
                         setHasUpdated={setUpdatedSmm} smm={smm} hasSMM={hasSMM}
                     />
                 </>}
-                <button
-                    className="button"
-                >
-                    Cambia password
-                </button>
             </div>
             {posts.map((post)=> {
                 return(

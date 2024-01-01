@@ -151,13 +151,14 @@ const changePwsd = async(username,password,newPassword) =>{
         await connection.get();
 
         let user = await User.findOne({'username':username}).lean();
+        const match = await bcrypt.compare(password, user.password);
 
-        if(user.password !== password) {
+        if(!match) {
             throw createError('Password non corretta',400);
         }
 
-        newPassword = await bcrypt.hash(newPassword,saltRounds);
-        await User.findOneAndUpdate({'username': user.username},{password: newPassword}).lean();
+        let newPasswordCrypt = await bcrypt.hash(newPassword, saltRounds);
+        await User.findOneAndUpdate({'username': user.username},{password: newPasswordCrypt}).lean();
     }
     catch (err) {
         throw err;
