@@ -8,6 +8,8 @@ let LastCall = {
         'typeFilter': '',
         'destType': '',
         'channel': '',
+        'user': '',
+        'keyword' : '',
         'popularity': '',
         'sort': "",
         'offset': 0,
@@ -59,7 +61,11 @@ const showPosts = (filters,append = false) => {
                     }
 
                     if (destination.destType === "user") {
-                        destinationNames.push('@' + destination.name);
+                        
+                    }
+                    
+                    if(destination.destType === "keyword") {
+                        destinationNames.push('#' + destination.name);
                     }
                 })
 
@@ -242,6 +248,8 @@ $('#filter').on("keyup", () => {
         case 'receiver':
             LastCall.filters.name = '';
             LastCall.filters.channel = value;
+            LastCall.filters.user = value;
+            LastCall.filters.keyword = value;
             break;
     }
 
@@ -319,7 +327,7 @@ $('#changeReactionsForm').on('submit',(event) => {
 $('#addDestinationForm').on('submit',(event) => {
     event.preventDefault();
     let destination = {
-        destType: $('#type-select option:selected').val(),
+        destType: 'keyword',
         name: $('#destination-name').val(),
     }
 
