@@ -319,14 +319,14 @@ const getAllPost = async (query,sessionUser) =>{
 
 
                 /* PER IL CANALE SINGOLO */
-            ... (query.channel) && {$and: [{'destinationArray.name': query.channel}, {"destinationArray.type": 'channel'}]},
+            ... (query.channel) && {$and: [{'destinationArray.name': query.channel}, {"destinationArray.destType": 'channel'}]},
 
                 /* PER IL CANALE UFFICIALE */
             ...(query.official) && {'officialChannelsArray': query.official},
 
-            ... (query.user) && {$and: [{'destinationArray.name': query.user}, {"destinationArray.type": 'user'}]},
+            ... (query.user) && {$and: [{'destinationArray.name': query.user}, {"destinationArray.destType": 'user'}]},
 
-            ...(query.keyword) && {$and: [{'destinationArray.name': {$regex: query.keyword}}, {'destinationArray.type': 'keyword'}]}
+            ...(query.keyword) && {$and: [{'destinationArray.name': {$regex: query.keyword}}, {'destinationArray.destType': 'keyword'}]}
         }
 
         await connection.get();

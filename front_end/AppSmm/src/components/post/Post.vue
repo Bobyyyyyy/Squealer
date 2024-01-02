@@ -23,7 +23,7 @@
   const onlyUser = computed(() => {
     let tmpArr = props.dest.split(', ');
     for (let i = 0; i < tmpArr.length; i++) {
-      if(tmpArr[i].startsWith('§')) return false;
+      if(tmpArr[i].startsWith('§') || tmpArr[i].startsWith('#') ) return false;
     }
     return true;
   })

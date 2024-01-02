@@ -30,6 +30,7 @@ import {computed, onMounted, onUnmounted, ref} from "vue";
   const offset = computed(() => store.getters.getOffset);
   const vip = computed(() => store.getters.getVip);
 
+
   let query = ''
 
   let lastRequestLength = 12;
@@ -82,7 +83,7 @@ import {computed, onMounted, onUnmounted, ref} from "vue";
 
   async function updateTagPosts(){
     store.commit('clearSqueal');
-    store.commit('pushSqueal', await getPosts(`${query}&keyword=${keyWord.value}`));
+    store.commit('pushSqueal', await getPosts(`${query}&keyword=${keyWord.value}`, offset.value));
   }
 
 
