@@ -97,20 +97,13 @@
 
   function parseDestinations(){
     let dest = [];
-    let tags = []
     receiverArr.value.forEach(receiver => {
-      if(receiver.startsWith('#')){
-        tags.push(receiver.substring(1));
-      }
-      else{
-        dest.push({
-          name: receiver.substring(1),
-          destType: receiver.startsWith('§') ? 'channel' : receiver.startsWith('@') ? 'user' : 'errore',
-        })
-      }
-
+      dest.push({
+        name: receiver.substring(1),
+        destType: receiver.startsWith('§') ? 'channel' : receiver.startsWith('@') ? 'user' : receiver.startsWith('#') ? 'keyword': 'errore',
+      })
     })
-    return [dest, tags];
+    return dest;
   }
 
   async function createPost() {
@@ -123,22 +116,26 @@
         if (tags) tags = tags.map(el => el.substring(1));
       }
 
-      let [tmpDest, tmpTags] = parseDestinations(receiverArr.value);
-      if (tmpTags?.length > 0) tags = tags.concat(tmpTags);
+      let dest = parseDestinations(receiverArr.value);
+      tags.forEach(tag => {
+        dest.push({
+          name: tag.substring(1),
+          destType: 'keyword',
+        })
+      })
       //remove duplicates
-      if (tags?.length > 0) tags = tags.filter((tag, index) => tags.indexOf(tag) === index);
+      if (dest.length > 0) dest = dest.filter((dst, index) => dest.indexOf(dst) === index);
 
       let post = {
         creator: vip.value.name,
         contentType: postType.value,
         dateOfCreation: Date.now(),
-        destinations: tmpDest,
+        destinations: dest,
         timed: timed.value,
         ...(timed) && {
           squealNumber: numberOfRepetitions.value,
           millis: parse2timestamp([numFrequency.value.toString(), typeFrequency.value]),
         },
-        ...(tags !== []) && {tags: tags}
       }
 
 

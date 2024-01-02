@@ -69,7 +69,7 @@ const getId =  () => `repliesModal${props.idx}`;
         <div class="modal-body d-flex flex-column justify-content-center">
           <Post
               :post="post"
-              :dest= "parseDestinationsViewPost(post.destinationArray, post.officialChannelsArray, post.tags)"
+              :dest= "parseDestinationsViewPost(post.destinationArray, post.officialChannelsArray)"
               :numberOfPost="1"
               :viewFooter="false"
               picProfile = "/img/defaultUser.jpeg"
