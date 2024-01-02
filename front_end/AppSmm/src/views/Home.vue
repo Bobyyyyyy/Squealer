@@ -1,9 +1,13 @@
 <script setup>
   import NavBar from "../components/navbar/NavBar.vue";
-  import {smartPhone, smm} from "../utils/config.js"
-  import {ref} from "vue";
+  import {smartPhone} from "../utils/config.js"
+  import {computed, ref} from "vue";
   import Spinner from "../components/Spinner.vue";
+  import {useStore} from "vuex";
 
+  const store = useStore();
+
+  const smm = computed(() => store.getters.getSmm);
   const ready = ref(false);
 
   const go2user = async () => {

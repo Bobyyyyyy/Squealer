@@ -1,7 +1,6 @@
 <script setup>
-import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
+import {computed, onMounted, onUnmounted, ref} from "vue";
   import {
-    currentVip,
     filterValues,
     filterValuesITAS,
     postType,
@@ -18,8 +17,6 @@ import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
 
   const readyPosts = ref(false);
 
-  const profilePicturePath ="/img/profilePicture.png";
-
   const keyWordFilter = ref(false);
   const destFilter = ref('Filter');
   const typePostFilter = ref('Type');
@@ -31,6 +28,7 @@ import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
 
   const squeals = computed(()=> store.getters.getSqueal);
   const offset = computed(() => store.getters.getOffset);
+  const vip = computed(() => store.getters.getVip);
 
   let query = ''
 
@@ -101,16 +99,16 @@ import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
 
     store.commit('clearSqueal');
 
-    n_post.value = (await getUserInfo()).nposts;
+    n_post.value = (await getUserInfo(vip.value.name)).nposts;
 
     document.addEventListener('scroll', scrollEndDetector, true);
 
-    let quota = await getUserQuota();
+    let quota = await getUserQuota(vip.value.name);
 
     store.commit('setQuota', quota.characters);
     store.commit('setMaxQuota',quota.maxQuota);
 
-    query = `name=${currentVip.value}&limit=12`
+    query = `name=${vip.value.name}&limit=12`
 
     store.commit('pushSqueal',(await getPosts(query, 0)));
 
@@ -129,11 +127,11 @@ import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
     <div class="marginCD">
       <div class="d-flex flex-row justify-content-center  profileDim">
         <div class="aspect-ratio object-fit-fill profileDim">
-          <img :src= "profilePicturePath" alt="pippo" class="img-fluid rounded-circle" />
+          <img :src= "vip.profilePic" alt="pippo" class="img-fluid rounded-circle" />
         </div>
       </div>
 
-    <h2 class="m-0 text-center text-white fw-bolder">{{'@'+currentVip }}</h2>
+    <h2 class="m-0 text-center text-white fw-bolder">{{'@'+ vip.name }}</h2>
     <h6 class="mt-1 text-center text-white fw-bold mb-0">{{[store.getters.getQuota.daily,store.getters.getQuota.weekly,store.getters.getQuota.monthly].join(' | ')}}</h6>
      <p class="m-0 text-center text-white mt-1 mb-0">{{n_post}} Squeal </p>
 
@@ -184,7 +182,7 @@ import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
               :post="post"
               :dest= "parseDestinationsViewPost(post.destinationArray, post.tags)"
               :numberOfPost="i"
-              picProfile = "/img/defaultUser.jpeg"
+              :picProfile = "post.profilePicture"
         />
       </div>
     </div>

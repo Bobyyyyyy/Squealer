@@ -1,8 +1,8 @@
 <script setup>
-  import {computed, onMounted, onUnmounted, ref, getCurrentInstance} from "vue";
+  import {computed, onMounted, onUnmounted, ref} from "vue";
   import Post from "../post/Post.vue";
   import Select from "../Select.vue";
-  import {currentVip, postType, postTypeITAS, sortPosts} from "../../utils/config.js";
+  import {postType, postTypeITAS, sortPosts} from "../../utils/config.js";
   import {getPosts, parseDestinationsViewPost} from "../../utils/functions.js";
   import {useStore} from "vuex";
   import Spinner from "../Spinner.vue";
@@ -19,6 +19,7 @@
 
   const squeals = computed(()=> store.getters.getSqueal);
   const offset = computed(() => store.getters.getOffset);
+  const vip = computed(() => store.getters.getVip);
 
   const channel = ref({});
   const readyChannel = ref(false);
@@ -95,7 +96,7 @@
     channel.value = await res.json();
     channel.value.requests = channel.value.requests.map(obj => obj.user);
     readyChannel.value = true;
-    query =`name=${currentVip.value}&channel=${name}&smm=${true}&limit=12`;
+    query =`name=${vip.value.name}&channel=${name}&smm=${true}&limit=12`;
 
     store.commit('clearSqueal');
     store.commit('pushSqueal',(await getPosts(query, 0)));
@@ -123,8 +124,8 @@
         <h5 class="m-1 text-center">{{ channel.description }}</h5>
         <div class="w-50 d-flex flex-row  align-self-center  justify-content-center">
           <div class="text-center bordEl" >
-            <span v-if="channel.creator === currentVip" class="badge rounded-pill text-bg-primary"> creatore </span>
-            <span v-else-if="channel.admins.includes(currentVip)" class="badge rounded-pill text-bg-warning"> admin </span>
+            <span v-if="channel.creator === vip.name" class="badge rounded-pill text-bg-primary"> creatore </span>
+            <span v-else-if="channel.admins.includes(vip.name)" class="badge rounded-pill text-bg-warning"> admin </span>
           </div>
           <div class="text-center bordEl ">
             <span v-if="channel.type === 'public'" class="badge rounded-pill text-bg-success"> pubblico </span>
@@ -136,8 +137,8 @@
         <div class="d-flex flex-row flex-wrap justify-content-around gap-2 mt-2">
           <button type="button" class="btn btn-primary" @click="permissionModal.openModal">Permessi</button>
           <button v-if="channel.type === 'private'" type="button"  class="btn btn-primary ms-2" @click="requestModal.openModal">Richieste</button>
-          <button v-if="channel.creator === currentVip" type="button" class="btn btn-primary ms-2" @click="addAdminModal.openModal">Aggiungi admin</button>
-          <button v-if="channel.creator === currentVip" type="button" class="btn btn-primary ms-2" @click="deleteAdminModal.openModal">Rimuovi admin</button>
+          <button v-if="channel.creator === vip.name" type="button" class="btn btn-primary ms-2" @click="addAdminModal.openModal">Aggiungi admin</button>
+          <button v-if="channel.creator === vip.name" type="button" class="btn btn-primary ms-2" @click="deleteAdminModal.openModal">Rimuovi admin</button>
         </div>
 
         <div class="d-flex flex-row justify-content-end">

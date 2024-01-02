@@ -1,11 +1,11 @@
 <script setup>
 import {useStore} from "vuex";
 import ChartChannel from "./ChartChannel.vue";
-import {reactive, ref, watch} from "vue";
-import {currentVip} from "../../utils/config.js";
+import {computed, ref} from "vue";
 import {parseReactionType} from "../../utils/functions.js";
 
 const store = useStore();
+const vip = computed(() => store.getters.getVip);
 
 const readyReac = ref({});
 const readyData = ref(false);
@@ -21,7 +21,7 @@ const readyData = ref(false);
 
   async function getDataOpenModal(){
 
-    let res = await fetch(`/db/post/allReactionMonth?user=${currentVip.value}&channel=${props.name}`, {
+    let res = await fetch(`/db/post/allReactionMonth?user=${vip.value.name}&channel=${props.name}`, {
       method: "GET",
     })
 
@@ -52,8 +52,8 @@ const readyData = ref(false);
     </div>
     <div class="d-flex flex-row flex-wrap sameWidth justify-content-around">
       <div class="text-center bordEl" >
-        <span v-if="creator === currentVip" class="badge rounded-pill text-bg-primary"> creatore </span>
-        <span v-else-if="admins.includes(currentVip)" class="badge rounded-pill text-bg-warning"> admin </span>
+        <span v-if="creator === vip.name" class="badge rounded-pill text-bg-primary"> creatore </span>
+        <span v-else-if="admins.includes(vip.name)" class="badge rounded-pill text-bg-warning"> admin </span>
       </div>
       <div class="text-center bordEl ">
         <span v-if="isPublic" class="badge rounded-pill text-bg-success"> pubblico </span>

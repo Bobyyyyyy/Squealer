@@ -1,10 +1,15 @@
 <script setup>
   import Reaction from "./Reaction.vue";
-  import {currentVip, reactionsIcons} from "../../utils/config.js";
-  import {onMounted, reactive, ref, watch} from "vue";
+  import {reactionsIcons} from "../../utils/config.js";
+  import {computed, onMounted, reactive, ref} from "vue";
   import ChartModalPost from "./ChartModalPost.vue";
   import {parseReactionType} from "../../utils/functions.js";
   import ReplyModal from "./reply/ReplyModal.vue";
+  import {useStore} from "vuex";
+
+  const store = useStore();
+
+  const vip = computed(()=>store.getters.getVip);
 
   const props = defineProps({
     post: Object,
@@ -30,7 +35,7 @@
   function updateProps(newReac){
       let newReaction = {
         rtype: newReac,
-        user:currentVip.value,
+        user: vip.value.name,
         date: new Date().toISOString(),
       }
 
@@ -62,7 +67,7 @@
       },
       body:JSON.stringify({
         postId: props.post.postId,
-        user: currentVip.value,
+        user: vip.value.name,
         reaction: newReac,
       })
     })
@@ -78,7 +83,7 @@
       },
       body:JSON.stringify({
         postId: props.post.postId,
-        user: currentVip.value,
+        user: vip.value.name,
       })
     })
   }
@@ -96,7 +101,7 @@
 
   onMounted(()=>{
 
-    let idx = props.post.reactions.findIndex(el => el.user === currentVip.value);
+    let idx = props.post.reactions.findIndex(el => el.user === vip.value.name);
     if (idx >= 0) currentActive.value = props.post.reactions[idx].rtype
 
     parsedType.value = parseReactionType(props.post.reactions);

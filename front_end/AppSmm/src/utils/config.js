@@ -88,9 +88,6 @@ const reactionsIcons = [
     },
 ]
 
-const smm = ref('');
-const currentVip = ref('')
-
 const windowWidth = ref(window.innerWidth);
 const onWidthChange =  () => windowWidth.value = window.innerWidth
 window.addEventListener('resize', onWidthChange);
@@ -117,7 +114,7 @@ const cast2millis = {
 const CHANNEL_OFFSET = 36
 
 
-export {smm, sideBarElements, currentVip,
+export { sideBarElements,
     postType, sortPosts, filterValues,
     reactionsIcons, QUALITY, MAX_WIDTH, MAX_HEIGHT,
     smartPhone, expanded, URLHTTPREGEX,

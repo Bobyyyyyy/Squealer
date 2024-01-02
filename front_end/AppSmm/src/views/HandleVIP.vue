@@ -3,10 +3,12 @@
   import VipCard from "../components/handleVip/VipCard.vue";
   import VipModal from "../components/handleVip/VipModal.vue";
   import {Modal} from 'bootstrap'
-  import {onMounted, reactive, ref} from "vue";
+  import {computed, onMounted, reactive, ref} from "vue";
   import {getLastPost} from "../utils/functions.js";
-  import {smm} from "../utils/config.js";
   import Spinner from "../components/Spinner.vue";
+  import {useStore} from "vuex";
+
+  const store = useStore();
 
   let vips = [];
   let lastVipsPost = [];
@@ -16,6 +18,8 @@
   const name2Use = ref('')
   const requestCompleted = ref(false);
   const readyPage = ref(false);
+
+  const smm = computed(() => store.getters.getSmm);
 
   onMounted(async ()=>{
     modalState.myModal = new Modal('#choiceModal',{});

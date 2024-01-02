@@ -1,6 +1,6 @@
 <script setup>
 import {Modal} from "bootstrap";
-import {onBeforeUpdate, onMounted, onUnmounted, onUpdated, reactive, ref} from "vue";
+import {reactive, ref} from "vue";
 import {parseDestinationsViewPost} from "../../../utils/functions.js";
 import Post from "../Post.vue";
 import Reply from "./Reply.vue";

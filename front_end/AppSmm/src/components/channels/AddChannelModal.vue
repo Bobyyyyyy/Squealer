@@ -1,6 +1,9 @@
 <script setup>
-  import {ref} from "vue";
-  import {currentVip} from "../../utils/config.js";
+import {computed, ref} from "vue";
+  import {useStore} from "vuex";
+
+  const store = useStore();
+  const vip = computed(()=>store.getters.getVip);
 
   const channelName = ref('')
   const channelDescription = ref('')
@@ -15,7 +18,7 @@
         name: channelName.value.toLowerCase().split(' ').join('_'),
         description: channelDescription.value,
         isPublic: document.querySelector("input[name=btnTypeChannel]:checked").value === 'public',
-        creator: currentVip.value,
+        creator: vip.value.name,
       }
 
       await fetch("/db/channel",{

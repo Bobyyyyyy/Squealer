@@ -1,9 +1,13 @@
 <script setup>
 import {Bar} from "vue-chartjs";
-import {onMounted, ref} from "vue";
+import {computed, onMounted, ref} from "vue";
 import {getPostsDate} from "../../utils/functions.js";
-import {currentVip} from "../../utils/config.js";
 import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js'
+import {useStore} from "vuex";
+
+const store = useStore();
+
+const vip = computed(()=>store.getters.getVip);
 
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
 
@@ -16,7 +20,7 @@ let barReady = ref(false);
 const emit = defineEmits(['ready'])
 
 onMounted(async () => {
-  (await getPostsDate(currentVip.value, true)).forEach(date => {
+  (await getPostsDate(vip.value.name, true)).forEach(date => {
     let dayPost = parseInt(date.split(/[^0-9]+/)[2])
     postPerDay[dayPost] += 1;
   })

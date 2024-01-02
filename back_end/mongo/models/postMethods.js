@@ -354,6 +354,35 @@ const getAllPost = async (query,sessionUser) =>{
             },
             {$match: filter},
             {$sort: query.sort ? sorts[query.sort] : sorts['più recente']},
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "owner",
+                    foreignField: "username",
+                    as: "user_info",
+                },
+            },
+            {
+              $unwind: "$user_info",
+            },
+            {
+                $project:{
+                    owner: '$owner',
+                    destinationArray: '$destinationArray',
+                    officialChannelsArray: '$officialChannelsArray',
+                    category: '$category',
+                    popularity: '$popularity',
+                    contentType: '$contentType',
+                    content: '$content',
+                    reactions: '$reactions',
+                    dateOfCreation: '$dateOfCreation',
+                    criticalMass: '$criticalMass',
+                    views: '$views',
+                    tags: '$tags',
+                    views_count: {$size: '$views'},
+                    profilePicture: '$user_info.profilePicture',
+                }
+            },
             {$skip: parseInt(query.offset)},
             {$limit: parseInt(query.limit)},
         ])

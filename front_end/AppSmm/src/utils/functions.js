@@ -1,5 +1,5 @@
 
-import {currentVip, QUALITY, MAX_HEIGHT, MAX_WIDTH, URLHTTPREGEX, cast2millis} from './config.js'
+import {QUALITY, MAX_HEIGHT, MAX_WIDTH, URLHTTPREGEX, cast2millis} from './config.js'
 
 function getPage(){
     return window.location.pathname.split('/')[2];
@@ -16,9 +16,9 @@ async function getPosts(query,offset){
     }
 }
 
-async function getUserQuota() {
+async function getUserQuota(vip) {
     try{
-        let res = await fetch(`/db/user/quota?user=${currentVip.value}`,{
+        let res = await fetch(`/db/user/quota?user=${vip}`,{
             method:'GET',
         })
         return (await res.json());
@@ -28,9 +28,9 @@ async function getUserQuota() {
     }
 }
 
-async function getUserInfo(){
+async function getUserInfo(vip){
     try{
-        let res = await fetch(`/db/user/info?user=${currentVip.value}`,{
+        let res = await fetch(`/db/user/info?user=${vip}`,{
             method:'GET',
         })
         return (await res.json());

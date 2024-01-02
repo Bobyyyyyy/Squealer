@@ -1,7 +1,7 @@
 <script setup>
   import postReactionsChart from '../charts/postReactionsChart.vue'
   import {Modal} from "bootstrap";
-  import {computed, onMounted, onUnmounted, reactive, ref, toRaw, watch, watchEffect} from "vue";
+  import {onMounted, reactive, ref, watch} from "vue";
   import Popularity30days from "../charts/Popularity30days.vue";
 
 

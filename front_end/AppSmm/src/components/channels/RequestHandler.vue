@@ -1,5 +1,5 @@
 <script setup>
-import {reactive, ref} from "vue";
+import {reactive} from "vue";
 import {Modal} from "bootstrap";
 import {useToast} from "vue-toast-notification";
 

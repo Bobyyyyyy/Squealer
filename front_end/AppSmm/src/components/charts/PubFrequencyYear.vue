@@ -1,9 +1,12 @@
 <script setup>
 import {Bar} from "vue-chartjs";
-import {onMounted, ref} from "vue";
+import {computed, onMounted, ref} from "vue";
 import {getPostsDate} from "../../utils/functions.js";
-import {currentVip} from "../../utils/config.js";
 import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js'
+import {useStore} from "vuex";
+
+const store = useStore();
+const vip = computed(()=> store.getters.getVip);
 
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
 
@@ -13,7 +16,7 @@ let postPerMonth = {"Jan": 0, "Feb": 0, "Mar": 0, "Apr": 0, "May": 0, "Jun": 0, 
 let barReady = ref(false);
 
 onMounted(async () => {
-  (await getPostsDate(currentVip.value, false)).forEach(date => {
+  (await getPostsDate(vip.value.name, false)).forEach(date => {
     let monthPost = num2Month[date.split(/[^0-9]+/)[1]]
     postPerMonth[monthPost] += 1;
   })

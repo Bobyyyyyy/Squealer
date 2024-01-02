@@ -39,7 +39,7 @@
           :name= "post.owner"
           :dest="dest"
           :srcImg="picProfile"
-          :dateCreation="post.dateOfCreation"
+          :dateCreation="new Date(post.dateOfCreation)"
       />
       <div class="d-flex flex-row justify-content-center text-center align-items-center h-100 text-dark">
         <img v-if="post.contentType==='image'" :src="post.content"  alt="silly cat" class="img-fluid" />

@@ -1,7 +1,8 @@
 <script setup>
 
+  import {useStore} from "vuex";
 
-import {currentVip} from "../../utils/config.js";
+  const store = useStore();
 
   const props = defineProps({
     SMMname: String,
@@ -17,7 +18,16 @@ import {currentVip} from "../../utils/config.js";
         },
         body: JSON.stringify({vipName: props.VIPname})
         })
-      currentVip.value = (await res.json()).vip;
+      let vipname  = (await res.json()).vip;
+
+      res = await fetch(`/db/user/profilePic?name=${vipname}`,{
+        method:"GET",
+      })
+
+      store.commit('setVip',{
+        name: vipname,
+        profilePic: (await res.json()).profilePic,
+      })
     }
   }
 
