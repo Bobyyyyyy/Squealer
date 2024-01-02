@@ -169,9 +169,9 @@
       <div v-if="readyPosts" class="d-flex flex-row flex-wrap justify-content-around mt-3">
         <Post v-for="(post,i) in squeals" :key="post._id"
               :post="post"
-              :dest= "parseDestinationsViewPost(post.destinationArray, post.officialChannelsArray, post.tags)"
+              :dest= "parseDestinationsViewPost(post.destinationArray, post.officialChannelsArray)"
               :numberOfPost="i"
-              picProfile = "/img/defaultUser.jpeg"
+              :picProfile = "post.profilePic"
         />
       </div>
     </div>

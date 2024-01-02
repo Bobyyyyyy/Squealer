@@ -45,8 +45,8 @@ export const store = createStore({
             state.currentSqueals.push(...squeals);
         },
         clearSqueal(state){
-            state.currentSqueals = [];
             state.offsetSqueals = 0;
+            state.currentSqueals = [];
         },
         pushHeadSqueal(state, squeal){
             state.currentSqueals.unshift(squeal.post);

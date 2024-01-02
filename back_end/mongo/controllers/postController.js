@@ -12,7 +12,7 @@ const createPost = async (req,res) => {
         res.send(postSaved)
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
-            res.status(Error.statusCode).send(Error.message);
+            res.status(Error.statusCode).send({message: Error.message});
         else {
             res.status(500).send(Error);
         }
@@ -24,7 +24,7 @@ const getPosts = async (req,res) => {
         res.send(await postModel.getAllPost(req.query,{username: req.session.user, typeUser: req.session.type}));
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
-            res.status(Error.statusCode).send(Error.message);
+            res.status(Error.statusCode).send({message: Error.message});
         else {
             res.status(500).send(Error);
         }
@@ -43,7 +43,7 @@ const updateReaction = async (req,res) => {
         }
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
-            res.status(Error.statusCode).send(Error.message);
+            res.status(Error.statusCode).send({message: Error.message});
         else {
             res.status(500).send(Error);
         }
@@ -55,7 +55,7 @@ const deleteReaction = async (req,res) => {
         res.send(await postModel.deleteReac(req.body))
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
-            res.status(Error.statusCode).send(Error.message);
+            res.status(Error.statusCode).send({message: Error.message});
         else {
             res.status(500).send(Error);
         }
@@ -67,7 +67,7 @@ const removePost = async (req,res) => {
         res.send(await postModel.removeDestination(req.body.destination,req.body.postID))
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
-            res.status(Error.statusCode).send(Error.message);
+            res.status(Error.statusCode).send({message: Error.message});
         else {
             res.status(500).send(Error);
         }
@@ -79,7 +79,7 @@ const getPostsDate = async (req,res) => {
         await res.send(await postModel.getPostsDate(req.query.user, req.query.onlyMonth));
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
-            res.status(Error.statusCode).send(Error.message);
+            res.status(Error.statusCode).send({message: Error.message});
         else {
             res.status(500).send(Error);
         }
@@ -91,7 +91,7 @@ const getReactionLast30days = async (req,res) => {
         await res.send(await postModel.getReactionLast30days(req.query.user, req.query?.channel));
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
-            res.status(Error.statusCode).send(Error.message);
+            res.status(Error.statusCode).send({message: Error.message});
         else {
             res.status(500).send(Error);
         }
@@ -103,7 +103,7 @@ const postLength = async (req,res) => {
         res.send(await postModel.postLength(req.query.filter))
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
-            res.status(Error.statusCode).send(Error.message);
+            res.status(Error.statusCode).send({message: Error.message});
         else {
             res.status(500).send(Error);
         }
@@ -115,7 +115,7 @@ const addDestination = async(req,res) => {
         res.send(await postModel.addDestination(req.body.destination, req.body.postID));
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
-            res.status(Error.statusCode).send(Error.message);
+            res.status(Error.statusCode).send({message: Error.message});
         else {
             res.status(500).send(Error);
         }
@@ -127,7 +127,7 @@ const addPosition = async(req,res) => {
         res.send(await postModel.addPosition(req.body.newPosition, req.body.postID));
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
-            res.status(Error.statusCode).send(Error.message);
+            res.status(Error.statusCode).send({message: Error.message});
         else {
             res.status(500).send(Error);
         }
