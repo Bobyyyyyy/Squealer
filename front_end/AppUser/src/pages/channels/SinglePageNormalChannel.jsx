@@ -13,8 +13,10 @@ import AddAdminModal from "./modals/AddAdminModal.jsx";
 import RmAdminModal from "./modals/RmAdminModal.jsx";
 import ChangeChannelPictureModal from "./modals/ChangeChannelPictureModal.jsx";
 import DeleteChannelModal from "./modals/DeleteChannelModal.jsx";
+import {useParams} from "react-router-dom";
 
-function SinglePageNormalChannel({nome}) {
+function SinglePageNormalChannel() {
+    const {nome} = useParams()
 
     const [type, setType] = useState();
     const [isLoading, setIsLoading] = useState(true);
@@ -79,9 +81,9 @@ function SinglePageNormalChannel({nome}) {
         setRole(res.role);
         setCanSeePosts((res.role !== "Not Follower" || res.role !== "Pending"));
         setFollowers(res.followers.sort((a,b) => (a.user > b.user) ? 1 : ((b.user > a.user) ? -1 : 0)))
-        setAdmins(res.admins.sort())
+        setAdmins(res.admins.sort((a,b) => (a.user > b.user) ? 1 : ((b.user > a.user) ? -1 : 0)))
         setType(res.type);
-        setRequests(res.requests)
+        setRequests(res.requests.sort((a,b) => (a.user > b.user) ? 1 : ((b.user > a.user) ? -1 : 0)))
         setHasUpdatedReq(false);
         setHasUpdatedFol(false);
         setHasUpdatedAddAdm(false);
@@ -97,7 +99,7 @@ function SinglePageNormalChannel({nome}) {
     useEffect(() => {
         fetchPost()
             .catch(console.error);
-    }, [canSeePosts]);
+    }, [canSeePosts, nome]);
 
     return (
         <>

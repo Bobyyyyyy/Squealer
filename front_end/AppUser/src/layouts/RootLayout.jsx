@@ -1,6 +1,6 @@
 import { Outlet, NavLink } from "react-router-dom";
 import '../index.css'
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {
     AddIcon,
     ChannelIcon,
@@ -19,6 +19,7 @@ import CustomToast from "../components/toasts/CustomToast.jsx";
 
 export default function RootLayout() {
 
+    const checkNotificationCounter = useRef(0);
     const [notifications, setNotifications] = useState(null);
     const [showToast, setShowToast] = useState(false);
     const [toastNotification, setToastNotification] = useState(null)
@@ -74,8 +75,13 @@ export default function RootLayout() {
 
     useEffect(() => {
         handleToastNotification();
+        if (checkNotificationCounter.current === 0) {
+            getNotification()
+                .then((res) => setNotifications(res));
+        }
         const interval = setInterval(async () => {
             let notificationRes = await getNotification();
+            checkNotificationCounter.current += 1;
             setNotifications(notificationRes);
         }, CHECK_NOTIFICATION_TIME);
         return () => clearInterval(interval);

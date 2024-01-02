@@ -3,7 +3,7 @@ import {CheckBoldIcon, WarningIcon} from "../assets/index.jsx";
 function CustomToast({message, type}) {
 
     return (
-        <div className={`toast-${type === "success" ? "success" : "failure"}`} role="alert">
+        <div className={`toast-${type === "success" ? "success" : "failure"} z-10`} role="alert">
             <div className="flex justify-between items-center gap-2">
                 <p className="text-base font-normal">{message}</p>
                 {type === "success" ? (
