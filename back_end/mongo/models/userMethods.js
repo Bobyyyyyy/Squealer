@@ -10,7 +10,7 @@ const Post = require("../schemas/Post");
 const {start} = require("@popperjs/core");
 const {scheduledFnOne} = require("../controllers/utils");
 const connection = require('../ConnectionSingle');
-const {removeDestination} = require("./postMethods");
+//const {removeDestination} = require("./postMethods");
 
 
 //POST
@@ -341,7 +341,7 @@ const resetQuota = async (type, user = 'ALL_USER') => {
  */
 
 const changePopularity = async (userID, valueToModify, increaseValue) => {
-    let user = await User.findById(userID, 'username popularity unpopularity');
+    let user = await User.findById(userID, 'username popularity unpopularity maxQuota');
 
     if(valueToModify === 'popularity') {
         let popularity = user.popularity;
@@ -370,6 +370,7 @@ const changePopularity = async (userID, valueToModify, increaseValue) => {
             await User.findByIdAndUpdate(userID, {'unpopularity': unpopularity});
         }
 
+
         if(unpopularity % 3 === 0) {
             await updateMaxQuota(-1,user.username);
         }
@@ -393,6 +394,8 @@ const updateMaxQuota = async (percentage, user, ID = -1) => {
         })
 
         await connection.get();
+
+
 
         let res = await User.findOneAndUpdate({username:user},
             [{ $set:{
@@ -425,8 +428,41 @@ const updateMaxQuota = async (percentage, user, ID = -1) => {
                               ]
                           }
                       ]
-                  }
-              }
+                  },
+                    'characters.daily': {
+                        $trunc:[
+                            {
+                                $add:[
+                                    "$characters.daily",
+                                    updateQuota.daily,
+                                ]
+                            }
+                        ]
+                    },
+
+                    'characters.weekly': {
+                      $trunc:[
+                          {
+                              $add:[
+                                  "$characters.weekly",
+                                  updateQuota.weekly,
+                              ]
+                          }
+                            ]
+                    },
+
+                    'characters.monthly': {
+                        $trunc:[
+                            {
+                                $add:[
+                                    "$characters.monthly",
+                                    updateQuota.monthly,
+                                ]
+                            }
+                        ]
+                    },
+
+                }
             }], { returnOriginal: false }).lean()
 
 
@@ -507,9 +543,9 @@ const deleteUser = async(name) => {
         await Notification.deleteMany({$or: [{'sender': name}, {'user': name}]}).lean();
         await Post.deleteMany({'owner': name}).lean();
         let posts = await Post.find({'destinationArray.name': name});
-        for (let post of posts) {
-            await removeDestination(name, post._id);
-        }
+     //   for (let post of posts) {
+       //     await removeDestination(name, post._id);
+        //}
 
         await Post.updateMany({reactions:{$elemMatch:{user: name}}}, {$pull: {'reactions': {'user':name}}});
         await Reply.deleteMany({'owner': name}).lean();
@@ -556,5 +592,5 @@ module.exports = {
     getAllSmm,
     clearDB,
     hireSmm,
-    deleteUser
+    deleteUser,
 }

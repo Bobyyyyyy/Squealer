@@ -265,10 +265,26 @@ const addPost = async (post,quota) => {
             dateOfCreation: post.dateOfCreation,
         })
 
-        await newPost.save();
+
 
         if (creator.typeUser !== 'mod') {
             /* QUOTA UPDATE */
+            if(quota.daily < 0) {
+                quota.weekly += quota.daily;
+                quota.daily = 0;
+
+            }
+
+            if(quota.weekly < 0) {
+                quota.monthly += quota.weekly;
+                quota.weekly = 0;
+            }
+
+            if(quota.monthly < 0) {
+                throw createError('No more quota remaining',400);
+            }
+
+
             await User.findOneAndUpdate({username: post.creator}, {
                 characters:{
                     daily: quota.daily,
@@ -277,6 +293,8 @@ const addPost = async (post,quota) => {
                 }
             } );
         }
+
+        await newPost.save();
         return {post: newPost.toObject()};
     }
     catch(err){
@@ -319,14 +337,16 @@ const getAllPost = async (query,sessionUser) =>{
 
 
                 /* PER IL CANALE SINGOLO */
-            ... (query.channel) && {$and: [{'destinationArray.name': query.channel}, {"destinationArray.type": 'channel'}]},
+            ... (query.channel) && {$and: [{'destinationArray.name': query.channel}, {"destinationArray.destType": 'channel'}]},
 
                 /* PER IL CANALE UFFICIALE */
             ...(query.official) && {'officialChannelsArray': query.official},
 
-            ... (query.user) && {$and: [{'destinationArray.name': query.user}, {"destinationArray.type": 'user'}]},
+            ... (query.user) && {$and: [{'destinationArray.name': query.user}, {"destinationArray.destType": 'user'}]},
 
-            ...(query.keyword) && {$and: [{'destinationArray.name': {$regex: query.keyword}}, {'destinationArray.type': 'keyword'}]}
+            ...(query.keyword) && {$and: [{'destinationArray.name': {$regex: query.keyword}}, {'destinationArray.destType': 'keyword'}]},
+
+            ...(query.mention) && {$and: [{'content' : {$regex: query.mention}},{'contentType': 'text'}]},
         }
 
         await connection.get();
