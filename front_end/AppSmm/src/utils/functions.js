@@ -113,13 +113,15 @@ const compressBlob = (file) => new Promise((resolve) => {
  *
  * @param {Array<{name:String,destType:String}>} destinations
  * @param {Array<String>} tags - #
+ * @param {Array<String>} officialDestinations - §PIPPO
  * @return {String} - '@francesco, §popi_ma_buoni,'
  */
-const parseDestinationsViewPost = (destinations, tags) => {
+const parseDestinationsViewPost = (destinations,officialDestinations,  tags) => {
     let arr = [];
     destinations.forEach(dest => {
         arr.push(dest.destType === 'channel' ? `§${dest.name}` : `@${dest.name}`)
     })
+    officialDestinations.forEach(dest => arr.push(`§${dest.toUpperCase()}`));
     if(tags) arr = arr.concat(tags.map(tag => `#${tag}`))
     return arr.join(', ');
 }
