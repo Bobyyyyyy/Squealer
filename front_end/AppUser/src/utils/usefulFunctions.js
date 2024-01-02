@@ -213,6 +213,23 @@ const getToastNotification = () => {
     }
 }
 
+const getNotification = async () => {
+    try {
+        let res = await fetch(`/db/notification?user=${getUsernameFromSessionStore()}`, {
+            method:'GET'
+        });
+        if (res.ok) {
+            res = await res.json();
+            if (Object.keys(res).length !== 0) {
+                return res;
+            }
+        }
+        return null;
+    } catch (e) {
+        return null;
+    }
+}
+
 export {
     getUsernameFromSessionStore,
     setUsernameInSessionStore,
@@ -230,5 +247,6 @@ export {
     handleLogout,
     setToastNotification,
     deleteToastNotification,
-    getToastNotification
+    getToastNotification,
+    getNotification
 }

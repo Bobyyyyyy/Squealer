@@ -8,14 +8,18 @@ import {
     SearchIcon,
     UserIcon
 } from "../components/assets/index.jsx"
-import {deleteToastNotification, getToastNotification, getUsernameFromSessionStore} from "../utils/usefulFunctions.js";
+import {
+    deleteToastNotification,
+    getNotification,
+    getToastNotification
+} from "../utils/usefulFunctions.js";
 import NotificationButton from "./NotificationButton.jsx";
 import CustomToast from "../components/toasts/CustomToast.jsx";
 
 
 export default function RootLayout() {
 
-    const [notifications, setNotifications] = useState([]);
+    const [notifications, setNotifications] = useState(null);
     const [showToast, setShowToast] = useState(false);
     const [toastNotification, setToastNotification] = useState()
     const CHECK_NOTIFICATION_TIME = 5000;
@@ -55,18 +59,6 @@ export default function RootLayout() {
     ];
 
 
-    const getNotification = async () => {
-        let res = await fetch(`/db/notification?user=${getUsernameFromSessionStore()}`, {
-            method:'GET'
-        });
-        if (res.ok) {
-            res = await res.json();
-            if (Object.keys(res).length !== 0) {
-                setNotifications(res);
-            }
-        }
-    }
-
     const handleToastNotification = () => {
         const TOAST_TIME = 1500;
         const notificationObj = getToastNotification();
@@ -83,7 +75,8 @@ export default function RootLayout() {
     useEffect(() => {
         handleToastNotification();
         const interval = setInterval(async () => {
-            await getNotification();
+            let notificationRes = await getNotification();
+            setNotifications(notificationRes);
         }, CHECK_NOTIFICATION_TIME);
         return () => clearInterval(interval);
     }, []);
@@ -107,7 +100,7 @@ export default function RootLayout() {
                         ))}
                     </div>
                 </nav>
-                {notifications.length !== 0 &&
+                {notifications !== null &&
                     <NotificationButton notifications={notifications} setNotifications={setNotifications} />
                 }
                 {showToast &&
