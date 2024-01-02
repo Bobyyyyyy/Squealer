@@ -1,6 +1,7 @@
 import {Modal, ToggleSwitch} from "flowbite-react";
 import {blob2base64, compressBlob} from "../../../utils/imageFunctions.js";
 import React, { useState} from "react";
+import {setToastNotification} from "../../../utils/usefulFunctions.js";
 
 let imageObj = null;
 
@@ -26,7 +27,11 @@ function ChangeProfilePictureModal({isOpen, setIsOpen, user}) {
                     }),
                 });
                 if (res.ok) {
-                    setIsOpen(false)
+                    setIsOpen(false);
+                    setToastNotification("Foto profilo aggiornata con successo", "success");
+                    location.reload();
+                } else {
+                    setToastNotification("Oh no! Qualcosa è andato storto nell'aggiornamento della foto profilo", "failure");
                     location.reload();
                 }
             } else {

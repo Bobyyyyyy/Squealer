@@ -172,11 +172,11 @@ function AddPost(){
                         console.log("wait", wait)
                         setTimeout(()=> {
                             setShowModalGeo(false);
-                            setToastNotification("Poast inviato correttamente", "success");
+                            setToastNotification("Post inviato correttamente", "success");
                             window.location.href = "/user/"
                         }, wait)
                     } else {
-                        setToastNotification("Poast inviato correttamente", "success");
+                        setToastNotification("Post inviato correttamente", "success");
                         window.location.href = "/user/"
                     }
                 } else {
@@ -186,7 +186,8 @@ function AddPost(){
             }
         } catch (e) {
             console.log(e)
-            window.alert("canale o utente non esistente")
+            setToastNotification("Oh no, qualcosa è andato storto nell'invio del post", "failure");
+            window.location.href = "/user/"
         }
     }
 

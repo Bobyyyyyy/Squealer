@@ -21,7 +21,7 @@ export default function RootLayout() {
 
     const [notifications, setNotifications] = useState(null);
     const [showToast, setShowToast] = useState(false);
-    const [toastNotification, setToastNotification] = useState()
+    const [toastNotification, setToastNotification] = useState(null)
     const CHECK_NOTIFICATION_TIME = 5000;
 
     const navigationButtons = [

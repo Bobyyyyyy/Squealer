@@ -231,7 +231,7 @@ function SinglePageNormalChannel({nome}) {
                                                 />
                                         )})}
                                     {posts.length===0 &&
-                                        <p>Non ci sono ancora post indirizzati al canale {nome}</p>
+                                        <p className="text-center">Non ci sono ancora post indirizzati al canale {nome}</p>
                                     }
                                 </>
                         )}

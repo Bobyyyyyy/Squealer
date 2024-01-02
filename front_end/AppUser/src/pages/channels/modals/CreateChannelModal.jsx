@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, Button, Radio, Label } from 'flowbite-react';
-import {getUsernameFromSessionStore} from "../../../utils/usefulFunctions.js";
-function CreateChannelModal({ isOpen, setIsOpen, setNuovoCanale}) {
+import {getUsernameFromSessionStore, setToastNotification} from "../../../utils/usefulFunctions.js";
+function CreateChannelModal({ isOpen, setIsOpen}) {
 
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
@@ -23,29 +23,31 @@ function CreateChannelModal({ isOpen, setIsOpen, setNuovoCanale}) {
                 type: visibility,
                 creator: getUsernameFromSessionStore(),
             }
-            console.log("channel creato:", channel)
-            await fetch("/db/channel",{
+            let res = await fetch("/db/channel",{
                 method:"POST",
                 body: JSON.stringify(channel),
                 headers: {
                     "Content-Type":"application/json"
                 }
             })
-
-        }catch (err){
-            console.log(err)  //GESTIRE ERRORE
+            if (res.ok) {
+                cleanInput();
+                setIsOpen(false);
+                setToastNotification("Canale creato con successo", "success");
+                window.location.href = "/user/channels"
+            } else {
+                setError("Nome già utilizzato");
+            }
+        } catch (err){
+            console.log(err);
+            setToastNotification("Oh no! Qualcosa è andato storto nell'invio del canale", "failure");
+            window.location.href = "/user/channels"
         }
     }
 
-    const handleSubmit = () => {
-        console.log(!!name && !!description && !!visibility)
+    const handleSubmit = async () => {
         if (!!name && !!description && !!visibility) {
-            createChannel()
-                .then(()=>{
-                    cleanInput();
-                    setIsOpen(false);
-                    setNuovoCanale(true);
-                })
+            await createChannel();
         } else {
             setError('Inserisci tutti i campi.');
         }
@@ -57,7 +59,7 @@ function CreateChannelModal({ isOpen, setIsOpen, setNuovoCanale}) {
             <Modal.Header>Creazione nuovo canale</Modal.Header>
             <Modal.Body>
                 <div className="mb-4">
-                    <Label className="block mb-1">Name:</Label>
+                    <Label className="block mb-1">Nome canale:</Label>
                     <input
                         type="text"
                         className="border border-gray-300 rounded px-3 py-2 w-full"
@@ -66,7 +68,7 @@ function CreateChannelModal({ isOpen, setIsOpen, setNuovoCanale}) {
                     />
                 </div>
                 <div className="mb-4">
-                    <Label className="block mb-1">Description:</Label>
+                    <Label className="block mb-1">Descrizione:</Label>
                     <input
                         type="text"
                         className="border border-gray-300 rounded px-3 py-2 w-full"

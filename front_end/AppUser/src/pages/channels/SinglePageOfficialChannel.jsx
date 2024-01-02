@@ -54,7 +54,7 @@ function SinglePageOfficialChannel() {
                             />
                         )})}
                     {posts.length===0 &&
-                        <p>Non ci sono ancora post indirizzati al canale {channel.name}</p>
+                        <p className="text-center">Non ci sono ancora post indirizzati al canale {channel.name}</p>
                     }
                 </div>
             )}

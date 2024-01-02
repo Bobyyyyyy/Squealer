@@ -14,7 +14,6 @@ function Channels () {
     const [officialChannels, setOfficialChannels] = useState([]);
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [showFilterModal, setShowFilterModal] = useState(false);
-    const [nuovoCanale, setNuovoCanale] = useState(false)
     const [channelName, setChannelName] = useState('');
     const [visibility, setVisibility] = useState('');
     const [owner, setOwner] = useState('');
@@ -80,7 +79,6 @@ function Channels () {
         setIsLoading(true);
         let resChannel = await getChannels();
         setChannels(resChannel);
-        setNuovoCanale(false);
         if (activeOfficialChannel) {
             let resOfficialChannels = await getOfficialChannels();
             setOfficialChannels(resOfficialChannels);
@@ -91,7 +89,7 @@ function Channels () {
     useEffect(() => {
         fetchChannels()
             .catch(console.error)
-    }, [nuovoCanale, queryFilter]);
+    }, [queryFilter]);
 
     return (
         <>
@@ -171,7 +169,7 @@ function Channels () {
                 >
                     Crea canale
                 </button>
-                <CreateChannelModal isOpen={showCreateModal} setIsOpen={setShowCreateModal} setNuovoCanale={setNuovoCanale} />
+                <CreateChannelModal isOpen={showCreateModal} setIsOpen={setShowCreateModal} />
             </div>
         </>
     );
