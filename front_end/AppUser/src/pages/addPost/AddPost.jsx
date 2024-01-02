@@ -1,7 +1,11 @@
 import ContentPost from "./ContentPost.jsx";
 import {useEffect, useState} from "react";
 import {SubmitIcon} from "../../components/assets/index.jsx";
-import {getQuotaByUsername, getUsernameFromSessionStore} from "../../utils/usefulFunctions.js";
+import {
+    getQuotaByUsername,
+    getUsernameFromSessionStore,
+    setToastNotification
+} from "../../utils/usefulFunctions.js";
 
 import {blob2base64, compressBlob, getEmbed} from "../../utils/imageFunctions.js";
 import TimedPost from "./TimedPost.jsx";
@@ -168,20 +172,16 @@ function AddPost(){
                         console.log("wait", wait)
                         setTimeout(()=> {
                             setShowModalGeo(false);
+                            setToastNotification("Poast inviato correttamente", "success");
                             window.location.href = "/user/"
                         }, wait)
                     } else {
+                        setToastNotification("Poast inviato correttamente", "success");
                         window.location.href = "/user/"
                     }
                 } else {
-                    let data = await res.json();
-                    if (data.statusCode === 400) {
-                        console.log(data.message);
-                        window.alert("Non hai il prermesso di scrivere");
-                    } else if (data.statusCode === 400) {
-                        window.alert("Canale o utente non esiste");
-                    }
-                    throw res;
+                    setToastNotification("Oh no, qualcosa è andato storto nell'invio del post", "failure");
+                    window.location.href = "/user/"
                 }
             }
         } catch (e) {

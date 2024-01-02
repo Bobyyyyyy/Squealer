@@ -4,7 +4,7 @@ function getUsernameFromSessionStore () {
 
 async function setUsernameInSessionStore() {
     localStorage.clear();
-    sessionStorage.clear();
+    sessionStorage.removeItem("username");
     try {
         let res = await fetch("/db/user/session");
         res = await res.json();
@@ -189,6 +189,29 @@ const handleLogout = async () => {
     sessionStorage.clear();
 }
 
+const setToastNotification = (message, type) => {
+    sessionStorage.setItem("message", message);
+    sessionStorage.setItem("type", type);
+}
+
+const deleteToastNotification = () => {
+    sessionStorage.removeItem("message");
+    sessionStorage.removeItem("type");
+}
+
+const getToastNotification = () => {
+    let messageRes = sessionStorage.getItem("message");
+    let typeRes = sessionStorage.getItem("type");
+    if (!!messageRes && !!typeRes) {
+        // sono entrambi non nulli
+        return {
+            message: messageRes,
+            type: typeRes
+        }
+    } else {
+        return null;
+    }
+}
 
 export {
     getUsernameFromSessionStore,
@@ -204,5 +227,8 @@ export {
     getAllPost,
     getPostByOfficialChannelName,
     getAllOfficialChannelPost,
-    handleLogout
+    handleLogout,
+    setToastNotification,
+    deleteToastNotification,
+    getToastNotification
 }

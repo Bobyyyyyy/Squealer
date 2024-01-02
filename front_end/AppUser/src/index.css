@@ -16,6 +16,8 @@ body {
     --activeBtn: rgb(63 131 248);
     --normalBtn: rgba(35, 87, 137, 0.52);
     --text-button: white;
+    --bg-toast-success: green;
+    --bg-toast-failure: red;
     margin: 0;
       /*
       background: var(--sfondo);
@@ -85,6 +87,27 @@ body {
 
 .button-delete {
     background-color: rgb(200 30 30);
+}
+
+.toast, .toast-success, .toast-failure {
+    position: fixed;
+    top: 10%;
+    left: 50%;
+    transform: translate(-50%, 0);
+    padding: 1.5rem;
+    border-radius: 0.5em;
+    opacity: 0.99;
+    width: 80vw;
+    color: white;
+
+}
+
+.toast-success {
+    background-color: var(--bg-toast-success);
+}
+
+.toast-failure {
+    background-color: var(--bg-toast-failure);
 }
 
 /* Computer */
