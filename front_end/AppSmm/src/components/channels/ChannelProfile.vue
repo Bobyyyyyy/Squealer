@@ -34,16 +34,20 @@
   let lastRequestLength = 12;
 
   const updateAfterInsert = (admin) => {
-    channel.value.admins.push(admin);
-    channel.value.followers.splice(channel.value.followers.map(follower => follower.user).indexOf(admin),1);
+    let adminInfo = channel.value.followers.find(foll => foll.user === admin);
+    channel.value.admins.push({
+      name: adminInfo.user,
+      profilePic: adminInfo.profilePic,
+    });
+    channel.value.followers.splice(channel.value.followers.map(follower => follower.user).indexOf(admin.name),1);
   }
-  const updateAfterDelete = user => {
-    channel.value.followers.push({user:user, canWrite: true});
-    channel.value.admins.splice(channel.value.admins.indexOf(user),1);
+  const updateAfterDelete = admin => {
+    channel.value.followers.push({user: admin.name, canWrite: true, profilePic: admin.profilePic});
+    channel.value.admins.splice(channel.value.admins.map(admin => admin.name).indexOf(admin.name),1);
   }
   const updateRequests = (user,accepted) => {
-    channel.value.requests.splice(channel.value.requests.indexOf(user),1);
-    if(accepted) channel.value.followers.push({user:user, canWrite: true});
+    channel.value.requests.splice(channel.value.requests.map(req => req.user).indexOf(user.user),1);
+    if(accepted) channel.value.followers.push({user:user.user, canWrite: true, profilePic: user.profilePic});
   }
 
   async function updateSortFilter(newText){
@@ -93,8 +97,7 @@
     let res = await fetch(`/db/channel/${name}`,{
       method:'GET'
     });
-    channel.value = await res.json();
-    channel.value.requests = channel.value.requests.map(obj => obj.user);
+    channel.value = await res.json();;
     readyChannel.value = true;
     query =`name=${vip.value.name}&channel=${name}&smm=${true}&limit=12`;
 
@@ -125,7 +128,7 @@
         <div class="w-50 d-flex flex-row  align-self-center  justify-content-center">
           <div class="text-center bordEl" >
             <span v-if="channel.creator === vip.name" class="badge rounded-pill text-bg-primary"> creatore </span>
-            <span v-else-if="channel.admins.includes(vip.name)" class="badge rounded-pill text-bg-warning"> admin </span>
+            <span v-else-if="channel.admins.map(admin => admin.name).includes(vip.name)" class="badge rounded-pill text-bg-warning"> admin </span>
           </div>
           <div class="text-center bordEl ">
             <span v-if="channel.type === 'public'" class="badge rounded-pill text-bg-success"> pubblico </span>
@@ -177,7 +180,7 @@
   <RequestHandler ref="requestModal" :chname="channel.name" :requests="channel.requests" @updateFollowers="(user,accepted) => updateRequests(user,accepted)" />
   <DeleteAdminHandler ref="deleteAdminModal" :chname="channel.name" :admins="channel.admins" @updateAdmin="admin => updateAfterDelete(admin)"/>
   <AddAdminHandler ref="addAdminModal" :followers="channel.followers" :chname="channel.name" @updateAdmin="admin => updateAfterInsert(admin)" />
-  <PermissionHandler ref="permissionModal" :followers="channel.followers" :chname="channel.name"/>
+  <PermissionHandler ref="permissionModal" :followers="channel.followers" :chname="channel.name" />
 </template>
 
 <style scoped>
