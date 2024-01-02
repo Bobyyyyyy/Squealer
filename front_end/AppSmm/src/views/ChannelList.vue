@@ -102,7 +102,7 @@ watchEffect(async () => {
                  :isPublic="ch.type === 'public'"
                  :creator="ch.creator"
                  :admins="ch.admins"
-                 channelPic="https://picsum.photos/id/1/300/300"
+                 :channelPic="ch.profilePicture"
         />
       </div>
     </div>

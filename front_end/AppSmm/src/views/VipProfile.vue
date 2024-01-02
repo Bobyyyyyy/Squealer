@@ -66,7 +66,6 @@ import {computed, onMounted, onUnmounted, ref} from "vue";
       else query = query.replace(`&destType=${destFilter.value}`, `&destType=${newText}`)
       destFilter.value = newText
     }
-      //GESTIRE IL CASO DELLA KEYWORD
 
     destFilter.value = newText;
     store.commit('clearSqueal');

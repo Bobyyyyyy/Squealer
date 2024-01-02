@@ -120,7 +120,7 @@
       <div class="d-flex flex-column">
         <div class="d-flex flex-row justify-content-center w-100">
           <div class="maxWidth">
-            <img src="https://picsum.photos/id/1/300/300" class="img-fluid rounded-circle" alt="gatto che ormai ha stufato">
+            <img :src="channel.profilePicture" class="img-fluid rounded-circle" alt="gatto che ormai ha stufato">
           </div>
         </div>
         <h2 class="m-1 text-center">{{ channel.name }}</h2>
