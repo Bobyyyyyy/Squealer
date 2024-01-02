@@ -3,9 +3,9 @@
   import NavBar from "../navbar/NavBar.vue";
   import AddPostModal from "../post/AddPostModal.vue";
   import {Modal} from 'bootstrap'
-  import {onMounted, reactive, ref} from "vue";
+  import {computed, onMounted, reactive, ref} from "vue";
   import {getPage} from "../../utils/functions.js";
-  import {currentVip, expanded, sideBarElements, smartPhone, smm} from "../../utils/config.js"
+  import {expanded, sideBarElements, smartPhone} from "../../utils/config.js"
   import BuyQuotaModal from "../../quota/buyQuotaModal.vue";
   import Dropdown from "../Dropdown.vue";
   import {logout} from "../../utils/functions.js";
@@ -13,8 +13,10 @@
   import NotificationModal from "../notification/notificationModal.vue";
   import {useStore} from "vuex";
 
-
   const store = useStore();
+
+  const vip = computed(() => store.getters.getVip);
+  const smm = computed(() => store.getters.getSmm);
   const modalState = reactive({addPostModal: null})
   const beforeModalPage = ref('');
   const quotaModal = ref();
@@ -104,7 +106,7 @@
     <div v-if="!smartPhone" class="d-flex flex-column align-items-center">
       <ul class="nav nav-pills flex-column mb-auto">
         <li>
-          <NotificationBadge :text="currentVip"
+          <NotificationBadge :text="vip.name"
                              :class="'nameUser p-0 text-center fw-bold fs-5'"
                              @openNotificationModal="openNotificationModal"
                               />

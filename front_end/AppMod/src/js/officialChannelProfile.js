@@ -99,6 +99,10 @@ const showPosts = (filter,offset,limit,append = false) => {
                     if (destination.destType === "user") {
                         destinationNames.push('@' + destination.name);
                     }
+                    
+                    if(destination.destType === "keyword") {
+                        destinationNames.push('#' + destination.name);
+                    }
                 })
 
                 post.officialChannelsArray.forEach(destination => {

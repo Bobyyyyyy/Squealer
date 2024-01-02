@@ -141,7 +141,6 @@ const addTimedPost = async (postId) => {
             officialChannelsArray: post.officialChannelsArray,
             contentType: post.contentType,
             dateOfCreation: Date.now(),
-            tags: post.tags,
             content: post.contentType === 'text' ? parseText(timedInfo.content,timedInfo.done + 1) : post.content
         }
         let delQuota = !!newPost.destinations.find(dest => dest.destType === 'channel' || dest.destType === 'official');
@@ -166,7 +165,7 @@ const addTimedPost = async (postId) => {
 
 /**
  * @param {Object} post
- * {creator: String, destinations: array of objects{name: String, destType: String}, contentType: String, content: String, dateOfCreation: Date , tags: Array<String>}
+ * {creator: String, destinations: array of objects{name: String, destType: String}, contentType: String, content: String, dateOfCreation: Date ,}
  * @param {Object} quota - {daily,weekly-monthly} - remaining updated
  * @returns {Promise<{postId: *}>}
  */
@@ -181,7 +180,7 @@ const addPost = async (post,quota) => {
         let officialChannels = post?.officialChannelsArray ? post.officialChannelsArray : [];
         let creator = await User.findOne({username: post.creator});
         for (const destination of destinations) {
-            if ( !['user', 'channel', 'official'].includes(destination.destType)){
+            if ( !['user', 'channel', 'official','keyword'].includes(destination.destType)){
                 throw createError(`destinazione non valida. Inserire una destinazione sintatticamente valida.`, 400);
             }
             let destinationType = destination.destType;
@@ -264,13 +263,28 @@ const addPost = async (post,quota) => {
             category: postCategory,
             popularity: 'neutral',
             dateOfCreation: post.dateOfCreation,
-            ...(post.tags && post.tags !== []) && {tags: post.tags},
         })
 
-        await newPost.save();
+
 
         if (creator.typeUser !== 'mod') {
             /* QUOTA UPDATE */
+            if(quota.daily < 0) {
+                quota.weekly += quota.daily;
+                quota.daily = 0;
+
+            }
+
+            if(quota.weekly < 0) {
+                quota.monthly += quota.weekly;
+                quota.weekly = 0;
+            }
+
+            if(quota.monthly < 0) {
+                throw createError('No more quota remaining',400);
+            }
+
+
             await User.findOneAndUpdate({username: post.creator}, {
                 characters:{
                     daily: quota.daily,
@@ -279,6 +293,8 @@ const addPost = async (post,quota) => {
                 }
             } );
         }
+
+        await newPost.save();
         return {post: newPost.toObject()};
     }
     catch(err){
@@ -321,15 +337,16 @@ const getAllPost = async (query,sessionUser) =>{
 
 
                 /* PER IL CANALE SINGOLO */
-            ... (query.channel) && {'destinationArray.name': query.channel},
+            ... (query.channel) && {$and: [{'destinationArray.name': query.channel}, {"destinationArray.destType": 'channel'}]},
 
                 /* PER IL CANALE UFFICIALE */
             ...(query.official) && {'officialChannelsArray': query.official},
 
-            ... (query.user) && {$or: [{'destinationArray.name': query.user}]},
+            ... (query.user) && {$and: [{'destinationArray.name': query.user}, {"destinationArray.destType": 'user'}]},
 
-            ...(query?.keyword) && {tags: {$regex: query.keyword}},
+            ...(query.keyword) && {$and: [{'destinationArray.name': {$regex: query.keyword}}, {'destinationArray.destType': 'keyword'}]},
 
+            ...(query.mention) && {$and: [{'content' : {$regex: query.mention}},{'contentType': 'text'}]},
         }
 
         await connection.get();
@@ -348,12 +365,39 @@ const getAllPost = async (query,sessionUser) =>{
                     dateOfCreation: '$dateOfCreation',
                     criticalMass: '$criticalMass',
                     views: '$views',
-                    tags: '$tags',
                     views_count: {$size: '$views'},
                 }
             },
             {$match: filter},
             {$sort: query.sort ? sorts[query.sort] : sorts['più recente']},
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "owner",
+                    foreignField: "username",
+                    as: "user_info",
+                },
+            },
+            {
+              $unwind: "$user_info",
+            },
+            {
+                $project:{
+                    owner: '$owner',
+                    destinationArray: '$destinationArray',
+                    officialChannelsArray: '$officialChannelsArray',
+                    category: '$category',
+                    popularity: '$popularity',
+                    contentType: '$contentType',
+                    content: '$content',
+                    reactions: '$reactions',
+                    dateOfCreation: '$dateOfCreation',
+                    criticalMass: '$criticalMass',
+                    views: '$views',
+                    views_count: {$size: '$views'},
+                    profilePicture: '$user_info.profilePicture',
+                }
+            },
             {$skip: parseInt(query.offset)},
             {$limit: parseInt(query.limit)},
         ])
@@ -403,7 +447,7 @@ const removeDestination = async (destination,postID)=> {
             await Channel.findOneAndUpdate({name: destination},[{$set: {'postNumber': {$subtract: ['$postNumber',1]}}}]);
         }
 
-        if(checkArrayDestination.destinationArray.length === 0 && checkOfficialDestination.officialChannelsArray.length === 0 && checkArrayDestination.tags.length === 0) {
+        if(checkArrayDestination.destinationArray.length === 0 && checkOfficialDestination.officialChannelsArray.length === 0) {
             await deletePost(postID);
         }
     }
@@ -467,6 +511,10 @@ const addDestination = async (destination,postID) => {
                     throw createError('Canale Non esiste',400);
                 }
                 await Post.findByIdAndUpdate(postID,{$push: {officialChannelsArray: destination.name}},{new : true});
+                break;
+
+            case 'keyword':
+                await Post.findByIdAndUpdate(postID,{$push: {destinationArray: destination}},{new : true});
                 break;
         }
 

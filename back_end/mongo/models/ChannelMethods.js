@@ -372,7 +372,147 @@ const getSingleChannel = async(name,user) => {
     try{
         await connection.get()
         let channelName = name.trim().toLowerCase();
-        let channel = await Channel.findOne({name: channelName}).lean();
+        let channel = await Channel.aggregate([
+            {
+                $match: {name: channelName},
+            },
+            {
+                $limit: 1,  //findOne
+            },
+            {
+                $lookup:{
+                    from: "users",
+                    localField: "followers.user",
+                    foreignField: "username",
+                    as: "followers_info",
+                }
+            },
+            {
+                $lookup:{
+                    from: "users",
+                    localField: "admins",
+                    foreignField: "username",
+                    as: "admins_info",
+                }
+            },
+            {
+                $lookup:{
+                    from: "users",
+                    localField: "requests.user",
+                    foreignField: "username",
+                    as: "requests_info",
+                }
+            },
+            {
+                $project:{
+                    name: "$name",
+                    description: "$description",
+                    type: "$type",
+                    creator: "$creator",
+                    admins: {
+                        $map:{
+                            input: "$admins",
+                            as: "admin",
+                            in: {
+                                $mergeObjects: [
+                                    {
+                                        'name': "$$admin",
+                                    },
+                                    {
+                                        'profilePic':{
+                                            $getField:{
+                                                input: {
+                                                    $arrayElemAt: [
+                                                        {
+                                                            $filter:{
+                                                                input:"$admins_info",
+                                                                cond:{
+                                                                    $eq:["$$this.username", "$$admin"]
+                                                                }
+                                                            }
+                                                        },
+                                                        0,
+                                                    ],
+                                                },
+                                                field: 'profilePicture'
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    followers: {
+                        $map: {
+                            input: "$followers",
+                            as: "user",
+                            in: {
+                                $mergeObjects:[
+                                    "$$user",
+                                    {
+                                        'profilePic':{
+                                            $getField:{
+                                                input: {
+                                                    $arrayElemAt: [
+                                                        {
+                                                            $filter:{
+                                                                input:"$followers_info",
+                                                                cond:{
+                                                                    $eq:["$$this.username", "$$user.user"]
+                                                                }
+                                                            }
+                                                        },
+                                                        0,
+                                                    ],
+                                                },
+                                                field: 'profilePicture'
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    requests: {
+                        $map:{
+                            input: "$requests",
+                            as: "request",
+                            in: {
+                                $mergeObjects: [
+                                    "$$request",
+                                    {
+                                        'profilePic':{
+                                            $getField:{
+                                                input: {
+                                                    $arrayElemAt: [
+                                                        {
+                                                            $filter:{
+                                                                input:"$requests_info",
+                                                                cond:{
+                                                                    $eq:["$$this.username", "$$request.user"]
+                                                                }
+                                                            }
+                                                        },
+                                                        0,
+                                                    ],
+                                                },
+                                                field: 'profilePicture'
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    followerNumber: "$followerNumber",
+                    postNumber: "$postNumber",
+                    isBlocked: "$isBlocked",
+                    profilePicture: "$profilePicture",
+                }
+            }
+        ]);
+
+        channel = channel[0];
 
         if (!channel) {
             throw createError('Canale Non trovato',404);

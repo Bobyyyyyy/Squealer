@@ -1,8 +1,6 @@
 <script setup>
 
 import {computed, onMounted, ref} from "vue";
-import {currentVip} from "../../utils/config.js";
-import NotificationModal from "./notificationModal.vue";
 import {useStore} from "vuex";
 import Dropdown from "../Dropdown.vue";
 import {logout} from "../../utils/functions.js";
@@ -10,6 +8,8 @@ import {logout} from "../../utils/functions.js";
 const MINUTE = 60000;
 
 const store = useStore();
+
+const vip = computed(()=> store.getters.getVip);
 
 defineProps({
   text:String,
@@ -31,7 +31,7 @@ const checkNot = async () => {
   const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
   const check = async () => {
-    let res = await fetch(`/db/notification?user=${currentVip.value}`, {
+    let res = await fetch(`/db/notification?user=${vip.value.name}`, {
       method:"GET",
     })
     store.commit('setNotification', await res.json());
@@ -57,7 +57,7 @@ defineEmits(['openNotificationModal']);
 <template>
     <Dropdown v-if="smartphoneNav"
               id="notification_badge"
-              :filterRef="currentVip"
+              :filterRef="vip.name"
               classButton="btn btn-lg btn-primary position-relative text-center h-100 w-100 p-0 d-flex flex-row align-items-center ps-1 pe-1"
               updateRef="action"
               classDropDown="dropstart"

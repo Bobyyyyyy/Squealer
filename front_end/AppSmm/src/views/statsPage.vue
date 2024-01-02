@@ -3,17 +3,20 @@
 import PubFrequencyYear from "../components/charts/PubFrequencyYear.vue";
 import Popularity30days from "../components/charts/Popularity30days.vue";
 import PubFrequencyMonth from "../components/charts/PubFrequencyMonth.vue";
-import {onMounted, reactive, ref} from "vue";
+import {computed, onMounted, reactive, ref} from "vue";
 import {parseReactionType} from "../utils/functions.js";
-import {currentVip} from "../utils/config.js";
+import {useStore} from "vuex";
 
+const store = useStore();
 const dataFirstReady = ref(false);
 const firstReady = ref(false);
 const secondReady = ref(false);
 const dataChart = reactive({})
 
+const vip = computed(() => store.getters.getVip);
+
 onMounted(async ()=> {
-  let res =  await fetch(`/db/post/allReactionMonth?user=${currentVip.value}`,{
+  let res =  await fetch(`/db/post/allReactionMonth?user=${vip.value.name}`,{
     method:"GET",
   })
 

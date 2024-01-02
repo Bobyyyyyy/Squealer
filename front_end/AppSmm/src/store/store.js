@@ -16,6 +16,13 @@ export const store = createStore({
             currentSqueals: [],
             offsetSqueals: 0,
             notifications: [],
+            user_info:{
+                smm: '',
+                vip: {
+                    name: '',
+                    profilePic: '',
+                }
+            }
         }
     },
     mutations: {
@@ -55,7 +62,18 @@ export const store = createStore({
         },
         deleteNotifications(state){
             state.notifications = [];
-        }
+        },
+        setsmm(state, smmname){
+            state.user_info.smm = smmname
+        },
+        setVip(state,vip){
+            state.user_info.vip.name = vip.name;
+            state.user_info.vip.profilePic = vip.profilePic;
+        },
+        deleteVip(state){
+            state.user_info.vip.name= '';
+            state.user_info.vip.profilePic = '';
+        },
     },
     getters:{
         getQuota(state){
@@ -72,7 +90,13 @@ export const store = createStore({
         },
         getNotifications(state){
             return state.notifications;
-        }
+        },
+        getVip(state){
+            return state.user_info.vip;
+        },
+        getSmm(state){
+            return state.user_info.smm;
+        },
     }
 })
 

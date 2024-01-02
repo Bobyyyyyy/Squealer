@@ -3,7 +3,7 @@
   import {computed, onMounted, reactive, ref} from "vue";
   import Map from "./Map.vue";
   import {blob2base64, compressBlob, parse2timestamp, setupBeep} from "../../utils/functions.js";
-  import {currentVip, URLHTTPREGEX} from "../../utils/config.js";
+  import {URLHTTPREGEX} from "../../utils/config.js";
   import {useStore} from "vuex";
   import Select from "../Select.vue";
   import {useToast} from "vue-toast-notification";
@@ -12,6 +12,7 @@
   const store = useStore();
   const $toast = useToast();
 
+  const vip = computed(() => store.getters.getVip);
   const modalState = reactive({post: null});
 
   const emits = defineEmits(['restoreSideBar', 'addedPost']);
@@ -128,7 +129,7 @@
       if (tags?.length > 0) tags = tags.filter((tag, index) => tags.indexOf(tag) === index);
 
       let post = {
-        creator: currentVip.value,
+        creator: vip.value.name,
         contentType: postType.value,
         dateOfCreation: Date.now(),
         destinations: tmpDest,

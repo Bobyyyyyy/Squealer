@@ -1,8 +1,8 @@
 <script setup>
-  import {computed, onMounted, onUnmounted, ref, getCurrentInstance} from "vue";
+  import {computed, onMounted, onUnmounted, ref} from "vue";
   import Post from "../post/Post.vue";
   import Select from "../Select.vue";
-  import {currentVip, postType, postTypeITAS, sortPosts} from "../../utils/config.js";
+  import {postType, postTypeITAS, sortPosts} from "../../utils/config.js";
   import {getPosts, parseDestinationsViewPost} from "../../utils/functions.js";
   import {useStore} from "vuex";
   import Spinner from "../Spinner.vue";
@@ -19,6 +19,7 @@
 
   const squeals = computed(()=> store.getters.getSqueal);
   const offset = computed(() => store.getters.getOffset);
+  const vip = computed(() => store.getters.getVip);
 
   const channel = ref({});
   const readyChannel = ref(false);
@@ -33,16 +34,20 @@
   let lastRequestLength = 12;
 
   const updateAfterInsert = (admin) => {
-    channel.value.admins.push(admin);
-    channel.value.followers.splice(channel.value.followers.map(follower => follower.user).indexOf(admin),1);
+    let adminInfo = channel.value.followers.find(foll => foll.user === admin);
+    channel.value.admins.push({
+      name: adminInfo.user,
+      profilePic: adminInfo.profilePic,
+    });
+    channel.value.followers.splice(channel.value.followers.map(follower => follower.user).indexOf(admin.name),1);
   }
-  const updateAfterDelete = user => {
-    channel.value.followers.push({user:user, canWrite: true});
-    channel.value.admins.splice(channel.value.admins.indexOf(user),1);
+  const updateAfterDelete = admin => {
+    channel.value.followers.push({user: admin.name, canWrite: true, profilePic: admin.profilePic});
+    channel.value.admins.splice(channel.value.admins.map(admin => admin.name).indexOf(admin.name),1);
   }
   const updateRequests = (user,accepted) => {
-    channel.value.requests.splice(channel.value.requests.indexOf(user),1);
-    if(accepted) channel.value.followers.push({user:user, canWrite: true});
+    channel.value.requests.splice(channel.value.requests.map(req => req.user).indexOf(user.user),1);
+    if(accepted) channel.value.followers.push({user:user.user, canWrite: true, profilePic: user.profilePic});
   }
 
   async function updateSortFilter(newText){
@@ -92,10 +97,9 @@
     let res = await fetch(`/db/channel/${name}`,{
       method:'GET'
     });
-    channel.value = await res.json();
-    channel.value.requests = channel.value.requests.map(obj => obj.user);
+    channel.value = await res.json();;
     readyChannel.value = true;
-    query =`name=${currentVip.value}&channel=${name}&smm=${true}&limit=12`;
+    query =`name=${vip.value.name}&channel=${name}&smm=${true}&limit=12`;
 
     store.commit('clearSqueal');
     store.commit('pushSqueal',(await getPosts(query, 0)));
@@ -116,15 +120,15 @@
       <div class="d-flex flex-column">
         <div class="d-flex flex-row justify-content-center w-100">
           <div class="maxWidth">
-            <img src="https://picsum.photos/id/1/300/300" class="img-fluid rounded-circle" alt="gatto che ormai ha stufato">
+            <img :src="channel.profilePicture" class="img-fluid rounded-circle" alt="gatto che ormai ha stufato">
           </div>
         </div>
         <h2 class="m-1 text-center">{{ channel.name }}</h2>
         <h5 class="m-1 text-center">{{ channel.description }}</h5>
         <div class="w-50 d-flex flex-row  align-self-center  justify-content-center">
           <div class="text-center bordEl" >
-            <span v-if="channel.creator === currentVip" class="badge rounded-pill text-bg-primary"> creatore </span>
-            <span v-else-if="channel.admins.includes(currentVip)" class="badge rounded-pill text-bg-warning"> admin </span>
+            <span v-if="channel.creator === vip.name" class="badge rounded-pill text-bg-primary"> creatore </span>
+            <span v-else-if="channel.admins.map(admin => admin.name).includes(vip.name)" class="badge rounded-pill text-bg-warning"> admin </span>
           </div>
           <div class="text-center bordEl ">
             <span v-if="channel.type === 'public'" class="badge rounded-pill text-bg-success"> pubblico </span>
@@ -136,8 +140,8 @@
         <div class="d-flex flex-row flex-wrap justify-content-around gap-2 mt-2">
           <button type="button" class="btn btn-primary" @click="permissionModal.openModal">Permessi</button>
           <button v-if="channel.type === 'private'" type="button"  class="btn btn-primary ms-2" @click="requestModal.openModal">Richieste</button>
-          <button v-if="channel.creator === currentVip" type="button" class="btn btn-primary ms-2" @click="addAdminModal.openModal">Aggiungi admin</button>
-          <button v-if="channel.creator === currentVip" type="button" class="btn btn-primary ms-2" @click="deleteAdminModal.openModal">Rimuovi admin</button>
+          <button v-if="channel.creator === vip.name" type="button" class="btn btn-primary ms-2" @click="addAdminModal.openModal">Aggiungi admin</button>
+          <button v-if="channel.creator === vip.name" type="button" class="btn btn-primary ms-2" @click="deleteAdminModal.openModal">Rimuovi admin</button>
         </div>
 
         <div class="d-flex flex-row justify-content-end">
@@ -165,7 +169,7 @@
       <div v-if="readyPosts" class="d-flex flex-row flex-wrap justify-content-around mt-3">
         <Post v-for="(post,i) in squeals" :key="post._id"
               :post="post"
-              :dest= "parseDestinationsViewPost(post.destinationArray, post.tags)"
+              :dest= "parseDestinationsViewPost(post.destinationArray, post.officialChannelsArray, post.tags)"
               :numberOfPost="i"
               picProfile = "/img/defaultUser.jpeg"
         />
@@ -176,7 +180,7 @@
   <RequestHandler ref="requestModal" :chname="channel.name" :requests="channel.requests" @updateFollowers="(user,accepted) => updateRequests(user,accepted)" />
   <DeleteAdminHandler ref="deleteAdminModal" :chname="channel.name" :admins="channel.admins" @updateAdmin="admin => updateAfterDelete(admin)"/>
   <AddAdminHandler ref="addAdminModal" :followers="channel.followers" :chname="channel.name" @updateAdmin="admin => updateAfterInsert(admin)" />
-  <PermissionHandler ref="permissionModal" :followers="channel.followers" :chname="channel.name"/>
+  <PermissionHandler ref="permissionModal" :followers="channel.followers" :chname="channel.name" />
 </template>
 
 <style scoped>

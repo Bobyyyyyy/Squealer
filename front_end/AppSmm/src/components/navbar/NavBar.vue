@@ -1,9 +1,13 @@
 <script setup>
 
-import {currentVip, smartPhone} from "../../utils/config.js";
-  import Dropdown from "../Dropdown.vue";
+import {smartPhone} from "../../utils/config.js";
   import {logout} from "../../utils/functions.js";
 import NotificationBadge from "../notification/NotificationBadge.vue";
+import {useStore} from "vuex";
+import {computed} from "vue";
+
+const store = useStore();
+const vip = computed(() => store.getters.getVip);
 
 
   defineProps({
@@ -36,7 +40,7 @@ import NotificationBadge from "../notification/NotificationBadge.vue";
                 @click="logout"
         >LOGOUT</button>
         <div v-else-if="smartPhone" class="sameWidth align-items-center justify-content-end">
-          <NotificationBadge :text="currentVip"
+          <NotificationBadge :text="vip.name"
                              :class="'nameUser p-0 text-center fw-bold fs-6'"
                              :disable="false"
                              :smartphoneNav = "true"

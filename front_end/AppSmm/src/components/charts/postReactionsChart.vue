@@ -11,7 +11,7 @@
    Tooltip,
    ArcElement,
  } from "chart.js";
- import {onBeforeUpdate, onMounted, onUnmounted, onUpdated, ref, watch} from "vue";
+ import {ref} from "vue";
 
  ChartJS.register(ArcElement,CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
 

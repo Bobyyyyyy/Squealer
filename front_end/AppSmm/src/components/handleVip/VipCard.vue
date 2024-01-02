@@ -1,8 +1,9 @@
 <script setup>
   import Post from "../post/Post.vue";
   import {parseDestinationsViewPost} from "../../utils/functions.js";
-  import {computed, onMounted} from "vue";
-  let srcImg="/img/profilePicture.png";
+  import {computed, onMounted, ref} from "vue";
+
+  const srcImage = ref('');
 
   defineEmits(['setModal']);
 
@@ -16,13 +17,20 @@
     return Object.keys(props.post).length === 0
   })
 
+  onMounted(async () => {
+      let res = await fetch(`/db/user/profilePic?name=${props.username}`,{
+        method:"GET",
+      })
+      srcImage.value = (await res.json()).profilePic;
+  })
+
 </script>
 
 <template>
   <div class="d-flex flex-column justify-content-around vipCard border-primary bg-body-secondary mt-3">
     <div class="d-flex flex-column justify-content-around align-items-center">
       <div class="d-flex justify-content-center" style="width: 35%">
-        <img :src=" srcImg " alt="immagine profilo" class="img-fluid rounded-circle" />
+        <img :src=" srcImage " alt="immagine profilo" class="img-fluid rounded-circle" />
       </div>
       <div class="d-flex justify-content-center">
         <h3 class="mb-0">{{ username }}</h3>
@@ -33,9 +41,9 @@
       <div v-if="!noPost" class="d-flex flex-row justify-content-center">
         <Post
             :post="post"
-            :dest= "parseDestinationsViewPost(post.destinationArray, post.tags)"
+            :dest= "parseDestinationsViewPost(post.destinationArray, post.officialChannelsArray, post.tags)"
             :numberOfPost="1"
-            picProfile = "/img/defaultUser.jpeg"
+            :picProfile = "srcImage"
         />
       </div>
       <div v-else>

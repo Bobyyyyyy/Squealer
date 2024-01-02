@@ -1,5 +1,5 @@
 <script setup>
-import {reactive, ref} from "vue";
+import {reactive} from "vue";
 import {Modal} from "bootstrap";
 import {useToast} from "vue-toast-notification";
 
@@ -31,15 +31,15 @@ const handleRequest = async (user,accept) => {
       "Content-Type":"application/json"
     },
     body: JSON.stringify({
-      user: user,
+      user: user.user,
       channel: props.chname,
       accepted: accept,
     })
   })
   if (!res.ok){
-    $toast.error(`errore nel${accept ? "l'accettare" : ' rifiutare'} ${user}`);
+    $toast.error(`errore nel${accept ? "l'accettare" : ' rifiutare'} ${user.user}`);
   } else {
-    $toast.success(`${user} ${accept?"accettato":"rifiutato"}`, {position:'top-right'});
+    $toast.success(`${user.user} ${accept?"accettato":"rifiutato"}`, {position:'top-right'});
   }
   emits('updateFollowers', user , accept);
 }
@@ -58,7 +58,12 @@ const handleRequest = async (user,accept) => {
           <div class="modal-body">
             <div class="d-flex flex-column align-items-center">
               <div v-for="(user,i) in requests" :key="user+i" class="w-75 d-flex flex-row justify-content-between mt-1 mb-1 align-items-center">
-                <span>{{user}}</span>
+                <div class="d-flex flex-row align-items-center gap-1">
+                  <div class="container-img">
+                    <img :src="user.profilePic" alt="immagine di profilo" class="img-fluid rounded-circle h-100 w-100">
+                  </div>
+                  <span>{{user.user}}</span>
+                </div>
                 <div class="d-flex flex-row justify-content-center" style="height: 2rem; aspect-ratio: 1">
                   <div type="button" class="h-100 me-4" @click="handleRequest(user, true)">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-check-lg" viewBox="0 0 16 16">
@@ -81,5 +86,8 @@ const handleRequest = async (user,accept) => {
 </template>
 
 <style scoped>
-
+.container-img{
+  height: 2rem;
+  aspect-ratio: 1;
+}
 </style>

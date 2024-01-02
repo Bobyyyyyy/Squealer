@@ -1,6 +1,6 @@
 <script setup>
 import {Modal} from "bootstrap";
-import {onBeforeUpdate, onMounted, onUnmounted, onUpdated, reactive, ref} from "vue";
+import {reactive, ref} from "vue";
 import {parseDestinationsViewPost} from "../../../utils/functions.js";
 import Post from "../Post.vue";
 import Reply from "./Reply.vue";
@@ -69,7 +69,7 @@ const getId =  () => `repliesModal${props.idx}`;
         <div class="modal-body d-flex flex-column justify-content-center">
           <Post
               :post="post"
-              :dest= "parseDestinationsViewPost(post.destinationArray, post.tags)"
+              :dest= "parseDestinationsViewPost(post.destinationArray, post.officialChannelsArray, post.tags)"
               :numberOfPost="1"
               :viewFooter="false"
               picProfile = "/img/defaultUser.jpeg"
