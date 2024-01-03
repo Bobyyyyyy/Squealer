@@ -56,7 +56,6 @@ function closeChannelModal() {
 }
 
 watchEffect(async () => {
-  console.log(query.value);
   channels.value = await updateChannels(query.value);
 });
 

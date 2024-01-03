@@ -101,7 +101,7 @@
     let res = await fetch(`/db/channel/${name}`,{
       method:'GET'
     });
-    channel.value = await res.json();;
+    channel.value = await res.json();
     readyChannel.value = true;
     query =`name=${vip.value.name}&channel=${name}&smm=${true}&limit=12`;
 
@@ -179,15 +179,17 @@
               :picProfile = "post.profilePicture"
         />
       </div>
+
+      <RequestHandler ref="requestModal" :chname="channel.name" :requests="channel.requests" @updateFollowers="(user,accepted) => updateRequests(user,accepted)" />
+      <DeleteAdminHandler ref="deleteAdminModal" :chname="channel.name" :admins="channel.admins" @updateAdmin="admin => updateAfterDelete(admin)"/>
+      <AddAdminHandler ref="addAdminModal" :followers="channel.followers" :chname="channel.name" @updateAdmin="admin => updateAfterInsert(admin)" />
+      <PermissionHandler ref="permissionModal" :followers="channel.followers" :chname="channel.name" />
+      <DeleteChannelModal ref="deleteChannelModal" :channelName="channel.name" />
+      <ProfilePicModal ref="changeProfilePic" :channelName="channel.name" @profilePic="(img) => channel.profilePicture = img"/>
     </div>
     <Spinner v-else />
   </div>
-  <RequestHandler ref="requestModal" :chname="channel.name" :requests="channel.requests" @updateFollowers="(user,accepted) => updateRequests(user,accepted)" />
-  <DeleteAdminHandler ref="deleteAdminModal" :chname="channel.name" :admins="channel.admins" @updateAdmin="admin => updateAfterDelete(admin)"/>
-  <AddAdminHandler ref="addAdminModal" :followers="channel.followers" :chname="channel.name" @updateAdmin="admin => updateAfterInsert(admin)" />
-  <PermissionHandler ref="permissionModal" :followers="channel.followers" :chname="channel.name" />
-  <DeleteChannelModal ref="deleteChannelModal" :channelName="channel.name" />
-  <ProfilePicModal ref="changeProfilePic" :channelName="channel.name" @profilePic="(img) => channel.profilePicture = img"/>
+
 </template>
 
 <style scoped>

@@ -1,5 +1,5 @@
 <script setup>
-  import {reactive, ref} from "vue";
+import {computed, reactive, ref} from "vue";
   import {Modal} from "bootstrap";
   import RemoveButton from "../RemoveButton.vue";
   import {useToast} from "vue-toast-notification";
@@ -12,6 +12,8 @@
     admins: Array,
     chname: String,
   })
+
+  const adminsLive = ref(props.admins);
 
   const openModal = () => {
     modalState.removeAdmin = new Modal('#channelDeleteAdmin',{});
@@ -51,7 +53,7 @@
 </script>
 
 <template>
-  <div class="modal modal fade overflow-hidden" id="channelDeleteAdmin" tabindex="-1" aria-hidden="true">
+  <div class="modal fade overflow-hidden" id="channelDeleteAdmin" tabindex="-1" aria-hidden="true">
     <div class="centralDiv z-1">
       <div class="modal-dialog modal-dialog-centered ">
         <div class="modal-content">
@@ -61,7 +63,7 @@
           </div>
           <div class="modal-body">
             <div class="d-flex flex-column gap-1 align-items-center">
-              <div v-for="(user,i) in admins?.sort((a, b) => a.name.localeCompare(b))" :key="user+i" class="w-75 d-flex flex-row justify-content-between mt-1 mb-1 align-items-center">
+              <div v-for="(user,i) in adminsLive.sort((a, b) => a.name.localeCompare(b))" :key="user+i" class="w-75 d-flex flex-row justify-content-between mt-1 mb-1 align-items-center">
                 <div class="d-flex flex-row align-items-center gap-2">
                   <div class="container-img">
                     <img :src="user.profilePic" alt="immagine di profilo" class="img-fluid rounded-circle h-100 w-100">
@@ -69,7 +71,7 @@
                   <span>{{user.name}}</span>
                 </div>
                 <button type="button" class="btn btn-danger btn-sm" @click="() => {
-                  admins.splice(admins.map(admin => admin.name).indexOf(user.name),1);
+                  adminsLive.splice(adminsLive.map(admin => admin.name).indexOf(user.name),1);
                   selectedUsers.push(user);
                 }">rimuovi</button>
               </div>
@@ -86,7 +88,7 @@
                 </div>
                 <RemoveButton :value="user" @updateList="() => {
                   selectedUsers.splice(selectedUsers.map(admin => admin.name).indexOf(user.name),1);
-                  admins.push(user);
+                  adminsLive.push(user);
                 }"/>
               </div>
               <hr class="mt-2 mb-3">

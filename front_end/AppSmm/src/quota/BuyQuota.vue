@@ -39,7 +39,7 @@
     }
   )
 
-  const emits = defineEmits('closeModal')
+  const emits = defineEmits(['closeModal'])
 
   function openModalConfQuota() {
     modalConf.value.openModal();

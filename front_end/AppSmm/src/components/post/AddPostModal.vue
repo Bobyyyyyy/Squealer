@@ -1,9 +1,9 @@
 <script setup>
   import 'vue-toast-notification/dist/theme-sugar.css';
-  import {computed, onMounted, reactive, ref} from "vue";
+  import {computed, onMounted, reactive, ref, watch} from "vue";
   import Map from "./Map.vue";
   import {blob2base64, compressBlob, parse2timestamp, setupBeep} from "../../utils/functions.js";
-  import {URLHTTPREGEX} from "../../utils/config.js";
+  import {F_QUOTA, MAX_TEXT_LENGTH, URLHTTPREGEX} from "../../utils/config.js";
   import {useStore} from "vuex";
   import Select from "../Select.vue";
   import {useToast} from "vue-toast-notification";
@@ -52,7 +52,7 @@
 
   /* TIMED MESSAGE */
   const timed = ref(false);
-  const numberOfRepetitions = ref(0);
+  const numberOfRepetitions = ref(1);
   const typeFrequency = ref('select Frequency')
   const numFrequency = ref(0);
 
@@ -94,9 +94,16 @@
   );
   const quota = computed(() => store.getters.getQuota);
   const getLiveDQuota = computed(()=> (quota.value.daily - (inChannel.value ? quota2remove.value : 0)));
-  const getLiveWQuota = computed(()=> (quota.value.weekly - (inChannel.value ? quota2remove.value : 0)));
-  const getLiveMQuota = computed(()=> (quota.value.monthly - (inChannel.value ? quota2remove.value : 0)));
-  const disabled = computed(() => ((quota.value.daily === 0 || quota.value.weekly === 0 || quota.value.monthly === 0) && inChannel.value))
+  const getLiveWQuota = computed(()=> (quota.value.weekly - ((inChannel.value ? quota2remove.value : 0) - (getLiveDQuota.value < 0 ? getLiveDQuota.value : 0))));
+  const getLiveMQuota = computed(()=> (quota.value.monthly - ((inChannel.value ? quota2remove.value : 0) - (getLiveWQuota.value < 0 ? getLiveWQuota.value : 0))));
+  const disabled = computed(() => ((quota.value.daily === 0 || quota.value.weekly === 0 || quota.value.monthly === 0) && inChannel.value));
+  const maxTextLength = computed(() => (inChannel.value ? Math.floor(((Math.min(MAX_TEXT_LENGTH, quota.value.daily, quota.value.weekly, quota.value.monthly) + F_QUOTA )/numberOfRepetitions.value)) : MAX_TEXT_LENGTH));
+
+  watch(maxTextLength, () => {
+    if (textSqueal.value.length > maxTextLength.value){
+      textSqueal.value = textSqueal.value.substring(0,maxTextLength.value);
+    }
+  })
 
   function parseDestinations(){
     let dest = [];
@@ -267,7 +274,7 @@
                   </div>
                 <div class="mt-2 m-lg-1 preview-size" >
 
-                  <textarea v-if=" postType==='text'" rows="6" v-model="textSqueal" maxlength="500" placeholder="cosa pensi?"  class="form-control" :disabled="disabled"></textarea>
+                  <textarea v-if=" postType==='text'" rows="6" v-model="textSqueal" :maxlength="maxTextLength" placeholder="cosa pensi?"  class="form-control" :disabled="disabled"></textarea>
                   <div v-if="!!link && activeChoiceLink" class="d-flex flex-row mt-3 mb-2 align-items-center">
                     <h5 class="fw-light m-0">E' stato rilevato un link. Preferisci crearne uno breve? </h5>
                     <button type="button" class="btn btn-outline-success ms-3 btn-sm " style="width: 5%"
@@ -364,7 +371,7 @@
                   <div class="d-flex flex-row justify-content-between justify-content-lg-end flex-fill align-items-end">
                     <button type="button" class="btn btn-danger m-1"
                             @click="closeModal(false); reset()">Indietro</button>
-                    <button type="submit" class="btn btn-primary m-1" > Crea Squeal </button>
+                    <button type="submit" class="btn btn-primary m-1" :disabled="getLiveDQuota < - F_QUOTA || getLiveWQuota < - F_QUOTA || getLiveMQuota < - F_QUOTA"> Crea Squeal </button>
                   </div>
                 </div>
 
