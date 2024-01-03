@@ -93,12 +93,10 @@
       * (timed.value && numberOfRepetitions.value > 1 ? parseInt(numberOfRepetitions.value) : 1)
   );
   const quota = computed(() => store.getters.getQuota);
-  /* 15 è il valore tolto per immagine e geolocalizzazione */
   const getLiveDQuota = computed(()=> (quota.value.daily - (inChannel.value ? quota2remove.value : 0)));
   const getLiveWQuota = computed(()=> (quota.value.weekly - (inChannel.value ? quota2remove.value : 0)));
   const getLiveMQuota = computed(()=> (quota.value.monthly - (inChannel.value ? quota2remove.value : 0)));
-
-  const disabled = quota.value.daily === 0 || quota.value.weekly === 0 || quota.value.monthly === 0
+  const disabled = computed(() => ((quota.value.daily === 0 || quota.value.weekly === 0 || quota.value.monthly === 0) && inChannel.value))
 
   function parseDestinations(){
     let dest = [];
@@ -113,7 +111,7 @@
 
   async function createPost() {
     try {
-      if (disabled){
+      if (disabled.value){
         throw new Error('quota 0. Acquista quota per continuare');
       }
       let dest = parseDestinations(receiverArr.value);

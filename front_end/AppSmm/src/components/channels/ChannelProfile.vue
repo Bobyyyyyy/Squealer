@@ -10,6 +10,7 @@
   import AddAdminHandler from "./AddAdminHandler.vue";
   import DeleteAdminHandler from "./DeleteAdminHandler.vue";
   import RequestHandler from "./RequestHandler.vue";
+  import DeleteChannelModal from "./DeleteChannelModal.vue";
 
   const store = useStore();
 
@@ -28,6 +29,7 @@
   const addAdminModal = ref();
   const deleteAdminModal = ref();
   const requestModal = ref();
+  const deleteChannelModal = ref();
 
   let query = ''
 
@@ -142,6 +144,7 @@
           <button v-if="channel.type === 'private'" type="button"  class="btn btn-primary ms-2" @click="requestModal.openModal">Richieste</button>
           <button v-if="channel.creator === vip.name" type="button" class="btn btn-primary ms-2" @click="addAdminModal.openModal">Aggiungi admin</button>
           <button v-if="channel.creator === vip.name" type="button" class="btn btn-primary ms-2" @click="deleteAdminModal.openModal">Rimuovi admin</button>
+          <button v-if="channel.creator === vip.name" type="button" class="btn btn-danger ms-2" @click="deleteChannelModal.openModal">Elimina canale</button>
         </div>
 
         <div class="d-flex flex-row justify-content-end">
@@ -171,7 +174,7 @@
               :post="post"
               :dest= "parseDestinationsViewPost(post.destinationArray, post.officialChannelsArray)"
               :numberOfPost="i"
-              :picProfile = "post.profilePic"
+              :picProfile = "post.profilePicture"
         />
       </div>
     </div>
@@ -181,6 +184,7 @@
   <DeleteAdminHandler ref="deleteAdminModal" :chname="channel.name" :admins="channel.admins" @updateAdmin="admin => updateAfterDelete(admin)"/>
   <AddAdminHandler ref="addAdminModal" :followers="channel.followers" :chname="channel.name" @updateAdmin="admin => updateAfterInsert(admin)" />
   <PermissionHandler ref="permissionModal" :followers="channel.followers" :chname="channel.name" />
+  <DeleteChannelModal ref="deleteChannelModal" :channelName="channel.name" />
 </template>
 
 <style scoped>

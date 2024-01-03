@@ -52,7 +52,7 @@
   <NavBar v-show="readyPage"
           center-text="SQUEALER"
           :welcomingPage="true"
-          @imgLoaded="console.log('ENTRO');readyPage = true"/>
+          @imgLoaded="readyPage = true"/>
   <h2 class="mt-3 mb-0">Scegli account da gestire:</h2>
 
   <div v-show="readyPage"  class="d-flex flex-row mb-5 flex-wrap justify-content-evenly" v-if="requestCompleted">
