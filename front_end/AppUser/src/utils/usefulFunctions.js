@@ -1,3 +1,5 @@
+const LIMIT_POST = 10;
+
 function getUsernameFromSessionStore () {
     return sessionStorage.getItem("username");
 }
@@ -29,48 +31,51 @@ async function getQuotaByUsername(username) {
     }
 }
 
-async function getPostByUsername(username){
+async function getPostByUsername(username, offset = 0, limit = POST_TO_GET){
     try {
-        let res = await fetch(`/db/post/all?name=${username}&offset=0&limit=100`, {
+        let res = await fetch(`/db/post/all?name=${username}&offset=${offset}&limit=${limit}`, {
             method: 'GET',
         });
         if (res.ok) {
             return await res.json();
-        }
+        } else return [];
     } catch (e) {
         console.log(e);
+        return null;
     }
 }
 
-async function getPostByChannelName(channelName){
+async function getPostByChannelName(channelName, offset= 0, limit= POST_TO_GET){
     try {
-        let res = await fetch(`/db/post/all?offset=0&limit=10&channel=${channelName}`,{
+        let res = await fetch(`/db/post/all?offset=${offset}&limit=${limit}&channel=${channelName}`,{
             method: 'GET',
         });
         if (res.ok) {
             return await res.json();
-        }
+        } else return [];
     } catch (e) {
         console.log(e);
+        return null;
     }
 }
 
 async function getPostByOfficialChannelName(channelName){
     try {
-        let res = await fetch(`/db/post/all?offset=0&limit=10&official=${channelName}`,{
+        let res = await fetch(`/db/post/all?offset=0&limit=${LIMIT_POST}&official=${channelName}`,{
             method: 'GET',
         });
         if (res.ok) {
             return await res.json();
-        }
+        } else return [];
     } catch (e) {
         console.log(e);
+        return null;
     }
 }
 
 async function getAllOfficialChannelPost() {
     try {
-        let res = await fetch(`/db/post/all?offset=0&limit=10&official=${channelName}`,{
+        let res = await fetch(`/db/post/all?offset=0&limit=${LIMIT_POST}&official=${channelName}`,{
             method: 'GET',
         });
         if (res.ok) {
@@ -81,17 +86,17 @@ async function getAllOfficialChannelPost() {
     }
 }
 
-async function getAllPost(offset) {
+async function getAllPost(offset, limit) {
     try {
-        let res = await fetch(`/db/post/all?offset=${offset}&limit=10`, {
+        let res = await fetch(`/db/post/all?offset=${offset}&limit=${limit}`, {
             method: 'GET'
         });
-
         if (res.ok) {
             return await res.json();
-        }
+        } else return [];
     } catch (e) {
         console.log(e);
+        return null;
     }
 }
 
@@ -230,6 +235,18 @@ const getNotification = async () => {
     }
 }
 
+const POST_TO_GET = 10;
+
+const scrollEndDetectorHandler = async (lastRequestLength, lastHeightDiv, updatePost) => {
+    const postDiv = document.getElementById("postDiv");
+    // se l'ultima richiesta ha ricevuto meno post del massimo allora sono finiti,
+    // quindi non serve fare una nuova richiesta
+    if (postDiv && window.innerHeight + window.scrollY >= postDiv.offsetHeight && lastRequestLength.current >= POST_TO_GET) {
+        lastHeightDiv.current = window.scrollY;
+        await updatePost();
+    }
+};
+
 export {
     getUsernameFromSessionStore,
     setUsernameInSessionStore,
@@ -248,5 +265,7 @@ export {
     setToastNotification,
     deleteToastNotification,
     getToastNotification,
-    getNotification
+    getNotification,
+    scrollEndDetectorHandler,
+    POST_TO_GET,
 }

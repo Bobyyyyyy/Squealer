@@ -3,7 +3,7 @@ import {
     getPostByUsername,
     getUserInfoByUsername,
     getQuotaByUsername,
-    handleLogout
+    handleLogout, getAllPost, POST_TO_GET, scrollEndDetectorHandler
 } from "../../utils/usefulFunctions.js";
 import React, {useEffect, useRef, useState} from "react";
 import Post from "../../components/posts/Post.jsx";
@@ -17,8 +17,14 @@ import ChangePswModal from "./modals/ChangePswModal.jsx";
 
 function Profile () {
     const name = getUsernameFromSessionStore();
+    // posts state
+    const [isLoading, setIsLoading] = useState(true);
     const [posts, setPosts] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
+    const currentOffset = useRef(0);
+    const lastRequestLength = useRef(0);
+    const lastHeightDiv = useRef(0);
+
+    // quota and smm state
     const [quota, setQuota] = useState(null);
     const [smm, setSmm] = useState([]);
     const [hasSMM, setHasSMM] = useState(false);
@@ -26,6 +32,7 @@ function Profile () {
     const [updatedQuota, setUpdatedQuota] = useState(false);
     const [updatedSmm, setUpdatedSmm] = useState(false);
 
+    // state for modals
     const [showBuyQuotaModal, setShowBuyQuotaModal] = useState(false);
     const [showChangePicModal, setShowChangePicModal] = useState(false);
     const [showSmmModal, setShowSmmModal] = useState(false);
@@ -46,16 +53,6 @@ function Profile () {
         }
     }
 
-    const fetchData = async () => {
-        setIsLoading(true);
-        const quotaRes = await getQuotaByUsername(name);
-        setQuota(quotaRes);
-        user.current = await getUserInfoByUsername(name);
-        const postRes = await getPostByUsername(name);
-        setPosts(postRes);
-        setIsLoading(false);
-    }
-
     const updateSmm = async () => {
         let resSMM = await getSmm();
         setHasSMM(resSMM.found);
@@ -63,16 +60,28 @@ function Profile () {
         setUpdatedSmm(false);
     }
 
-    useEffect(() => {
-        fetchData()
-            .catch(console.error)
-    }, []);
+    const fetchUserInfo = async () => {
+        user.current = await getUserInfoByUsername(name);
+    }
+
+    const fetchPosts = async () => {
+        setIsLoading(true);
+        let newPosts = await getPostByUsername(name, currentOffset.current, POST_TO_GET);
+        currentOffset.current += newPosts.length;
+        lastRequestLength.current = newPosts.length;
+        setPosts((prev) => [...prev, ...newPosts]);
+        setIsLoading(false);
+    };
+
+    const scrollEndDetector = async (event) => {
+        event.preventDefault();
+        await scrollEndDetectorHandler(lastRequestLength, lastHeightDiv, fetchPosts);
+    };
 
     useEffect(() => {
         updateSmm()
             .catch(console.error)
     }, [updatedSmm]);
-
 
     useEffect(() => {
         getQuotaByUsername(name)
@@ -82,6 +91,20 @@ function Profile () {
             })
     }, [updatedQuota])
 
+    useEffect(() => {
+        fetchUserInfo()
+            .catch(console.error)
+        document.addEventListener('scroll', scrollEndDetector, true);
+        fetchPosts()
+            .catch(console.error);
+        return () => {
+            document.removeEventListener('scroll', scrollEndDetector);
+        }
+    }, []);
+
+    useEffect(() => {
+        window.scrollTo({ behavior: "instant", top: lastHeightDiv.current, left:0})
+    }, [posts]);
 
     return (
         <>
@@ -157,7 +180,7 @@ function Profile () {
                     />
                 </>}
             </div>
-            <div className="container-post" id="postDiv">
+            <div className="flex flex-wrap w-full gap-8 items-center justify-center pb-20 overflow-y-scroll mt-4" id="postDiv">
                 {posts.map((post)=> {
                     return(
                         <Post
