@@ -20,21 +20,21 @@
                     <a class="nav-link" aria-current="page" href="/mod/users">Utenti</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/mod/posts">Posts</a>
+                    <a class="nav-link" href="/mod/posts">Squeal</a>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle active" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Channels
+                        Canali
                     </a>
                     <ul class="dropdown-menu fontcustom">
-                        <li><a class="dropdown-item" href="/mod/officialChannels">Official Channels</a></li>
+                        <li><a class="dropdown-item" href="/mod/officialChannels">§CANALI</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="/mod/userChannels">Private Channels</a></li>
+                        <li><a class="dropdown-item" href="/mod/userChannels">§canali</a></li>
                     </ul>
                 </li>
             </ul>
             <span class="navbar-text text-white ms-auto me-2 fontcustom" >@<span id="session-user">${user}</span></span>
-            <button class="btn btn-outline-light bg-accent fontcustom" onclick="window.location.href = '/logout'">Logout</button>
+            <button class="btn btn-outline-light bg-accent fontcustom" onclick="window.location.href = '/logout'">Disconnettiti</button>
         </div>
     </div>
 </nav>
@@ -59,13 +59,13 @@
             <div class="d-flex flex-row flex-wrap ms-auto">
                 <div id="channel-visual" class="btn-group ms-3 bg-secondary" role="group" aria-label="Filters radio buttons">
                     <input type="radio" class="btn-check" name="filters" id="filter-all" value="" checked autocomplete="off">
-                    <label class="btn fontcustom" for="filter-all">All</label>
+                    <label class="btn fontcustom" for="filter-all">Tutti</label>
 
                     <input type="radio" class="btn-check" name="filters" id="filter-public" value="public" autocomplete="off">
-                    <label class="btn fontcustom" for="filter-public">Public</label>
+                    <label class="btn fontcustom" for="filter-public">Pubblici</label>
 
                     <input type="radio" class="btn-check" name="filters" id="filter-private" value="private" autocomplete="off">
-                    <label class="btn fontcustom" for="filter-private">Private</label>
+                    <label class="btn fontcustom" for="filter-private">Privati</label>
                 </div>
 
                 <div class="ms-3 d-flex flex-row flex-wrap justify-content-center align-self-center">
@@ -86,7 +86,7 @@
                 </div>
                 <div>
                 <button type="button" class="btn ms-auto fontcustom bg-primary" data-bs-toggle="modal" data-bs-target="#addChannel">
-                    Add Channel
+                     Aggiungi Canale
                 </button>
                 </div>
             </div>

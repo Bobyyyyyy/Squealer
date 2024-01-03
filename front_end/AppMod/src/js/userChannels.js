@@ -165,7 +165,7 @@ $('#addChannelForm').on('submit', (event) => {
             location.reload();
         },
         error: (error) => {
-            $('#toast-content').empty().html(error.responseText);
+            $('#toast-content').empty().html(error.responseJSON.message);
             let toastList = inizializeToast();
             toastList.forEach(toast => toast.show()); // This show them
         }

@@ -19,25 +19,25 @@
         </button>
         <div class="navbar-collapse collapse dual-collapse2" style="flex-basis: 100%">
             <ul class="navbar-nav me-auto mb-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link" aria-current="page" href="/mod/users">Utenti</a>
+                <li class="nav-item" onclick=window.location.href="/mod/users">
+                    <a class="nav-link">Utenti</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active" href="/mod/posts">Posts</a>
+                    <a class="nav-link active" href="/mod/posts">Squeal</a>
                 </li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle " role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Channels
+                    <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Canali
                     </a>
                     <ul class="dropdown-menu fontcustom">
-                        <li><a class="dropdown-item" href="/mod/officialChannels">Official Channels</a></li>
+                        <li><a class="dropdown-item" href="/mod/officialChannels">§CANALI</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="/mod/userChannels">Private Channels</a></li>
+                        <li><a class="dropdown-item" href="/mod/userChannels">§canali</a></li>
                     </ul>
                 </li>
             </ul>
             <span class="navbar-text text-white ms-auto me-2 fontcustom" >@<span id="session-user">${user}</span></span>
-            <button class="btn btn-outline-light bg-accent fontcustom" onclick="window.location.href = '/logout'">Logout</button>
+            <button class="btn btn-outline-light bg-accent fontcustom" onclick="window.location.href = '/logout'">Disconnettiti</button>
         </div>
     </div>
 </nav>
@@ -62,16 +62,16 @@
             <div class="d-flex flex-row flex-wrap ms-auto">
                 <div id="channel-visual" class="btn-group ms-3" role="group" aria-label="">
                     <input type="radio" class="btn-check" name="filters" id="filter-all" value="" autocomplete="off" checked>
-                    <label class="btn bg-secondary fontcustom" for="filter-all">All</label>
+                    <label class="btn bg-secondary fontcustom" for="filter-all">Tutti</label>
 
                     <input type="radio" class="btn-check" name="filters" id="filter-popular" value="popular" autocomplete="off">
-                    <label class="btn bg-secondary fontcustom" for="filter-popular">Popular</label>
+                    <label class="btn bg-secondary fontcustom" for="filter-popular">Popolare</label>
 
                     <input type="radio" class="btn-check" name="filters" id="filter-unpopular" value="unpopular" autocomplete="off">
-                    <label class="btn bg-secondary fontcustom" for="filter-unpopular">Unpopular</label>
+                    <label class="btn bg-secondary fontcustom" for="filter-unpopular">Impopolare</label>
 
                     <input type="radio" class="btn-check" name="filters" id="filter-controversial" value="controversial" autocomplete="off">
-                    <label class="btn bg-secondary fontcustom" for="filter-controversial">Controversial</label>
+                    <label class="btn bg-secondary fontcustom" for="filter-controversial">Controverso</label>
                 </div>
 
                 <div class="ms-3 d-flex flex-row flex-wrap justify-content-center align-self-center">
@@ -155,6 +155,7 @@
                         <option value="user" selected>Utente</option>
                         <option value="channel">Canale</option>
                         <option value="official">Canale Ufficiale</option>
+                        <option value="keyword"> Keyword </option>
                     </select>
                 </div>
 

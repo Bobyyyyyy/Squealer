@@ -23,21 +23,21 @@
                     <a class="nav-link" aria-current="page" href="/mod/users">Utenti</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/mod/posts">Posts</a>
+                    <a class="nav-link" href="/mod/posts">Squeal</a>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle active" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Channels
+                        Canali
                     </a>
                     <ul class="dropdown-menu fontcustom">
-                        <li><a class="dropdown-item" href="/mod/officialChannels">Official Channels</a></li>
+                        <li><a class="dropdown-item" href="/mod/officialChannels">§CANALI</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="/mod/userChannels">Private Channels</a></li>
+                        <li><a class="dropdown-item" href="/mod/userChannels">§canali</a></li>
                     </ul>
                 </li>
             </ul>
             <span class="navbar-text text-white ms-auto me-2 fontcustom" >@<span id="session-user">${user}</span></span>
-            <button class="btn btn-outline-light bg-accent fontcustom" onclick="window.location.href = '/logout'">Logout</button>
+            <button class="btn btn-outline-light bg-accent fontcustom" onclick="window.location.href = '/logout'">Disconnettiti</button>
         </div>
     </div>
 </nav>
@@ -47,20 +47,21 @@
 
     <div class="p-5 flex-column text-white" id="div1" style="height: 100%; width: 100%">
         <div class="d-flex flex-column align-items-center justify-content-center w-100">
-        <h1 style="font-size: 6vh"> §<span id="channel-name" class="fw-bold">${name}</span> </h1>
-        <h6 class="fw-light fontcustom"> creato da @<span id="channel-creator"></span></h6>
-        <div class="d-inline-flex flex-row align-items-center pt-3">
-            <div id="channel-description" class="p-2 rounded d-inline bg-white text-dark fontcustom"></div>
-            <i id="modify-description" class="p-2 bi bi-pencil-fill fontcustom"> Modifica </i>
-            <button id="modify-button" type="button" class="btn btn-success ms-2" style="display: none">
-                Fatto
-            </button>
-        </div>
+            <div id="channel-picture" class="w-100 d-flex flex-column justify-content-center align-items-center mb-2"> </div>
+            <h1 style="font-size: 6vh"> §<span id="channel-name" class="fw-bold">${name}</span> </h1>
+            <h6 class="fw-light fontcustom"> creato da @<span id="channel-creator"></span></h6>
+            <div class="d-inline-flex flex-row align-items-center pt-3">
+                <div id="channel-description" class="p-2 rounded d-inline bg-white text-dark fontcustom"></div>
+                <i id="modify-description" class="p-2 bi bi-pencil-fill fontcustom"> Modifica </i>
+                <button id="modify-button" type="button" class="btn btn-success ms-2" style="display: none">
+                    Fatto
+                </button>
+            </div>
         </div>
 
         <!-- Modal Button -->
         <div class="d-flex flex-row align-items-center pt-4 flex-wrap">
-            <div id="post-filters" class="btn-group text-black" role="group" aria-label="Radio toggle button for type of posts">
+            <div id="post-filters" class="btn-group text-black" role="group" aria-label="Radio toggle button for type of sqheals">
                 <input type="radio" class="btn-check " name="filters" id="filter-all" value="" checked  autocomplete="off">
                 <label class="btn bg-secondary fontcustom" for="filter-all">Mostra tutti</label>
 
@@ -124,22 +125,17 @@
 
                 <div class="form-group d-flex align-items-center flex-column">
                     <div id="content" class="mt-2" style="width: 100%">
-                        <div class="d-flex flex-row align-items-center h-100">
-                            <label for="short-link" class="form-label w-50">
-                                <textarea class="form-control" id="short-link" name="shortener" rows="1" placeholder="Inserisci link" style="resize: none" data-role="none" autocomplete="off"></textarea>
-                            </label>
-                            <button type="button" id="shortener-button" class="btn bg-secondary ms-2 h-100"> Accorcia link </button>
-                        </div>
                         <label for="post-content" class="form-label w-100" style>
-                            <textarea class="form-control" name="content" id="post-content" rows="3" placeholder="Inserisci testo o link per immagine...." style="resize: none" data-role="none" autocomplete="off" required></textarea>
+                            <textarea class="form-control" name="content" id="post-content" rows="3" placeholder="Inserisci testo" style="resize: none" data-role="none" autocomplete="off" required></textarea>
                         </label>
                     </div>
-
+<!--
                     <div class="d-flex flex-column align-items-center">
                         <input type="checkbox" class="btn-check" name="timedButton" id="timedButton" autocomplete="off">
                         <label class="btn bg-secondary" for="timedButton">Timed Post</label>
                         <div class="d-flex flex-row mt-2" id="timedParameters"></div>
                     </div>
+                    -->
                 </div>
             </div>
             <div class="modal-footer">

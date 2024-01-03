@@ -33,6 +33,7 @@ const addOfficialChannel = async (body,creator) => {
             creator: creator.name,
             description: body.description.trim(),
             silenceable: body.silenceable ? true : false,
+            ...(body.profilePicture) && {profilePicture: body.profilePicture},
             silenced : body.silenceable ? [] : null,
         });
         //save new reserved channel in DB

@@ -4,6 +4,7 @@ const Channel = require("../schemas/Channel")
 const Notification = require("../schemas/Notification")
 const User = require("../schemas/User");
 const Reply = require("../schemas/Reply");
+const officialChannels = require("../schemas/officialChannels");
 const {saltRounds,quota, createError} = require("./utils");
 const {json} = require("express");
 const Post = require("../schemas/Post");
@@ -561,12 +562,11 @@ const deleteUser = async(name) => {
 const clearDB = async () => {
     await connection.get();
     await User.deleteMany();
-    await require('../schemas/officialChannels').deleteMany();
     await Post.deleteMany();
     await Channel.deleteMany();
     await Notification.deleteMany();
-
-
+    await Reply.deleteMany();
+    await officialChannels.deleteMany();
 }
 
 
