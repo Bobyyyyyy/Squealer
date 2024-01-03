@@ -143,7 +143,7 @@ const addTimedPost = async (postId) => {
             dateOfCreation: Date.now(),
             content: post.contentType === 'text' ? parseText(timedInfo.content,timedInfo.done + 1) : post.content
         }
-        let delQuota = !!newPost.destinations.find(dest => dest.destType === 'channel' || dest.destType === 'official');
+        let delQuota = !!newPost.destinations.find(dest => dest.destType !== 'user');
 
         let quota2del = delQuota ? (post.contentType === 'text' ? newPost.content.length : 125) : 0 ;
         //GESTIRE CASI IN CUI NON PUO' INSERIRE
@@ -159,7 +159,7 @@ const addTimedPost = async (postId) => {
         return {newPostId : id};
 
     }catch (err) {
-        console.log(err);
+        throw err;
     }
 }
 

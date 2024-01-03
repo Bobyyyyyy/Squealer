@@ -11,6 +11,7 @@
   import DeleteAdminHandler from "./DeleteAdminHandler.vue";
   import RequestHandler from "./RequestHandler.vue";
   import DeleteChannelModal from "./DeleteChannelModal.vue";
+  import ProfilePicModal from "./ProfilePicModal.vue";
 
   const store = useStore();
 
@@ -30,6 +31,7 @@
   const deleteAdminModal = ref();
   const requestModal = ref();
   const deleteChannelModal = ref();
+  const changeProfilePic = ref();
 
   let query = ''
 
@@ -122,7 +124,7 @@
       <div class="d-flex flex-column">
         <div class="d-flex flex-row justify-content-center w-100">
           <div class="maxWidth">
-            <img :src="channel.profilePicture" class="img-fluid rounded-circle" alt="gatto che ormai ha stufato">
+            <img :src="channel.profilePicture" class="img-fluid rounded-circle h-100 object-fit-cover" alt="immagine profilo canale" @click="changeProfilePic.openModal">
           </div>
         </div>
         <h2 class="m-1 text-center">{{ channel.name }}</h2>
@@ -185,11 +187,13 @@
   <AddAdminHandler ref="addAdminModal" :followers="channel.followers" :chname="channel.name" @updateAdmin="admin => updateAfterInsert(admin)" />
   <PermissionHandler ref="permissionModal" :followers="channel.followers" :chname="channel.name" />
   <DeleteChannelModal ref="deleteChannelModal" :channelName="channel.name" />
+  <ProfilePicModal ref="changeProfilePic" :channelName="channel.name" @profilePic="(img) => channel.profilePicture = img"/>
 </template>
 
 <style scoped>
   .maxWidth{
     max-width:  20vh;
+    aspect-ratio: 1;
   }
   @media screen and (max-width: 768px){
     .btn{
