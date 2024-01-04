@@ -449,11 +449,9 @@ const getPostHome = async (user , limit, offset) => {
                         {
                             $match: {
                                 $or: [
-                                    { creator: user },
-                                    { admins: { $in: [user] } },
-                                    {
-                                        followers: { $in: [{ user: user }] },
-                                    },
+                                    { 'creator': user },
+                                    { 'admins': user },
+                                    {'followers.user': user},
                                 ],
                             },
                         },
@@ -485,11 +483,6 @@ const getPostHome = async (user , limit, offset) => {
                 },
             },
             {
-              $unwind:{
-                  path: '$channel_info',
-              },
-            },
-            {
                 $match: {
                     $expr: {
                         $and:[
@@ -511,10 +504,18 @@ const getPostHome = async (user , limit, offset) => {
                                                 ],
                                             },
                                             {
-                                                $in: [
-                                                    "$channel_info.name",
-                                                    "$destinationArray.name",
-                                                ],
+                                                $reduce:{
+                                                    input:'$channel_info',
+                                                    initialValue: false,
+                                                    in: {
+                                                        $or:[
+                                                            '$$value',
+                                                            {
+                                                                $in:["$$this.name", '$destinationArray.name']
+                                                            }
+                                                        ]
+                                                    }
+                                                }
                                             },
                                         ],
                                     },
@@ -573,13 +574,10 @@ const getPostHome = async (user , limit, offset) => {
                     destinationArray: '$destinationArray',
                     officialChannelsArray: '$officialChannelsArray',
                     category: '$category',
-                    popularity: '$popularity',
                     contentType: '$contentType',
                     content: '$content',
                     reactions: '$reactions',
                     dateOfCreation: '$dateOfCreation',
-                    criticalMass: '$criticalMass',
-                    views: '$views',
                     views_count: {$size: '$views'},
                     profilePicture: '$user_info.profilePicture',
                 }
