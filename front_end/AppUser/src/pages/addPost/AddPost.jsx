@@ -1,7 +1,7 @@
 import ContentPost from "./ContentPost.jsx";
 import {useEffect, useState} from "react";
 import {SubmitIcon} from "../../components/assets/index.jsx";
-import {getQuotaByUsername, getUsernameFromSessionStore} from "../../utils/usefulFunctions.js";
+import {getQuotaByUsername, getUsernameFromSessionStore, setToastNotification} from "../../utils/usefulFunctions.js";
 
 import {blob2base64, compressBlob, getEmbed} from "../../utils/imageFunctions.js";
 import TimedPost from "./TimedPost.jsx";
@@ -15,8 +15,10 @@ function AddPost(){
     const [content, setContent] = useState('');
     const [imgAsFile, setImgAsFile] = useState();
     const [position, setPosition] = useState(null);
-    const [quota,setQuota] = useState();
+
+    const [quota, setQuota] = useState(null);
     const [currentQuota, setCurrentQuota] = useState();
+
     const [error, setError] = useState('');
 
     const [isTimed, setIsTimed] = useState(false);
@@ -71,6 +73,7 @@ function AddPost(){
             setError("Inserisci @ o § nei destinatari");
             canSend = false;
         } else if (isQuotaNegative()) {
+            setError("Hai finito la quota");
             canSend = false;
         } else if (isMyUsername(destinations)) {
             setError("Non puoi inviare messaggi a te stesso")
@@ -92,7 +95,7 @@ function AddPost(){
     }
 
     const isQuotaNegative = () => {
-        return currentQuota?.monthly < 0;
+        return quota.characters.daily <= 0 || quota.characters.weekly <= 0 || quota.characters.monthly <= 0;
     }
 
     async function createPost() {
@@ -168,25 +171,22 @@ function AddPost(){
                         console.log("wait", wait)
                         setTimeout(()=> {
                             setShowModalGeo(false);
+                            setToastNotification("Post inviato correttamente", "success");
                             window.location.href = "/user/"
                         }, wait)
                     } else {
+                        setToastNotification("Post inviato correttamente", "success");
                         window.location.href = "/user/"
                     }
                 } else {
-                    let data = await res.json();
-                    if (data.statusCode === 400) {
-                        console.log(data.message);
-                        window.alert("Non hai il prermesso di scrivere");
-                    } else if (data.statusCode === 400) {
-                        window.alert("Canale o utente non esiste");
-                    }
-                    throw res;
+                    setToastNotification("Oh no, qualcosa è andato storto nell'invio del post", "failure");
+                    window.location.href = "/user/"
                 }
             }
         } catch (e) {
             console.log(e)
-            window.alert("canale o utente non esistente")
+            setToastNotification("Oh no, qualcosa è andato storto nell'invio del post", "failure");
+            window.location.href = "/user/"
         }
     }
 
@@ -194,19 +194,10 @@ function AddPost(){
         getQuotaByUsername(username)
             .then((response) => {
                 setQuota(response);
-                setCurrentQuota(response);
+                setCurrentQuota(response.characters);
             })
     }, []);
 
-    useEffect(() => {
-        if (!isQuotaNegative()) {
-            setError('')
-        }
-    }, [content, destinations]);
-
-    useEffect(()=> {
-        console.log("num post:", numberOfPosts)
-    }, [numberOfPosts])
 
     return (
         <main className="flex flex-col items-center justify-center m-4 pb-8">
@@ -296,15 +287,6 @@ function AddPost(){
             />
         </main>
     );
-    /*
-        <Toast>
-            <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-cyan-100 text-cyan-500 dark:bg-cyan-800 dark:text-cyan-200">
-                {SubmitIcon}
-            </div>
-            <div className="ml-3 text-sm font-normal">Set yourself free.</div>
-            <Toast.Toggle />
-        </Toast>
-     */
 }
 
 export default AddPost;

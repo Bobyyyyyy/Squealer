@@ -1,6 +1,6 @@
 import { Outlet, NavLink } from "react-router-dom";
 import '../index.css'
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {
     AddIcon,
     ChannelIcon,
@@ -8,13 +8,23 @@ import {
     SearchIcon,
     UserIcon
 } from "../components/assets/index.jsx"
-import {getUsernameFromSessionStore} from "../utils/usefulFunctions.js";
+import {
+    deleteToastNotification,
+    getNotification,
+    getToastNotification
+} from "../utils/usefulFunctions.js";
 import NotificationButton from "./NotificationButton.jsx";
+import CustomToast from "../components/toasts/CustomToast.jsx";
 
 
 export default function RootLayout() {
 
-    const [notifications, setNotifications] = useState([]);
+    const checkNotificationCounter = useRef(0);
+    const [notifications, setNotifications] = useState(null);
+    const [showToast, setShowToast] = useState(false);
+    const [toastNotification, setToastNotification] = useState(null)
+    const CHECK_NOTIFICATION_TIME = 5000;
+
     const navigationButtons = [
         {
             id: 0,
@@ -49,21 +59,32 @@ export default function RootLayout() {
         },
     ];
 
-    const getNotification = async () => {
-        let res = await fetch(`/db/notification?user=${getUsernameFromSessionStore()}`, {
-            method:'GET'
-        });
-        if (res.ok) {
-            res = await res.json();
-            if (Object.keys(res).length !== 0) {
-                setNotifications(res);
-            }
-        }
 
+    const handleToastNotification = () => {
+        const TOAST_TIME = 1500;
+        const notificationObj = getToastNotification();
+        if (notificationObj !== null) {
+            setToastNotification(notificationObj);
+            setShowToast(true);
+            setTimeout(()=>{
+                setShowToast(false);
+                deleteToastNotification();
+            }, TOAST_TIME)
+        }
     }
 
     useEffect(() => {
-        getNotification();
+        handleToastNotification();
+        if (checkNotificationCounter.current === 0) {
+            getNotification()
+                .then((res) => setNotifications(res));
+        }
+        const interval = setInterval(async () => {
+            let notificationRes = await getNotification();
+            checkNotificationCounter.current += 1;
+            setNotifications(notificationRes);
+        }, CHECK_NOTIFICATION_TIME);
+        return () => clearInterval(interval);
     }, []);
 
 
@@ -85,8 +106,11 @@ export default function RootLayout() {
                         ))}
                     </div>
                 </nav>
-                {notifications.length !== 0 &&
+                {notifications !== null &&
                     <NotificationButton notifications={notifications} setNotifications={setNotifications} />
+                }
+                {showToast &&
+                    <CustomToast message={toastNotification.message} type={toastNotification.type} />
                 }
             </header>
             <main>

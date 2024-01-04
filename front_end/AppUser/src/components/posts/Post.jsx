@@ -61,7 +61,7 @@ function Post({post}) {
 
     return(
     <>
-        <div className="w-full md:w-[32rem] border border-gray-200">
+        <div className="w-full md:w-[32rem] h-fit border border-gray-200">
             <Title post={post} />
             <Body post={post} />
             <div className="flex w-full justify-evenly py-2 px-4" >

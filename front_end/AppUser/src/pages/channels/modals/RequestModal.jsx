@@ -1,5 +1,6 @@
 import {Modal} from "flowbite-react";
 import {CheckIcon, DenyIcon} from "../../../components/assets/index.jsx";
+import {Link} from "react-router-dom";
 
 function RequestModal({isOpen, setIsOpen, requests, channelName, hasUpdated, setHasUpdated}) {
 
@@ -30,20 +31,33 @@ function RequestModal({isOpen, setIsOpen, requests, channelName, hasUpdated, set
                     <div>Non ci sono richieste pendenti</div>
                 ):(
                     <div>
-                        {requests.map((user) => {
+                        {requests.map((follower) => {
                             return (
-                                <div key={user._id}
+                                <div key={follower._id}
                                     className="flex justify-between"
                                 >
-                                    {user.user}
+                                    <div className="flex gap-2 items-center justify-start">
+                                        <Link to={`/search/${follower.user}`}>
+                                            <img
+                                                src={follower.profilePic}
+                                                alt={`foto profilo di ${follower.user}`}
+                                                className="w-6 h-6 object-cover rounded-full"
+                                            />
+                                        </Link>
+                                        <Link to={`/search/${follower.user}`} >
+                                            <span>
+                                                {follower.user}
+                                            </span>
+                                        </Link>
+                                    </div>
                                     <div className="flex gap-4">
                                         <button
-                                            onClick={() => handleRequest(user.user, true)}
+                                            onClick={() => handleRequest(follower.user, true)}
                                         >
                                             {CheckIcon}
                                         </button>
                                         <button
-                                            onClick={() => handleRequest(user.user, false)}
+                                            onClick={() => handleRequest(follower.user, false)}
                                         >
                                             {DenyIcon}
                                         </button>

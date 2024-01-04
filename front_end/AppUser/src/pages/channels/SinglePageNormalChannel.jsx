@@ -1,8 +1,9 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {
-    getChannelPicByChannelName,
     getPostByChannelName,
-    getUsernameFromSessionStore
+    getUsernameFromSessionStore,
+    POST_TO_GET, resetPosts,
+    scrollEndDetectorHandler
 } from "../../utils/usefulFunctions.js";
 import Post from "../../components/posts/Post.jsx";
 import {FollowIcon, DontFollow} from "../../components/assets/index.jsx";
@@ -13,34 +14,45 @@ import AddAdminModal from "./modals/AddAdminModal.jsx";
 import RmAdminModal from "./modals/RmAdminModal.jsx";
 import ChangeChannelPictureModal from "./modals/ChangeChannelPictureModal.jsx";
 import DeleteChannelModal from "./modals/DeleteChannelModal.jsx";
+import {useParams} from "react-router-dom";
 
-function SinglePageNormalChannel({nome}) {
 
-    const [type, setType] = useState();
+function SinglePageNormalChannel() {
+    const {nome} = useParams()
+
+    // related user states
+    const [type, setType] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
-    const [posts, setPosts] = useState([]);
     const [description, setDescription] = useState("");
     const [role, setRole] = useState("");
     const [channelPic, setChannelPic] = useState(null);
-    
+    const [canSeePosts, setCanSeePosts] = useState(false);
+
+    // modals states
     const [showRequestModal, setShowRequestModal] = useState(false);
     const [showFollowerModal, setShowFollowerModal] = useState(false);
-    const [showAddAdminModal, setShowAddAdimnModal] = useState(false);
+    const [showAddAdminModal, setShowAddAdminModal] = useState(false);
     const [showRmAdminModal, setShowRmAdminModal] = useState(false);
     const [showChangePicModal, setShowChangePicModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-
+    // has updated states
     const [hasUpdatedReq, setHasUpdatedReq] = useState(false);
     const [hasUpdatedFol, setHasUpdatedFol] = useState(false);
     const [hasUpdatedAddAdm, setHasUpdatedAddAdm] = useState(false);
     const [hasUpdatedRmAdm, setHasUpdatedRmAdm] = useState(false);
 
+    // users states
     const [requests, setRequests] = useState([]);
     const [followers, setFollowers] = useState([]);
     const [admins, setAdmins] = useState([]);
 
-    const [canSeePosts, setCanSeePosts] = useState(false);
+    // posts states for infinite scroll
+    const [posts, setPosts] = useState([]);
+    const currentOffset = useRef(0);
+    const lastRequestLength = useRef(0);
+    const lastHeightDiv = useRef(0);
+    const currentNome = useRef(nome);
 
     const handleFollow = () => {
         fetch(`/db/channel/follower`, {
@@ -59,45 +71,74 @@ function SinglePageNormalChannel({nome}) {
             })
     }
 
-    const fetchPost = async () => {
-        setIsLoading(true);
-        const picChannelRes = await getChannelPicByChannelName(nome);
-        setChannelPic(picChannelRes.profilePicture);
-        if (canSeePosts) {
-            const resPost = await getPostByChannelName(nome);
-            setPosts(resPost);
-        } else {
-            setPosts([]);
+    const getChannelInfo = async () => {
+        if (currentNome.current !== nome) {
+            console.log("CHANNEL INFO NOME CAMBIATO", currentNome.current, nome)
+            return;
         }
-        setIsLoading(false)
+        let res = await fetch(`/db/channel/${nome}`);
+        if (res.ok) {
+            res = await res.json();
+            setChannelPic(res.profilePicture);
+            setDescription(res.description)
+            setRole(res.role);
+            setCanSeePosts((res.role !== "Not Follower" || res.role !== "Pending"));
+            setFollowers(res.followers.sort((a,b) => (a.user > b.user) ? 1 : ((b.user > a.user) ? -1 : 0)))
+            setAdmins(res.admins.sort((a,b) => (a.user > b.user) ? 1 : ((b.user > a.user) ? -1 : 0)))
+            setType(res.type);
+            if (res.type === "public") {
+                setRequests([]);
+            } else {
+                setRequests(res.requests.sort((a,b) => (a.user > b.user) ? 1 : ((b.user > a.user) ? -1 : 0)))
+            }
+            setHasUpdatedReq(false);
+            setHasUpdatedFol(false);
+            setHasUpdatedAddAdm(false);
+            setHasUpdatedRmAdm(false);
+        }
     }
 
-    const updateRequestAdminFollower = async () => {
-        let res = await fetch(`/db/channel/${nome}`);
-        res = await res.json();
-        setDescription(res.description)
-        setRole(res.role);
-        setCanSeePosts((res.role !== "Not Follower" || res.role !== "Pending"));
-        setFollowers(res.followers.sort((a,b) => (a.user > b.user) ? 1 : ((b.user > a.user) ? -1 : 0)))
-        setAdmins(res.admins.sort())
-        setType(res.type);
-        setRequests(res.requests)
-        setHasUpdatedReq(false);
-        setHasUpdatedFol(false);
-        setHasUpdatedAddAdm(false);
-        setHasUpdatedRmAdm(false);
-    }
+    const fetchPosts = async () => {
+        if (currentNome.current !== nome) {
+            console.log("CHANNEL INFO NOME CAMBIATO", currentNome.current, nome)
+            return;
+        }
+        setIsLoading(true);
+        if (canSeePosts) {
+            console.log("nome", nome,"offset", currentOffset.current)
+            let newPosts = await getPostByChannelName(nome, currentOffset.current, POST_TO_GET);
+            console.log(newPosts)
+            currentOffset.current += newPosts.length;
+            lastRequestLength.current = newPosts.length;
+            setPosts((prev) => [...prev, ...newPosts]);
+        }
+        setIsLoading(false);
+    };
+
+    const scrollEndDetector = async (event) => {
+        event.preventDefault();
+        await scrollEndDetectorHandler(lastRequestLength, lastHeightDiv, fetchPosts);
+    };
 
     useEffect(() => {
-        updateRequestAdminFollower()
+        getChannelInfo()
             .catch(console.error);
     }, [hasUpdatedReq, hasUpdatedFol, hasUpdatedAddAdm, hasUpdatedRmAdm]);
 
+    useEffect(() => {
+        resetPosts(setPosts, currentOffset, lastRequestLength, lastHeightDiv);
+        document.addEventListener('scroll', scrollEndDetector, false);
+        currentNome.current = nome;
+        fetchPosts()
+            .catch(console.error);
+        return () => {
+            document.removeEventListener('scroll', scrollEndDetector);
+        }
+    }, [canSeePosts, nome]);
 
     useEffect(() => {
-        fetchPost()
-            .catch(console.error);
-    }, [canSeePosts]);
+        window.scrollTo({ behavior: "instant", top: lastHeightDiv.current, left:0})
+    }, [posts]);
 
     return (
         <>
@@ -160,12 +201,12 @@ function SinglePageNormalChannel({nome}) {
                                 {role === "Creator" &&
                                     <>
                                        <button className="button"
-                                            onClick={()=>setShowAddAdimnModal(true)}
+                                            onClick={()=>setShowAddAdminModal(true)}
                                         >
                                             Aggiungi admin
                                         </button>
                                         <AddAdminModal
-                                            channelName={nome} followers={followers} isOpen={showAddAdminModal} setIsOpen={setShowAddAdimnModal}
+                                            channelName={nome} followers={followers} isOpen={showAddAdminModal} setIsOpen={setShowAddAdminModal}
                                             hasUpdated={hasUpdatedAddAdm} setHasUpdated={setHasUpdatedAddAdm}
                                         />
 
@@ -215,27 +256,24 @@ function SinglePageNormalChannel({nome}) {
                         }
                         </div>
                     }
-                    <div className={"flex flex-wrap w-full gap-8 items-center justify-center h-full pb-20 mt-4 overflow-y-scroll"}>
-                        {type === "private" && (role === "Not Follower" || role === "Pending")? (
-                            <div>
-                                Non puoi ancora vedere i post
-                            </div>
-                            ) : (
-                                <>
-                                    {posts!==null && posts.map((post)=> {
-                                        //console.log("id",post._id)
-                                        return(
-                                                <Post
-                                                    key={post._id}
-                                                    post={post}
-                                                />
-                                        )})}
-                                    {posts.length===0 &&
-                                        <p>Non ci sono ancora post indirizzati al canale {nome}</p>
-                                    }
-                                </>
-                        )}
+                    {type === "private" && (role === "Not Follower" || role === "Pending")? (
+                        <div>
+                            Non puoi ancora vedere i post
                         </div>
+                        ) : (
+                            <div className="flex flex-wrap w-full gap-8 items-center justify-center pb-20 overflow-y-scroll mt-4" id="postDiv">
+                                {posts!==null && posts.map((post)=> {
+                                    return(
+                                            <Post
+                                                key={post._id}
+                                                post={post}
+                                            />
+                                    )})}
+                                {posts.length===0 &&
+                                    <p className="text-center">Non ci sono ancora post indirizzati al canale {nome}</p>
+                                }
+                            </div>
+                    )}
                 </div>
             )}
         </>

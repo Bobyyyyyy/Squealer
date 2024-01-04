@@ -1,4 +1,5 @@
 import {Modal, ToggleSwitch} from "flowbite-react";
+import {Link} from "react-router-dom";
 
 function FollowersModal({isOpen, setIsOpen, followers, channelName, hasUpdated, setHasUpdated}) {
     const setPermission = (name) => {
@@ -40,7 +41,20 @@ function FollowersModal({isOpen, setIsOpen, followers, channelName, hasUpdated, 
                         })
                         return (
                             <div key={follower._id} className="flex justify-between py-2">
-                                {follower.user}
+                                <div className="flex gap-2 items-center justify-start">
+                                    <Link to={`/search/${follower.user}`}>
+                                        <img
+                                            src={follower.profilePic}
+                                            alt={`foto profilo di ${follower.user}`}
+                                            className="w-6 h-6 object-cover rounded-full"
+                                        />
+                                    </Link>
+                                    <Link to={`/search/${follower.user}`} >
+                                        <span>
+                                            {follower.user}
+                                        </span>
+                                    </Link>
+                                </div>
                                 <div className="flex gap-4">
                                     <span> può scrivere</span>
                                     <ToggleSwitch
