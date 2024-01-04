@@ -66,7 +66,7 @@
         'Content-Type': 'application/json'
       },
       body:JSON.stringify({
-        postId: props.post.postId,
+        postId: props.post._id,
         user: vip.value.name,
         reaction: newReac,
       })

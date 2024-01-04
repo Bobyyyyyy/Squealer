@@ -3,10 +3,11 @@ const ReservedChannel = require("../schemas/officialChannels");
 const Post = require("../schemas/Post");
 const User = require("../schemas/User");
 const connection = require('../ConnectionSingle');
+const OfficialChannel = require("../schemas/officialChannels")
 const {createError} = require("./utils");
-const Channel = require("../schemas/Channel");
 const {create} = require("connect-mongo");
 const {removeDestination} = require("./postMethods");
+const Channel = require("../schemas/Channel");
 
 //POST
 const addOfficialChannel = async (body,creator) => {
@@ -116,11 +117,10 @@ const modifyDescription = async (body) => {
     }
 }
 
-const getChannelProfilePicByName = async (channelName) => {
+const getOfficialChannelProfilePicByName = async (channelName) => {
     try {
         await connection.get();
-        console.log("channel NAME:", channelName)
-        let channel = await Channel.findOne({name: channelName}).lean();
+        let channel = await OfficialChannel.findOne({name: channelName}).lean();
         if (!channel) {
             throw createError('Canale non esiste',400);
         }
@@ -132,14 +132,42 @@ const getChannelProfilePicByName = async (channelName) => {
     }
 }
 
-const updateChannelProfilePic = async (channelName, newProfilePic) => {
+const updateOfficialChannelProfilePic = async (channelName, newProfilePic) => {
     try {
         await connection.get();
-        let channel = await Channel.findOneAndUpdate({name: channelName}, {profilePicture: newProfilePic});
+        let channel = await OfficialChannel.findOneAndUpdate({name: channelName}, {profilePicture: newProfilePic});
         if (!channel) {
             throw createError('Canale non esiste',400);
         }
         return true;
+    } catch (err) {
+        throw err;
+    }
+}
+
+
+const updateSilenceUser = async (channelName, username) => {
+    try {
+        await connection.get();
+        let channel = await OfficialChannel.findOne({'name': channelName}).lean();
+        let user = await User.findOne({username: username}).lean();
+
+        if (!channel) {
+            throw createError('Canale non esiste',400);
+        }
+
+        if (!user) {
+            throw createError('Utente non esiste',400);
+        }
+
+        let checkUser = await OfficialChannel.findOne({$and: [{name: channelName},{'silenced': user.username}]}).lean();
+
+        if (checkUser) {
+            await OfficialChannel.findOneAndUpdate({name: channelName},{$pull: {'silenced': user.username}}).lean();
+        } else {
+            await OfficialChannel.findOneAndUpdate({name: channelName},{$push: {'silenced': user.username}}).lean();
+        }
+
     } catch (err) {
         throw err;
     }
@@ -154,6 +182,7 @@ module.exports = {
     channelsLength,
     searchByChannelName,
     modifyDescription,
-    getChannelProfilePicByName,
-    updateChannelProfilePic
+    getOfficialChannelProfilePicByName,
+    updateOfficialChannelProfilePic,
+    updateSilenceUser
 }

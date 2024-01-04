@@ -1,7 +1,7 @@
 import {Modal} from "flowbite-react";
 import {useEffect, useState} from "react";
 import {CloseEyeIcon, ShowEyeIcon} from "../../../components/assets/index.jsx";
-import {getUsernameFromSessionStore} from "../../../utils/usefulFunctions.js";
+import {getUsernameFromSessionStore, setToastNotification} from "../../../utils/usefulFunctions.js";
 
 function ChangePswModal({isOpen, setIsOpen}) {
     const [currentPsw, setCurrentPsw] = useState('');
@@ -42,11 +42,15 @@ function ChangePswModal({isOpen, setIsOpen}) {
                     setCurrentPsw('');
                     setConfirmNewPsw('');
                     setIsOpen(false);
+                    setToastNotification("Password aggiornata con successo", "success");
+                    location.reload();
                 } else {
                     setError("La password corrente non è corretta");
                 }
             } catch (e) {
                 console.log(e);
+                setToastNotification("Oh no! Qualcosa è andato storto nell'aggiornamento della password", "failure");
+                location.reload();
             }
         }
     }

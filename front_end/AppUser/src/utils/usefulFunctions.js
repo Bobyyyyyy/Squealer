@@ -1,10 +1,12 @@
+const LIMIT_POST = 10;
+
 function getUsernameFromSessionStore () {
     return sessionStorage.getItem("username");
 }
 
 async function setUsernameInSessionStore() {
     localStorage.clear();
-    sessionStorage.clear();
+    sessionStorage.removeItem("username");
     try {
         let res = await fetch("/db/user/session");
         res = await res.json();
@@ -29,9 +31,9 @@ async function getQuotaByUsername(username) {
     }
 }
 
-async function getPostByUsername(username){
+async function getPostByUsername(username, offset = 0, limit = POST_TO_GET){
     try {
-        let res = await fetch(`/db/post/all?name=${username}&offset=0&limit=100`, {
+        let res = await fetch(`/db/post/all?name=${username}&offset=${offset}&limit=${limit}`, {
             method: 'GET',
         });
         if (res.ok) {
@@ -42,9 +44,9 @@ async function getPostByUsername(username){
     }
 }
 
-async function getPostByChannelName(channelName){
+async function getPostByChannelName(channelName, offset= 0, limit= POST_TO_GET){
     try {
-        let res = await fetch(`/db/post/all?offset=0&limit=10&channel=${channelName}`,{
+        let res = await fetch(`/db/post/all?offset=${offset}&limit=${limit}&channel=${channelName}`,{
             method: 'GET',
         });
         if (res.ok) {
@@ -55,9 +57,9 @@ async function getPostByChannelName(channelName){
     }
 }
 
-async function getPostByOfficialChannelName(channelName){
+async function getPostByOfficialChannelName(channelName, offset= 0, limit= POST_TO_GET){
     try {
-        let res = await fetch(`/db/post/all?offset=0&limit=10&official=${channelName}`,{
+        let res = await fetch(`/db/post/all?offset=${offset}&limit=${limit}&official=${channelName}`,{
             method: 'GET',
         });
         if (res.ok) {
@@ -69,8 +71,9 @@ async function getPostByOfficialChannelName(channelName){
 }
 
 async function getAllOfficialChannelPost() {
+    /*
     try {
-        let res = await fetch(`/db/post/all?offset=0&limit=10&official=${channelName}`,{
+        let res = await fetch(`/db/post/all?offset=0&limit=${LIMIT_POST}&official=${channelName}`,{
             method: 'GET',
         });
         if (res.ok) {
@@ -79,19 +82,20 @@ async function getAllOfficialChannelPost() {
     } catch (e) {
         console.log(e);
     }
+     */
 }
 
-async function getAllPost(offset) {
+async function getAllPost(offset, limit) {
     try {
-        let res = await fetch(`/db/post/all?offset=${offset}&limit=10`, {
+        let res = await fetch(`/db/post/all?offset=${offset}&limit=${limit}`, {
             method: 'GET'
         });
-
         if (res.ok) {
             return await res.json();
-        }
+        } else return [];
     } catch (e) {
         console.log(e);
+        return null;
     }
 }
 
@@ -146,7 +150,6 @@ const checkChannelExists = async ({params}) => {
     if (nome.toUpperCase() === nome) {
         // e' un canale ufficiale
         const res = await fetch(`/db/official/?name=${nome}`);
-        console.log("res off", res)
         if (!res.ok) {
             throw Error(`Non esiste il canale ${nome}`);
         } else {
@@ -189,6 +192,65 @@ const handleLogout = async () => {
     sessionStorage.clear();
 }
 
+const setToastNotification = (message, type) => {
+    sessionStorage.setItem("message", message);
+    sessionStorage.setItem("type", type);
+}
+
+const deleteToastNotification = () => {
+    sessionStorage.removeItem("message");
+    sessionStorage.removeItem("type");
+}
+
+const getToastNotification = () => {
+    let messageRes = sessionStorage.getItem("message");
+    let typeRes = sessionStorage.getItem("type");
+    if (!!messageRes && !!typeRes) {
+        // sono entrambi non nulli
+        return {
+            message: messageRes,
+            type: typeRes
+        }
+    } else {
+        return null;
+    }
+}
+
+const getNotification = async () => {
+    try {
+        let res = await fetch(`/db/notification?user=${getUsernameFromSessionStore()}`, {
+            method:'GET'
+        });
+        if (res.ok) {
+            res = await res.json();
+            if (Object.keys(res).length !== 0) {
+                return res;
+            }
+        }
+        return null;
+    } catch (e) {
+        return null;
+    }
+}
+
+const POST_TO_GET = 10;
+
+const scrollEndDetectorHandler = async (lastRequestLength, lastHeightDiv, updatePost) => {
+    const postDiv = document.getElementById("postDiv");
+    // se l'ultima richiesta ha ricevuto meno post del massimo allora sono finiti,
+    // quindi non serve fare una nuova richiesta
+    if (postDiv && window.innerHeight + window.scrollY >= postDiv.offsetHeight && lastRequestLength.current >= POST_TO_GET) {
+        lastHeightDiv.current = window.scrollY;
+        await updatePost();
+    }
+};
+
+const resetPosts = (setPosts, currentOffset, lastRequestLength, lastHeightDiv) => {
+    setPosts([]);
+    currentOffset.current = 0;
+    lastRequestLength.current = 0;
+    lastHeightDiv.current = 0;
+}
 
 export {
     getUsernameFromSessionStore,
@@ -204,5 +266,12 @@ export {
     getAllPost,
     getPostByOfficialChannelName,
     getAllOfficialChannelPost,
-    handleLogout
+    handleLogout,
+    setToastNotification,
+    deleteToastNotification,
+    getToastNotification,
+    getNotification,
+    scrollEndDetectorHandler,
+    resetPosts,
+    POST_TO_GET,
 }

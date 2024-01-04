@@ -1,5 +1,5 @@
 import {Modal} from "flowbite-react";
-import {getUsernameFromSessionStore} from "../../../utils/usefulFunctions.js";
+import {getUsernameFromSessionStore, setToastNotification} from "../../../utils/usefulFunctions.js";
 
 function DeleteChannelModal({isOpen, setIsOpen, channelName}) {
     const DeleteChannel = async () => {
@@ -9,9 +9,12 @@ function DeleteChannelModal({isOpen, setIsOpen, channelName}) {
                 method: 'DELETE',
             });
             setIsOpen(false);
+            setToastNotification("Canale eliminato con successo", "success");
             window.location.href = "/user/";
         } catch (e) {
             console.log(e);
+            setToastNotification("Oh no! Qualcosa è andato storto nell'eliminazione del canale", "failure");
+            window.location.href = "/user/channels";
         }
     }
 

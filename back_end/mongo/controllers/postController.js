@@ -1,6 +1,7 @@
 const postModel = require("../models/postMethods");
 const CronController = require("./CronController");
 const {mongo} = require("mongoose");
+const {createError} = require("../models/utils");
 
 
 const createPost = async (req,res) => {
@@ -134,6 +135,26 @@ const addPosition = async(req,res) => {
     }
 }
 
+const getHomePosts = async (req, res) => {
+    try{
+        let limit = req.query.limit;
+        let offset = req.query.offset;
+        if (isNaN(limit) || isNaN(offset))
+            throw createError('bad request', 400);
+
+        let user = req.session.user;
+
+        res.send(await postModel.getPostHome(user, limit, offset))
+    }
+    catch(Error){
+        if(typeof Error.statusCode !== 'undefined')
+            res.status(Error.statusCode).send({message: Error.message});
+        else {
+            res.status(500).send(Error);
+        }
+    }
+}
+
 module.exports = {
     createPost,
     getPosts,
@@ -144,5 +165,6 @@ module.exports = {
     getReactionLast30days,
     postLength,
     addDestination,
-    addPosition
+    addPosition,
+    getHomePosts
 }

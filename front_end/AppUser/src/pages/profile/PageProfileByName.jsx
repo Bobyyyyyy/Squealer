@@ -1,25 +1,50 @@
-import {Link, useLoaderData} from "react-router-dom";
-import React, {useEffect, useState} from "react";
-import {getPostByUsername} from "../../utils/usefulFunctions.js";
+import {Link, useLoaderData, useParams} from "react-router-dom";
+import React, {useEffect, useRef, useState} from "react";
+import {
+    getPostByUsername,
+    POST_TO_GET, resetPosts,
+    scrollEndDetectorHandler
+} from "../../utils/usefulFunctions.js";
 import Post from "../../components/posts/Post.jsx";
 import {Spinner} from 'flowbite-react'
 
 function PageProfileByName() {
     const user = useLoaderData();
-    const [posts, setPosts] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
-    const fetchData = async () => {
+    // post related states
+    const [posts, setPosts] = useState([]);
+    const currentOffset = useRef(0);
+    const lastRequestLength = useRef(0);
+    const lastHeightDiv = useRef(0);
+
+    const fetchPosts = async () => {
         setIsLoading(true);
-        let postsRes = await getPostByUsername(user.username);
-        setPosts(postsRes);
+        let newPosts = await getPostByUsername(user.username, currentOffset.current, POST_TO_GET);
+        currentOffset.current += newPosts.length;
+        lastRequestLength.current = newPosts.length;
+        setPosts((prev) => [...prev, ...newPosts]);
         setIsLoading(false);
-    }
+    };
+
+    const scrollEndDetector = async (event) => {
+        event.preventDefault();
+        await scrollEndDetectorHandler(lastRequestLength, lastHeightDiv, fetchPosts);
+    };
 
     useEffect(() => {
-        fetchData()
+        resetPosts(setPosts, currentOffset, lastRequestLength, lastHeightDiv);
+        document.addEventListener('scroll', scrollEndDetector, true);
+        fetchPosts()
             .catch(console.error);
-    }, [user]);
+        return () => {
+            document.removeEventListener('scroll', scrollEndDetector);
+        }
+    }, [user.username]);
+
+    useEffect(() => {
+        window.scrollTo({ behavior: "instant", top: lastHeightDiv.current, left:0})
+    }, [posts]);
 
     return (
         <>
@@ -62,16 +87,18 @@ function PageProfileByName() {
                                     </span>
                                 </div>
                             </div>
-                            {posts.map((post)=> {
-                                return(
-                                    <Post key={post._id} post={post}
-                                    />
-                                )})}
-                            {posts.length === 0 &&
-                                <div className="text-lg text-center mt-4">
-                                    Al momento non ci sono post!
-                                </div>
-                            }
+                            <div className="flex flex-wrap w-full gap-8 items-center justify-center pb-20 overflow-y-scroll mt-4" id="postDiv">
+                                {posts.map((post)=> {
+                                    return(
+                                        <Post key={post._id} post={post}
+                                        />
+                                    )})}
+                                {posts.length === 0 &&
+                                    <div className="text-lg text-center mt-4">
+                                        Al momento non ci sono post!
+                                    </div>
+                                }
+                            </div>
                         </>
                     )}
                 </>
