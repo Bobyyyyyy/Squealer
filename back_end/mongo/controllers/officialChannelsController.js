@@ -1,5 +1,4 @@
 const officialChannel = require('../models/officialChannelsMethods');
-const channelsModel = require("../models/ChannelMethods");
 
 /* Reserved Channel Methods */
 const createReservedChannel = async (req,res,next) => {
@@ -73,9 +72,9 @@ const channel = async (req,res) => {
     }
 }
 
-const getChannelProfilePicByName = async (req,res) => {
+const getOfficialChannelProfilePicByName = async (req,res) => {
     try {
-        res.send(await channelsModel.getChannelProfilePicByName(req.query.channelName));
+        res.send(await officialChannel.getOfficialChannelProfilePicByName(req.query.channelName));
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
@@ -85,9 +84,9 @@ const getChannelProfilePicByName = async (req,res) => {
     }
 }
 
-const updateChannelProfilePic = async (req, res) => {
+const updateOfficialChannelProfilePic = async (req, res) => {
     try {
-        res.send(await channelsModel.updateChannelProfilePic(req.body.channelName, req.body.newProfilePic));
+        res.send(await officialChannel.updateOfficialChannelProfilePic(req.body.channelName, req.body.newProfilePic));
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send(Error.message);
@@ -96,6 +95,19 @@ const updateChannelProfilePic = async (req, res) => {
         }
     }
 }
+
+const updateSilenceUser = async (req, res) => {
+    try {
+        res.send(await officialChannel.updateSilenceUser(req.body.channelName, req.body.username));
+    } catch (Error) {
+        if(typeof Error.statusCode !== 'undefined')
+            res.status(Error.statusCode).send(Error.message);
+        else {
+            res.status(500).send(Error);
+        }
+    }
+}
+
 
 module.exports = {
     createReservedChannel,
@@ -104,6 +116,7 @@ module.exports = {
     getChannel,
     modifyDesc,
     channel,
-    getChannelProfilePicByName,
-    updateChannelProfilePic
+    getOfficialChannelProfilePicByName,
+    updateOfficialChannelProfilePic,
+    updateSilenceUser
 }
