@@ -3,7 +3,9 @@ import {
     getPostByUsername,
     getUserInfoByUsername,
     getQuotaByUsername,
-    handleLogout, getAllPost, POST_TO_GET, scrollEndDetectorHandler
+    handleLogout,
+    POST_TO_GET,
+    scrollEndDetectorHandler
 } from "../../utils/usefulFunctions.js";
 import React, {useEffect, useRef, useState} from "react";
 import Post from "../../components/posts/Post.jsx";

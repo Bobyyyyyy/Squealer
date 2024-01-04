@@ -38,10 +38,9 @@ async function getPostByUsername(username, offset = 0, limit = POST_TO_GET){
         });
         if (res.ok) {
             return await res.json();
-        } else return [];
+        }
     } catch (e) {
         console.log(e);
-        return null;
     }
 }
 
@@ -52,24 +51,23 @@ async function getPostByChannelName(channelName, offset= 0, limit= POST_TO_GET){
         });
         if (res.ok) {
             return await res.json();
-        } else return [];
+        }
     } catch (e) {
         console.log(e);
-        return null;
     }
 }
 
-async function getPostByOfficialChannelName(channelName){
+async function getPostByOfficialChannelName(channelName, offset= 0, limit= POST_TO_GET){
     try {
-        let res = await fetch(`/db/post/all?offset=0&limit=${LIMIT_POST}&official=${channelName}`,{
+        let res = await fetch(`/db/post/all?offset=${offset}&limit=${limit}&official=${channelName}`,{
+
             method: 'GET',
         });
         if (res.ok) {
             return await res.json();
-        } else return [];
+        }
     } catch (e) {
         console.log(e);
-        return null;
     }
 }
 
@@ -151,7 +149,6 @@ const checkChannelExists = async ({params}) => {
     if (nome.toUpperCase() === nome) {
         // e' un canale ufficiale
         const res = await fetch(`/db/official/?name=${nome}`);
-        console.log("res off", res)
         if (!res.ok) {
             throw Error(`Non esiste il canale ${nome}`);
         } else {
@@ -247,6 +244,13 @@ const scrollEndDetectorHandler = async (lastRequestLength, lastHeightDiv, update
     }
 };
 
+const resetPosts = (setPosts, currentOffset, lastRequestLength, lastHeightDiv) => {
+    setPosts([]);
+    currentOffset.current = 0;
+    lastRequestLength.current = 0;
+    lastHeightDiv.current = 0;
+}
+
 export {
     getUsernameFromSessionStore,
     setUsernameInSessionStore,
@@ -267,5 +271,6 @@ export {
     getToastNotification,
     getNotification,
     scrollEndDetectorHandler,
+    resetPosts,
     POST_TO_GET,
 }

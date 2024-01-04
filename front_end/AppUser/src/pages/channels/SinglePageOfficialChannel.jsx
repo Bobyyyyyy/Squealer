@@ -1,25 +1,50 @@
-import {useLoaderData, useParams} from "react-router-dom";
+import {useLoaderData} from "react-router-dom";
 import {Spinner} from "flowbite-react";
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import Post from "../../components/posts/Post.jsx";
-import { getPostByOfficialChannelName} from "../../utils/usefulFunctions.js";
+import {
+    getPostByOfficialChannelName,
+    POST_TO_GET,
+    resetPosts,
+    scrollEndDetectorHandler
+} from "../../utils/usefulFunctions.js";
 
 function SinglePageOfficialChannel() {
     const channel = useLoaderData();
     const [isLoading, setIsLoading] = useState(true);
     const [posts, setPosts] = useState([]);
+    const currentOffset = useRef(0);
+    const lastRequestLength = useRef(0);
+    const lastHeightDiv = useRef(0);
 
-    const fetchPost = async () => {
+    const fetchPosts = async () => {
         setIsLoading(true);
-        const resPost = await getPostByOfficialChannelName(channel.name);
-        console.log(resPost)
-        setPosts(resPost);
-        setIsLoading(false)
-    }
+        let newPosts = await getPostByOfficialChannelName(channel.name, currentOffset.current, POST_TO_GET);
+        console.log(newPosts)
+        currentOffset.current += newPosts.length;
+        lastRequestLength.current = newPosts.length;
+        setPosts((prev) => [...prev, ...newPosts]);
+        setIsLoading(false);
+    };
+
+    const scrollEndDetector = async (event) => {
+        event.preventDefault();
+        await scrollEndDetectorHandler(lastRequestLength, lastHeightDiv, fetchPosts);
+    };
 
     useEffect(() => {
-        fetchPost()
-    }, []);
+        resetPosts(setPosts, currentOffset, lastRequestLength, lastHeightDiv);
+        document.addEventListener('scroll', scrollEndDetector, true);
+        fetchPosts()
+            .catch(console.error);
+        return () => {
+            document.removeEventListener('scroll', scrollEndDetector);
+        }
+    }, [channel.username]);
+
+    useEffect(() => {
+        window.scrollTo({ behavior: "instant", top: lastHeightDiv.current, left:0})
+    }, [posts]);
 
     return (
         <>
@@ -46,16 +71,18 @@ function SinglePageOfficialChannel() {
                             silenziabile
                         </div>
                     }
-                    {posts!==null && posts.map((post)=> {
-                        return(
-                            <Post
-                                key={post._id}
-                                post={post}
-                            />
-                        )})}
-                    {posts.length===0 &&
-                        <p className="text-center">Non ci sono ancora post indirizzati al canale {channel.name}</p>
-                    }
+                    <div className="flex flex-wrap w-full gap-8 items-center justify-center pb-20 overflow-y-scroll mt-4" id="postDiv">
+                        {posts!==null && posts.map((post)=> {
+                            return(
+                                <Post
+                                    key={post._id}
+                                    post={post}
+                                />
+                            )})}
+                        {posts.length===0 &&
+                            <p className="text-center">Non ci sono ancora post indirizzati al canale {channel.name}</p>
+                        }
+                    </div>
                 </div>
             )}
         </>

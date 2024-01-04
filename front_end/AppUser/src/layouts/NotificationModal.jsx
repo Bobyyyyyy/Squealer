@@ -39,8 +39,8 @@ function NotificationModal({isOpen, setIsOpen, notifications, setNotifications})
     }
 
     const handleDeleteNotifications = async () => {
-        await deleteNotifications();
         setIsOpen(false);
+        await deleteNotifications();
     }
 
     return (

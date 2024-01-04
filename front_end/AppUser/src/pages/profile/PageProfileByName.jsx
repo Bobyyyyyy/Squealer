@@ -1,9 +1,8 @@
 import {Link, useLoaderData, useParams} from "react-router-dom";
 import React, {useEffect, useRef, useState} from "react";
 import {
-    getAllPost,
     getPostByUsername,
-    POST_TO_GET,
+    POST_TO_GET, resetPosts,
     scrollEndDetectorHandler
 } from "../../utils/usefulFunctions.js";
 import Post from "../../components/posts/Post.jsx";
@@ -34,7 +33,7 @@ function PageProfileByName() {
     };
 
     useEffect(() => {
-        setPosts([]);
+        resetPosts(setPosts, currentOffset, lastRequestLength, lastHeightDiv);
         document.addEventListener('scroll', scrollEndDetector, true);
         fetchPosts()
             .catch(console.error);
