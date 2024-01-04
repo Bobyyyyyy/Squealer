@@ -17,22 +17,30 @@ function SinglePageOfficialChannel() {
     const currentOffset = useRef(0);
     const lastRequestLength = useRef(0);
     const lastHeightDiv = useRef(0);
-
-    const [isSilenced, setIsSilenced] = useState(false);
-    console.log("silenceable",channel.silenceable,"silenziati", channel.silence)
+    const [isSilenced, setIsSilenced] = useState(() => {
+        if (channel.silenceable) {
+            let user = channel.silenced.filter((user) => user === getUsernameFromSessionStore());
+            return user.length !== 0;
+        } else {
+            return false;
+        }
+    });
 
     const handleSilenceChannel = async () => {
         setIsSilenced((prev) => !prev);
-        console.log("prova cambia il silence")
-        let res = await fetchPosts("/db/official/silence", {
-            method: 'PUT',
-            body: {
-                channelName: channel.name,
-                username: getUsernameFromSessionStore()
-            }
-        })
-        if (res.ok) {
-            console.log("cambiato il silence")
+        try {
+             await fetch(`/db/official/silenced`,{
+                method:"PUT",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body:JSON.stringify({
+                    channelName: channel.name,
+                    username: getUsernameFromSessionStore()
+                })
+            })
+        } catch (e) {
+            console.log(e);
         }
     }
 
@@ -88,7 +96,11 @@ function SinglePageOfficialChannel() {
                             <span>
                                 Canale silenziato
                             </span>
-                            <ToggleSwitch checked={isSilenced} onChange={handleSilenceChannel} aria-label={"Silenzia canale"} />
+                            <ToggleSwitch
+                                checked={isSilenced}
+                                onChange={async () => await handleSilenceChannel()}
+                                aria-label="Silenzia canale"
+                            />
                         </div>
                     )}
                     <div className="flex flex-wrap w-full gap-8 items-center justify-center pb-20 overflow-y-scroll mt-4" id="postDiv">

@@ -13,6 +13,6 @@ router.get('/all',officialChannelsController.getChannel);
 router.get('/channelPic', officialChannelsController.getOfficialChannelProfilePicByName);
 router.put('/channelPic', officialChannelsController.updateOfficialChannelProfilePic);
 
-router.put('/silence', officialChannelsController.updateSilenceUser)
+router.put('/silenced', officialChannelsController.updateSilenceUser)
 
 module.exports = router;
