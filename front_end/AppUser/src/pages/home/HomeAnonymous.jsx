@@ -2,7 +2,7 @@ import Post from "../../components/posts/Post.jsx";
 import React, { useEffect, useRef, useState} from "react";
 import {
     getAllOfficialChannelPost,
-    getAllPost
+
 } from "../../utils/usefulFunctions.js";
 import {Spinner} from "flowbite-react";
 
@@ -26,10 +26,13 @@ function Home() {
 
     const updatePost = async () => {
         setIsLoading(true);
-        let newPosts = await getAllPost(currentOffset.current);
+        /*
+        let newPosts = await (currentOffset.current);
         currentOffset.current += newPosts.length;
         lastRequestLenght.current = newPosts.length;
         //setPosts((prev) => [...prev, ...newPosts]);
+
+         */
         setIsLoading(false);
     }
 

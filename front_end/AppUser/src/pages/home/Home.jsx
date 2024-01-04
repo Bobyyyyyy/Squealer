@@ -1,9 +1,12 @@
 import Post from "../../components/posts/Post.jsx";
 import React, { useEffect, useRef, useState} from "react";
 import {
-    getAllPost, POST_TO_GET, scrollEndDetectorHandler
+    getHomePosts,
+    POST_TO_GET,
+    scrollEndDetectorHandler
 } from "../../utils/usefulFunctions.js";
 import {Spinner} from "flowbite-react";
+import {loadConfigFromFile} from "vite";
 
 function Home() {
 
@@ -15,7 +18,8 @@ function Home() {
 
     const fetchPosts = async () => {
         setIsLoading(true);
-        let newPosts = await getAllPost(currentOffset.current, POST_TO_GET);
+        let newPosts = await getHomePosts(currentOffset.current, POST_TO_GET);
+        console.log(newPosts)
         currentOffset.current += newPosts.length;
         lastRequestLength.current = newPosts.length;
         setPosts((prev) => [...prev, ...newPosts]);

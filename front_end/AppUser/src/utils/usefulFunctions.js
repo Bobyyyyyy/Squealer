@@ -85,17 +85,16 @@ async function getAllOfficialChannelPost() {
      */
 }
 
-async function getAllPost(offset, limit) {
+async function getHomePosts(offset, limit) {
     try {
-        let res = await fetch(`/db/post/all?offset=${offset}&limit=${limit}`, {
+        let res = await fetch(`/db/post/?offset=${offset}&limit=${limit}`, {
             method: 'GET'
         });
         if (res.ok) {
             return await res.json();
-        } else return [];
+        }
     } catch (e) {
         console.log(e);
-        return null;
     }
 }
 
@@ -263,7 +262,7 @@ export {
     checkUserExists,
     getUserInfoByUsername,
     getPostByChannelName,
-    getAllPost,
+    getHomePosts,
     getPostByOfficialChannelName,
     getAllOfficialChannelPost,
     handleLogout,

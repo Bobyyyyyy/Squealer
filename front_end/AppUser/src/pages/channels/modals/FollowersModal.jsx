@@ -46,7 +46,7 @@ function FollowersModal({isOpen, setIsOpen, followers, channelName, hasUpdated, 
                                         <img
                                             src={follower.profilePic}
                                             alt={`foto profilo di ${follower.user}`}
-                                            className="w-6 h-6 object-cover rounded-full"
+                                            className="w-6 h-6 object-cover rounded-full aspect-square"
                                         />
                                     </Link>
                                     <Link to={`/search/${follower.user}`} >

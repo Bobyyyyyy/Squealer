@@ -158,7 +158,7 @@ function SinglePageNormalChannel() {
                                         <img
                                             src={channelPic}
                                             alt={`foto canale ${nome}`}
-                                            className={"w-20 h-20 rounded-full object-cover"}
+                                            className={"w-20 h-20 rounded-full object-cover aspect-square"}
                                         />
                                     </button>
                                     <ChangeChannelPictureModal isOpen={showChangePicModal} setIsOpen={setShowChangePicModal} channelName={nome} />
@@ -167,7 +167,7 @@ function SinglePageNormalChannel() {
                                 <img
                                     src={channelPic}
                                     alt={`foto canale ${nome}`}
-                                    className={"w-20 h-20 rounded-full object-cover"}
+                                    className="w-20 h-20 rounded-full object-cover aspect-square"
                                 />
                             )}
                             <h3 className="text-center text-2xl font-extrabold">§{nome}</h3>

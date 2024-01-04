@@ -73,7 +73,11 @@ function ChannelAnonymous () {
                             return (
                                 <Link className="w-full" to={`/channels/${channel.name}`} key={channel._id} >
                                     <div className="flex w-full justify-start gap-4">
-                                        <img src={channel.profilePicture} alt="immagine canale" className="w-14 h-14 object-cover rounded-full"/>
+                                        <img
+                                            src={channel.profilePicture}
+                                            alt="immagine canale"
+                                            className="w-14 h-14 object-cover rounded-full aspect-square"
+                                        />
                                         <div className="flex flex-col overflow-x-hidden  mx-2 w-full">
                                             <div className="flex justify-between">
                                                 <span className="font-semibold text-lg">{channel.name}</span>

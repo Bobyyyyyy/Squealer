@@ -74,13 +74,13 @@ function PageProfileByName() {
                         </div>
                     ) : (
                         <>
-                            <div className="flex w-full items-center justify-start gap-8 p-4">
+                            <div className="flex w-full items-center justify-start gap-6 p-4">
                                 <img
                                     src={user.profilePicture} alt={`${user.username}'s profile picture`}
-                                    className={"w-24 h-24 rounded-full object-cover"}
+                                    className="w-24 h-24 rounded-full object-cover aspect-square"
                                 />
 
-                                <div className="flex flex-col w-full justify-between gap-3">
+                                <div className="flex flex-col w-fit justify-between gap-3">
                                     <span className="text-4xl font-extrabold">{user.username}</span>
                                     <span className="text-lg font-normal">Squeals:
                                         <span className="ml-1 font-medium">{posts.length}</span>

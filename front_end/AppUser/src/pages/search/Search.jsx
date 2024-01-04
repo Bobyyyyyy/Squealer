@@ -46,7 +46,7 @@ function Search ()  {
                                 <img
                                     src={user.profilePicture}
                                     alt={`${user.username}'s profile picture`}
-                                    className="w-14 h-14 object-cover rounded-full"
+                                    className="w-14 h-14 aspect-square rounded-full object-cover"
                                 />
                                 <div className="flex flex-col justify-between overflow-x-hidden w-full">
                                     <span className="font-semibold text-lg truncate">{user.username}</span>

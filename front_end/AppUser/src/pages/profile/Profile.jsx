@@ -126,8 +126,8 @@ function Profile () {
                     >
                         <img
                             src={user.current.profilePicture}
-                            className={"w-20 h-20 rounded-full object-cover"}
-                            alt={"profile"}
+                            className="w-20 h-20 rounded-full object-cover aspect-square"
+                            alt="profile"
                         />
                     </button>
                     <ChangeProfilePictureModal setIsOpen={setShowChangePicModal} isOpen={showChangePicModal} user={user} />

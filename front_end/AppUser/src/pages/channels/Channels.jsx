@@ -121,13 +121,13 @@ function Channels () {
                             const role = checkRole(channel.admins, channel.followers, channel.creator, channel.requests);
                             return (
                                 <Link className="w-full" to={`/channels/${channel.name}`} key={channel._id} >
-                                    <div className="flex w-full justify-start items-center gap-4">
+                                    <div className="flex w-full justify-start items-center gap-3">
                                         <img
                                             src={channel.profilePicture}
                                             alt={`immagine canale ${channel.name}`}
-                                            className="w-14 h-14 rounded-full"
+                                            className="w-14 h-14 aspect-square rounded-full object-cover"
                                         />
-                                        <div className="flex flex-col overflow-x-hidden  mx-2 w-full">
+                                        <div className="flex flex-col overflow-x-hidden w-full mr-2">
                                             <div className="flex justify-between items-center">
                                                 <span className="font-semibold text-lg">{channel.name}</span>
                                                 <span className="font-medium text-base text-red-600">{channel.type}</span>
@@ -146,9 +146,9 @@ function Channels () {
                                         <img
                                             src={channel.profilePicture}
                                             alt={`immagine canale ${channel.name}`}
-                                            className="w-14 h-14 object-cover rounded-full"
+                                            className="w-14 h-14 object-cover rounded-full aspect-square"
                                         />
-                                        <div className="flex flex-col overflow-x-hidden  mx-2 w-full">
+                                        <div className="flex flex-col overflow-x-hidden w-full mr-2">
                                             <div className="flex justify-between">
                                                 <span className="font-semibold text-lg">{channel.name}</span>
                                                 <span className="font-medium text-base text-red-600">ufficiale</span>

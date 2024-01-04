@@ -37,7 +37,7 @@ function RmAdminModal({isOpen, setIsOpen, admins, channelName, hasUpdated, setHa
                                         <img
                                             src={admin.profilePic}
                                             alt={`foto profilo di ${admin.name}`}
-                                            className="w-6 h-6 object-cover rounded-full"
+                                            className="w-6 h-6 object-cover rounded-full aspect-square"
                                         />
                                     </Link>
                                     <Link to={`/search/${admin.name}`} >

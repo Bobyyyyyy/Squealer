@@ -85,7 +85,7 @@ function SinglePageOfficialChannel() {
                             <img
                                 src={channel.profilePicture}
                                 alt={`foto canale ${channel.name}`}
-                                className={"w-20 h-20 rounded-full object-cover"}
+                                className="w-20 h-20 rounded-full object-cover aspect-square"
                             />
                             <h3 className="text-center text-2xl font-extrabold">§{channel.name}</h3>
                         </div>
