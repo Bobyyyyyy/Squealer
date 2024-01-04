@@ -40,6 +40,7 @@ const showChannel = (name) => {
         url:`/db/channel/${name}`,
         type: 'get',
         success: (channel) => {
+            $('#channel-picture').html(`<img src="${channel.profilePicture}" alt="immagine profilo" style="width: 20%; aspect-ratio: 1; border-radius: 50%; object-fit: cover">`)
             $('#channel-description').html(channel.description);
             $('#channel-creator').html(channel.creator);
             $('#posts-number').html(channel.postNumber);
@@ -99,6 +100,7 @@ const showPosts = (filter,offset,limit,append = false) => {
                     <div id="header-${id}" class="card-header d-flex flex align-items-center bg-primary">
                     <div class="d-flex flex-column">
                         <div class="d-flex flex-row align-items-center justify-content-start">
+                            <img src="${post.profilePicture}" alt="profile picture" style="width: 6%; aspect-ratio: 1; border-radius: 50%" class=" m-2 ms-0" >
                             <div class="fw-bold">@${post.owner}</div>
                             <div class="ms-1 fw-light">/${post.popularity}</div> 
                         </div>
@@ -132,7 +134,7 @@ const showPosts = (filter,offset,limit,append = false) => {
                         let parsedText = `${post.content}`.replace(urlRegex, function (url) {
                             return `<a class="fw-bold"  href="${url}" target="_blank">${url}</a>`;
                         })
-                        Post = Post + `<span><p class='card-text lead' style="font-size: 3vh" > ${parsedText} </p></span>`
+                        Post = Post + `<span class="w-100 h-100"><p class='card-text lead' style="font-size: 3vh" > ${parsedText} </p></span>`
                         break;
 
                     case 'image':
@@ -343,7 +345,6 @@ function getReplies(parentID) {
         success: (replies) => {
             let numberOfReplies = replies.length;
             if(numberOfReplies === 0) {
-                console.log('porcodio')
                 $('#replies').empty().append(`<h4>Nessuna risposta per questo post</h4>`)
                 $('#postReplies').modal('show');
                 return
@@ -355,6 +356,7 @@ function getReplies(parentID) {
                     <div id="header-${reply._id}" class="card-header d-flex flex align-items-center bg-primary">
                         <div class="d-flex flex-column w-100">
                             <div class="d-flex flex-row align-items-center justify-content-start w-100">
+                                <img src="${reply.profilePicture}" alt="profile picture" style="width: 5%; aspect-ratio: 1; border-radius: 50%" class=" m-2 ms-0" >
                                 <div class="fw-bold">@${reply.owner}</div>
                                 <div class="fw-bold ms-auto">${reply.dateOfCreation.split('T')[0]},
                                 ${reply.dateOfCreation.split('T')[1].split('.')[0]}</div>
@@ -395,7 +397,7 @@ $('#addAdminForm').on('submit',(event) => {
             location.reload()
         },
         error: (error) => {
-            $('#toast-content').empty().html(error.responseText);
+            $('#toast-content').empty().html(error.responseJSON.message);
             let toastList = inizializeToast();
             toastList.forEach(toast => toast.show()); // This show them
         }

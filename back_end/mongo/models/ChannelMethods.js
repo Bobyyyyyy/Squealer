@@ -171,6 +171,8 @@ const changeChannelName = async (channelName,newName,username) => {
 
         await Post.updateMany({'destinationArray.name': channelName},{$push : {'destinationArray': {destType: 'channel',name: newName}}});
         await Post.updateMany({'destinationArray.name': channelName},{$pull: {'destinationArray': {destType: 'channel', name:channelName}}});
+        await Notification.updateMany({'channel': channelName}, {'channel': newName});
+
 
     }
     catch (error) {

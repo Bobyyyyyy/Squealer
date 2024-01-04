@@ -20,21 +20,21 @@
                     <a class="nav-link" aria-current="page" href="/mod/users">Utenti</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/mod/posts">Posts</a>
+                    <a class="nav-link" href="/mod/posts">Squeal</a>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle active" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Channels
+                        Canali
                     </a>
                     <ul class="dropdown-menu fontcustom">
-                        <li><a class="dropdown-item" href="/mod/officialChannels">Official Channels</a></li>
+                        <li><a class="dropdown-item" href="/mod/officialChannels">§CANALI</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="/mod/userChannels">Private Channels</a></li>
+                        <li><a class="dropdown-item" href="/mod/userChannels">§canali</a></li>
                     </ul>
                 </li>
             </ul>
             <span class="navbar-text text-white ms-auto me-2 fontcustom" >@<span id="session-user">${user}</span></span>
-            <button class="btn btn-outline-light bg-accent fontcustom" onclick="window.location.href = '/logout'">Logout</button>
+            <button class="btn btn-outline-light bg-accent fontcustom" onclick="window.location.href = '/logout'">Disconnettiti</button>
         </div>
     </div>
 </nav>
@@ -48,7 +48,7 @@
         <div class="d-flex flex-row align-items-center p-3 pe-0">
             <label for="filter"></label><input class="form-control fontcustom" id="filter" type="text" style="height: 10%; width: 15%; background-color: lightgray" placeholder="Cerca Canale..">
             <button type="button" class="btn bg-primary ms-auto" data-bs-toggle="modal" data-bs-target="#addChannel" style="font-size: 2vh">
-                Add Channel
+               Aggiungi Canale
             </button>
         </div>
 
@@ -83,6 +83,10 @@
                     <div class="form-group">
                         <label for="description" class="form-label w-100"> Descrizione:
                             <textarea class="form-control" id="description" name="description" rows="3" form="channelform" placeholder="Inserisci descrizione del canale...." maxlength="150" style="resize: none" data-role="none" required autocomplete="off"></textarea></label>
+                    </div>
+                    <div>
+                        <label for="picture" class="form-label w-100"> Immagine canale:
+                            <input type="text" class="form-control" name="picture" id="picture" placeholder="Inserisci link immagine.." autocomplete="off"></label>
                     </div>
                     <div>
                         <label for="silenceable"> Silenziabile </label>

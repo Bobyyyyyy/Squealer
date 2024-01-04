@@ -113,9 +113,12 @@ const cast2millis = {
 
 const CHANNEL_OFFSET = 36
 
+const MAX_TEXT_LENGTH = 450;
+const F_QUOTA = 50;
+
 
 export { sideBarElements,
     postType, sortPosts, filterValues,
     reactionsIcons, QUALITY, MAX_WIDTH, MAX_HEIGHT,
     smartPhone, expanded, URLHTTPREGEX,
-    postTypeITAS, filterValuesITAS, cast2millis, CHANNEL_OFFSET}
+    postTypeITAS, filterValuesITAS, cast2millis, CHANNEL_OFFSET,MAX_TEXT_LENGTH, F_QUOTA}

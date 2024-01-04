@@ -61,7 +61,7 @@ const showPosts = (filters,append = false) => {
                     }
 
                     if (destination.destType === "user") {
-                        
+                        destinationNames.push('@' + destination.name)
                     }
                     
                     if(destination.destType === "keyword") {
@@ -87,6 +87,7 @@ const showPosts = (filters,append = false) => {
                     <div id="header-${id}" class="card-header d-flex flex align-items-center bg-primary">
                     <div class="d-flex flex-column">
                         <div class="d-flex flex-row align-items-center justify-content-start">
+                            <img src="${post.profilePicture}" alt="profile picture" style="width: 6%; aspect-ratio: 1; border-radius: 50%" class=" m-2 ms-0" >
                             <div class="fw-bold">@${post.owner}</div>
                             <div class="ms-1 fw-light">/${post.popularity}</div> 
                         </div>
@@ -120,7 +121,7 @@ const showPosts = (filters,append = false) => {
                         let parsedText = `${post.content}`.replace(urlRegex, function (url) {
                             return `<a class="fw-bold"  href="${url}" target="_blank">${url}</a>`;
                         })
-                        Post = Post + `<span><p class='card-text lead' style="font-size: 3vh" > ${parsedText} </p></span>`
+                        Post = Post + `<span class="w-100 h-100"><p class='card-text lead' style="font-size: 3vh" > ${parsedText} </p></span>`
                         break;
 
                     case 'image':
@@ -196,7 +197,7 @@ $('#orderby').on('change',() => {
 
     if(orderBy === 'publication') {
         let options = `<label for="order"></label>
-                                <select class="select btn bg-secondary" id="order" autocomplete="off">
+                                <select class="select btn bg-secondary fontcustom" id="order" autocomplete="off">
                                     <option value="" disabled selected>Ordine</option>
                                     <option value="più recente" >Piu' recenti</option>
                                     <option value="meno recente">Meno recenti</option>
@@ -205,7 +206,7 @@ $('#orderby').on('change',() => {
     }
 
     else if(orderBy === 'visuals') {
-        let options = `<label for="order"></label><select class="select btn bg-secondary" id="order" autocomplete="off">
+        let options = `<label for="order"></label><select class="select btn bg-secondary fontcustom" id="order" autocomplete="off">
                                   <option value="" selected disabled>Ordine</option>
                                   <option value="più visual">Decrescente</option>
                                   <option value="meno visual">Crescente</option>
@@ -315,7 +316,7 @@ $('#changeReactionsForm').on('submit',(event) => {
             location.reload();
         },
         error: (error) => {
-            $('#toast-content').empty().html(error.responseJSON.mes);
+            $('#toast-content').empty().html(error.responseJSON.message);
             let toastList = inizializeToast();
             toastList.forEach(toast => toast.show()); // This show them
         }
@@ -327,7 +328,7 @@ $('#changeReactionsForm').on('submit',(event) => {
 $('#addDestinationForm').on('submit',(event) => {
     event.preventDefault();
     let destination = {
-        destType: 'keyword',
+        destType: $('#type-select option:selected').val(),
         name: $('#destination-name').val(),
     }
 
@@ -340,7 +341,7 @@ $('#addDestinationForm').on('submit',(event) => {
         },
         error: (error) => {
             console.log(error);
-            $('#toast-content').empty().html(error.responseText);
+            $('#toast-content').empty().html(error.responseJSON.message);
             let toastList = inizializeToast();
             toastList.forEach(toast => toast.show()); // This show them
         }
@@ -384,6 +385,7 @@ function getReplies(parentID) {
                     <div id="header-${reply._id}" class="card-header d-flex flex align-items-center bg-primary">
                         <div class="d-flex flex-column w-100">
                             <div class="d-flex flex-row align-items-center justify-content-start w-100">
+                               <img src="${reply.profilePicture}" alt="profile picture" style="width: 5%; aspect-ratio: 1; border-radius: 50%;" class=" m-2 ms-0" >
                                 <div class="fw-bold">@${reply.owner}</div>
                                 <div class="fw-bold ms-auto">${reply.dateOfCreation.split('T')[0]},
                                 ${reply.dateOfCreation.split('T')[1].split('.')[0]}</div>
@@ -396,7 +398,7 @@ function getReplies(parentID) {
                 let parsedText = `${reply.content}`.replace(urlRegex, function (url) {
                     return `<a class="fw-bold"  href="${url}" target="_blank">${url}</a>`;
                 })
-                content = content + `<span><p class='card-text lead' > ${parsedText} </p></span></div>`
+                content = content + `<span class="h-100 h-100"><p class='card-text lead'> ${parsedText} </p></span></div>`
                 
                 
                 content = content + `</div>`
@@ -411,19 +413,6 @@ function getReplies(parentID) {
         }
     })
 }
-
-
-// Usata per testare
-function addReply(parent) {
-    $.ajax({
-        url: '/db/reply',
-        data: {owner: User, content: "Ciao bel post di merda https://www.youtube.com/", parentid: parent},
-        type: 'POST',
-        success: (data) => {
-        }
-    })
-}
-
 
 
 $(document).ready(() => {

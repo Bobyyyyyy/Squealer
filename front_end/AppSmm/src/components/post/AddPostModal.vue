@@ -1,9 +1,9 @@
 <script setup>
   import 'vue-toast-notification/dist/theme-sugar.css';
-  import {computed, onMounted, reactive, ref} from "vue";
+  import {computed, onMounted, reactive, ref, watch} from "vue";
   import Map from "./Map.vue";
   import {blob2base64, compressBlob, parse2timestamp, setupBeep} from "../../utils/functions.js";
-  import {URLHTTPREGEX} from "../../utils/config.js";
+  import {F_QUOTA, MAX_TEXT_LENGTH, URLHTTPREGEX} from "../../utils/config.js";
   import {useStore} from "vuex";
   import Select from "../Select.vue";
   import {useToast} from "vue-toast-notification";
@@ -23,7 +23,10 @@
 
   function closeModal(addedPost, post) {
     emits('restoreSideBar');
-    if(addedPost) emits('addedPost', post);
+    if(addedPost) {
+      post.post.profilePicture = vip.value.profilePic;
+      emits('addedPost', post);
+    }
     modalState.post.hide()
   }
 
@@ -43,13 +46,13 @@
   const receivers = ref('')
   const receiverArr = computed(()=> receivers.value.replaceAll(" ","").split(','))
   const inChannel = computed(()=> {
-    return !!receiverArr.value.find(el => el.startsWith('§'));
+    return !!receiverArr.value.find(el => el.startsWith('§') || el.startsWith('#'));
   });
   const typeSelect = ref();
 
   /* TIMED MESSAGE */
   const timed = ref(false);
-  const numberOfRepetitions = ref(0);
+  const numberOfRepetitions = ref(1);
   const typeFrequency = ref('select Frequency')
   const numFrequency = ref(0);
 
@@ -89,56 +92,59 @@
   const quota2remove = computed(() => (postType.value === 'text' ? textSqueal.value.length : 125)
       * (timed.value && numberOfRepetitions.value > 1 ? parseInt(numberOfRepetitions.value) : 1)
   );
-  /* 15 è il valore tolto per immagine e geolocalizzazione */
-  const getLiveDQuota = computed(()=> (store.getters.getQuota.daily - (inChannel.value ? quota2remove.value : 0)));
-  const getLiveWQuota = computed(()=> (store.getters.getQuota.weekly - (inChannel.value ? quota2remove.value : 0)));
-  const getLiveMQuota = computed(()=> (store.getters.getQuota.monthly - (inChannel.value ? quota2remove.value : 0)));
+  const quota = computed(() => store.getters.getQuota);
+  const getLiveDQuota = computed(()=> (quota.value.daily - (inChannel.value ? quota2remove.value : 0)));
+  const getLiveWQuota = computed(()=> (quota.value.weekly - ((inChannel.value ? quota2remove.value : 0) - (getLiveDQuota.value < 0 ? getLiveDQuota.value : 0))));
+  const getLiveMQuota = computed(()=> (quota.value.monthly - ((inChannel.value ? quota2remove.value : 0) - (getLiveWQuota.value < 0 ? getLiveWQuota.value : 0))));
+  const disabled = computed(() => ((quota.value.daily === 0 || quota.value.weekly === 0 || quota.value.monthly === 0) && inChannel.value));
+  const maxTextLength = computed(() => (inChannel.value ? Math.floor(((Math.min(MAX_TEXT_LENGTH, quota.value.daily, quota.value.weekly, quota.value.monthly) + F_QUOTA )/numberOfRepetitions.value)) : MAX_TEXT_LENGTH));
 
+  watch(maxTextLength, () => {
+    if (textSqueal.value.length > maxTextLength.value){
+      textSqueal.value = textSqueal.value.substring(0,maxTextLength.value);
+    }
+  })
 
   function parseDestinations(){
     let dest = [];
-    let tags = []
     receiverArr.value.forEach(receiver => {
-      if(receiver.startsWith('#')){
-        tags.push(receiver.substring(1));
-      }
-      else{
-        dest.push({
-          name: receiver.substring(1),
-          destType: receiver.startsWith('§') ? 'channel' : receiver.startsWith('@') ? 'user' : 'errore',
-        })
-      }
-
+      dest.push({
+        name: receiver.substring(1),
+        destType: receiver.startsWith('§') ? 'channel' : receiver.startsWith('@') ? 'user' : receiver.startsWith('#') ? 'keyword': 'errore',
+      })
     })
-    return [dest, tags];
+    return dest;
   }
 
   async function createPost() {
     try {
-
-      let tags = [];
+      if (disabled.value){
+        throw new Error('quota 0. Acquista quota per continuare');
+      }
+      let dest = parseDestinations(receiverArr.value);
 
       if (postType.value === 'text') {
-        tags = textSqueal.value.match(/\#\w+/g)
-        if (tags) tags = tags.map(el => el.substring(1));
+        let tags = textSqueal.value.match(/\#\w+/g);
+        if (tags) tags.forEach(tag => {
+          dest.push({
+            name: tag.substring(1),
+            destType: 'keyword',
+          })
+        })
       }
-
-      let [tmpDest, tmpTags] = parseDestinations(receiverArr.value);
-      if (tmpTags?.length > 0) tags = tags.concat(tmpTags);
       //remove duplicates
-      if (tags?.length > 0) tags = tags.filter((tag, index) => tags.indexOf(tag) === index);
+      if (dest.length > 0) dest = dest.filter((dst, index) => dest.indexOf(dst) === index);
 
       let post = {
         creator: vip.value.name,
         contentType: postType.value,
         dateOfCreation: Date.now(),
-        destinations: tmpDest,
+        destinations: dest,
         timed: timed.value,
         ...(timed) && {
           squealNumber: numberOfRepetitions.value,
           millis: parse2timestamp([numFrequency.value.toString(), typeFrequency.value]),
         },
-        ...(tags !== []) && {tags: tags}
       }
 
 
@@ -182,12 +188,11 @@
         }
       }
       else{
-        throw res;
+        throw await res.json()
       }
     }
     catch (err){
-      let message = await err.json()
-        $toast.error(message);
+      $toast.error(err.message);
     }
   }
 
@@ -269,7 +274,7 @@
                   </div>
                 <div class="mt-2 m-lg-1 preview-size" >
 
-                  <textarea v-if=" postType==='text'" rows="6" v-model="textSqueal" maxlength="500" placeholder="cosa pensi?"  class="form-control"></textarea>
+                  <textarea v-if=" postType==='text'" rows="6" v-model="textSqueal" :maxlength="maxTextLength" placeholder="cosa pensi?"  class="form-control" :disabled="disabled"></textarea>
                   <div v-if="!!link && activeChoiceLink" class="d-flex flex-row mt-3 mb-2 align-items-center">
                     <h5 class="fw-light m-0">E' stato rilevato un link. Preferisci crearne uno breve? </h5>
                     <button type="button" class="btn btn-outline-success ms-3 btn-sm " style="width: 5%"
@@ -291,7 +296,7 @@
                     <div class="d-flex flex-column w-100 mt-3">
                       <div class="d-flex flex-row align-items-center">
                         <div class="input-group d-flex flex-row">
-                          <input class="form-control" :disabled="Object.keys(fileUploaded).length !== 0"  type="text" placeholder="inserisci URL foto" id="pathImgForm" v-model="imgPath" >
+                          <input class="form-control" :disabled="Object.keys(fileUploaded).length !== 0 || disabled"  type="text" placeholder="inserisci URL foto" id="pathImgForm" v-model="imgPath" >
                           <button :disabled="Object.keys(fileUploaded).length !== 0" type="button" class="btn btn-secondary" @click=" currentImgPath = imgPath; showImg = true">
                             Anteprima
                           </button>
@@ -300,7 +305,7 @@
                       <h6 class="m-0 mt-2 mb-2 text-center">oppure</h6>
                       <div class="d-flex flex-row align-items-center">
                         <label for="formFile" class="form-label flex-shrink-0 mb-0 me-2">carica una foto</label>
-                        <input :disabled="!canUploadFile" class="form-control" type="file" id="formFile" accept="image/png, image/jpeg"
+                        <input :disabled="!canUploadFile || disabled" class="form-control" type="file" id="formFile" accept="image/png, image/jpeg"
                                @change="(event) => showPreviewUploaded(event)">
                       </div>
                     </div>
@@ -366,7 +371,7 @@
                   <div class="d-flex flex-row justify-content-between justify-content-lg-end flex-fill align-items-end">
                     <button type="button" class="btn btn-danger m-1"
                             @click="closeModal(false); reset()">Indietro</button>
-                    <button type="submit" class="btn btn-primary m-1" > Crea Squeal </button>
+                    <button type="submit" class="btn btn-primary m-1" :disabled="getLiveDQuota < - F_QUOTA || getLiveWQuota < - F_QUOTA || getLiveMQuota < - F_QUOTA"> Crea Squeal </button>
                   </div>
                 </div>
 

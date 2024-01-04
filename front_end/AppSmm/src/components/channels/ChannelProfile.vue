@@ -10,6 +10,8 @@
   import AddAdminHandler from "./AddAdminHandler.vue";
   import DeleteAdminHandler from "./DeleteAdminHandler.vue";
   import RequestHandler from "./RequestHandler.vue";
+  import DeleteChannelModal from "./DeleteChannelModal.vue";
+  import ProfilePicModal from "./ProfilePicModal.vue";
 
   const store = useStore();
 
@@ -28,6 +30,8 @@
   const addAdminModal = ref();
   const deleteAdminModal = ref();
   const requestModal = ref();
+  const deleteChannelModal = ref();
+  const changeProfilePic = ref();
 
   let query = ''
 
@@ -97,7 +101,7 @@
     let res = await fetch(`/db/channel/${name}`,{
       method:'GET'
     });
-    channel.value = await res.json();;
+    channel.value = await res.json();
     readyChannel.value = true;
     query =`name=${vip.value.name}&channel=${name}&smm=${true}&limit=12`;
 
@@ -120,7 +124,7 @@
       <div class="d-flex flex-column">
         <div class="d-flex flex-row justify-content-center w-100">
           <div class="maxWidth">
-            <img :src="channel.profilePicture" class="img-fluid rounded-circle" alt="gatto che ormai ha stufato">
+            <img :src="channel.profilePicture" class="img-fluid rounded-circle h-100 object-fit-cover" alt="immagine profilo canale" @click="changeProfilePic.openModal">
           </div>
         </div>
         <h2 class="m-1 text-center">{{ channel.name }}</h2>
@@ -142,6 +146,7 @@
           <button v-if="channel.type === 'private'" type="button"  class="btn btn-primary ms-2" @click="requestModal.openModal">Richieste</button>
           <button v-if="channel.creator === vip.name" type="button" class="btn btn-primary ms-2" @click="addAdminModal.openModal">Aggiungi admin</button>
           <button v-if="channel.creator === vip.name" type="button" class="btn btn-primary ms-2" @click="deleteAdminModal.openModal">Rimuovi admin</button>
+          <button v-if="channel.creator === vip.name" type="button" class="btn btn-danger ms-2" @click="deleteChannelModal.openModal">Elimina canale</button>
         </div>
 
         <div class="d-flex flex-row justify-content-end">
@@ -169,23 +174,28 @@
       <div v-if="readyPosts" class="d-flex flex-row flex-wrap justify-content-around mt-3">
         <Post v-for="(post,i) in squeals" :key="post._id"
               :post="post"
-              :dest= "parseDestinationsViewPost(post.destinationArray, post.officialChannelsArray, post.tags)"
+              :dest= "parseDestinationsViewPost(post.destinationArray, post.officialChannelsArray)"
               :numberOfPost="i"
-              picProfile = "/img/defaultUser.jpeg"
+              :picProfile = "post.profilePicture"
         />
       </div>
+
+      <RequestHandler ref="requestModal" :chname="channel.name" :requests="channel.requests" @updateFollowers="(user,accepted) => updateRequests(user,accepted)" />
+      <DeleteAdminHandler ref="deleteAdminModal" :chname="channel.name" :admins="channel.admins" @updateAdmin="admin => updateAfterDelete(admin)"/>
+      <AddAdminHandler ref="addAdminModal" :followers="channel.followers" :chname="channel.name" @updateAdmin="admin => updateAfterInsert(admin)" />
+      <PermissionHandler ref="permissionModal" :followers="channel.followers" :chname="channel.name" />
+      <DeleteChannelModal ref="deleteChannelModal" :channelName="channel.name" />
+      <ProfilePicModal ref="changeProfilePic" :channelName="channel.name" @profilePic="(img) => channel.profilePicture = img"/>
     </div>
     <Spinner v-else />
   </div>
-  <RequestHandler ref="requestModal" :chname="channel.name" :requests="channel.requests" @updateFollowers="(user,accepted) => updateRequests(user,accepted)" />
-  <DeleteAdminHandler ref="deleteAdminModal" :chname="channel.name" :admins="channel.admins" @updateAdmin="admin => updateAfterDelete(admin)"/>
-  <AddAdminHandler ref="addAdminModal" :followers="channel.followers" :chname="channel.name" @updateAdmin="admin => updateAfterInsert(admin)" />
-  <PermissionHandler ref="permissionModal" :followers="channel.followers" :chname="channel.name" />
+
 </template>
 
 <style scoped>
   .maxWidth{
     max-width:  20vh;
+    aspect-ratio: 1;
   }
   @media screen and (max-width: 768px){
     .btn{

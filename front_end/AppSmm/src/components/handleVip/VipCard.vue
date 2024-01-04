@@ -41,7 +41,7 @@
       <div v-if="!noPost" class="d-flex flex-row justify-content-center">
         <Post
             :post="post"
-            :dest= "parseDestinationsViewPost(post.destinationArray, post.officialChannelsArray, post.tags)"
+            :dest= "parseDestinationsViewPost(post.destinationArray, post.officialChannelsArray)"
             :numberOfPost="1"
             :picProfile = "srcImage"
         />
