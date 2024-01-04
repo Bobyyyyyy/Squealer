@@ -111,7 +111,7 @@ body {
 /* Computer */
 @media (min-width: 768px) {
     .button-action, .button-submit, .button-delete {
-        max-width: 12rem;
+        max-width: fit-content;
         align-self: center;
     }
 }

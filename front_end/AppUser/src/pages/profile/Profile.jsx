@@ -86,10 +86,12 @@ function Profile () {
     }, [updatedSmm]);
 
     useEffect(() => {
+        setIsLoading(true);
         getQuotaByUsername(name)
             .then((res) => {
                 setQuota(res);
                 setUpdatedQuota(false);
+                setIsLoading(false);
             })
     }, [updatedQuota])
 

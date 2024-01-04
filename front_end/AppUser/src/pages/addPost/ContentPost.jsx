@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from "react";
 import Mappa from "../../components/posts/maps/Mappa.jsx";
 import {ArrowRightIcon} from "../../components/assets/index.jsx";
+
 function ContentPost({type, quota, currentQuota, setCurrentQuota,
                          content, setContent, setImgAsFile, position, setPosition,
                          destinations, handleError, isQuotaNegative}) {
@@ -14,12 +15,13 @@ function ContentPost({type, quota, currentQuota, setCurrentQuota,
     const [isShorterLink, setIsShorterLink] = useState(false);
     const [textLink, setTextLink] = useState([]);
 
-    const quotaForImg = 125;
+    const QUOTA_FOR_IMAGE = 125;
+    const EXTRA_CHARACTERS = 50;
     const URLHTTPREGEX = /(http|ftp|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-])/g
 
     const handleQuotaChange = (e, type) => {
         if (has2removeQuota()) {
-            const quota2remove = (type === "text") ? e.target.value.length : quotaForImg;
+            const quota2remove = (type === "text") ? e.target.value.length : QUOTA_FOR_IMAGE;
             updateQuota(quota2remove)
         }
     }
@@ -28,15 +30,30 @@ function ContentPost({type, quota, currentQuota, setCurrentQuota,
         return destinations.includes("§");
     }
 
-    const updateQuota = (quota2remove) => {
-        let remainingDquota =  quota.characters.daily - quota2remove;
-        let remainingWquota = quota.characters.weekly + ((remainingDquota < 0) ? remainingDquota : 0);
-        let remainingMquota = quota.characters.monthly + ((remainingWquota < 0) ? remainingWquota : 0);
+    const isCurrentQuotaNegative = () => {
+        return currentQuota?.weekly < 0 || isQuotaNegative();
+    }
 
-        handleError(remainingMquota < 0? "hai finito la quota mensile" : "");
+    const updateQuota = (quota2remove) => {
+
+        let remainingDquota =  quota.characters.daily - quota2remove;
+        let remainingWquota = quota.characters.weekly  - quota2remove;
+        let remainingMquota = quota.characters.monthly  - quota2remove;
+
+        if (remainingDquota <= 0 ) {
+            let extraQuota2remove = Math.abs(2*remainingDquota);
+            remainingWquota -= extraQuota2remove;
+            if (extraQuota2remove <= EXTRA_CHARACTERS && remainingWquota >= 0) {
+                // può utilizzare un numero massimo di EXTRA_CHARACTERS
+                handleError("");
+            } else {
+                handleError("Hai finito anche i caratteri extra");
+            }
+        } else if (!isQuotaNegative()){
+            handleError("");
+        }
 
         remainingDquota = (remainingDquota < 0) ? 0 : remainingDquota;
-        remainingWquota = (remainingWquota < 0) ? 0 : remainingWquota;
         setCurrentQuota({
             daily: remainingDquota,
             weekly: remainingWquota,
@@ -61,14 +78,20 @@ function ContentPost({type, quota, currentQuota, setCurrentQuota,
         setTextLink([]);
         setHasLink(false);
         setIsShorterLink(false);
+        setShowCounter(has2removeQuota());
+
         if (has2removeQuota()) {
             if (type === "geolocation") {
-                updateQuota(quotaForImg);
+                updateQuota(QUOTA_FOR_IMAGE);
                 setContent(position);
             } else {
-                updateQuota((type !== "text" && !!content) ? quotaForImg : content.length);
+                updateQuota((type !== "text" && !!content) ? QUOTA_FOR_IMAGE : content.length);
+            }
+            if (isQuotaNegative()) {
+                handleError('Hai finito la quota');
             }
         } else {
+            handleError('');
             updateQuota(0);
             if (type === "geolocation") {
                 setContent(position);
@@ -84,11 +107,6 @@ function ContentPost({type, quota, currentQuota, setCurrentQuota,
         }, 200)
     }, [content]);
 
-
-    useEffect(() => {
-        setShowCounter(destinations.includes("§"))
-    }, [destinations]);
-
     return (
         <>
             <div className="flex justify-between items-center mb-2">
@@ -96,7 +114,7 @@ function ContentPost({type, quota, currentQuota, setCurrentQuota,
                     Contenuto
                 </span>
                 {!!currentQuota && showCounter &&
-                    <div className={`text-base md:text-xl text-white bg-${isQuotaNegative() ? "red-600" : "green-600"} rounded-xl p-2 quotaCounter ${counterActive && "active"}`}>
+                    <div className={`text-base md:text-xl text-white bg-${isCurrentQuotaNegative() ? "red-600" : "green-600"} rounded-xl p-2 quotaCounter ${counterActive && "active"}`}>
                         {currentQuota.daily}/{currentQuota.weekly}/{currentQuota.monthly}
                     </div>
                 }

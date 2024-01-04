@@ -128,12 +128,10 @@ function SinglePageNormalChannel() {
     useEffect(() => {
         resetPosts(setPosts, currentOffset, lastRequestLength, lastHeightDiv);
         document.addEventListener('scroll', scrollEndDetector, false);
-        console.log("Nome cambiato", nome);
         currentNome.current = nome;
         fetchPosts()
             .catch(console.error);
         return () => {
-            console.log("COMPOENTE RIMOSSO", nome)
             document.removeEventListener('scroll', scrollEndDetector);
         }
     }, [canSeePosts, nome]);
@@ -258,26 +256,24 @@ function SinglePageNormalChannel() {
                         }
                         </div>
                     }
-                    <div className={"flex flex-wrap w-full gap-8 items-center justify-center h-full pb-20 mt-4 overflow-y-scroll"}>
-                        {type === "private" && (role === "Not Follower" || role === "Pending")? (
-                            <div>
-                                Non puoi ancora vedere i post
+                    {type === "private" && (role === "Not Follower" || role === "Pending")? (
+                        <div>
+                            Non puoi ancora vedere i post
+                        </div>
+                        ) : (
+                            <div className="flex flex-wrap w-full gap-8 items-center justify-center pb-20 overflow-y-scroll mt-4" id="postDiv">
+                                {posts!==null && posts.map((post)=> {
+                                    return(
+                                            <Post
+                                                key={post._id}
+                                                post={post}
+                                            />
+                                    )})}
+                                {posts.length===0 &&
+                                    <p className="text-center">Non ci sono ancora post indirizzati al canale {nome}</p>
+                                }
                             </div>
-                            ) : (
-                                <div className="flex flex-wrap w-full gap-8 items-center justify-center pb-20 overflow-y-scroll mt-4" id="postDiv">
-                                    {posts!==null && posts.map((post)=> {
-                                        return(
-                                                <Post
-                                                    key={post._id}
-                                                    post={post}
-                                                />
-                                        )})}
-                                    {posts.length===0 &&
-                                        <p className="text-center">Non ci sono ancora post indirizzati al canale {nome}</p>
-                                    }
-                                </div>
-                        )}
-                    </div>
+                    )}
                 </div>
             )}
         </>

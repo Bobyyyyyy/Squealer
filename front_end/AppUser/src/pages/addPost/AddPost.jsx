@@ -1,11 +1,7 @@
 import ContentPost from "./ContentPost.jsx";
 import {useEffect, useState} from "react";
 import {SubmitIcon} from "../../components/assets/index.jsx";
-import {
-    getQuotaByUsername,
-    getUsernameFromSessionStore,
-    setToastNotification
-} from "../../utils/usefulFunctions.js";
+import {getQuotaByUsername, getUsernameFromSessionStore, setToastNotification} from "../../utils/usefulFunctions.js";
 
 import {blob2base64, compressBlob, getEmbed} from "../../utils/imageFunctions.js";
 import TimedPost from "./TimedPost.jsx";
@@ -19,8 +15,10 @@ function AddPost(){
     const [content, setContent] = useState('');
     const [imgAsFile, setImgAsFile] = useState();
     const [position, setPosition] = useState(null);
-    const [quota,setQuota] = useState();
+
+    const [quota, setQuota] = useState(null);
     const [currentQuota, setCurrentQuota] = useState();
+
     const [error, setError] = useState('');
 
     const [isTimed, setIsTimed] = useState(false);
@@ -75,6 +73,7 @@ function AddPost(){
             setError("Inserisci @ o § nei destinatari");
             canSend = false;
         } else if (isQuotaNegative()) {
+            setError("Hai finito la quota");
             canSend = false;
         } else if (isMyUsername(destinations)) {
             setError("Non puoi inviare messaggi a te stesso")
@@ -96,7 +95,7 @@ function AddPost(){
     }
 
     const isQuotaNegative = () => {
-        return currentQuota?.monthly < 0;
+        return quota.characters.daily <= 0 || quota.characters.weekly <= 0 || quota.characters.monthly <= 0;
     }
 
     async function createPost() {
@@ -195,19 +194,10 @@ function AddPost(){
         getQuotaByUsername(username)
             .then((response) => {
                 setQuota(response);
-                setCurrentQuota(response);
+                setCurrentQuota(response.characters);
             })
     }, []);
 
-    useEffect(() => {
-        if (!isQuotaNegative()) {
-            setError('')
-        }
-    }, [content, destinations]);
-
-    useEffect(()=> {
-        console.log("num post:", numberOfPosts)
-    }, [numberOfPosts])
 
     return (
         <main className="flex flex-col items-center justify-center m-4 pb-8">
