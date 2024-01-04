@@ -55,56 +55,72 @@ function CreateChannelModal({ isOpen, setIsOpen}) {
 
 
     return (
-        <Modal show={isOpen} onClose={()=>setIsOpen(false)}>
-            <Modal.Header>Creazione nuovo canale</Modal.Header>
+        <Modal show={isOpen} onClose={() => setIsOpen(false)}>
+            <Modal.Header aria-label="Creazione nuovo canale">
+                Creazione nuovo canale
+            </Modal.Header>
             <Modal.Body>
                 <div className="mb-4">
-                    <Label className="block mb-1">Nome canale:</Label>
+                    <label className="block mb-1" htmlFor="channelName">
+                        Nome canale:
+                    </label>
                     <input
                         type="text"
+                        id="channelName"
                         className="border border-gray-300 rounded px-3 py-2 w-full"
                         value={name}
-                        onChange={(e)=>setName(e.target.value)}
+                        onChange={(e) => setName(e.target.value)}
+                        aria-label="Inserisci il nome del canale"
                     />
                 </div>
                 <div className="mb-4">
-                    <Label className="block mb-1">Descrizione:</Label>
+                    <label className="block mb-1" htmlFor="channelDescription">
+                        Descrizione:
+                    </label>
                     <input
                         type="text"
+                        id="channelDescription"
                         className="border border-gray-300 rounded px-3 py-2 w-full"
                         value={description}
-                        onChange={(e)=>setDescription(e.target.value)}
+                        onChange={(e) => setDescription(e.target.value)}
+                        aria-label="Inserisci la descrizione del canale"
                     />
                 </div>
                 <div className="flex items-center gap-2 mb-4">
                     <Radio
-                        name = "visibility"
+                        name="visibility"
                         value="private"
+                        checked={visibility === 'private'}
                         onChange={() => setVisibility('private')}
+                        aria-label="Imposta il canale come privato"
                     />
-                    <Label className="mr-4">
-                        Private
-                    </Label>
+                    <label className="mr-4">Private</label>
                     <Radio
-                        name = "visibility"
+                        name="visibility"
                         value="public"
+                        checked={visibility === 'public'}
                         onChange={() => setVisibility('public')}
+                        aria-label="Imposta il canale come pubblico"
                     />
-                    <Label>
-                        Public
-                    </Label>
+                    <label>Public</label>
                 </div>
-                    {error && <p className="text-red-500 mb-4">{error}</p>}
-                <Modal.Footer>
-                    <button
-                        className="button-action"
-                        onClick={handleSubmit}
-                    >
-                        conferma
-                    </button>
-                </Modal.Footer>
+                {error && (
+                    <p className="text-red-500 mb-4" aria-label="Errore nella creazione del canale">
+                        {error}
+                    </p>
+                )}
             </Modal.Body>
+            <Modal.Footer>
+                <button
+                    className="button-action"
+                    onClick={handleSubmit}
+                    aria-label="Conferma la creazione del canale"
+                >
+                    conferma
+                </button>
+            </Modal.Footer>
         </Modal>
+
     );
 }
 export default CreateChannelModal;

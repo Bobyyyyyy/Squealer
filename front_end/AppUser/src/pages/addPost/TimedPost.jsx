@@ -27,7 +27,7 @@ function TimedPost({numberOfPosts, setNumberOfPosts, type, setFrequencyMs, handl
         <div className="flex flex-col justify-between w-full gap-2 mb-4">
             <Interval name={`${type === "geolocation" ? "Aggiornamenti mappa" : "Numero di post"}`} min={1} value={numberOfPosts} setValue={setNumberOfPosts} handleError={handleError} />
             <span className="text-xl text-center">Frequenza</span>
-            <div className="flex flex-wrap w-full gap-4 justify-between items-center">
+            <div className="flex flex-wrap w-full gap-4 justify-between items-center" aria-label="Frequenza di aggiornamento">
                 <Interval name={"secondi"} min={0} value={seconds} setValue={setSeconds} handleError={handleError} />
                 <Interval name={"minuti"} min={0} value={minutes} setValue={setMinutes} handleError={handleError} />
                 <Interval name={"ore"} min={0} value={hours} setValue={setHours} handleError={handleError} />
@@ -46,18 +46,23 @@ function Interval({name, value, setValue, min, handleError}) {
 
     return (
         <div>
-            <label htmlFor="number-input" className="text-lg md:text-2xl mr-2">{name} :</label>
-            <input type="number" id="number-input"
-                   className="appearance-none w-20 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2"
-                   placeholder="0"
-                   value={String(value)}
-                   min={min}
-                   onChange={(e) => {
-                        setValue(e.target.value)
-                        if (e.target.value < min) {
-                            handleError(`Selezionare un valore superiore di ${min}`);
-                        }
-                   }}
+            <label htmlFor="number-input" className="text-lg md:text-2xl mr-2">
+                {name} :
+            </label>
+            <input
+                type="number"
+                id="number-input"
+                className="appearance-none w-20 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2"
+                placeholder="0"
+                value={String(value)}
+                min={min}
+                aria-label={`${name} input`}
+                onChange={(e) => {
+                    setValue(e.target.value);
+                    if (e.target.value < min) {
+                        handleError(`Selezionare un valore superiore di ${min}`);
+                    }
+                }}
             />
         </div>
     );

@@ -28,7 +28,7 @@ function ModalGeo({isOpen, setIsOpen, frequencyMs, numOfUpdates, startSending}) 
     }, [startSending]);
 
     return (
-        <Modal show={isOpen} onClose={()=>setIsOpen(false)}>
+        <Modal show={isOpen} onClose={() => setIsOpen(false)}>
             <Modal.Header>
                 Condivisione posizione
             </Modal.Header>
@@ -42,14 +42,16 @@ function ModalGeo({isOpen, setIsOpen, frequencyMs, numOfUpdates, startSending}) 
                         size="lg"
                         labelProgress
                         labelText
+                        aria-label="Progresso di invio della posizione"
                     />
                     <div className="flex flex-col flex-wrap w-full gap-4 text-md font-normal justify-center items-center">
                         <p>
-                            Mentre condividi la posizione <span className="font-semibold">non puoi lasciare questa pagina</span>,
-                            altrimenti la <span className="font-semibold">condivisione verrà intrerrotta</span>
+                            Mentre condividi la posizione{" "}
+                            <span className="font-semibold">non puoi lasciare questa pagina</span>, altrimenti la{" "}
+                            <span className="font-semibold">condivisione verrà interrotta</span>
                         </p>
                         <p>
-                            Una volta che la condivisione sarà terminata verra' riportata alla home
+                            Una volta che la condivisione sarà terminata verrà riportata alla home
                         </p>
                     </div>
                 </div>

@@ -213,9 +213,10 @@ function AddPost(){
                     </div>
                     <input
                         type="text"
-                        className="border-2 border-gray-500  rounded-md w-full focus:border-teal-500 focus:ring-teal-500 "
+                        className="border-2 border-gray-500 rounded-md w-full focus:border-teal-500 focus:ring-teal-500"
                         placeholder="@Pippo42, §calcetto"
                         onChange={e => setDestinations(e.target.value)}
+                        aria-label="Inserisci i destinatari del post"
                     />
                 </div>
                 {/* TIPO DI CONTENUTO DEL POST */}
@@ -227,6 +228,7 @@ function AddPost(){
                             setType(e.target.value)
                             setContent('');
                         }}
+                        aria-label="Seleziona la tipologia del post"
                     >
                         <option value="text">Testo</option>
                         <option value="image">Immagine</option>
@@ -240,20 +242,21 @@ function AddPost(){
                         type={type} content={content} setContent={setContent} destinations={destinations}
                         quota={quota} currentQuota={currentQuota} setCurrentQuota={setCurrentQuota}
                         setImgAsFile={setImgAsFile} position={position} setPosition={setPosition}
-                        handleError={handleError}  isQuotaNegative={isQuotaNegative}
+                        handleError={handleError} isQuotaNegative={isQuotaNegative}
                     />
                 }
                 <div className="flex items-center gap-4 mt-4">
                     <input
                         type="checkbox" checked={isTimed} onChange={() => setIsTimed((prev) => !prev)}
                         className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                        id="timedCheckbox"
                     />
-                        <label
-                            htmlFor="default-checkbox"
-                            className="text-xl md:text-2xl"
-                        >
-                            Messaggio temporizzato
-                        </label>
+                    <label
+                        htmlFor="timedCheckbox"
+                        className="text-xl md:text-2xl"
+                    >
+                        Messaggio temporizzato
+                    </label>
                 </div>
             </div>
             {isTimed && type === "text" && <>{infoTimedText}</>}
