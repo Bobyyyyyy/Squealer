@@ -15,7 +15,7 @@ const addUser = async (req, res,next) => {
         }
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
-            res.status(Error.statusCode).send(Error.message);
+            res.status(Error.statusCode).send({message: Error.message});
         else {
             res.status(500).send(Error);
         }
@@ -32,7 +32,7 @@ const resetPswd = async (req,res) => {
         res.status(200).send(await userModel.checkSecurityAnswer(user,answer,password));
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
-            res.status(Error.statusCode).send(Error.message);
+            res.status(Error.statusCode).send({message: Error.message});
         else {
             res.status(500).send(Error);
         }
@@ -44,7 +44,7 @@ const searchUser = async (req,res) => {
         res.send(await userModel.searchByUsername(req.body));
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
-            res.status(Error.statusCode).send(Error.message);
+            res.status(Error.statusCode).send({message: Error.message});
         else {
             res.status(500).send(Error);
         }
@@ -59,7 +59,7 @@ const changePassword = async (req,res) => {
         res.send(await userModel.changePwsd(username, currentPsw, newPsw));
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
-            res.status(Error.statusCode).send(Error.message);
+            res.status(Error.statusCode).send({message: Error.message});
         else {
             res.status(500).send(Error);
         }
@@ -71,7 +71,7 @@ const getSessionUser = async (req,res) => {
         res.send({username: req.session.user});
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
-            res.status(Error.statusCode).send(Error.message);
+            res.status(Error.statusCode).send({message: Error.message});
         else {
             res.status(500).send(Error);
         }
@@ -83,7 +83,7 @@ const getUserProfileByName = async (req,res) => {
         res.send(await userModel.getUserProfilePicture(req.query.name));
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
-            res.status(Error.statusCode).send(Error.message);
+            res.status(Error.statusCode).send({message: Error.message});
         else {
             res.status(500).send(Error);
         }
@@ -95,7 +95,7 @@ const updateUserProfilePic = async (req, res) => {
         res.send(await userModel.updateProfilePicture(req.session.user, req.body.newProfilePic));
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
-            res.status(Error.statusCode).send(Error.message);
+            res.status(Error.statusCode).send({message: Error.message});
         else {
             res.status(500).send(Error);
         }
@@ -109,7 +109,7 @@ const updateSessionVip = async (req,res) => {
         res.send({vip: req.session.vip})
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
-            res.status(Error.statusCode).send(Error.message);
+            res.status(Error.statusCode).send({message: Error.message});
         else {
             res.status(500).send(Error);
         }
@@ -124,7 +124,7 @@ const smm2userSession = async (req,res) => {
     }
     catch(err){
         if(typeof err.statusCode !== 'undefined')
-            res.status(err.statusCode).send(err.message);
+            res.status(err.statusCode).send({message: err.message});
         else {
             res.status(500).send(err);
         }
@@ -140,7 +140,7 @@ const modifyUser = async(req,res) => {
         res.send(await userModel.altUser(req.body));
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
-            res.status(Error.statusCode).send(Error.message);
+            res.status(Error.statusCode).send({message: Error.message});
         else {
             res.status(500).send(Error);
         }
@@ -152,7 +152,7 @@ const getAllUsers = async (req,res) => {
         res.status(200).send(await userModel.getUsers(req.query));
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
-            res.status(Error.statusCode).send(Error.message);
+            res.status(Error.statusCode).send({message: Error.message});
         else {
             res.status(500).send(Error);
         }
@@ -164,7 +164,7 @@ const getSingleUser = async (req, res) => {
         res.status(200).send(await userModel.getSingleUser(req.query));
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
-            res.status(Error.statusCode).send(Error.message);
+            res.status(Error.statusCode).send({message: Error.message});
         else {
             res.status(500).send(Error);
         }
@@ -176,7 +176,7 @@ const getUsersNumber = async (req,res) => {
         res.send(await userModel.usersLength(req.query));
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
-            res.status(Error.statusCode).send(Error.message);
+            res.status(Error.statusCode).send({message: Error.message});
         else {
             res.status(500).send(Error);
         }
@@ -188,7 +188,7 @@ const getVips = async (req,res) => {
         res.send(await userModel.getHandledVip(req.query));
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
-            res.status(Error.statusCode).send(Error.message);
+            res.status(Error.statusCode).send({message: Error.message});
         else {
             res.status(500).send(Error);
         }
@@ -201,7 +201,7 @@ const getQuota = async (req,res) => {
         res.send(await userModel.getUserQuota(username));
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
-            res.status(Error.statusCode).send(Error.message);
+            res.status(Error.statusCode).send({message: Error.message});
         else {
             res.status(500).send(Error);
         }
@@ -236,7 +236,7 @@ const updateMaxQuota = async(req,res) => {
             });
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
-            res.status(Error.statusCode).send(Error.message);
+            res.status(Error.statusCode).send({message: Error.message});
         else {
             res.status(500).send(Error);
         }
@@ -257,7 +257,7 @@ const updateRemainingQuota = async(req,res) => {
         );
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
-            res.status(Error.statusCode).send(Error.message);
+            res.status(Error.statusCode).send({message: Error.message});
         else {
             res.status(500).send(Error);
         }
@@ -269,7 +269,7 @@ const getFollnPosts = async(req,res)=> {
         res.send(await userModel.get_n_FollnPosts(req.query));
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
-            res.status(Error.statusCode).send(Error.message);
+            res.status(Error.statusCode).send({message: Error.message});
         else {
             res.status(500).send(Error);
         }
@@ -282,7 +282,7 @@ const getLastPost = async(req,res)=> {
         res.send({post: response});
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
-            res.status(Error.statusCode).send(Error.message);
+            res.status(Error.statusCode).send({message: Error.message});
         else {
             res.status(500).send(Error);
         }
@@ -296,7 +296,7 @@ const clearDB = async (req,res) => {
         res.status(200).send('PIPPO');
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
-            res.status(Error.statusCode).send(Error.message);
+            res.status(Error.statusCode).send({message: Error.message});
         else {
             res.status(500).send(Error);
         }
@@ -308,7 +308,7 @@ const deleteUser = async (req,res) => {
         res.status(200).send(await userModel.deleteUser(req.params.username));
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
-            res.status(Error.statusCode).send(Error.message);
+            res.status(Error.statusCode).send({message: Error.message});
         else {
             res.status(500).send(Error);
         }
@@ -320,7 +320,7 @@ const getAllSmm = async (req, res) => {
         res.status(200).send(await userModel.getAllSmm(req.query));
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
-            res.status(Error.statusCode).send(Error.message);
+            res.status(Error.statusCode).send({message: Error.message});
         else {
             res.status(500).send(Error);
         }
@@ -335,7 +335,7 @@ const hireSmm = async (req, res) => {
         res.status(200).send(await userModel.hireSmm(vipUsername, smmUsername, isHiring));
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
-            res.status(Error.statusCode).send(Error.message);
+            res.status(Error.statusCode).send({message: Error.message});
         else {
             res.status(500).send(Error);
         }
