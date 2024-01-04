@@ -41,7 +41,7 @@ const addUser = async (body) => {
             maxQuota: body.type === 'mod' ? {daily: null, weekly: null, monthly: null} : quota,
             popularity: body.type === 'mod' ? null : 0,
             unpopularity: body.type === 'mod' ? null : 0,
-            backupAnswer: body.answer.trim(),
+            backupAnswer: body.answer ? body.answer.trim() : null,
         });
 
 

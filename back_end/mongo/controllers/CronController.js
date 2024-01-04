@@ -89,7 +89,6 @@ const createOfficialScheduledPost = async(canale, endpoint) => {
     try{
         await UMM.addUser({
             name: creator,
-            //TODO: GENERATA CASUALMENTE
             password: (Math.random() + 1).toString(36).substring(2),
             // Non ci può accedere nessuno, scelta implementativa.
             type:'mod'

@@ -196,8 +196,7 @@ const addPost = async (post,quota) => {
                 throw createError("canale non esistente!", 400);
             }
             /* canale ufficiale non esiste e l'utente non mod*/
-            else if (destinationType === 'official' && (!(await ReservedChannel.findOne({name: destination.name}))
-                || creator.typeUser !== 'mod')) {
+            else if (destinationType === 'official' && (!(await ReservedChannel({name: destination.name})) || (creator.typeUser !== 'mod'))) {
                 throw createError("canale ufficiale non esistente o utente non moderatore!", 400);
             }
             /* tipo di destinatario non inserito */

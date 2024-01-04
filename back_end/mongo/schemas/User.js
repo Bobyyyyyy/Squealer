@@ -85,7 +85,7 @@ const UserSchema = new mongoose.Schema({
 
     backupAnswer: {
         type: String,
-        required: true
+        required: false
     }
 
 })
