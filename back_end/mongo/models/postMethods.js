@@ -430,6 +430,172 @@ const getAllPost = async (query,sessionUser) =>{
     }
 }
 
+/**
+ *
+ * @param {String} user
+ * @param {Number} limit
+ * @param {Number} offset
+ * @return {Promise<void>}
+ */
+const getPostHome = async (user , limit, offset) => {
+    try{
+
+        await connection.get();
+
+        let posts = await Post.aggregate([
+            {
+                $lookup: {
+                    from: "channels",
+                    pipeline: [
+                        {
+                            $match: {
+                                $or: [
+                                    { creator: user },
+                                    { admins: { $in: [user] } },
+                                    {
+                                        followers: { $in: [{ user: user }] },
+                                    },
+                                ],
+                            },
+                        },
+                        {
+                            $project: {
+                                name: "$name",
+                            },
+                        },
+                    ],
+                    as: "channel_info",
+                },
+            },
+            {
+                $lookup: {
+                    from: "officialChannels",
+                    pipeline: [
+                        {
+                            $match: {
+                                silenced: { $in: [user] }
+                            },
+                        },
+                        {
+                            $project: {
+                                name: "$name",
+                            },
+                        },
+                    ],
+                    as: "silenced_official",
+                },
+            },
+            {
+              $unwind:{
+                  path: '$channel_info',
+              },
+            },
+            {
+                $match: {
+                    $expr: {
+                        $and:[
+                            {
+                                $not: [
+                                    {
+                                        $eq: ["$owner", user],
+                                    },
+                                ],
+                            },
+                            {
+                                $or: [
+                                    {
+                                        $and: [
+                                            {
+                                                $in: [
+                                                    "channel",
+                                                    "$destinationArray.destType",
+                                                ],
+                                            },
+                                            {
+                                                $in: [
+                                                    "$channel_info.name",
+                                                    "$destinationArray.name",
+                                                ],
+                                            },
+                                        ],
+                                    },
+                                    {
+                                        $in:["keyword", "$destinationArray.destType"]
+                                    },
+                                    {
+                                        $and:[
+                                            {
+                                                $gt:[{$size:"$officialChannelsArray"}, 0],
+                                            },
+                                            {
+                                                $not:{
+                                                    $eq:[
+                                                        {
+                                                            $size:{
+                                                                $filter: {
+                                                                    input: '$silenced_official',
+                                                                    as: 'off_sil',
+                                                                    cond:{
+                                                                        $in:['$$off_sil.name', '$officialChannelsArray']
+                                                                    }
+                                                                }
+                                                            },
+                                                        },
+                                                        {
+                                                            $size: '$officialChannelsArray',
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ],
+                            }
+                        ]
+
+                    }
+                }
+            },
+            {$sort: sorts['più recente']},
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "owner",
+                    foreignField: "username",
+                    as: "user_info",
+                },
+            },
+            {
+                $unwind: "$user_info",
+            },
+            {
+                $project:{
+                    owner: '$owner',
+                    destinationArray: '$destinationArray',
+                    officialChannelsArray: '$officialChannelsArray',
+                    category: '$category',
+                    popularity: '$popularity',
+                    contentType: '$contentType',
+                    content: '$content',
+                    reactions: '$reactions',
+                    dateOfCreation: '$dateOfCreation',
+                    criticalMass: '$criticalMass',
+                    views: '$views',
+                    views_count: {$size: '$views'},
+                    profilePicture: '$user_info.profilePicture',
+                }
+            },
+            {$skip: parseInt(offset)},
+            {$limit: parseInt(limit)},
+        ])
+
+        return posts;
+
+    }catch (err){
+        throw err;
+    }
+}
+
 
 const removeDestination = async (destination,postID)=> {
     try {
@@ -749,5 +915,6 @@ module.exports = {
     getReactionLast30days,
     postLength,
     addDestination,
-    addPosition
+    addPosition,
+    getPostHome
 }
