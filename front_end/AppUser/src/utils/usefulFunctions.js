@@ -60,7 +60,6 @@ async function getPostByChannelName(channelName, offset= 0, limit= POST_TO_GET){
 async function getPostByOfficialChannelName(channelName, offset= 0, limit= POST_TO_GET){
     try {
         let res = await fetch(`/db/post/all?offset=${offset}&limit=${limit}&official=${channelName}`,{
-
             method: 'GET',
         });
         if (res.ok) {
@@ -72,6 +71,7 @@ async function getPostByOfficialChannelName(channelName, offset= 0, limit= POST_
 }
 
 async function getAllOfficialChannelPost() {
+    /*
     try {
         let res = await fetch(`/db/post/all?offset=0&limit=${LIMIT_POST}&official=${channelName}`,{
             method: 'GET',
@@ -82,6 +82,7 @@ async function getAllOfficialChannelPost() {
     } catch (e) {
         console.log(e);
     }
+     */
 }
 
 async function getAllPost(offset, limit) {

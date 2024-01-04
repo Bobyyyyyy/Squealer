@@ -1,9 +1,10 @@
 import {useLoaderData} from "react-router-dom";
-import {Spinner} from "flowbite-react";
+import {Spinner, ToggleSwitch} from "flowbite-react";
 import React, {useEffect, useRef, useState} from "react";
 import Post from "../../components/posts/Post.jsx";
 import {
     getPostByOfficialChannelName,
+    getUsernameFromSessionStore,
     POST_TO_GET,
     resetPosts,
     scrollEndDetectorHandler
@@ -16,11 +17,36 @@ function SinglePageOfficialChannel() {
     const currentOffset = useRef(0);
     const lastRequestLength = useRef(0);
     const lastHeightDiv = useRef(0);
+    const [isSilenced, setIsSilenced] = useState(() => {
+        if (channel.silenceable) {
+            let user = channel.silenced.filter((user) => user === getUsernameFromSessionStore());
+            return user.length !== 0;
+        } else {
+            return false;
+        }
+    });
+
+    const handleSilenceChannel = async () => {
+        setIsSilenced((prev) => !prev);
+        try {
+             await fetch(`/db/official/silenced`,{
+                method:"PUT",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body:JSON.stringify({
+                    channelName: channel.name,
+                    username: getUsernameFromSessionStore()
+                })
+            })
+        } catch (e) {
+            console.log(e);
+        }
+    }
 
     const fetchPosts = async () => {
         setIsLoading(true);
         let newPosts = await getPostByOfficialChannelName(channel.name, currentOffset.current, POST_TO_GET);
-        console.log(newPosts)
         currentOffset.current += newPosts.length;
         lastRequestLength.current = newPosts.length;
         setPosts((prev) => [...prev, ...newPosts]);
@@ -53,24 +79,30 @@ function SinglePageOfficialChannel() {
                 <Spinner aria-label="loading profile spinner" size="xl" color="pink" />
             </div>
             ) : (
-                    <div className="flex flex-col w-full justify-center items-center gap-4 mt-2">
-                        <div className="flex flex-col items-center justify-start px-4 gap-2 w-full">
-                            <div className="flex justify-center items-center gap-3 w-full ">
-                                <img
-                                    src={channel.profilePicture}
-                                    alt={`foto canale ${channel.name}`}
-                                    className={"w-20 h-20 rounded-full object-cover"}
-                                />
-                                <h3 className="text-center text-2xl font-extrabold">§{channel.name}</h3>
-                            </div>
-                            <p className="text-center px-2 break-words text-sm">{channel.description}</p>
+                <div className="flex flex-col w-full justify-center items-center gap-4 mt-2">
+                    <div className="flex flex-col items-center justify-start px-4 gap-2 w-full">
+                        <div className="flex justify-center items-center gap-3 w-full ">
+                            <img
+                                src={channel.profilePicture}
+                                alt={`foto canale ${channel.name}`}
+                                className={"w-20 h-20 rounded-full object-cover"}
+                            />
+                            <h3 className="text-center text-2xl font-extrabold">§{channel.name}</h3>
                         </div>
-
-                    {channel.silenceable &&
-                        <div>
-                            silenziabile
+                        <p className="text-center px-2 break-words text-sm">{channel.description}</p>
+                    </div>
+                    {channel.silenceable && (
+                        <div className="flex justify-center gap-2">
+                            <span>
+                                Canale silenziato
+                            </span>
+                            <ToggleSwitch
+                                checked={isSilenced}
+                                onChange={async () => await handleSilenceChannel()}
+                                aria-label="Silenzia canale"
+                            />
                         </div>
-                    }
+                    )}
                     <div className="flex flex-wrap w-full gap-8 items-center justify-center pb-20 overflow-y-scroll mt-4" id="postDiv">
                         {posts!==null && posts.map((post)=> {
                             return(

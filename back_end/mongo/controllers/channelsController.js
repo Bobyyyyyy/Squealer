@@ -1,6 +1,5 @@
 const channelsModel = require('../models/ChannelMethods');
 const {mongo} = require("mongoose");
-const officialChannel = require("../models/officialChannelsMethods");
 const createChannel = async (req,res) => {
     try {
         res.status(200).send(await channelsModel.addChannel(req.body))
