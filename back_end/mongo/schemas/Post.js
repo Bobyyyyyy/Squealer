@@ -73,7 +73,7 @@ const PostSchema = new mongoose.Schema({
 
     criticalMass: {
         type: Number,
-        default: 5,
+        default: 0,
     },
 
     views: [{

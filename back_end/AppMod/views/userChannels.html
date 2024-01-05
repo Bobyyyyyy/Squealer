@@ -57,15 +57,15 @@
 
 
             <div class="d-flex flex-row flex-wrap ms-auto">
-                <div id="channel-visual" class="btn-group ms-3 bg-secondary" role="group" aria-label="Filters radio buttons">
+                <div id="channel-visual" class="btn-group ms-3" role="group" aria-label="Filters radio buttons">
                     <input type="radio" class="btn-check" name="filters" id="filter-all" value="" checked autocomplete="off">
-                    <label class="btn fontcustom" for="filter-all">Tutti</label>
+                    <label class="btn fontcustom bg-secondary" for="filter-all">Tutti</label>
 
                     <input type="radio" class="btn-check" name="filters" id="filter-public" value="public" autocomplete="off">
-                    <label class="btn fontcustom" for="filter-public">Pubblici</label>
+                    <label class="btn fontcustom bg-secondary" for="filter-public">Pubblici</label>
 
                     <input type="radio" class="btn-check" name="filters" id="filter-private" value="private" autocomplete="off">
-                    <label class="btn fontcustom" for="filter-private">Privati</label>
+                    <label class="btn fontcustom bg-secondary" for="filter-private">Privati</label>
                 </div>
 
                 <div class="ms-3 d-flex flex-row flex-wrap justify-content-center align-self-center">
@@ -85,7 +85,7 @@
                         </select>
                 </div>
                 <div>
-                <button type="button" class="btn ms-auto fontcustom bg-primary" data-bs-toggle="modal" data-bs-target="#addChannel">
+                <button type="button" class="btn ms-auto fontcustom btn-primary" data-bs-toggle="modal" data-bs-target="#addChannel">
                      Aggiungi Canale
                 </button>
                 </div>
@@ -101,8 +101,12 @@
             <div class="" style="width: 50%"> Post</div>
             <div class="" style="width: 50%"> Popolarita'</div>
             <div class="" style="width: 50%"> Visibilita'</div>
+            <div class="" style="width: 50%"> Azioni </div>
         </div>
-        <div id="channels" class="d-flex flex-column justify-content-center align-items-center"></div>
+        <div id="channels" class="d-flex flex-column justify-content-center align-items-center">
+            <div class="mt-5 spinner-border text-light" role="status">
+            </div>
+        </div>
 
         <!-- Channel table Pages -->
         <nav class="p-3" aria-label="User Table Pagination">
@@ -148,8 +152,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn bg-secondary" data-bs-dismiss="modal">Chiudi</button>
-                    <button type="submit" class="btn bg-primary">Inserisci</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
+                    <button type="submit" class="btn btn-primary">Inserisci</button>
                 </div>
             </form>
         </div>

@@ -39,7 +39,8 @@ const updateReaction = async (req,res) => {
                 res.send('200');
         }
         else {
-            await postModel.updateReac({user: req.session.user, typeUser: req.session.type, reaction: req.body.reaction, postId: req.body.postId});
+            let user = req.session.type === 'smm' ? req.session.vip : req.session.user;
+            await postModel.updateReac({user: user, typeUser: req.session.type, reaction: req.body.reaction, postId: req.body.postId});
             res.send('200');
         }
     } catch (Error) {

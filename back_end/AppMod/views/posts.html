@@ -19,8 +19,8 @@
         </button>
         <div class="navbar-collapse collapse dual-collapse2" style="flex-basis: 100%">
             <ul class="navbar-nav me-auto mb-lg-0">
-                <li class="nav-item" onclick=window.location.href="/mod/users">
-                    <a class="nav-link">Utenti</a>
+                <li class="nav-item">
+                    <a class="nav-link" href="/mod/users">Utenti</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link active" href="/mod/posts">Squeal</a>
@@ -95,6 +95,8 @@
         </div>
 
         <div id="posts" class="d-flex flex-column align-items-center">
+            <div class="mt-5 spinner-border text-light" role="status">
+            </div>
         </div>
 
         <div id="under_posts" class="d-flex align-items-center mt-5">
@@ -133,8 +135,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn bg-secondary" data-bs-dismiss="modal">Chiudi</button>
-                <button type="submit" class="btn bg-primary" id="changeReactionsButton">Modifica</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
+                <button type="submit" class="btn btn-primary" id="changeReactionsButton">Modifica</button>
             </div>
             </form>
         </div>
@@ -171,8 +173,8 @@
 
 
             <div class="modal-footer">
-                <button type="button" class="btn bg-secondary" data-bs-dismiss="modal">Chiudi</button>
-                <button type="submit" id="addDestinationButton" class="btn bg-primary">Inserisci</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
+                <button type="submit" id="addDestinationButton" class="btn btn-primary">Inserisci</button>
             </div>
             </form>
         </div>

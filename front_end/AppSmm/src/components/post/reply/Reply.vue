@@ -36,7 +36,7 @@
 
 <style scoped>
 .replyDim{
-  width: 32rem;
+  width: 40rem;
   height: auto;
 }
 

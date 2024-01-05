@@ -38,9 +38,10 @@ function getChannels (limit,offset,filter) {
             }
 
             let html = `${$.map(data,(channel,index) => `
-            <div class="mt-3 mx-auto rounded d-flex flex-row bg-back align-items-center text-center channeldiv" onclick="window.location.href = window.location.href + '/${channel.name}'" style="height:7vh; width: 90vw;">
-                <div style="width: 50%;" class="fontcustom"> §${channel.name}</> </div>
-                <div style="width: 50%;" class="fontcustom"> @${channel.creator}</> </div> 
+            <div class="mt-3 mx-auto rounded d-flex flex-row bg-back align-items-center text-center channeldiv"style="height:7vh; width: 90vw;">
+                <div style="width: 50%;" class="fontcustom"> §${channel.name}</div>
+                <div style="width: 50%;" class="fontcustom"> @${channel.creator} </div>
+                <div style="width: 50%;" class="fontcustom"> <button class="btn btn-primary" onclick="window.location.href = window.location.href + '/${channel.name}'" > Entra nel profilo </button> </div> 
             </div>`).join('\n')}`;
 
             if (offset !== 0) {

@@ -1,4 +1,4 @@
-const {loginUser} = require("../../mongo/models/userMethods");
+const {loginUser,searchByUsername} = require("../../mongo/models/userMethods");
 const {mongoCredentials} = require("../../mongo/models/utils");
 
 const registerView = (req, res) => {
@@ -22,8 +22,21 @@ const login  = async (req,res,next) => {
     }
 }
 
-const isUser = (req,res,next) => {
+const isUser = async (req,res,next) => {
     if(req.session.authenticated && (req.session.type === 'user' || req.session.type === 'vip' || req.session.type === 'guest') ) {
+
+        if(req.session.type !== 'guest') {
+            try {
+                await searchByUsername({username: req.session.user});
+            }
+            catch (ignored) {
+                req.session.destroy();
+                res.redirect('/');
+                return;
+            }
+        }
+
+
         next();
     }
     else {
@@ -31,8 +44,18 @@ const isUser = (req,res,next) => {
     }
 }
 
-const isMod = (req,res,next) => {
+const isMod = async (req,res,next) => {
     if(req.session.authenticated && req.session.type === 'mod') {
+
+        try {
+            await searchByUsername({username: req.session.user});
+        }
+        catch (ignored) {
+            req.session.destroy();
+            res.redirect('/');
+            return;
+        }
+
         next();
     }
     else {
@@ -40,8 +63,18 @@ const isMod = (req,res,next) => {
     }
 }
 
-const isSMM = (req,res,next) => {
+const isSMM = async (req,res,next) => {
     if(req.session.authenticated && req.session.type === 'smm' ) {
+
+        try {
+            await searchByUsername({username: req.session.user});
+        }
+        catch (ignored) {
+            req.session.destroy();
+            res.redirect('/');
+            return;
+        }
+
         next();
     }
     else {
@@ -49,11 +82,22 @@ const isSMM = (req,res,next) => {
     }
 }
 
-const isSessionActive = (req,res,next) => {
+const isSessionActive = async (req,res,next) => {
+
     if(!req.session.authenticated) {
         next();
     }
     else {
+        if(req.session.type !== 'guest') {
+            try {
+                await searchByUsername({username: req.session.user});
+            }
+            catch (ignored) {
+                req.session.destroy();
+                res.redirect('/');
+                return;
+            }
+        }
         switch (req.session.type) {
             case 'user':
             case 'vip':
