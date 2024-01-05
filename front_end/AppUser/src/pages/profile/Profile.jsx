@@ -97,13 +97,20 @@ function Profile () {
 
     useEffect(() => {
         fetchUserInfo()
-            .catch(console.error)
-        document.addEventListener('scroll', scrollEndDetector, true);
-        fetchPosts()
-            .catch(console.error);
-        return () => {
-            document.removeEventListener('scroll', scrollEndDetector);
-        }
+            .then(() => {
+                document.addEventListener('scroll', scrollEndDetector, true);
+                fetchPosts()
+            })
+            .catch(error => {
+                // Handle errors from fetchUserInfo, fetchPosts, or scroll event listener removal
+                console.error("Error:", error);
+            })
+            .finally(() => {
+                // Cleanup: Remove the scroll event listener when the component unmounts
+                return () => {
+                    document.removeEventListener('scroll', scrollEndDetector);
+                };
+            });
     }, []);
 
     useEffect(() => {
