@@ -135,10 +135,10 @@ import {computed, onMounted, onUnmounted, ref} from "vue";
     <h6 class="mt-1 text-center text-white fw-bold mb-0">{{[store.getters.getQuota.daily,store.getters.getQuota.weekly,store.getters.getQuota.monthly].join(' | ')}}</h6>
      <p class="m-0 text-center text-white mt-1 mb-0">{{n_post}} Squeal </p>
 
-      <div class="d-flex flex-column align-items-start">
+      <div class="d-flex flex-column align-items-center">
         <div class="d-flex flex-row justify-content-around align-items-end wrap-md">
-
-          <Select class="buttonDropDown"
+          <div class="d-flex" style="flex: 1 1 0">
+            <Select class="buttonDropDown"
                     :dropItems="filterValues"
                     :dropItemsName="filterValuesITAS"
                     classButton="btn btn-secondary"
@@ -146,9 +146,10 @@ import {computed, onMounted, onUnmounted, ref} from "vue";
                     label="destinazione"
                     def="all"
                     @updateDestFilter = updateDestFilter
-          />
-
-          <Select class="ms-1 buttonDropDown"
+            />
+          </div>
+          <div class="d-flex" style="flex: 1 1 0">
+            <Select class="ms-1 buttonDropDown"
                     classButton="btn btn-secondary"
                     :dropItems="postType"
                     :dropItemsName="postTypeITAS"
@@ -156,9 +157,10 @@ import {computed, onMounted, onUnmounted, ref} from "vue";
                     label= 'contenuto'
                     def = 'all'
                     @updatePostType = updatePostType
-          />
-
-          <Select  class="ms-1 buttonDropDown"
+            />
+          </div>
+          <div class="d-flex" style="flex: 1 1 0">
+            <Select  class="ms-1 buttonDropDown"
                      classButton="btn btn-secondary"
                      :dropItems="sortPosts"
                      :dropItemsName="sortPosts"
@@ -166,7 +168,8 @@ import {computed, onMounted, onUnmounted, ref} from "vue";
                      label="ordina per"
                      :def="sortPosts[0]"
                      @updateSort = updateSortFilter
-          />
+            />
+          </div>
           <div v-if="keyWordFilter && !smartPhone" class="input-group ms-3 keyword-dim">
             <input type="text" class="form-control" placeholder="Keyword..." aria-label="Keyword's search" v-model="keyWord">
             <button class="btn btn-secondary" type="button" @click="updateTagPosts">Cerca</button>
@@ -177,13 +180,13 @@ import {computed, onMounted, onUnmounted, ref} from "vue";
           <button class="btn btn-secondary" type="button" @click="updateTagPosts">Cerca</button>
         </div>
       </div>
-      <div id="postContainer" v-if="readyPosts" class="d-flex flex-row flex-wrap justify-content-around mt-3">
-        <Post v-for="(post,i) in squeals" :key="post._id"
+      <div id="postContainer" v-if="readyPosts" class="mt-3 d-flex flex-column align-items-center">
+          <Post v-for="(post,i) in squeals" :key="post._id"
               :post="post"
               :dest= "parseDestinationsViewPost(post.destinationArray, post.officialChannelsArray)"
               :numberOfPost="i"
               :picProfile = "post.profilePicture"
-        />
+          />
       </div>
     </div>
   </div>

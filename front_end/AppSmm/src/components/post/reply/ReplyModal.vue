@@ -96,7 +96,7 @@ const getId =  () => `repliesModal${props.idx}`;
 
 <style scoped>
   .modalReplyDim{
-    width: 36rem !important;
+    width: 43rem !important;
   }
 
   @media screen and (max-width: 768px){

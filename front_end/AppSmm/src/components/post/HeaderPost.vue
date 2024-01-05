@@ -32,7 +32,7 @@
 <style>
 
   .header_post{
-    height: 6rem;
+    height: 5rem;
   }
 
   .setMargin{
@@ -44,10 +44,6 @@
   }
 
   @media screen and (max-width: 768px){
-    .imgFluid{
-      min-width: 20%;
-      max-width: 20%;
-    }
     .dimOverflowText{
       max-width: 14rem;
     }
