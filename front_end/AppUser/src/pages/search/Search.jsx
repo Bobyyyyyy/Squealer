@@ -95,8 +95,10 @@ function Search ()  {
                             );
                         })}
                         {users.length === 0 &&
-                            <div>
-                                nessun utente trovato
+                            <div className="flex w-full items-center justify-center mt-8 text-2xl text-center">
+                                <p>
+                                    Nessun utente trovato
+                                </p>
                             </div>
                         }
                     </div>
