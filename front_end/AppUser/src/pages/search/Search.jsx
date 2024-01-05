@@ -1,5 +1,5 @@
 import Searchbar from "./Searchbar.jsx";
-import React, {useEffect, useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import {Link} from "react-router-dom";
 import KeywordPostContainer from "./keywords/KeywordPostContainer.jsx";
 import MentionPostContainer from "./MentionPostContainer.jsx";
@@ -20,6 +20,16 @@ function Search ()  {
     const [name, setName] = useState('');
     const [type, setType] = useState('');
     const [users, setUsers] = useState([]);
+
+    const [debouncedName, setDebouncedName] = useState('');
+
+    const debouncedHandleChange = useCallback(
+        debounce(async () => {
+            await handleChangeActiveButton();
+            setShowContent(true);
+        }, TIME_2_WAIT),
+        []
+    );
 
     async function handleChangeActiveButton() {
         switch (activeButton) {
@@ -49,15 +59,18 @@ function Search ()  {
     useEffect(() => {
         setShowContent(false)
         if (!!name) {
-            setTimeout(async () => {
-                await handleChangeActiveButton();
-                setShowContent(true)
-            }, TIME_2_WAIT)
+            setDebouncedName(name);
         } else {
             setUsers([]);
             setShowContent(false)
         }
     }, [name, activeButton]);
+
+    useEffect(() => {
+        if (!!debouncedName) {
+            debouncedHandleChange(debouncedName);
+        }
+    }, [debouncedName, debouncedHandleChange]);
 
     return (
         <>
@@ -105,18 +118,26 @@ function Search ()  {
                 <>
                 {activeButton === "keyword" && !!name &&
                     <>
-                        <KeywordPostContainer tag={name} />
+                        <KeywordPostContainer tag={name} has2update={showContent} />
                     </>
                 }
                 {activeButton === "mention" && !!name &&
                     <>
-                        <MentionPostContainer mention={name} />
+                        <MentionPostContainer mention={name}  has2update={showContent} />
                     </>
                 }
                 </>
             }
         </>
     );
+}
+
+function debounce(func, delay) {
+    let timeoutId;
+    return function (...args) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => func(...args), delay);
+    };
 }
 
 export default Search;

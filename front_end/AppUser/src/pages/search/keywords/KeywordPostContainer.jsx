@@ -3,7 +3,7 @@ import {getPostByKeyword, POST_TO_GET, scrollEndDetectorHandler} from "../../../
 import {Spinner} from "flowbite-react";
 import Post from "../../../components/posts/Post.jsx";
 
-function KeywordPostContainer({tag}) {
+function KeywordPostContainer({tag, has2update}) {
     const [isLoading, setIsLoading] = useState(true);
     const [posts, setPosts] = useState([]);
     const currentOffset = useRef(0);
@@ -26,14 +26,16 @@ function KeywordPostContainer({tag}) {
     };
 
     useEffect(() => {
-        setPosts([]);
-        document.addEventListener('scroll', scrollEndDetector, true);
-        fetchPosts()
-            .catch(console.error);
-        return () => {
-            document.removeEventListener('scroll', scrollEndDetector);
+        if (has2update) {
+            setPosts([]);
+            document.addEventListener('scroll', scrollEndDetector, true);
+            fetchPosts()
+                .catch(console.error);
+            return () => {
+                document.removeEventListener('scroll', scrollEndDetector);
+            }
         }
-    }, [tag]);
+    }, [tag, has2update]);
 
 
     useEffect(() => {

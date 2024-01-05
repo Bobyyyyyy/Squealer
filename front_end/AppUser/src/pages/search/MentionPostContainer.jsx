@@ -7,7 +7,7 @@ import {
 import {Spinner} from "flowbite-react";
 import Post from "../../components/posts/Post.jsx";
 
-function MentionPostContainer({mention}) {
+function MentionPostContainer({mention, has2update}) {
         const [isLoading, setIsLoading] = useState(true);
         const [posts, setPosts] = useState([]);
         const currentOffset = useRef(0);
@@ -18,6 +18,7 @@ function MentionPostContainer({mention}) {
             setIsLoading(true);
             let newPosts = await getPostByMention(mention, currentOffset.current, POST_TO_GET);
             currentOffset.current += newPosts.length;
+            console.log(newPosts)
             lastRequestLength.current = newPosts.length;
             setPosts((prev) => [...prev, ...newPosts]);
             setIsLoading(false);
@@ -29,13 +30,15 @@ function MentionPostContainer({mention}) {
         };
 
         useEffect(() => {
-            document.addEventListener('scroll', scrollEndDetector, true);
-            fetchPosts()
-                .catch(console.error);
-            return () => {
-                document.removeEventListener('scroll', scrollEndDetector);
+            if (has2update) {
+                document.addEventListener('scroll', scrollEndDetector, true);
+                fetchPosts()
+                    .catch(console.error);
+                return () => {
+                    document.removeEventListener('scroll', scrollEndDetector);
+                }
             }
-        }, [mention]);
+        }, [mention, has2update]);
 
 
         useEffect(() => {
