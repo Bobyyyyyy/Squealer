@@ -27,9 +27,9 @@
 </script>
 
 <template>
-  <div class="d-flex flex-column justify-content-around vipCard border-primary bg-body-secondary mt-3">
+  <div class="d-flex flex-column justify-content-around vipCard border-primary bg-body-secondary mt-3 vipcard">
     <div class="d-flex flex-column justify-content-around align-items-center">
-      <div class="d-flex justify-content-center" style="width: 35%">
+      <div class="d-flex justify-content-center" style="width: 30%">
         <img :src=" srcImage " alt="immagine profilo" class="img-fluid rounded-circle" />
       </div>
       <div class="d-flex justify-content-center">
@@ -42,16 +42,16 @@
         <Post
             :post="post"
             :dest= "parseDestinationsViewPost(post.destinationArray, post.officialChannelsArray)"
-            :numberOfPost="1"
+            :numberOfPost="0"
             :picProfile = "srcImage"
         />
       </div>
-      <div v-else>
-        NON CI SONO POST
+      <div v-else class="text-center w-100">
+        non ci sono squeal
       </div>
     </div>
     <div class="d-flex justify-content-center mb-2">
-      <button type="button" class="btn btn-primary" @click="$emit('setModal', username)"> Gestisci </button>
+      <button type="button" class="btn btn-primary" @click="$emit('setModal', username, srcImage)"> Gestisci </button>
     </div>
   </div>
 </template>
@@ -62,6 +62,9 @@
   .postMargin{
     margin-left: 0.5rem;
     margin-right: 0.5rem;
+  }
+  .vipcard{
+    border-radius: 5%;
   }
 
   @media screen and (max-width: 768px){
