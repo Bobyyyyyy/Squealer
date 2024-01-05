@@ -6,27 +6,14 @@ import {parseTime} from "../../utils/timeFunctions.js";
 
 function Title({post}) {
 
-    const [profilePic, setProfilePic] = useState();
     const tempo = parseTime(post);
-    
-    useEffect(()=> {
-        if (post.hasOwnProperty("profilePicture")) {
-            setProfilePic(post.profilePicture);
-        } else {
-            getProfilePicByUsername(post.owner)
-                .then((res)=>{
-                    setProfilePic(res)
-                })
-        }
-    }, [])
-
 
     return (
         <>
             <div className="flex justify-between items-center px-4 py-2">
                 <div className="flex w-full items-center" >
                     <Link to={`/search/${post.owner}`}>
-                        <img className="w-14 h-14 rounded-full object-cover" alt="foto profilo" src={profilePic} />
+                        <img className="w-14 h-14 rounded-full object-cover" alt="foto profilo" src={post.profilePicture} />
                     </Link>
                     <div className="flex flex-col ml-4 gap-2">
                         <Link to={`/search/${post.owner}`}>

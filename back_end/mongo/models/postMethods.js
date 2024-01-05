@@ -827,7 +827,7 @@ const getPostByProfile = async (username, limit, offset) => {
                                 ]
                             },
                             {
-                                $eq: [
+                                $in: [
                                     username,
                                     "$destinationArray.name"
                                 ]
