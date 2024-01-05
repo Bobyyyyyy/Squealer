@@ -1,5 +1,3 @@
-const LIMIT_POST = 10;
-
 function getUsernameFromSessionStore () {
     return sessionStorage.getItem("username");
 }
@@ -83,10 +81,9 @@ async function getPostByOfficialChannelName(channelName, offset= 0, limit= POST_
     }
 }
 
-async function getAllOfficialChannelPost() {
-    /*
+async function getHomeAnonymousPost(offset, limit) {
     try {
-        let res = await fetch(`/db/post/all?offset=0&limit=${LIMIT_POST}&official=${channelName}`,{
+        let res = await fetch(`/db/post/anonymous?offset=${offset}&limit=${limit}`,{
             method: 'GET',
         });
         if (res.ok) {
@@ -95,7 +92,6 @@ async function getAllOfficialChannelPost() {
     } catch (e) {
         console.log(e);
     }
-     */
 }
 
 async function getHomePosts(offset, limit) {
@@ -277,7 +273,7 @@ export {
     getPostByChannelName,
     getHomePosts,
     getPostByOfficialChannelName,
-    getAllOfficialChannelPost,
+    getHomeAnonymousPost,
     handleLogout,
     setToastNotification,
     deleteToastNotification,

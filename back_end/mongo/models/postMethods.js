@@ -581,6 +581,110 @@ const getPostHome = async (userInSession , limit, offset) => {
 }
 
 
+const getPostHomeAnonymous = async (limit, offset) => {
+    try{
+        await connection.get();
+
+        let posts = await Post.aggregate([
+            {
+                $lookup: {
+                    from: "channels",
+                    pipeline: [
+                        {
+                            $project: {
+                                name: "$name",
+                            },
+                        },
+                    ],
+                    as: "channel_info",
+                },
+            },
+            {
+                $match: {
+                    $expr: {
+                        $or: [
+                            {
+                                $in: [
+                                    "channel",
+                                    "$officialChannelsArray.destType",
+                                ],
+                            },
+                            {
+                                $reduce: {
+                                    input: "$channel_info",
+                                    initialValue: false,
+                                    in: {
+                                        $and: [
+                                            "$$value",
+                                            {
+                                                $in: [
+                                                    "$$this.name",
+                                                    "$officialChannelsArray.name",
+                                                ],
+                                            },
+                                        ],
+                                    },
+                                },
+                            },
+
+                            {
+                                $in: [
+                                    "keyword",
+                                    "$destinationArray.destType",
+                                ],
+                            },
+                            {
+                                $and: [
+                                    {
+                                        $gt: [
+                                            { $size: "$officialChannelsArray" },
+                                            0,
+                                        ],
+                                    },
+                                ],
+                            },
+                        ],
+                    },
+                }
+            },
+            {$sort: sorts['più recente']},
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "owner",
+                    foreignField: "username",
+                    as: "user_info",
+                },
+            },
+            {
+                $unwind: "$user_info",
+            },
+            {
+                $project:{
+                    owner: '$owner',
+                    destinationArray: '$destinationArray',
+                    officialChannelsArray: '$officialChannelsArray',
+                    category: '$category',
+                    contentType: '$contentType',
+                    content: '$content',
+                    reactions: '$reactions',
+                    dateOfCreation: '$dateOfCreation',
+                    views_count: {$size: '$views'},
+                    profilePicture: '$user_info.profilePicture',
+                }
+            },
+            {$skip: parseInt(offset)},
+            {$limit: parseInt(limit)},
+        ])
+
+        return posts;
+
+    }catch (err){
+        throw err;
+    }
+}
+
+
 const getPostByUsername2watch = async (userInSession , limit, offset, user2watch) => {
     try{
         let checkUser2watch = await User.findOne({username: user2watch});
@@ -1090,5 +1194,6 @@ module.exports = {
     addPosition,
     getPostHome,
     getPostByUsername2watch,
-    getPostByProfile
+    getPostByProfile,
+    getPostHomeAnonymous
 }

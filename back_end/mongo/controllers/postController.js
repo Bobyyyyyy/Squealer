@@ -195,6 +195,26 @@ const getPostsByProfile = async (req, res) => {
     }
 }
 
+
+const getPostHomeAnonymous = async (req, res) => {
+    try{
+        let limit = req.query.limit;
+        let offset = req.query.offset;
+        if (isNaN(limit) || isNaN(offset))
+            throw createError('bad request', 400);
+
+        res.send(await postModel.getPostHomeAnonymous(limit, offset));
+    }
+    catch(Error){
+        if(typeof Error.statusCode !== 'undefined')
+            res.status(Error.statusCode).send({message: Error.message});
+        else {
+            res.status(500).send(Error);
+        }
+    }
+}
+
+
 module.exports = {
     createPost,
     getPosts,
@@ -208,5 +228,6 @@ module.exports = {
     addPosition,
     getHomePosts,
     getPostsByUser2watch,
-    getPostsByProfile
+    getPostsByProfile,
+    getPostHomeAnonymous
 }
