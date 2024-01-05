@@ -1,5 +1,5 @@
 import {Modal} from "flowbite-react";
-import {getUsernameFromSessionStore, setToastNotification} from "../../../utils/usefulFunctions.js";
+import {setToastNotification} from "../../../utils/usefulFunctions.js";
 
 function DeleteChannelModal({isOpen, setIsOpen, channelName}) {
     const DeleteChannel = async () => {

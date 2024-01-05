@@ -1,5 +1,5 @@
 import Body from "./Body.jsx";
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import Title from "./Title.jsx";
 
 import {

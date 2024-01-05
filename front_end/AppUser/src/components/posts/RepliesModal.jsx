@@ -1,4 +1,4 @@
-import {Button, Modal, Spinner} from "flowbite-react";
+import {Modal, Spinner} from "flowbite-react";
 import React, {useEffect, useState} from "react";
 function RepliesModal({isOpen, setIsOpen, postID}) {
     const [comment, setComment] = useState('');

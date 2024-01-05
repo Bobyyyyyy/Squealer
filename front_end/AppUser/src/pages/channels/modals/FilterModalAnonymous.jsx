@@ -1,6 +1,5 @@
-import {Modal, Button, Radio, Label, Checkbox, ToggleSwitch} from 'flowbite-react';
+import {Modal, Label} from 'flowbite-react';
 import React from "react";
-import {getUsernameFromSessionStore} from "../../../utils/usefulFunctions.js";
 
 function FilterModalAnonymous({isOpen, setIsOpen, channelName, setChannelName, handleSearch}) {
 

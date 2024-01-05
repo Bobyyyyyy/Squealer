@@ -1,5 +1,5 @@
 import MappaPost from "./maps/MappaPost.jsx";
-import React, {useEffect, useState} from "react";
+import React from "react";
 import {Link} from "react-router-dom";
 
 function Body({post}) {

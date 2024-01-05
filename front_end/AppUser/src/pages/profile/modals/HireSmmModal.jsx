@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from "react";
-import {Button, Modal, Spinner, ToggleSwitch} from "flowbite-react";
+import React from "react";
+import {Modal} from "flowbite-react";
 import {getUsernameFromSessionStore} from "../../../utils/usefulFunctions.js";
 
 function HireSmmModal({isOpen, setIsOpen, setHasUpdated, smm, hasSMM}) {

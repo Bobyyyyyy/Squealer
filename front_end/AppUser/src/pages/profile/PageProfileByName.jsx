@@ -1,4 +1,4 @@
-import {Link, useLoaderData, useParams} from "react-router-dom";
+import {Link, useLoaderData} from "react-router-dom";
 import React, {useEffect, useRef, useState} from "react";
 import {
     getPostByUsername,

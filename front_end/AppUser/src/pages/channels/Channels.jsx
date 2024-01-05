@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from "react";
-import {ProfilePic} from "../../components/assets/index.jsx"
 import {Link} from "react-router-dom";
 import CreateChannelModal from "./modals/CreateChannelModal.jsx";
 import FiltersModal from "./modals/FiltersModal.jsx";

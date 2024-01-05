@@ -11,7 +11,7 @@ function ErrorPage() {
                 className="button uppercase"
                 to="/"
             >
-                Back to the Homepage
+                Torna alla Homepage
             </Link>
         </div>
     )

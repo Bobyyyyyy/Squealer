@@ -1,6 +1,4 @@
-import {getProfilePicByUsername, getUsernameFromSessionStore} from "../../utils/usefulFunctions.js";
-
-import React, {useEffect, useState} from "react";
+import React from "react";
 import {Link} from "react-router-dom";
 import {parseTime} from "../../utils/timeFunctions.js";
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Modal, Button, Radio, Label } from 'flowbite-react';
+import {Modal, Radio} from 'flowbite-react';
 import {getUsernameFromSessionStore, setToastNotification} from "../../../utils/usefulFunctions.js";
 function CreateChannelModal({ isOpen, setIsOpen}) {
 

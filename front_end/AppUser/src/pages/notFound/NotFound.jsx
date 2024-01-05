@@ -19,7 +19,7 @@ function NotFound() {
                 className="button uppercase"
                 to="/"
             >
-                Back to the Homepage
+                Torna alla Homepage
             </Link>
         </div>
     );

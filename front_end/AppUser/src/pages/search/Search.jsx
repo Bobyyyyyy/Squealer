@@ -1,6 +1,5 @@
 import Searchbar from "./Searchbar.jsx";
 import {useEffect, useState} from "react";
-import {ProfilePic} from "../../components/assets/index.jsx";
 import {Link} from "react-router-dom";
 
 function Search ()  {

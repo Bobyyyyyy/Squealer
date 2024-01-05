@@ -1,7 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {ProfilePic} from "../../components/assets/index.jsx"
 import {Link} from "react-router-dom";
-import FiltersModal from "./modals/FiltersModal.jsx";
 import {Spinner} from "flowbite-react";
 import FilterModalAnonymous from "./modals/FilterModalAnonymous.jsx";
 
