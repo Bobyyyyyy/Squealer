@@ -6,7 +6,7 @@ function KeywordPageByUrl() {
     const {tag} = useParams();
 
     return (
-        <KeywordPostContainer tag={tag} />
+        <KeywordPostContainer tag={tag} has2update={true} />
     );
 }
 

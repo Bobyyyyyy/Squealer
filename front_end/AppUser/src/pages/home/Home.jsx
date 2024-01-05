@@ -18,7 +18,6 @@ function Home() {
     const fetchPosts = async () => {
         setIsLoading(true);
         let newPosts = await getHomePosts(currentOffset.current, POST_TO_GET);
-        console.log(newPosts)
         currentOffset.current += newPosts.length;
         lastRequestLength.current = newPosts.length;
         setPosts((prev) => [...prev, ...newPosts]);

@@ -40,7 +40,6 @@ function App() {
     const getUsername = async () => {
         setIsLoading(true);
         let usernameRes = await setUsernameInSessionStore();
-        console.log("has logged res", usernameRes);
         if (usernameRes.username.match(GUESTREGEX)) {
             setHasLogged(false);
         } else {

@@ -8,7 +8,6 @@ async function setUsernameInSessionStore() {
     try {
         let res = await fetch("/db/user/session");
         res = await res.json();
-        console.log("username", res);
         sessionStorage.setItem("username", res.username);
         return res;
     } catch (e) {
@@ -206,7 +205,6 @@ async function getPostByKeyword(tag, offset, limit){
 
 async function getPostByMention(mention, offset, limit){
     try {
-        console.log(mention, offset, limit)
         const res = await fetch(`/db/post/mention?mention=${mention}&offset=${offset}&limit=${limit}`);
         if (res.ok) {
             return await res.json();

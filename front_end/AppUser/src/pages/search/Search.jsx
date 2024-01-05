@@ -23,35 +23,24 @@ function Search ()  {
     const [debouncedName, setDebouncedName] = useState('');
 
     const debouncedHandleChange = useCallback(
-        debounce(async () => {
-            await handleChangeActiveButton();
+        debounce(async (username) => {
+            await handleChangeActiveButton(username);
             setShowContent(true);
         }, TIME_2_WAIT),
         []
     );
 
-    async function handleChangeActiveButton() {
-        switch (activeButton) {
-            case "user": {
-                let filter = JSON.stringify({
-                    name: name,
-                    type: ''
-                })
-                let res = await fetch(`/db/user/all?limit=100&offset=0&filter=${filter}`)
-                    if (res.ok) {
-                        res = await res.json();
-                        setUsers(res);
-                    }
-                    break;
+    async function handleChangeActiveButton(username) {
+        if (activeButton === "user") {
+            let filter = JSON.stringify({
+                name: username,
+                type: ''
+            })
+            let res = await fetch(`/db/user/all?limit=100&offset=0&filter=${filter}`)
+            if (res.ok) {
+                res = await res.json();
+                setUsers(res);
             }
-            case "keyword": {
-                break;
-            }
-            case "mention": {
-                break;
-            }
-            default:
-                break;
         }
     }
 
@@ -69,7 +58,7 @@ function Search ()  {
         if (!!debouncedName) {
             debouncedHandleChange(debouncedName);
         }
-    }, [debouncedName, debouncedHandleChange]);
+    }, [debouncedName, activeButton]);
 
     return (
         <>

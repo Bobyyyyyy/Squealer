@@ -18,7 +18,6 @@ function MentionPostContainer({mention, has2update}) {
             setIsLoading(true);
             let newPosts = await getPostByMention(mention, currentOffset.current, POST_TO_GET);
             currentOffset.current += newPosts.length;
-            console.log(newPosts)
             lastRequestLength.current = newPosts.length;
             setPosts((prev) => [...prev, ...newPosts]);
             setIsLoading(false);
