@@ -595,7 +595,7 @@ const getPostFromMention = async (userInSession, mention, limit, offset) => {
                                 $or: [
                                     { 'creator': userInSession },
                                     { 'admins': userInSession },
-                                    {'followers.user': userInSession},
+                                    {'followers.user': userInSession}
                                 ],
                             },
                         },
@@ -611,58 +611,49 @@ const getPostFromMention = async (userInSession, mention, limit, offset) => {
             {
                 $match: {
                     $expr: {
-                        $or: [
+                        $and: [
                             {
-                                $and: [
+                                $or: [
                                     {
-                                        $in: [
-                                            "channel",
-                                            "$destinationArray.destType",
+                                        $or: [
+                                            {
+                                                $and: [
+                                                    { $in: ["channel", "$destinationArray.destType"] },
+                                                    {
+                                                        $reduce: {
+                                                            input: '$channel_info',
+                                                            initialValue: false,
+                                                            in: {
+                                                                $or: [
+                                                                    '$$value',
+                                                                    { $in: ["$$this.name", '$destinationArray.name'] },
+                                                                ],
+                                                            },
+                                                        },
+                                                    },
+                                                ],
+                                            },
+                                            { $eq: ["$owner", userInSession] },
+                                            { $in: [userInSession, "$destinationArray.name"]}
                                         ],
                                     },
-                                    {
-                                        $reduce:{
-                                            input:'$channel_info',
-                                            initialValue: false,
-                                            in: {
-                                                $or:[
-                                                    '$$value',
-                                                    {
-                                                        $in:["$$this.name", '$destinationArray.name']
-                                                    }
-                                                ],
-                                                $and: [
-                                                    {
-                                                        'content' : {$regex: mention}
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    },
+                                    { $in: ["keyword", "$destinationArray.destType"] },
+                                    { $gt: [{ $size: "$officialChannelsArray" }, 0] },
                                 ],
                             },
                             {
-                                $in:["keyword", "$destinationArray.destType"]
+                                $regexMatch: {
+                                    input: "$content",
+                                    regex: mention,
+                                    options: "i", // Case-insensitive
+                                },
                             },
                             {
-                                $and:[
-                                    {
-                                        $gt:[{$size:"$officialChannelsArray"}, 0],
-                                    },
-                                    {
-                                        $not:{
-                                            $eq:[
-                                                {
-                                                    $size: '$officialChannelsArray',
-                                                }
-                                            ]
-                                        }
-                                    }
-                                ],
-                            }
-                        ]
-                    }
-                }
+                                $eq: ["$contentType", "text"],
+                            },
+                        ],
+                    },
+                },
             },
             {$sort: sorts['più recente']},
             {
