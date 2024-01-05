@@ -193,6 +193,30 @@ const checkUserExists = async ({params}) => {
     };
 }
 
+async function getPostByKeyword(tag, offset, limit){
+    try {
+        const res = await fetch(`/db/post/all?keyword=${tag}&offset=${offset}&limit=${limit}`);
+        if (res.ok) {
+            return await res.json();
+        }
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+async function getPostByMention(mention, offset, limit){
+    try {
+        console.log(mention, offset, limit)
+        const res = await fetch(`/db/post/mention?mention=${mention}&offset=${offset}&limit=${limit}`);
+        if (res.ok) {
+            return await res.json();
+        }
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+
 const handleLogout = async () => {
     let res = await fetch("/logout");
     window.location.href= res.url;
@@ -282,5 +306,7 @@ export {
     scrollEndDetectorHandler,
     resetPosts,
     getPostByProfile,
+    getPostByKeyword,
+    getPostByMention,
     POST_TO_GET,
 }

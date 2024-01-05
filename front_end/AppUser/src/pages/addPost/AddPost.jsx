@@ -50,7 +50,7 @@ function AddPost(){
         for (let dest of allDest) {
             finalDest.push({
                 name: dest.substring(1),
-                destType: dest.startsWith('§') ? 'channel' : dest.startsWith('@') ? 'user' : 'errore',
+                destType: (dest.startsWith('§') ? 'channel' : (dest.startsWith('@') ? 'user' : (dest.startsWith('#') ? 'keyword' : "error"))),
             })
         }
         return finalDest;
@@ -69,8 +69,8 @@ function AddPost(){
         } else if (!destinations) {
             setError("Inserisci i destinatari")
             canSend = false;
-        } else if (!(destinations.includes("§") || destinations.includes("@"))) {
-            setError("Inserisci @ o § nei destinatari");
+        } else if (!(destinations.includes("§") || destinations.includes("@") || destinations.includes("#"))) {
+            setError("Inserisci @ o § o # nei destinatari");
             canSend = false;
         } else if (isQuotaNegative()) {
             setError("Hai finito la quota");
@@ -207,14 +207,14 @@ function AddPost(){
             <div className="mt-6 w-full mb-4">
                 {/* DESTINATARI */}
                 <div className="flex flex-col justify-between items-start gap-2">
-                    <div className={"flex justify-between w-full"}>
+                    <div className={"flex justify-between items-center w-full"}>
                         <span className="text-xl md:text-2xl">Destinatari</span>
-                        <span className={"text-blue-400"}>(@utente, §canale)</span>
+                        <span className={"text-blue-400"}>(@utente, §canale, #keyword)</span>
                     </div>
                     <input
                         type="text"
                         className="border-2 border-gray-500 rounded-md w-full focus:border-teal-500 focus:ring-teal-500"
-                        placeholder="@Pippo42, §calcetto"
+                        placeholder="@Pippo42, §calcetto, #oggi"
                         onChange={e => setDestinations(e.target.value)}
                         aria-label="Inserisci i destinatari del post"
                     />

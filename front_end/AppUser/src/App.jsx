@@ -1,4 +1,18 @@
 import './index.css'
+import React, {useEffect, useState} from "react";
+
+import {
+    Route,
+    createBrowserRouter,
+    createRoutesFromElements,
+    RouterProvider
+} from "react-router-dom";
+
+import {
+    checkChannelExists,
+    checkUserExists,
+    setUsernameInSessionStore
+} from "./utils/usefulFunctions.js";
 
 import NotFound from "./pages/notFound/NotFound.jsx";
 import Home from "./pages/home/Home.jsx";
@@ -6,28 +20,17 @@ import Channels from "./pages/channels/Channels.jsx";
 import AddPost from "./pages/addPost/AddPost.jsx";
 import Profile from "./pages/profile/Profile.jsx";
 import Search from "./pages/search/Search.jsx";
-import {
-    Route,
-    createBrowserRouter,
-    createRoutesFromElements,
-    RouterProvider
-} from "react-router-dom";
-import React, {useEffect, useState} from "react";
-import RootLayout from "./layouts/RootLayout.jsx";
-import {
-    checkChannelExists,
-    checkUserExists,
-    setUsernameInSessionStore
-} from "./utils/usefulFunctions.js";
+import KeywordPageByUrl from "./pages/search/keywords/KeywordPageByUrl.jsx";
 import ErrorPage from "./pages/ErrorPage.jsx";
 import PageProfileByName from "./pages/profile/PageProfileByName.jsx";
 import SinglePageChannel from "./pages/channels/SinglePageChannel.jsx";
-import {Spinner} from "flowbite-react";
 import RootLayoutAnonymous from "./layouts/RootLayoutAnonymous.jsx";
 import HomeAnonymous from "./pages/home/HomeAnonymous.jsx";
 import ChannelAnonymous from "./pages/channels/ChannelAnonymous.jsx";
 import ProfileAnonymous from "./pages/profile/ProfileAnonymous.jsx";
+import RootLayout from "./layouts/RootLayout.jsx";
 
+import {Spinner} from "flowbite-react";
 
 function App() {
     const GUESTREGEX = /guest-\d+/g
@@ -59,6 +62,10 @@ function App() {
                 <Route
                     path="search"
                     element={<Search />}
+                />
+                <Route
+                    path="search/keyword/:tag"
+                    element={<KeywordPageByUrl />}
                 />
                 <Route
                     path="search/:username"

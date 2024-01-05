@@ -343,7 +343,7 @@ const getAllPost = async (query,sessionUser) =>{
 
             ... (query.user) && {$and: [{'destinationArray.name': query.user}, {"destinationArray.destType": 'user'}]},
 
-            ...(query.keyword) && {$and: [{'destinationArray.name': {$regex: query.keyword}}, {'destinationArray.destType': 'keyword'}]},
+            ...(query.keyword) && {$and: [{'destinationArray.name': query.keyword}, {'destinationArray.destType': 'keyword'}]},
 
             ...(query.mention) && {$and: [{'content' : {$regex: query.mention}},{'contentType': 'text'}]},
         }
@@ -576,6 +576,127 @@ const getPostHome = async (userInSession , limit, offset) => {
         return posts;
 
     }catch (err){
+        throw err;
+    }
+}
+
+
+const getPostFromMention = async (userInSession, mention, limit, offset) => {
+    try{
+        await connection.get();
+
+        let posts = await Post.aggregate([
+            {
+                $lookup: {
+                    from: "channels",
+                    pipeline: [
+                        {
+                            $match: {
+                                $or: [
+                                    { 'creator': userInSession },
+                                    { 'admins': userInSession },
+                                    {'followers.user': userInSession},
+                                ],
+                            },
+                        },
+                        {
+                            $project: {
+                                name: "$name",
+                            },
+                        },
+                    ],
+                    as: "channel_info",
+                },
+            },
+            {
+                $match: {
+                    $expr: {
+                        $or: [
+                            {
+                                $and: [
+                                    {
+                                        $in: [
+                                            "channel",
+                                            "$destinationArray.destType",
+                                        ],
+                                    },
+                                    {
+                                        $reduce:{
+                                            input:'$channel_info',
+                                            initialValue: false,
+                                            in: {
+                                                $or:[
+                                                    '$$value',
+                                                    {
+                                                        $in:["$$this.name", '$destinationArray.name']
+                                                    }
+                                                ],
+                                                $and: [
+                                                    {
+                                                        'content' : {$regex: mention}
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    },
+                                ],
+                            },
+                            {
+                                $in:["keyword", "$destinationArray.destType"]
+                            },
+                            {
+                                $and:[
+                                    {
+                                        $gt:[{$size:"$officialChannelsArray"}, 0],
+                                    },
+                                    {
+                                        $not:{
+                                            $eq:[
+                                                {
+                                                    $size: '$officialChannelsArray',
+                                                }
+                                            ]
+                                        }
+                                    }
+                                ],
+                            }
+                        ]
+                    }
+                }
+            },
+            {$sort: sorts['più recente']},
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "owner",
+                    foreignField: "username",
+                    as: "user_info",
+                },
+            },
+            {
+                $unwind: "$user_info",
+            },
+            {
+                $project:{
+                    owner: '$owner',
+                    destinationArray: '$destinationArray',
+                    officialChannelsArray: '$officialChannelsArray',
+                    category: '$category',
+                    contentType: '$contentType',
+                    content: '$content',
+                    reactions: '$reactions',
+                    dateOfCreation: '$dateOfCreation',
+                    views_count: {$size: '$views'},
+                    profilePicture: '$user_info.profilePicture',
+                }
+            },
+            {$skip: parseInt(offset)},
+            {$limit: parseInt(limit)},
+        ])
+
+        return posts;
+
+    }catch (err) {
         throw err;
     }
 }
@@ -1195,5 +1316,6 @@ module.exports = {
     getPostHome,
     getPostByUsername2watch,
     getPostByProfile,
-    getPostHomeAnonymous
+    getPostHomeAnonymous,
+    getPostFromMention
 }

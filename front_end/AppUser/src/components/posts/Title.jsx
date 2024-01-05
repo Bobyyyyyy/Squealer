@@ -21,9 +21,9 @@ function Title({post}) {
                         </Link>
                         <h2 className="flex gap-2 w-fit h-fit">
                             {post.destinationArray.map((dest) => {
-                                const isUser = dest.destType === "user";
-                                const name = (isUser ? "@" : "§") + dest.name;
-                                const path = isUser ? `/search/${dest.name}` : `/channels/${dest.name}`;
+                                const symbol = (dest.destType === "user" ? "@" : (dest.destType === "channel" ? "§" : (dest.destType === "keyword" ? "#" : "error")));
+                                const name = symbol + dest.name;
+                                const path = (symbol === "@" ? `/search/${dest.name}` : (symbol === "§" ?`/channels/${dest.name}` : (symbol === "#" ? `/search/keyword/${dest.name}`: "/")));
                                 return(
                                     <Link to={path} key={dest._id}>
                                         <span>{name}</span>
