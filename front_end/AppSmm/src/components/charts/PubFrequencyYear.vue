@@ -17,7 +17,7 @@ let barReady = ref(false);
 
 onMounted(async () => {
   (await getPostsDate(vip.value.name, false)).forEach(date => {
-    let monthPost = num2Month[date.split(/[^0-9]+/)[1]]
+    let monthPost = num2Month[parseInt(date.split('-')[1])]
     postPerMonth[monthPost] += 1;
   })
   barReady.value = true;
@@ -31,7 +31,7 @@ onMounted(async () => {
         datasets:[
             {
               label:'Squeals',
-              backgroundColor: '#1475f8',
+              backgroundColor: '#EA7F28',
               data: Object.values(postPerMonth),
             }
         ]

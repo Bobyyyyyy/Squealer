@@ -184,7 +184,7 @@
         closeModal(true, await res.json());
 
         if (timed.value) {
-          setupBeep(numberOfRepetitions.value, numFrequency.value, typeFrequency.value);
+          setupBeep(numberOfRepetitions.value - 1, numFrequency.value, typeFrequency.value);
         }
       }
       else{

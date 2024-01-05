@@ -11,7 +11,6 @@ const vip = computed(()=>store.getters.getVip);
 
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
 
-let thisMonth = new Date().toString().split(' ')[2];
 
 let postPerDay = {
   1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0, 10:0, 11:0, 12:0, 13:0, 14:0, 15:0, 16:0, 17:0, 18:0, 19:0, 20:0, 21:0, 22:0, 23:0, 24:0, 25:0, 26:0, 27:0, 28:0, 29:0, 30:0, 31:0
@@ -32,11 +31,11 @@ onMounted(async () => {
 
 <template>
   <Bar v-if="barReady" :data="{
-        labels: [...Array(new Date(2023,thisMonth,0).getDate()).keys()],
+        labels: Object.keys(postPerDay),
         datasets:[
             {
               label:`Squeals`,
-              backgroundColor: '#1475f8',
+              backgroundColor: '#EA7F28',
               data: Object.values(postPerDay),
             }
         ]

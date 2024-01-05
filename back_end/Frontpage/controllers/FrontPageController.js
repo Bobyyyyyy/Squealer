@@ -17,7 +17,8 @@ const login  = async (req,res,next) => {
         req.response = await loginUser(req.body, mongoCredentials);
         next();
     } catch (err) {
-        res.status(err.statusCode).send(err.mes);
+        console.log(err);
+        res.status(err.statusCode).send({message: err.mes});
     }
 }
 
