@@ -29,11 +29,6 @@ function Post({post}) {
         // effettivamente quando il componente viene renderizzato
         const user = getUsernameFromSessionStore();
         if (id !== activeButton) {
-            const newReaction = {
-                rtype: id,
-                user: user,
-                date: new Date().toISOString(),
-            }
             await fetch(`/db/post/updateReaction`,{
                 method:"PUT",
                 headers: {
