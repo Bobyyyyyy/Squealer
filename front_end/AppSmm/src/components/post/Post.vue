@@ -16,9 +16,7 @@
     }
   })
 
-  function getIdMap(){
-    return `map${props.numberOfPost}${Math.floor(Math.random() * 10000)}`;
-  }
+  const idMap = `map${props.numberOfPost}${Math.floor(Math.random() * 10000)}`
 
   const onlyUser = computed(() => {
     let tmpArr = props.dest.split(', ');
@@ -45,7 +43,7 @@
         <img v-if="post.contentType==='image'" :src="post.content"  alt="silly cat" class="img-fluid" />
         <postMap v-if="post.contentType==='geolocation'"
                  :latlng = "post.content"
-                 :mapID = "getIdMap()"
+                 :mapID = "idMap"
         />
         <div v-if="post.contentType === 'text'" class="mb-0 m-2 mb-2 align-self-center w-100" v-html="htmlContent"></div>
         <iframe v-if="post.contentType ==='video'" :src="post.content" width="100%" height="100%" allowfullscreen></iframe>

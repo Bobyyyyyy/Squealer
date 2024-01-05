@@ -1,36 +1,43 @@
 <script setup>
 import {Modal} from "bootstrap";
-import {reactive, ref} from "vue";
+import {computed, reactive, ref} from "vue";
 import {parseDestinationsViewPost} from "../../../utils/functions.js";
 import Post from "../Post.vue";
 import Reply from "./Reply.vue";
 import {useToast} from "vue-toast-notification";
+import {useStore} from "vuex";
 
 const $toast = useToast();
+const store = useStore();
 
 const reply = ref('');
-const modalStateQuota = reactive({replies: null});
+const modalState = reactive({replies: null});
+const replies = computed(() => store.getters.getReplies);
+const vipImage = computed(() => store.getters.getVip.profilePic);
 
 const props = defineProps({
   post:Object,
   idx:Number,
 })
 
-const replies = ref([]);
+const id =  `repliesModal${props.idx}${Math.floor(Math.random() * 1000)}`;
+
 const readyReplies = ref(false);
 
 const openModal = async () => {
   let res = await fetch(`/db/reply?parentid=${props.post._id}`, {
     method:"GET"
   })
-  if (res.ok) replies.value = await res.json();
+  if (res.ok) store.commit('setReplies', await res.json());
   readyReplies.value = true;
-  modalStateQuota.replies = new Modal(`#${getId()}`,{});
+  modalState.replies = new Modal(`#${id}`,{});
 
-  modalStateQuota.replies.show()
+  modalState.replies.show()
 }
 function closeModal() {
-  modalStateQuota.replies.hide()
+  modalState.replies.hide();
+  store.commit('deleteReplies');
+  modalState.replies = null;
 }
 
 async function addComment(){
@@ -45,6 +52,7 @@ async function addComment(){
     })
   })
   if(res.ok){
+    store.commit('pushReply', {...await res.json(), profilePicture: vipImage.value});
     $toast.success('commmento inserito con successo', {position:'top-right'});
   }
   else $toast.error(`errore: ${(await res.json()).message}`);
@@ -54,12 +62,10 @@ defineExpose({
   openModal,
 })
 
-const getId =  () => `repliesModal${props.idx}`;
-
 </script>
 
 <template>
-  <div class="modal fade" :id="getId()" tabindex="-1" aria-hidden="true">
+  <div class="modal fade" :id="id" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered ">
       <div class="modal-content modalReplyDim">
         <div class="modal-header">
@@ -72,7 +78,7 @@ const getId =  () => `repliesModal${props.idx}`;
               :dest= "parseDestinationsViewPost(post.destinationArray, post.officialChannelsArray)"
               :numberOfPost="1"
               :viewFooter="false"
-              picProfile = "/img/defaultUser.jpeg"
+              :picProfile = "post.profilePicture"
           />
           <Reply v-if="readyReplies" v-for="(reply, idx) in replies"
                  :key="idx"

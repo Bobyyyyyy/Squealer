@@ -22,7 +22,8 @@ export const store = createStore({
                     name: '',
                     profilePic: '',
                 }
-            }
+            },
+            currReplies: [],
         }
     },
     mutations: {
@@ -74,6 +75,16 @@ export const store = createStore({
             state.user_info.vip.name= '';
             state.user_info.vip.profilePic = '';
         },
+        setReplies(state, replies){
+            state.currReplies = replies;
+        },
+        pushReply(state, reply){
+            console.log(reply);
+            state.currReplies.unshift(reply);
+        },
+        deleteReplies(state){
+            state.currReplies = []
+        }
     },
     getters:{
         getQuota(state){
@@ -97,6 +108,9 @@ export const store = createStore({
         getSmm(state){
             return state.user_info.smm;
         },
+        getReplies(state){
+            return state.currReplies;
+        }
     }
 })
 
