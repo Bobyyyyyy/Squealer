@@ -543,11 +543,7 @@ const deleteUser = async(name) => {
         await User.updateMany({'typeUser': 'smm', 'vipHandled': name},{$pull: {'vipHandled': name}}).lean();
         await Notification.deleteMany({$or: [{'sender': name}, {'user': name}]}).lean();
         await Post.deleteMany({'owner': name}).lean();
-        let posts = await Post.find({'destinationArray.name': name});
-     //   for (let post of posts) {
-       //     await removeDestination(name, post._id);
-        //}
-
+        await Post.deleteMany({'destinationArray.name': name});
         await Post.updateMany({reactions:{$elemMatch:{user: name}}}, {$pull: {'reactions': {'user':name}}});
         await Reply.deleteMany({'owner': name}).lean();
 
