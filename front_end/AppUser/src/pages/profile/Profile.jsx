@@ -1,6 +1,6 @@
 import {
     getUsernameFromSessionStore,
-    getPostByUsername,
+    getPostByProfile,
     getUserInfoByUsername,
     getQuotaByUsername,
     handleLogout,
@@ -68,7 +68,7 @@ function Profile () {
 
     const fetchPosts = async () => {
         setIsLoading(true);
-        let newPosts = await getPostByUsername(name, currentOffset.current, POST_TO_GET);
+        let newPosts = await getPostByProfile(currentOffset.current, POST_TO_GET);
         currentOffset.current += newPosts.length;
         lastRequestLength.current = newPosts.length;
         setPosts((prev) => [...prev, ...newPosts]);

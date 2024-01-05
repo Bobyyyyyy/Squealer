@@ -10,10 +10,14 @@ function Title({post}) {
     const tempo = parseTime(post);
     
     useEffect(()=> {
-        getProfilePicByUsername(post.owner)
-            .then((res)=>{
-                setProfilePic(res)
-            })
+        if (post.hasOwnProperty("profilePicture")) {
+            setProfilePic(post.profilePicture);
+        } else {
+            getProfilePicByUsername(post.owner)
+                .then((res)=>{
+                    setProfilePic(res)
+                })
+        }
     }, [])
 
 

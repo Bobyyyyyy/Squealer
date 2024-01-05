@@ -3,7 +3,7 @@ const User = require("../schemas/User");
 const Reply = require("../schemas/Reply");
 const Channel = require("../schemas/Channel");
 const Notification = require("../schemas/Notification")
-const ReservedChannel = require("../schemas/officialChannels");
+const OfficialChannel = require("../schemas/officialChannels");
 const {connectdb, createError, mongoCredentials,find_remove, CRITICAL_MASS_MULTIPLIER, sorts} = require("./utils");
 const {scheduledPostArr, getNextTick} = require("../controllers/utils");
 const nodeCron = require("node-cron");
@@ -196,7 +196,7 @@ const addPost = async (post,quota) => {
                 throw createError("canale non esistente!", 400);
             }
             /* canale ufficiale non esiste e l'utente non mod*/
-            else if (destinationType === 'official' && (!(await ReservedChannel({name: destination.name})) || (creator.typeUser !== 'mod'))) {
+            else if (destinationType === 'official' && (!(await OfficialChannel.findOne({name: destination.name})) || (creator.typeUser !== 'mod'))) {
                 throw createError("canale ufficiale non esistente o utente non moderatore!", 400);
             }
             /* tipo di destinatario non inserito */
@@ -431,14 +431,13 @@ const getAllPost = async (query,sessionUser) =>{
 
 /**
  *
- * @param {String} user
+ * @param {String} userInSession
  * @param {Number} limit
  * @param {Number} offset
  * @return {Promise<void>}
  */
-const getPostHome = async (user , limit, offset) => {
+const getPostHome = async (userInSession , limit, offset) => {
     try{
-
         await connection.get();
 
         let posts = await Post.aggregate([
@@ -449,9 +448,9 @@ const getPostHome = async (user , limit, offset) => {
                         {
                             $match: {
                                 $or: [
-                                    { 'creator': user },
-                                    { 'admins': user },
-                                    {'followers.user': user},
+                                    { 'creator': userInSession },
+                                    { 'admins': userInSession },
+                                    {'followers.user': userInSession},
                                 ],
                             },
                         },
@@ -466,11 +465,11 @@ const getPostHome = async (user , limit, offset) => {
             },
             {
                 $lookup: {
-                    from: "officialChannels",
+                    from: "officialchannels",
                     pipeline: [
                         {
                             $match: {
-                                silenced: { $in: [user] }
+                                silenced: userInSession,
                             },
                         },
                         {
@@ -485,74 +484,62 @@ const getPostHome = async (user , limit, offset) => {
             {
                 $match: {
                     $expr: {
-                        $and:[
+                        $or: [
                             {
-                                $not: [
+                                $and: [
                                     {
-                                        $eq: ["$owner", user],
+                                        $in: [
+                                            "channel",
+                                            "$destinationArray.destType",
+                                        ],
+                                    },
+                                    {
+                                        $reduce:{
+                                            input:'$channel_info',
+                                            initialValue: false,
+                                            in: {
+                                                $or:[
+                                                    '$$value',
+                                                    {
+                                                        $in:["$$this.name", '$destinationArray.name']
+                                                    }
+                                                ]
+                                            }
+                                        }
                                     },
                                 ],
                             },
                             {
-                                $or: [
+                                $in:["keyword", "$destinationArray.destType"]
+                            },
+                            {
+                                $and:[
                                     {
-                                        $and: [
-                                            {
-                                                $in: [
-                                                    "channel",
-                                                    "$destinationArray.destType",
-                                                ],
-                                            },
-                                            {
-                                                $reduce:{
-                                                    input:'$channel_info',
-                                                    initialValue: false,
-                                                    in: {
-                                                        $or:[
-                                                            '$$value',
-                                                            {
-                                                                $in:["$$this.name", '$destinationArray.name']
+                                        $gt:[{$size:"$officialChannelsArray"}, 0],
+                                    },
+                                    {
+                                        $not:{
+                                            $eq:[
+                                                {
+                                                    $size:{
+                                                        $filter: {
+                                                            input: '$silenced_official',
+                                                            as: 'off_sil',
+                                                            cond:{
+                                                                $in:['$$off_sil.name', '$officialChannelsArray']
                                                             }
-                                                        ]
-                                                    }
-                                                }
-                                            },
-                                        ],
-                                    },
-                                    {
-                                        $in:["keyword", "$destinationArray.destType"]
-                                    },
-                                    {
-                                        $and:[
-                                            {
-                                                $gt:[{$size:"$officialChannelsArray"}, 0],
-                                            },
-                                            {
-                                                $not:{
-                                                    $eq:[
-                                                        {
-                                                            $size:{
-                                                                $filter: {
-                                                                    input: '$silenced_official',
-                                                                    as: 'off_sil',
-                                                                    cond:{
-                                                                        $in:['$$off_sil.name', '$officialChannelsArray']
-                                                                    }
-                                                                }
-                                                            },
-                                                        },
-                                                        {
-                                                            $size: '$officialChannelsArray',
                                                         }
-                                                    ]
+                                                    },
+                                                },
+                                                {
+                                                    $size: '$officialChannelsArray',
                                                 }
-                                            }
-                                        ]
+                                            ]
+                                        }
                                     }
                                 ],
                             }
                         ]
-
                     }
                 }
             },
@@ -594,6 +581,194 @@ const getPostHome = async (user , limit, offset) => {
 }
 
 
+const getPostByUsername2watch = async (userInSession , limit, offset, user2watch) => {
+    try{
+        let checkUser2watch = await User.findOne({username: user2watch});
+
+        if (!checkUser2watch) {
+            throw createError("Utente non esiste", 400);
+        }
+
+        let filterChannel = {$and: [
+                {
+                    $or: [
+                        { 'creator': userInSession },
+                        { 'admins': userInSession },
+                        {'followers.user': userInSession},
+                    ],
+                },
+                {
+                    $or: [
+                        { 'creator': user2watch },
+                        { 'admins': user2watch },
+                        {'followers.user': user2watch},
+                    ],
+                }
+            ]}
+
+        await connection.get();
+
+        let posts = await Post.aggregate([
+            {
+                $lookup: {
+                    from: "channels",
+                    pipeline: [
+                        {
+                            $match: filterChannel,
+                        },
+                        {
+                            $project: {
+                                name: "$name",
+                            },
+                        },
+                    ],
+                    as: "channel_info",
+                },
+            },
+            {
+                $match: {
+                    $expr: {
+                        $and: [
+                            {
+                                $eq: [
+                                    user2watch, '$owner'
+                                ]
+                            },
+                            {
+                                $or: [
+                                    {
+                                        $and: [
+                                            {
+                                                $in: [
+                                                    "channel",
+                                                    "$destinationArray.destType",
+                                                ],
+                                            },
+                                            {
+                                                $reduce:{
+                                                    input:'$channel_info',
+                                                    initialValue: false,
+                                                    in: {
+                                                        $or:[
+                                                            '$$value',
+                                                            {
+                                                                $in:["$$this.name", '$destinationArray.name']
+                                                            }
+                                                        ]
+                                                    }
+                                                }
+                                            },
+                                        ],
+                                    },
+                                    {
+                                        $in:["keyword", "$destinationArray.destType"]
+                                    },
+                                ]
+                            },
+                        ],
+                    }
+                }
+            },
+            {$sort: sorts['più recente']},
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "owner",
+                    foreignField: "username",
+                    as: "user_info",
+                },
+            },
+            {
+                $unwind: "$user_info",
+            },
+            {
+                $project:{
+                    owner: '$owner',
+                    destinationArray: '$destinationArray',
+                    officialChannelsArray: '$officialChannelsArray',
+                    category: '$category',
+                    contentType: '$contentType',
+                    content: '$content',
+                    reactions: '$reactions',
+                    dateOfCreation: '$dateOfCreation',
+                    views_count: {$size: '$views'},
+                    profilePicture: '$user_info.profilePicture',
+                }
+            },
+            {$skip: parseInt(offset)},
+            {$limit: parseInt(limit)},
+        ])
+
+        return posts;
+
+    }catch (err){
+        throw err;
+    }
+}
+
+
+const getPostByProfile = async (username, limit, offset) => {
+    try {
+        await connection.get();
+
+        let posts = await Post.aggregate([
+            {
+                $match: {
+                    $expr: {
+                        $or: [
+                            {
+                                $eq: [
+                                    "$owner",
+                                    username
+                                ]
+                            },
+                            {
+                                $eq: [
+                                    username,
+                                    "$destinationArray.name"
+                                ]
+                            }
+                        ]
+                    }
+                }
+            },
+            {$sort: sorts['più recente']},
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "owner",
+                    foreignField: "username",
+                    as: "user_info",
+                },
+            },
+            {
+                $unwind: "$user_info",
+            },
+            {
+                $project:{
+                    owner: '$owner',
+                    destinationArray: '$destinationArray',
+                    officialChannelsArray: '$officialChannelsArray',
+                    category: '$category',
+                    contentType: '$contentType',
+                    content: '$content',
+                    reactions: '$reactions',
+                    dateOfCreation: '$dateOfCreation',
+                    views_count: {$size: '$views'},
+                    profilePicture: '$user_info.profilePicture',
+                }
+            },
+            {$skip: parseInt(offset)},
+            {$limit: parseInt(limit)},
+        ])
+        return posts;
+
+    } catch (err) {
+        throw err;
+    }
+}
+
+
 const removeDestination = async (destination,postID)=> {
     try {
         await connection.get()
@@ -615,7 +790,7 @@ const removeDestination = async (destination,postID)=> {
         }
     }
     catch (error) {
-        throw err;
+        throw error;
     }
 }
 
@@ -669,7 +844,7 @@ const addDestination = async (destination,postID) => {
                 break;
 
             case 'official':
-                let officialChannel = await ReservedChannel.findOne({name: destination.name});
+                let officialChannel = await OfficialChannel.findOne({name: destination.name});
                 if(!officialChannel) {
                     throw createError('Canale Non esiste',400);
                 }
@@ -913,5 +1088,7 @@ module.exports = {
     postLength,
     addDestination,
     addPosition,
-    getPostHome
+    getPostHome,
+    getPostByUsername2watch,
+    getPostByProfile
 }

@@ -33,8 +33,21 @@ async function getQuotaByUsername(username) {
 
 async function getPostByUsername(username, offset = 0, limit = POST_TO_GET){
     try {
-        let res = await fetch(`/db/post/all?name=${username}&offset=${offset}&limit=${limit}`, {
-            method: 'GET',
+        let res = await fetch(`/db/post/user2watch?offset=${offset}&limit=${limit}&user2watch=${username}`, {
+            method: 'GET'
+        });
+        if (res.ok) {
+            return await res.json();
+        }
+    } catch (e) {
+        console.log(e);
+    }
+}
+
+async function getPostByProfile(offset = 0, limit = POST_TO_GET){
+    try {
+        let res = await fetch(`/db/post/profile?offset=${offset}&limit=${limit}`, {
+            method: 'GET'
         });
         if (res.ok) {
             return await res.json();
@@ -272,5 +285,6 @@ export {
     getNotification,
     scrollEndDetectorHandler,
     resetPosts,
+    getPostByProfile,
     POST_TO_GET,
 }
