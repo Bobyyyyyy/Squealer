@@ -114,14 +114,14 @@ const showPosts = (filter,offset,limit,append = false) => {
                         
                         <div class="d-flex flex-row ms-auto flex-wrap">
                             <div class="btn-group dropup">
-                                <button class="btn fontcustom" onclick="getReplies('${post._id}')" data-bs-toggle="tooltip" data-bs-placement="top" title="Mostra risposte" ><i class="bi bi-chat-square-text-fill" ></i></button>
-                                <button class="btn fontcustom"  data-bs-toggle="dropdown" aria-expanded="false">
+                                <button class="btn btn-primary fontcustom" onclick="getReplies('${post._id}')" data-bs-toggle="tooltip" data-bs-placement="top" title="Mostra risposte" ><i class="bi bi-chat-square-text-fill" ></i></button>
+                                <button class="btn btn-primary fontcustom"  data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="bi bi-three-dots"></i></i>
                                 </button>
                                 <ul class="dropdown-menu">
                                     <li onclick = "post = '${post._id}'" class="dropdown-item fontcustom" data-bs-toggle="modal" data-bs-target="#changeReactions"> Modifica Reazioni</li>
                                 </ul>
-                                 <button class="btn fontcustom" id="delete-${id}"><i class="bi bi-trash"></i></button>
+                                 <button class="btn btn-primary fontcustom" id="delete-${id}"><i class="bi bi-trash"></i></button>
                             </div>
                            
                         </div>

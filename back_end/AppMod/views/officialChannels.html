@@ -47,7 +47,7 @@
         <!-- Modal Button -->
         <div class="d-flex flex-row align-items-center p-3 pe-0">
             <label for="filter"></label><input class="form-control fontcustom" id="filter" type="text" style="height: 10%; width: 15%; background-color: lightgray" placeholder="Cerca Canale..">
-            <button type="button" class="btn bg-primary ms-auto" data-bs-toggle="modal" data-bs-target="#addChannel" style="font-size: 2vh">
+            <button type="button" class="btn btn-primary ms-auto" data-bs-toggle="modal" data-bs-target="#addChannel" style="font-size: 2vh">
                Aggiungi Canale
             </button>
         </div>
@@ -55,8 +55,12 @@
         <div class="mt-2 mx-auto bg-secondary fw-bold d-flex flex-row align-items-center text-center" style="height:6vh; width: 90vw;">
             <div class="" style="width: 50%; font-size: 2.5vh"> Nome </div>
             <div class="" style="width: 50%; font-size: 2.5vh"> Creatore</div>
+            <div class="" style="width: 50%; font-size: 2.5vh"> Azioni</div>
         </div>
-        <div id="channels" class="d-flex flex-column align-items-center justify-content-center"></div>
+        <div id="channels" class="d-flex flex-column align-items-center justify-content-center">
+            <div class="mt-5 spinner-border text-light" role="status">
+            </div>
+        </div>
 
         <!-- Channel table Pages -->
         <div class="pt-4 d-flex flex-row justify-content-center" aria-label="User Table Pagination">
@@ -94,8 +98,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn bg-secondary" data-bs-dismiss="modal">Chiudi</button>
-                    <button type="submit" class="btn bg-primary" id="addChannelButton">Inserisci</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
+                    <button type="submit" class="btn btn-primary" id="addChannelButton">Inserisci</button>
                 </div>
             </form>
         </div>

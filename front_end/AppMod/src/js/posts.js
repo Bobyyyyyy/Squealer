@@ -101,8 +101,8 @@ const showPosts = (filters,append = false) => {
                         
                         <div class="d-flex flex-row ms-auto flex-wrap">
                             <div class="btn-group dropup">
-                                <button class="btn fontcustom" onclick="getReplies('${post._id}')" data-bs-toggle="tooltip" data-bs-placement="top" title="Mostra risposte" ><i class="bi bi-chat-square-text-fill" ></i></button>
-                                <button class="btn fontcustom"  data-bs-toggle="dropdown" aria-expanded="false">
+                                <button class="btn btn-primary fontcustom" onclick="getReplies('${post._id}')" data-bs-toggle="tooltip" data-bs-placement="top" title="Mostra risposte" ><i class="bi bi-chat-square-text-fill" ></i></button>
+                                <button class="btn btn-primary fontcustom"  data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="bi bi-three-dots"></i></i>
                                 </button>
                                 <ul class="dropdown-menu">
@@ -169,7 +169,7 @@ const showPosts = (filters,append = false) => {
             }).join('\n')}`;
 
             if (filters.offset + filters.limit < LastCall.posts) {
-                $('#under_posts').html(`<div class="mx-auto"> <a id="load_posts" class="link-opacity-100 link-opacity-50-hover bg-secondary text-black rounded p-2 fontcustom"> Carica altri post </a></div>`)
+                $('#under_posts').html(`<div class="mx-auto"> <a id="load_posts" class="link-opacity-100 link-opacity-50-hover btn-secondary text-black rounded p-2 fontcustom"> Carica altri post </a></div>`)
             } else {
                 $('#under_posts').empty();
             }

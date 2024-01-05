@@ -49,7 +49,7 @@ app.use(cors());
 app.enable('trust proxy');
 
 app.engine('html', es6Renderer);
-app.set('views', [__dirname + '/back_end/AppMod/views', __dirname+ '/back_end/Frontpage/views']);
+app.set('views', [__dirname + '/back_end/AppMod/views', __dirname + '/back_end/Frontpage/views']);
 app.set('view engine','html');
 
 

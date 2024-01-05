@@ -138,14 +138,14 @@ const showPosts = (filter,offset,limit,append = false) => {
                         
                         <div class="d-flex flex-row ms-auto flex-wrap">
                             <div class="btn-group dropup">
-                                <button class="btn fontcustom" onclick="getReplies('${post._id}')" data-bs-toggle="tooltip" data-bs-placement="top" title="Mostra risposte" ><i class="bi bi-chat-square-text-fill" ></i></button>
-                                <button class="btn fontcustom"  data-bs-toggle="dropdown" aria-expanded="false">
+                                <button class="btn btn-primary fontcustom" onclick="getReplies('${post._id}')" data-bs-toggle="tooltip" data-bs-placement="top" title="Mostra risposte" ><i class="bi bi-chat-square-text-fill" ></i></button>
+                                <button class="btn btn-primary fontcustom"  data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="bi bi-three-dots"></i></i>
                                 </button>
                                 <ul class="dropdown-menu">
                                     <li onclick = "post = '${post._id}'" class="dropdown-item fontcustom" data-bs-toggle="modal" data-bs-target="#changeReactions"> Modifica Reazioni</li>
                                 </ul>
-                                 <button class="btn fontcustom" id="delete-${id}"><i class="bi bi-trash"></i></button>
+                                 <button class="btn btn-primary fontcustom" id="delete-${id}"><i class="bi bi-trash"></i></button>
                             </div>
                            
                         </div>
@@ -319,7 +319,7 @@ $('#type-select').on('change',() => {
                                 <label for="short-link" class="mt-2 form-label w-25">
                                     <textarea class="form-control" id="short-link" name="shortener" rows="1" placeholder="Inserisci link" style="resize: none;" data-role="none" autocomplete="off"></textarea>
                                 </label>
-                                <button type="button" id="shortener-button" class="btn btn-primary ms-2"> Accorcia link </button>
+                                <button type="button" id="shortener-button" class="btn bg-primary ms-2"> Accorcia link </button>
                             </div>
                             <label for="post-content" class="form-label w-100" style>
                                 <textarea class="form-control" name="content" id="post-content" rows="3" placeholder="Inserisci testo o link per immagine...." style="resize: none" data-role="none" autocomplete="off" required></textarea>

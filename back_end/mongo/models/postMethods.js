@@ -180,6 +180,11 @@ const addPost = async (post,quota) => {
         let officialChannels = post?.officialChannelsArray ? post.officialChannelsArray : [];
         let creator = await User.findOne({username: post.creator});
         for (const destination of destinations) {
+
+            if(!isNaN(parseInt(destination.name))) {
+                throw createError('Nome non valido',400);
+            }
+
             if ( !['user', 'channel', 'official','keyword'].includes(destination.destType)){
                 throw createError(`destinazione non valida. Inserire una destinazione sintatticamente valida.`, 400);
             }
@@ -907,6 +912,9 @@ const removeDestination = async (destination,postID)=> {
 
 const addDestination = async (destination,postID) => {
     try {
+        if(!isNaN(parseInt(destination.name))) {
+            throw createError('Nome non valido',400);
+        }
         await connection.get();
         let checkDestination = await Post.findOne({$and: [{$or: [{'destinationArray.name': destination.name},{'officialChannelsArray': destination.name}]}, {_id: postID}]});
         destination.name = destination.name.trim();
