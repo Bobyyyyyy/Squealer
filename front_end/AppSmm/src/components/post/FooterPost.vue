@@ -100,7 +100,6 @@
   }
 
   onMounted(()=>{
-
     let idx = props.post.reactions.findIndex(el => el.user === vip.value.name);
     if (idx >= 0) currentActive.value = props.post.reactions[idx].rtype
 

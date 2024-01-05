@@ -35,7 +35,7 @@
     requestCompleted.value=true;
   })
 
-  function openModal(name) {
+  function openModal(name, profilePic) {
     name2Use.value = name;
     modalState.myModal.show()
   }
@@ -61,7 +61,7 @@
             :followers="100"
              :username="vip"
              :post="lastVipsPost[index] ? lastVipsPost[index] : {}"
-            @setModal = " (username) => openModal(username)"
+            @setModal = " (username, profilePic) => openModal(username, profilePic)"
     />
 
   </div>

@@ -80,7 +80,7 @@ defineEmits(['openNotificationModal']);
             :class="classes"
             :disabled="disable && !isNotif"
             @click="$emit('openNotificationModal')">
-      {{ text }}
+      <h6 class="m-0 text-center fw-bold">{{text}}</h6>
       <span v-if="isNotif" class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle">
         <span v-if="isNotif" class="visually-hidden">New alerts</span>
       </span>
@@ -89,7 +89,8 @@ defineEmits(['openNotificationModal']);
 
 <style scoped>
   #notification_badge{
-    width: 6vw; height: 3vh
+    width: 6vw;
+    height: 3vh;
   }
 
   @media screen and (max-width: 768px){

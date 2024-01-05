@@ -105,7 +105,7 @@
     </div>
     <div v-if="!smartPhone" class="d-flex flex-column align-items-center">
       <ul class="nav nav-pills flex-column mb-auto">
-        <li>
+        <li class="d-flex flex-row justify-content-center">
           <NotificationBadge :text="vip.name"
                              :class="'nameUser p-0 text-center fw-bold fs-5'"
                              @openNotificationModal="openNotificationModal"
@@ -181,11 +181,11 @@
       height: 100%;
     }
   }
-  
+
  @media screen and (max-width: 1450px) and (min-width: 768px) {
     #sideBar{
       width: 7%;
     }
- } 
+ }
 
 </style>

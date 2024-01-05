@@ -49,22 +49,22 @@ defineExpose({
     datasets: [
         {
           label:'cuori',
-          borderColor:'#FF0000',
-          backgroundColor: '#FF0000',
+          borderColor:'#df1021',
+          backgroundColor: '#df1021',
           data: dataChart['heart'],
           cubicInterpolationMode: 'monotone'
         },
         {
           label:'pollici su',
-          borderColor:'#0000FF',
-          backgroundColor: '#0000FF',
+          borderColor:'#003da5',
+          backgroundColor: '#003da5',
           data: dataChart['thumbs-up'],
           cubicInterpolationMode: 'monotone'
         },
         {
           label:'pollici giù',
-          borderColor:'#00FF00',
-          backgroundColor: '#00FF00',
+          borderColor:'#78be20',
+          backgroundColor: '#78be20',
           data: dataChart['thumbs-down'],
           cubicInterpolationMode: 'monotone'
         },

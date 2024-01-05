@@ -12,9 +12,7 @@
     idx: Number,
   })
 
-  function getId(){
-    return `chartPostModal${props.idx}`
-  }
+  const id = `chartPostModal${props.idx}${Math.floor(Math.random() * 100000000)}`;
 
 
   const DChart = ref();
@@ -46,7 +44,7 @@
   })
 
   onMounted(()=> {
-    modalStateChart.chartPost = new Modal(`#${getId()}`, {})
+    modalStateChart.chartPost = new Modal(`#${id}`, {})
   })
   watch(props.reactions,(data)=>{
     if(Object.keys(data.value).length !== 0){
@@ -59,7 +57,7 @@
 </script>
 
 <template>
-  <div  class="modal modal-xl fade overflow-hidden" :id="getId()" tabindex="-1" aria-hidden="true">
+  <div  class="modal modal-xl fade overflow-hidden" :id="id" tabindex="-1" aria-hidden="true">
     <div class="centralDiv z-1">
       <div class="modal-dialog modal-dialog-centered ">
         <div class="modal-content">
