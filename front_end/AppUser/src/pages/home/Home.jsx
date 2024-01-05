@@ -6,7 +6,6 @@ import {
     scrollEndDetectorHandler
 } from "../../utils/usefulFunctions.js";
 import {Spinner} from "flowbite-react";
-import {loadConfigFromFile} from "vite";
 
 function Home() {
 
