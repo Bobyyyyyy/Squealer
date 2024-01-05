@@ -18,7 +18,6 @@ function Search ()  {
     const [showContent, setShowContent] = useState(false);
 
     const [name, setName] = useState('');
-    const [type, setType] = useState('');
     const [users, setUsers] = useState([]);
 
     const [debouncedName, setDebouncedName] = useState('');
@@ -36,7 +35,7 @@ function Search ()  {
             case "user": {
                 let filter = JSON.stringify({
                     name: name,
-                    type: type
+                    type: ''
                 })
                 let res = await fetch(`/db/user/all?limit=100&offset=0&filter=${filter}`)
                     if (res.ok) {
