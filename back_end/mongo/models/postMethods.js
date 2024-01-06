@@ -1057,14 +1057,15 @@ const addDestination = async (destination,postID) => {
                     return {user: follower.user, sender: 'mod', channel: channel._id};
                 });
 
-                let newAdminNotification = channel.admins.map((follower) => {
-                    return {user: follower.user, sender: 'mod', channel: channel._id};
+                let newAdminNotification = channel.admins.map((admin) => {
+                    return {user: admin, sender: 'mod', channel: channel._id};
                 });
 
                 let creatorNotification = [{user: channel.creator, sender: 'mod', channel: channel._id}];
                 let allNotification = [...newFollowerNotification, ...newAdminNotification, ...creatorNotification];
 
                 await Notification.insertMany(allNotification);
+
                 break;
 
             case 'official':
