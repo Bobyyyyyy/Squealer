@@ -63,7 +63,7 @@ defineEmits(['openNotificationModal']);
               classDropDown="dropstart"
               :dropItems="['cambia VIP', 'mostra notifiche','logout']"
               @action="async (el) => {
-              if (el === 'cambia VIP')  $router.push('/AppSmm/handlevip');
+              if (el === 'cambia VIP')  $router.push('/AppSmm/sceltavip');
               else if (el === 'mostra notifiche') $emit('openNotificationModal')
               else await logout();
       }"
