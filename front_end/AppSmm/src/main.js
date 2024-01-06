@@ -22,9 +22,9 @@ import ChannelProfile from "./components/channels/ChannelProfile.vue";
 
 const app = createApp(App);
 
-app.use(router);
 app.use(store);
 app.use(ToastPlugin);
+app.use(router);
 
 app
     .component('NavBarWel', NavBarWel)
@@ -41,4 +41,3 @@ app
 app.directive('tooltip',tooltips)
 
 app.mount('#app');
-

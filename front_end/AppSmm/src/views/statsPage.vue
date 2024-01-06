@@ -33,11 +33,14 @@ onMounted(async ()=> {
 <template>
   <div class="centralDiv">
     <div class="marginCD">
-      <h1 class="m-0 w-100 text-center"> STATISTICHE GENERALI </h1>
+      <h1 class="m-0 w-100 text-center fw-bold"> STATISTICHE GENERALI </h1>
+      <h3 class="m-0 w-100 text-center">Reazioni negli ultimi 30 giorni</h3>
       <Popularity30days v-if="dataFirstReady" :post="false" :reactions="dataChart"/>
-      <h3 class="m-0 w-100 text-center"> SQUEAL INSERITI QUESTO MESE </h3>
+      <hr class="mb-3">
+      <h3 class="m-0 w-100 text-center">Squeal postati in questo mese</h3>
       <PubFrequencyMonth v-if="firstReady" @ready="secondReady = true" />
-      <h3 class="m-0 w-100 text-center">  SQUEAL INSERITI NELL'ANNO </h3>
+      <hr class="mb-3">
+      <h3 class="m-0 w-100 text-center">Squeal postati nell'anno</h3>
       <PubFrequencyYear v-if="secondReady"/>
     </div>
   </div>

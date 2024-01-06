@@ -89,9 +89,7 @@
   const mapLocationLatLng = ref({});  //get [lat,lon] of current position.
 
   /* QUOTA */
-  const quota2remove = computed(() => (postType.value === 'text' ? textSqueal.value.length : 125)
-      * (timed.value && numberOfRepetitions.value > 1 ? parseInt(numberOfRepetitions.value) : 1)
-  );
+  const quota2remove = computed(() => (postType.value === 'text' ? textSqueal.value.length : 125));
   const quota = computed(() => store.getters.getQuota);
   const getLiveDQuota = computed(()=> (quota.value.daily - (inChannel.value ? quota2remove.value : 0)));
   const getLiveWQuota = computed(()=> (quota.value.weekly - ((inChannel.value ? quota2remove.value : 0) - (getLiveDQuota.value < 0 ? getLiveDQuota.value : 0))));
@@ -118,7 +116,7 @@
 
   async function createPost() {
     try {
-      if (disabled.value){
+      if (inChannel.value && disabled.value){
         throw new Error('quota 0. Acquista quota per continuare');
       }
       let dest = parseDestinations(receiverArr.value);
@@ -133,20 +131,9 @@
         })
       }
       //remove duplicates
-      if (dest.length > 0) dest = dest.filter((dst, index) => dest.indexOf(dst) === index);
-
-      let post = {
-        creator: vip.value.name,
-        contentType: postType.value,
-        dateOfCreation: Date.now(),
-        destinations: dest,
-        timed: timed.value,
-        ...(timed) && {
-          squealNumber: numberOfRepetitions.value,
-          millis: parse2timestamp([numFrequency.value.toString(), typeFrequency.value]),
-        },
-      }
-
+      dest = dest.filter((obj, index) => {
+        return index === dest.findIndex(o => obj.name === o.name && o.destType === obj.destType);
+      });
 
       /* content based on squeal type */
       let content = postType.value === 'geolocation' ? JSON.stringify(mapLocationLatLng.value.value) :
@@ -161,7 +148,18 @@
         return {message: 'Squeal vuoto! Dicci qualcosa'};
       }
 
-      post = {...post, content: content};
+      let post = {
+        creator: vip.value.name,
+        contentType: postType.value,
+        dateOfCreation: Date.now(),
+        destinations: dest,
+        timed: timed.value,
+        content: content,
+        ...(timed) && {
+          squealNumber: numberOfRepetitions.value,
+          millis: parse2timestamp([numFrequency.value.toString(), typeFrequency.value]),
+        },
+      }
 
 
       let res = await fetch("/db/post", {
@@ -180,7 +178,7 @@
       })
       if (res.ok) {
         reset();
-        $toast.success('Squal aggiunto con successo!', {position: 'top-right'});
+        $toast.success('Squeal aggiunto con successo!', {position: 'top-right'});
         closeModal(true, await res.json());
 
         if (timed.value) {
@@ -274,7 +272,7 @@
                   </div>
                 <div class="mt-2 m-lg-1 preview-size" >
 
-                  <textarea v-if=" postType==='text'" rows="6" v-model="textSqueal" :maxlength="maxTextLength" placeholder="cosa pensi?"  class="form-control" :disabled="disabled"></textarea>
+                  <textarea v-if=" postType==='text'" rows="6" v-model="textSqueal" :maxlength="maxTextLength" placeholder="cosa pensi?"  class="form-control"></textarea>
                   <div v-if="!!link && activeChoiceLink" class="d-flex flex-row mt-3 mb-2 align-items-center">
                     <h5 class="fw-light m-0">E' stato rilevato un link. Preferisci crearne uno breve? </h5>
                     <button type="button" class="btn btn-outline-success ms-3 btn-sm " style="width: 5%"
@@ -296,7 +294,7 @@
                     <div class="d-flex flex-column w-100 mt-3">
                       <div class="d-flex flex-row align-items-center">
                         <div class="input-group d-flex flex-row">
-                          <input class="form-control" :disabled="Object.keys(fileUploaded).length !== 0 || disabled"  type="text" placeholder="inserisci URL foto" id="pathImgForm" v-model="imgPath" >
+                          <input class="form-control" :disabled="Object.keys(fileUploaded).length !== 0"  type="text" placeholder="inserisci URL foto" id="pathImgForm" v-model="imgPath" >
                           <button :disabled="Object.keys(fileUploaded).length !== 0" type="button" class="btn btn-secondary" @click=" currentImgPath = imgPath; showImg = true">
                             Anteprima
                           </button>
@@ -305,7 +303,7 @@
                       <h6 class="m-0 mt-2 mb-2 text-center">oppure</h6>
                       <div class="d-flex flex-row align-items-center">
                         <label for="formFile" class="form-label flex-shrink-0 mb-0 me-2">carica una foto</label>
-                        <input :disabled="!canUploadFile || disabled" class="form-control" type="file" id="formFile" accept="image/png, image/jpeg"
+                        <input :disabled="!canUploadFile" class="form-control" type="file" id="formFile" accept="image/png, image/jpeg"
                                @change="(event) => showPreviewUploaded(event)">
                       </div>
                     </div>
@@ -338,8 +336,8 @@
 
                 </div>
                 <div :class="getLiveDQuota < 0 || getLiveWQuota < 0 ? 'justify-content-evenly':'justify-content-center'" class="d-flex flex-row">
-                  <h6 v-if="getLiveDQuota < 0">extra daily quota: {{-getLiveDQuota}}</h6>
-                  <h6 v-if="getLiveWQuota < 0">extra weekly quota: {{-getLiveWQuota}}</h6>
+                  <h6 v-if="getLiveDQuota < 0">quota extra giornaliera: {{-getLiveDQuota}}</h6>
+                  <h6 v-if="getLiveWQuota < 0">quota extra settimanale: {{-getLiveWQuota}}</h6>
                   <div class="d-flex flex-row">
                     <h6 :class="getLiveDQuota < 0 ? 'text-danger':''">{{getLiveDQuota}}</h6>
                     <h6 :class="getLiveWQuota < 0 ? 'text-danger':''">/{{getLiveWQuota}}</h6>

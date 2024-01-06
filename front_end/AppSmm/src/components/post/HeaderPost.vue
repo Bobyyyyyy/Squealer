@@ -40,7 +40,7 @@
   }
 
   .dimOverflowText{
-    max-width: 24rem;
+    max-width: 28rem;
   }
 
   @media screen and (max-width: 768px){

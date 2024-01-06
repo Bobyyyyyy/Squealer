@@ -5,12 +5,14 @@ function getPage(){
     return window.location.pathname.split('/')[2];
 }
 
-async function getPosts(query,offset){
+async function getPosts(query,offset, limit = 12){
     try{
-        let res = await fetch(`/db/post/all?${query}&offset=${offset}`,{
+        let res = await fetch(`/db/post/all?${query}&offset=${offset}&limit=${limit}`,{
             method:"GET",
         });
-        return (await res.json()).map(post => { return {...post, dateOfCreation: new Date(Date.parse(post.dateOfCreation))} });
+        let posts = await res.json();
+        if (posts.length > 0) return posts.map(post => { return {...post, dateOfCreation: new Date(Date.parse(post.dateOfCreation))} });
+        return [];
     }catch (e) {
         throw e
     }

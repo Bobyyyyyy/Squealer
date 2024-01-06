@@ -38,13 +38,13 @@ const readyData = ref(false);
 <template>
   <div class="d-flex flex-row justify-content-between align-items-center lineDim ">
     <div class="d-flex align-items-center justify-content-start sameWidth flex-grow-md">
-      <div  class="border-4 border-primary" style="height: 5.7rem; width: 5.7rem">
+      <div class="border-4 border-primary" style="height: 5.7rem; width: 5.7rem !important;">
         <img :src="channelPic" alt="immagine profilo canale" class="img-fluid rounded-circle h-100 object-fit-cover">
       </div>
-      <div class="text-start bordEl ms-3" >
+      <div class="text-start bordEl ms-3" style="width: calc(100% - 5.7rem)" >
         <router-link :to="{path: `/AppSmm/Canali/${name.split(' ').join('')}`}"
-                     class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover overflow-hidden"
-                     style="white-space: nowrap; text-overflow: ellipsis; width: calc(100% - 5.7rem)"
+                     class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover overflow-hidden d-block w-100"
+                     style="white-space: nowrap; text-overflow: ellipsis;"
         >
           {{ name }}
         </router-link>
