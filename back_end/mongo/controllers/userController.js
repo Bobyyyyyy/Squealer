@@ -118,7 +118,7 @@ const updateSessionVip = async (req,res) => {
 
 const smm2userSession = async (req,res) => {
     try{
-        req.session.type = 'vip'
+        req.session.type = 'user'
         req.session.save();
         res.status(200).send({});
     }

@@ -139,7 +139,7 @@ async function getUserInfoByUsername (username) {
                 res = await res.json();
                 return {
                     profilePicture: res.profilePicture,
-                    typeUser: res.typeUser === 'smm' ? 'vip' : res.typeUser,
+                    typeUser: res.typeUser,
                     _id: res._id,
                     characters: res.characters,
                     maxQuota: res.maxQuota
