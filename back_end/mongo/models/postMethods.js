@@ -743,13 +743,6 @@ const getPostHomeAnonymous = async (limit, offset) => {
                                     },
                                 },
                             },
-
-                            {
-                                $in: [
-                                    "keyword",
-                                    "$destinationArray.destType",
-                                ],
-                            },
                             {
                                 $and: [
                                     {
