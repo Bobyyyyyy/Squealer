@@ -4,7 +4,7 @@ import {ArrowRightIcon} from "../../components/assets/index.jsx";
 
 function ContentPost({type, quota, currentQuota, setCurrentQuota,
                          content, setContent, setImgAsFile, position, setPosition,
-                         destinations, handleError, isQuotaNegative}) {
+                         destinations, handleError, isQuotaNegative, realQuota}) {
 
     const [isLink, setIsLink] = useState(false)
     const [preview, setPreview] = useState(false);
@@ -31,29 +31,48 @@ function ContentPost({type, quota, currentQuota, setCurrentQuota,
     }
 
     const isCurrentQuotaNegative = () => {
-        return currentQuota?.weekly < 0 || isQuotaNegative();
+        return currentQuota?.monthly < 0 || isQuotaNegative();
     }
 
     const updateQuota = (quota2remove) => {
-
         let remainingDquota =  quota.characters.daily - quota2remove;
         let remainingWquota = quota.characters.weekly  - quota2remove;
         let remainingMquota = quota.characters.monthly  - quota2remove;
 
-        if (remainingDquota <= 0 ) {
-            let extraQuota2remove = Math.abs(2*remainingDquota);
-            remainingWquota -= extraQuota2remove;
-            if (extraQuota2remove <= EXTRA_CHARACTERS && remainingWquota >= 0) {
-                // può utilizzare un numero massimo di EXTRA_CHARACTERS
-                handleError("");
-            } else {
-                handleError("Hai finito anche i caratteri extra");
-            }
-        } else if (!isQuotaNegative()){
+        realQuota.current = {
+            daily: remainingDquota,
+            weekly: remainingWquota,
+            monthly: remainingMquota
+        }
+
+        let extraQuota2remove = 0;
+
+        if(remainingDquota < 0) {
+            remainingWquota += remainingDquota;
+            extraQuota2remove += Math.abs(2*remainingDquota);
+            remainingDquota = 0;
+        }
+
+        if(remainingWquota < 0) {
+            remainingMquota += remainingWquota;
+            extraQuota2remove += Math.abs(2*remainingWquota);
+            remainingWquota = 0;
+        }
+
+        let showError = false;
+
+        if (extraQuota2remove > EXTRA_CHARACTERS) {
+            handleError("Hai finito i caratteri extra");
+            showError = true;
+        } else {
+            handleError("");
+        }
+        if (remainingMquota < 0) {
+            handleError("Hai finito la quota");
+        } else if (!showError) {
             handleError("");
         }
 
-        remainingDquota = (remainingDquota < 0) ? 0 : remainingDquota;
         setCurrentQuota({
             daily: remainingDquota,
             weekly: remainingWquota,

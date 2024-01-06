@@ -15,8 +15,8 @@ function Title({post}) {
                     </Link>
                     <div className="flex flex-col ml-4 gap-2">
                         <Link to={`/search/${post.owner}`}>
-                            <h3 className="text-primary w-fit h-fit">
-                                    {post.owner}
+                            <h3 className="text-primary font-semibold text-lg w-fit h-fit">
+                                {post.owner}
                             </h3>
                         </Link>
                         <h2 className="flex gap-2 w-fit h-fit">
