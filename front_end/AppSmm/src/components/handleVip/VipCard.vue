@@ -27,13 +27,13 @@
 </script>
 
 <template>
-  <div class="d-flex flex-column justify-content-around vipCard border-primary bg-body-secondary mt-3 vipcard">
-    <div class="d-flex flex-column justify-content-around align-items-center">
-      <div class="d-flex justify-content-center" style="width: 30%">
+  <div class="d-flex flex-column justify-content-between vipCard border-primary mt-3">
+    <div class="d-flex flex-column justify-content-around align-items-center mt-4">
+      <div class="d-flex justify-content-center profilePicContainer" >
         <img :src=" srcImage " alt="immagine profilo" class="img-fluid rounded-circle" />
       </div>
       <div class="d-flex justify-content-center">
-        <h3 class="mb-0">{{ username }}</h3>
+        <h3 class="mb-0">@{{ username }}</h3>
       </div>
     </div>
     <div class="d-flex flex-column postMargin">
@@ -44,6 +44,7 @@
             :dest= "parseDestinationsViewPost(post.destinationArray, post.officialChannelsArray)"
             :numberOfPost="0"
             :picProfile = "srcImage"
+            :handle = 'true'
         />
       </div>
       <div v-else class="text-center w-100">
@@ -63,8 +64,13 @@
     margin-left: 0.5rem;
     margin-right: 0.5rem;
   }
-  .vipcard{
+  .vipCard{
     border-radius: 5%;
+    background-color: #232323;
+    border: thick double black !important;
+  }
+  .profilePicContainer{
+    height: 15vh;
   }
 
   @media screen and (max-width: 768px){
