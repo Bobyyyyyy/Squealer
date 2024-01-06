@@ -5,6 +5,7 @@ import Post from "../../components/posts/Post.jsx";
 import {
     getPostByOfficialChannelName,
     getUsernameFromSessionStore,
+    isUserAnonymous,
     POST_TO_GET,
     resetPosts,
     scrollEndDetectorHandler
@@ -13,7 +14,7 @@ import {
 function SinglePageOfficialChannel() {
     const channel = useLoaderData();
 
-    const isAnonymous = getUsernameFromSessionStore().match(/guest-\d+/g);
+    const isAnonymous = isUserAnonymous();
     const [isLoading, setIsLoading] = useState(true);
 
     const [posts, setPosts] = useState([]);

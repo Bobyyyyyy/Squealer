@@ -11,6 +11,11 @@ body {
     color: #EA7F28 !important;
 }
 
+.error{
+    color: #ea0000 !important;
+    font-size: 2rem;
+}
+
 .bg-primary{
     background-color: #EA7F28 !important;
     border-color: #EA7F28 !important;
@@ -126,6 +131,10 @@ body {
 
     .link{
         font-size: 2rem !important;
+    }
+
+    .error {
+        font-size: 1.4rem !important;
     }
 
     .fs-login{

@@ -263,7 +263,6 @@ const getNotification = async () => {
     }
 }
 
-const POST_TO_GET = 10;
 
 const scrollEndDetectorHandler = async (lastRequestLength, lastHeightDiv, updatePost) => {
     const postDiv = document.getElementById("postDiv");
@@ -281,6 +280,13 @@ const resetPosts = (setPosts, currentOffset, lastRequestLength, lastHeightDiv) =
     lastRequestLength.current = 0;
     lastHeightDiv.current = 0;
 }
+
+const isUserAnonymous = () => {
+    return getUsernameFromSessionStore().match(/guest-\d+/g) !== null;
+}
+
+const POST_TO_GET = 10;
+const GUESTREGEX = /guest-\d+/g;
 
 export {
     getUsernameFromSessionStore,
@@ -306,5 +312,7 @@ export {
     getPostByProfile,
     getPostByKeyword,
     getPostByMention,
+    isUserAnonymous,
     POST_TO_GET,
+    GUESTREGEX
 }

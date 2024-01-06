@@ -92,7 +92,7 @@ function ChannelAnonymous () {
                         {officialChannels.length === 0 &&
                             <div className="flex w-full items-center justify-center mt-8 text-2xl text-center">
                                 <p>
-                                    Nessun utente trovato
+                                    Nessun canale trovato
                                 </p>
                             </div>
                         }

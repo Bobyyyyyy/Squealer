@@ -11,7 +11,8 @@ import {
 import {
     checkChannelExists,
     checkUserExists,
-    setUsernameInSessionStore
+    setUsernameInSessionStore,
+    GUESTREGEX
 } from "./utils/usefulFunctions.js";
 
 import NotFound from "./pages/notFound/NotFound.jsx";
@@ -33,7 +34,6 @@ import RootLayout from "./layouts/RootLayout.jsx";
 import {Spinner} from "flowbite-react";
 
 function App() {
-    const GUESTREGEX = /guest-\d+/g
     const [isLoading, setIsLoading] = useState(true);
     const [hasLogged, setHasLogged] = useState(false);
 
