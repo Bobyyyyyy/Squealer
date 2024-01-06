@@ -3,38 +3,39 @@
 <head>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <link rel="stylesheet" href="/css/mod.css">
+    <link rel="icon" href="/img/logo.png">
     <title>Squealer</title>
 </head>
 <body class="d-flex flex-column">
 
 <!-- NavBar -->
 <nav class="navbar navbar-expand-sm bg-dark navbar-dark sticky-top fontcustom" style="height: 10%">
-    <div class="container-fluid" >
+    <div class="container-fluid">
         <a class="navbar-brand" style="font-size: 3vh" href="/mod">SquealerMOD</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".dual-collapse2">
-            <span class="navbar-toggler-icon" ></span>
+            <span class="navbar-toggler-icon"></span>
         </button>
         <div class="navbar-collapse collapse dual-collapse2" style="flex-basis: 100%">
             <ul class="navbar-nav me-auto mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="/mod/users">Utenti</a>
+                    <a class="nav-link active" aria-current="page"  role="button" href="/mod/users">Utenti</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/mod/posts">Posts</a>
+                    <a class="nav-link" role="button" href="/mod/posts">Squeal</a>
                 </li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle " role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Channels
+                    <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Canali
                     </a>
-                    <ul class="dropdown-menu fontcustom">
-                        <li><a class="dropdown-item" href="/mod/officialChannels">Official Channels</a></li>
+                    <ul class="dropdown-menu fontcustom "  role="button">
+                        <li><a class="dropdown-item" href="/mod/officialChannels">§CANALI</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="/mod/userChannels">Private Channels</a></li>
+                        <li><a class="dropdown-item" href="/mod/userChannels">§canali</a></li>
                     </ul>
                 </li>
             </ul>
-            <span class="navbar-text text-white ms-auto me-2 fontcustom" >@<span id="session-user">${user}</span></span>
-            <button class="btn btn-outline-light bg-accent fontcustom" onclick="window.location.href = '/logout'">Logout</button>
+            <span class="navbar-text text-white ms-auto me-2 fontcustom">@<span id="session-user">${user}</span></span>
+            <button class="btn btn-outline-light bg-accent fontcustom" onclick="window.location.href = '/logout'">Disconnettiti</button>
         </div>
     </div>
 </nav>
@@ -49,7 +50,7 @@
         <label for="filter" class="form-label"></label>
         <input class="form-control fontcustom" id="filter" type="text" style="height: 10%; width: 15%; background-color: lightgray" placeholder="Cerca Utente..">
 
-        <div id="user-type" class="btn-group ms-3" role="group" aria-label="">
+        <div id="user-type" class="btn-group ms-3" role="group" aria-label="Radio buttons for type of squeals">
             <input type="radio" class="btn-check" name="filters" id="filter-all" value="" autocomplete="off" checked>
             <label class="btn bg-secondary fontcustom" for="filter-all">All</label>
 
@@ -66,15 +67,16 @@
             <label class="btn bg-secondary fontcustom" for="filter-mod">Mod</label>
         </div>
 
-        <button type="button" class="btn bg-primary fontcustom ms-auto" data-bs-toggle="modal" data-bs-target="#addUser">
+        <button type="button" class="btn btn-primary fontcustom ms-auto" data-bs-toggle="modal" data-bs-target="#addUser">
             Add User
         </button>
     </div>
 
         <!-- User Table -->
-    <div class="mx-auto" id="table1"></div>
-
-
+    <div class="mx-auto d-flex flex-column align-items-center justify-content-center" id="table1">
+        <div class="mt-5 spinner-border text-light" role="status">
+        </div>
+    </div>
         <!-- User Table Pages -->
     <nav aria-label="User Table Pagination">
         <ul class="pagination justify-content-center" id="pages"></ul>
@@ -132,8 +134,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn bg-secondary" data-bs-dismiss="modal">Chiudi</button>
-                <button type="submit" class="btn bg-primary">Inserisci</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
+                <button type="submit" class="btn btn-primary">Inserisci</button>
             </div>
             </form>
         </div>
@@ -145,7 +147,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header bg-primary">
-                    <h1 class="modal-title fs-5 " id="modUserLabel"></h1>
+                    <h1 class="modal-title fs-5" id="modUserLabel"></h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                     <div class="modal-body">
@@ -165,9 +167,10 @@
                             <div class="mx-auto"><span class="fw-bold">Monthly Max Quota: <span id="max-monthly"></span> </span></div>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn bg-secondary" data-bs-dismiss="modal">Chiudi</button>
-                        <button class="btn bg-primary" id="modifyButton">Modifica</button>
+                    <div class="modal-footer d-flex">
+                        <button class="btn btn-danger text-white me-auto" id="deleteButton">Elimina Account</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
+                        <button class="btn btn-primary" id="modifyButton">Modifica</button>
                     </div>
             </div>
         </div>
@@ -184,6 +187,7 @@
         </div>
     </div>
 </div>
+
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script src="/js/modHomepage.js"></script>

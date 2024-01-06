@@ -1,8 +1,12 @@
 <script setup>
-import {currentVip} from "../utils/config.js";
 import {Modal} from "bootstrap";
 import BuyQuota from "./BuyQuota.vue";
-import {onMounted, reactive} from "vue";
+import {computed, onMounted, reactive} from "vue";
+import {useStore} from "vuex";
+
+const store = useStore();
+
+const vip = computed(()=> store.getters.getVip);
 
 const modalStateQuota = reactive({quota: null});
 
@@ -34,7 +38,7 @@ onMounted(()=> {
       <div class="modal-dialog modal-dialog-centered ">
         <div class="modal-content">
           <div class="modal-header">
-            <h1 class="modal-title fs-5 fw-bolder"> Compra quota - {{currentVip}}</h1>
+            <h1 class="modal-title fs-5 fw-bolder"> Compra quota - {{vip.name}}</h1>
             <button type="button" class="btn-close" @click="closeModal" aria-label="Close"></button>
           </div>
           <div class="modal-body">

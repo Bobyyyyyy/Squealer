@@ -85,22 +85,25 @@ function userTable (limit,offset,filter,type) {
         data: {filter: {name: filter,type: type}, limit: limit, offset: offset},
         type: 'get',
         success: (data) => {
+            console.log(data);
             $('#pages').empty();
 
             if(data.length === 0) {
-                $('#table1').empty().append(`<h4 class="text-white">Nessun Utente trovato</h4>`);
+                $('#table1').empty().append(`<h4 class="mt-5 text-white">Nessun Utente trovato</h4>`);
                 return;
             }
 
-            let header = `<table class="table table-hover fontcustom border-black" style="vertical-align: middle; text-align: center;">
+            let header = `<table class="table fontcustom border-black" style="vertical-align: middle; text-align: center;">
                         <!-- Header Tabella -->
                         <thead class="bg-secondary">
+                            <th> Immagine Profilo</th>
                             <th> Nome </th>
                             <th> Quota Rimanente </th>
                             <th> Quota Massima </th>
                             <th> Popolarita' </th>
                             <th> Impopolarita' </th>
                             <th> Tipo </th>
+                            <th> Azioni </th>
                         </thead>
                         <tbody>`
 
@@ -108,12 +111,13 @@ function userTable (limit,offset,filter,type) {
         ${$.map(data, (user, index) => {
             let row = `
             <!-- Righe Tabella -->
-            <tr id="user-${index}">
+            <tr>
+            <td> <span class=""> <img src="${user.profilePicture}" alt="immagine profilo" style="width: 40%; aspect-ratio: 1; border-radius: 50%" > </span>  </td>
             <!-- Nome -->
             <td> ${user.username} </td>`
 
                 if (`${user.typeUser}` === 'mod') {
-                    row = row + `<td><span>Not a Field</span></td><td><span>Not a Field</span></td><td>Not a Field</td><td>Not a Field</td>`
+                    row = row + `<td colspan="6"><span>mod</span></td>`
                 } else {
                     let remainingQuota = {daily: user.characters.daily,weekly: user.characters.weekly,monthly: user.characters.monthly};
                     let maxQuota = {daily: user.maxQuota.daily, weekly: user.maxQuota.weekly, monthly: user.maxQuota.monthly};
@@ -128,14 +132,16 @@ function userTable (limit,offset,filter,type) {
                                     <li> Monthly: ${user.maxQuota.monthly} </li>
                                  </ul></td>
                                  <td> ${user.popularity}</td>
-                                 <td> ${user.unpopularity}</td>
+                                 <td> ${user.unpopularity}</td>`
+                    row = row + `<td> ${user.typeUser} </td>`;
+                    
+                    row = row + `<td><button class="btn btn-primary" id="user-${index}">Gestisci</button></td></tr>
                              <script>
                              $('#user-'+${index}).on('click', () => {
                                 showUserModal('${user.username}',${JSON.stringify(remainingQuota)},${JSON.stringify(maxQuota)});
                              })
                              </script>`
                 }
-                row = row + `<td> ${user.typeUser} </td></tr>`;
 
                 return row;
 
@@ -193,7 +199,7 @@ $('#addUserForm').on('submit',(event) => {
             location.reload();
         },
         error: (error) => {
-            $('#toast-content').empty().html(error.responseText);
+            $('#toast-content').empty().html(error.responseJSON.message);
             let toastList = inizializeToast();
             toastList.forEach(toast => toast.show());
         }
@@ -217,23 +223,23 @@ function inizializeToast() {
 }
 
 
-function deleteUser(name) {
+$('#deleteButton').on('click',() => {
 
-    console.log(name)
+    let user = $('#modUserLabel').html();
     $.ajax({
-        url: '/db/user/delete',
+        url: `/db/user/delete/${user}`,
         type: 'delete',
-        data: {username: name},
         success: () => {
             location.reload();
         },
         error: (error) => {
-            $('#toast-content').empty().html(error.responseText);
+            $('#toast-content').empty().html(error.responseJSON.message);
             let toastList = inizializeToast();
             toastList.forEach(toast => toast.show());
         }
     })
-}
+})
+
 
 $(document).ready(function() {
     getUsersNumber(LastCall.filter,LastCall.type);

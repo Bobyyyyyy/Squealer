@@ -1,11 +1,11 @@
 <script setup>
 import {useStore} from "vuex";
 import ChartChannel from "./ChartChannel.vue";
-import {reactive, ref, watch} from "vue";
-import {currentVip} from "../../utils/config.js";
+import {computed, ref} from "vue";
 import {parseReactionType} from "../../utils/functions.js";
 
 const store = useStore();
+const vip = computed(() => store.getters.getVip);
 
 const readyReac = ref({});
 const readyData = ref(false);
@@ -21,7 +21,7 @@ const readyData = ref(false);
 
   async function getDataOpenModal(){
 
-    let res = await fetch(`/db/post/allReactionMonth?user=${currentVip.value}&channel=${props.name}`, {
+    let res = await fetch(`/db/post/allReactionMonth?user=${vip.value.name}&channel=${props.name}`, {
       method: "GET",
     })
 
@@ -34,25 +34,26 @@ const readyData = ref(false);
   }
 
 </script>
-
+ text-dark" id="ChannelName"
 <template>
   <div class="d-flex flex-row justify-content-between align-items-center lineDim ">
-    <div class="d-flex align-items-center justify-content-start sameWidth">
-      <div  class="border-4 border-primary" style="height: 5.7rem; width: 5.7rem">
-        <img :src="channelPic" alt="immagine profilo canale" class="img-fluid rounded-circle object-fit-scale">
+    <div class="d-flex align-items-center justify-content-start sameWidth flex-grow-md">
+      <div class="border-4 border-primary" style="height: 5.7rem; width: 5.7rem !important;">
+        <img :src="channelPic" alt="immagine profilo canale" class="img-fluid rounded-circle h-100 object-fit-cover">
       </div>
-      <div class="text-start bordEl" >
+      <div class="text-start bordEl ms-3" style="width: calc(100% - 5.7rem)" >
         <router-link :to="{path: `/AppSmm/Canali/${name.split(' ').join('')}`}"
-                     class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"
+                     class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover overflow-hidden d-block w-100"
+                     style="white-space: nowrap; text-overflow: ellipsis;"
         >
           {{ name }}
         </router-link>
       </div>
     </div>
-    <div class="d-flex flex-row sameWidth justify-content-around">
+    <div class="d-flex flex-row flex-wrap sameWidth justify-content-around">
       <div class="text-center bordEl" >
-        <span v-if="creator === currentVip" class="badge rounded-pill text-bg-primary"> creatore </span>
-        <span v-else-if="admins.includes(currentVip)" class="badge rounded-pill text-bg-warning"> admin </span>
+        <span v-if="creator === vip.name" class="badge rounded-pill text-bg-primary"> creatore </span>
+        <span v-else-if="admins.includes(vip.name)" class="badge rounded-pill text-bg-warning"> admin </span>
       </div>
       <div class="text-center bordEl ">
         <span v-if="isPublic" class="badge rounded-pill text-bg-success"> pubblico </span>
@@ -80,5 +81,12 @@ const readyData = ref(false);
   .bordEl{
     margin-left: 0.5%;
     margin-right: 0.5%;
+  }
+
+  @media screen and (max-width: 768px){
+    .flex-grow-md{
+      flex-grow: 3 !important;
+      max-width: 60%;
+    }
   }
 </style>

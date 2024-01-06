@@ -1,6 +1,6 @@
 import {createRouter, createWebHistory} from "vue-router";
-import {currentVip} from "../utils/config.js";
 import {routes} from "./routes.js";
+import {store} from "../store/store.js"
 
 
 const router = createRouter({
@@ -9,20 +9,30 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to)=> {
-    if(to.name === 'channelView'){
-        let query = `/db/channel/check?channel=${to.params.nomeCanale}&user=${currentVip.value}`;
+    if(to.name === 'canaleSingolo'){
+        let vipName = ''
+        if (store.getters.getVip.name === '') {
+            let response = await fetch("/db/user/sessionVip",{
+                method:"GET",
+            });
+            vipName = (await response.json())?.vip || '';
+        }
+        else {
+            vipName = store.getters.getVip.name
+        }
+
+        let query = `/db/channel/check?channel=${to.params.nomeCanale}&user=${vipName}`;
         let res = await fetch(query,{
             method: "GET"
         })
         switch ((await res.json()).canAccessAs) {
-            /* AGGIUNERE LE VIEW DIVERSE IN BASE AL TIPO DI UTENTE */
             case 'admin':
             case 'creator':
             case 'follower':
                 return true;
-            case 'noEntry': {
-                return {name: 'Channels'};
-            }
+            default :
+                return {name: 'Canali'};
+
         }
     }
     return true;

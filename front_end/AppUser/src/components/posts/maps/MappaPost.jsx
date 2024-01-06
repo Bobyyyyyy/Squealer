@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState} from "react";
+import {useRef} from "react";
 import {Icon} from "leaflet";
 import {MapContainer, Marker, Popup, TileLayer} from "react-leaflet";
 

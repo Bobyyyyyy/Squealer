@@ -22,7 +22,6 @@ function NotificationModal({isOpen, setIsOpen, notifications, setNotifications})
             channel,
             names: Array.from(nameSet)
         }));
-        console.log("pretty", resultArray)
         return resultArray;
     }
 
@@ -39,14 +38,13 @@ function NotificationModal({isOpen, setIsOpen, notifications, setNotifications})
         }
     }
 
-    const closeModal = async () => {
+    const handleDeleteNotifications = async () => {
         setIsOpen(false);
         await deleteNotifications();
-        setNotifications([]);
     }
 
     return (
-            <Modal show={isOpen} onClose={closeModal}>
+            <Modal show={isOpen} onClose={() => setIsOpen(false)}>
                 <Modal.Header>
                     Notifiche
                 </Modal.Header>
@@ -54,14 +52,13 @@ function NotificationModal({isOpen, setIsOpen, notifications, setNotifications})
                     <div className="flex flex-col w-full justify-start items-start">
                         {prettyNotification.map((notification, index) => {
                             let users = notifications.filter((not) => not.channel === notification.channel);
-                            console.log(users)
                             return (
                                     <div key={index} className="flex flex-col w-full my-2">
                                         <div className="flex gap-1.5">
                                             In
-                                            <span className="font-semibold">
+                                            <Link to={`/channels/${notification.channel}`} className="font-semibold text-blue-500">
                                                 §{notification.channel}
-                                            </span>
+                                            </Link>
                                             ci sono
                                             <span className="font-semibold">
                                                 {notification.names.length} nuovi post
@@ -78,6 +75,13 @@ function NotificationModal({isOpen, setIsOpen, notifications, setNotifications})
                         })}
                     </div>
                 </Modal.Body>
+                <Modal.Footer>
+                    <button className="button-delete"
+                        onClick={handleDeleteNotifications}
+                    >
+                        Segna come lette
+                    </button>
+                </Modal.Footer>
             </Modal>
         );
 }

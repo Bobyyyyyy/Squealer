@@ -1,5 +1,5 @@
 import MappaPost from "./maps/MappaPost.jsx";
-import React, {useEffect, useState} from "react";
+import React from "react";
 import {Link} from "react-router-dom";
 
 function Body({post}) {
@@ -59,10 +59,13 @@ function Body({post}) {
                 </div>
             }
             {post.contentType === "image" &&
-                <img className="aspect-auto w-full object-cover overflow-hidden" src={post.content} alt={"image"}/>
+                <img className="aspect-auto w-full object-cover overflow-hidden"
+                     src={post.content}
+                     alt="image"
+                />
             }
             {post.contentType === "geolocation" &&
-                <div className=" w-full h-96">
+                <div className="w-full h-96">
                     <MappaPost stringCoor={post.content} />
                 </div>
             }

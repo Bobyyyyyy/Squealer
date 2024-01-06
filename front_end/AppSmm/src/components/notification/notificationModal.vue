@@ -1,10 +1,9 @@
 <script setup>
-import {computed, onMounted, ref} from "vue";
+import {computed, ref} from "vue";
 import {Modal} from "bootstrap";
 
 import {useStore} from "vuex";
 import Notification from "./Notification.vue";
-import {currentVip} from "../../utils/config.js";
 import {useToast} from "vue-toast-notification";
 
 const store = useStore();
@@ -12,6 +11,7 @@ const $toast = useToast();
 
 const modalStateNotification = ref({notificationModal: null});
 const notifications = computed(() => store.getters.getNotifications);
+const vip = computed(() => store.getters.getVip);
 
 const parsedNotification = computed(() => {
   let dict = {};
@@ -38,7 +38,7 @@ const deleteNotifications = async () =>{
   let res = await fetch('/db/notification', {
     method: 'DELETE',
     body: {
-      user: currentVip.value,
+      user: vip.value.name,
     }
   })
   if (res.ok){

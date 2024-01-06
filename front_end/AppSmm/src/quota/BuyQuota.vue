@@ -39,7 +39,7 @@
     }
   )
 
-  const emits = defineEmits('closeModal')
+  const emits = defineEmits(['closeModal'])
 
   function openModalConfQuota() {
     modalConf.value.openModal();
@@ -147,7 +147,7 @@
         </div>
       </div>
     </div>
-    <div class="d-flex flex-row w-100 justify-content-around mt-5">
+    <div class="d-flex flex-row flex-wrap gap-2 w-100 justify-content-around mt-5">
       <input type="checkbox" class="btn-check" id="btnCheckDailyReset" v-model="resetDaily">
       <label class="btn btn-outline-primary" for="btnCheckDailyReset">ripristina giornaliera</label>
 

@@ -1,11 +1,16 @@
 
 <script setup>
-import {computed, onMounted, reactive, ref, watch, watchEffect} from "vue";
+import {computed, onMounted, reactive, ref, watchEffect} from "vue";
 import {Modal} from "bootstrap";
 import AddChannelModal from "../components/channels/AddChannelModal.vue";
 import Channel from "../components/channels/Channel.vue";
-import {currentVip, CHANNEL_OFFSET} from "../utils/config.js";
+import {CHANNEL_OFFSET} from "../utils/config.js";
 import Select from "../components/Select.vue";
+import {useStore} from "vuex";
+
+const store = useStore();
+
+const vip = computed(() => store.getters.getVip);
 
 let offset = ref(0);
 let limit = ref(CHANNEL_OFFSET);
@@ -15,12 +20,12 @@ const searchChannel = ref('');
 const filters = computed(() => {
   let filters = {}
   if(roleFilter.value === '' || roleFilter.value === 'all') {
-    filters.hasAccess = currentVip.value;
-    filters.creator = currentVip.value;
+    filters.hasAccess = vip.value.name;
+    filters.creator = vip.value.name;
     filters.both = true;
   }
-  else if(roleFilter.value === 'admin') filters.hasAccess = currentVip.value;
-  else filters.creator = currentVip.value;
+  else if(roleFilter.value === 'admin') filters.hasAccess = vip.value.name;
+  else filters.creator = vip.value.name;
   if(visibilityFilter.value !== '' && visibilityFilter.value !== 'all') filters.type = visibilityFilter.value;
   if(searchChannel.value !== '') filters.name = searchChannel.value;
   return JSON.stringify(filters);
@@ -51,7 +56,6 @@ function closeChannelModal() {
 }
 
 watchEffect(async () => {
-  console.log(query.value);
   channels.value = await updateChannels(query.value);
 });
 
@@ -59,9 +63,9 @@ watchEffect(async () => {
 
 <template>
   <div class="centralDiv">
-    <div class="marginCD">
-      <div class="d-flex flex-row justify-content-between align-items-end pt-4 pb-2">
-        <div id="filterCh" class="input-group m-0">
+    <div class="marginCD" id="channelListPage">
+      <div  class="d-flex flex-row flex-wrap justify-content-between align-items-end pt-4 mb-2 m-lg-0">
+        <div id="filterCh" class="input-group mb-2 m-lg-0">
           <input  type="text" class="form-control " placeholder="Cerca..." aria-label="channel search" aria-describedby="cerca canale" v-model="searchChannel">
           <button type="submit" class="btn btn-secondary">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
@@ -70,7 +74,6 @@ watchEffect(async () => {
           </button>
         </div>
         <Select
-            classButton="btn btn-secondary"
             updateRef="updateVisibility"
             :dropItems="['public', 'private', 'all']"
             :dropItemsName="['pubblico', 'privato', 'tutto']"
@@ -79,7 +82,6 @@ watchEffect(async () => {
             @updateVisibility="(vis) => visibilityFilter = vis"
         />
         <Select
-            classButton="btn btn-secondary"
             updateRef="updateRole"
             :dropItems="['creator', 'admin', 'all']"
             :dropItemsName="['creatore', 'amministratore', 'tutti']"
@@ -99,7 +101,7 @@ watchEffect(async () => {
                  :isPublic="ch.type === 'public'"
                  :creator="ch.creator"
                  :admins="ch.admins"
-                 channelPic="https://picsum.photos/id/1/300/300"
+                 :channelPic="ch.profilePicture"
         />
       </div>
     </div>
@@ -118,7 +120,10 @@ watchEffect(async () => {
 
   @media screen and (max-width: 768px) {
     #filterCh{
-      width: auto;
+      width: 100%;
+    }
+    #channelListPage{
+      padding-bottom: 4rem;
     }
   }
 

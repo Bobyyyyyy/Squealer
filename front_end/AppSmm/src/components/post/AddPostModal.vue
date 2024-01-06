@@ -1,9 +1,9 @@
 <script setup>
   import 'vue-toast-notification/dist/theme-sugar.css';
-  import {computed, onMounted, reactive, ref} from "vue";
+  import {computed, onMounted, reactive, ref, watch} from "vue";
   import Map from "./Map.vue";
   import {blob2base64, compressBlob, parse2timestamp, setupBeep} from "../../utils/functions.js";
-  import {currentVip, URLHTTPREGEX} from "../../utils/config.js";
+  import {F_QUOTA, MAX_TEXT_LENGTH, URLHTTPREGEX} from "../../utils/config.js";
   import {useStore} from "vuex";
   import Select from "../Select.vue";
   import {useToast} from "vue-toast-notification";
@@ -12,6 +12,7 @@
   const store = useStore();
   const $toast = useToast();
 
+  const vip = computed(() => store.getters.getVip);
   const modalState = reactive({post: null});
 
   const emits = defineEmits(['restoreSideBar', 'addedPost']);
@@ -22,7 +23,10 @@
 
   function closeModal(addedPost, post) {
     emits('restoreSideBar');
-    if(addedPost) emits('addedPost', post);
+    if(addedPost) {
+      post.post.profilePicture = vip.value.profilePic;
+      emits('addedPost', post);
+    }
     modalState.post.hide()
   }
 
@@ -38,16 +42,17 @@
   const infoTimed = `sintassi Squeal:<br>{NUM} per avere il numero corrente dello squeal<br>{TIME} per avere il tempo di pubblicazione dello squeal<br>{DATE} per avere la data di pubblicazione dello squeal`
 
   /* TYPE and USER/CHANNEL */
-  const postType = ref('Select type')
+  const postType = ref('text')
   const receivers = ref('')
   const receiverArr = computed(()=> receivers.value.replaceAll(" ","").split(','))
   const inChannel = computed(()=> {
-    return !!receiverArr.value.find(el => el.startsWith('§'));
+    return !!receiverArr.value.find(el => el.startsWith('§') || el.startsWith('#'));
   });
+  const typeSelect = ref();
 
   /* TIMED MESSAGE */
   const timed = ref(false);
-  const numberOfRepetitions = ref(0);
+  const numberOfRepetitions = ref(1);
   const typeFrequency = ref('select Frequency')
   const numFrequency = ref(0);
 
@@ -84,61 +89,51 @@
   const mapLocationLatLng = ref({});  //get [lat,lon] of current position.
 
   /* QUOTA */
-  const quota2remove = computed(() => (postType.value === 'text' ? textSqueal.value.length : postType.value === 'Select type' ? 0 : 125)
-      * (timed.value && numberOfRepetitions.value > 1 ? parseInt(numberOfRepetitions.value) : 1)
-  );
-  /* 15 è il valore tolto per immagine e geolocalizzazione */
-  const getLiveDQuota = computed(()=> (store.getters.getQuota.daily - (inChannel.value ? quota2remove.value : 0)));
-  const getLiveWQuota = computed(()=> (store.getters.getQuota.weekly - (inChannel.value ? quota2remove.value : 0)));
-  const getLiveMQuota = computed(()=> (store.getters.getQuota.monthly - (inChannel.value ? quota2remove.value : 0)));
+  const quota2remove = computed(() => (postType.value === 'text' ? textSqueal.value.length : 125));
+  const quota = computed(() => store.getters.getQuota);
+  const getLiveDQuota = computed(()=> (quota.value.daily - (inChannel.value ? quota2remove.value : 0)));
+  const getLiveWQuota = computed(()=> (quota.value.weekly - ((inChannel.value ? quota2remove.value : 0) - (getLiveDQuota.value < 0 ? getLiveDQuota.value : 0))));
+  const getLiveMQuota = computed(()=> (quota.value.monthly - ((inChannel.value ? quota2remove.value : 0) - (getLiveWQuota.value < 0 ? getLiveWQuota.value : 0))));
+  const disabled = computed(() => ((quota.value.daily === 0 || quota.value.weekly === 0 || quota.value.monthly === 0) && inChannel.value));
+  const maxTextLength = computed(() => (inChannel.value ? Math.floor(((Math.min(MAX_TEXT_LENGTH, quota.value.daily, quota.value.weekly, quota.value.monthly) + F_QUOTA )/numberOfRepetitions.value)) : MAX_TEXT_LENGTH));
 
+  watch(maxTextLength, () => {
+    if (textSqueal.value.length > maxTextLength.value){
+      textSqueal.value = textSqueal.value.substring(0,maxTextLength.value);
+    }
+  })
 
   function parseDestinations(){
     let dest = [];
-    let tags = []
     receiverArr.value.forEach(receiver => {
-      if(receiver.startsWith('#')){
-        tags.push(receiver.substring(1));
-      }
-      else{
-        dest.push({
-          name: receiver.substring(1),
-          destType: receiver.startsWith('§') ? 'channel' : receiver.startsWith('@') ? 'user' : 'errore',
-        })
-      }
-
+      dest.push({
+        name: receiver.substring(1),
+        destType: receiver.startsWith('§') ? 'channel' : receiver.startsWith('@') ? 'user' : receiver.startsWith('#') ? 'keyword': 'errore',
+      })
     })
-    return [dest, tags];
+    return dest;
   }
 
   async function createPost() {
     try {
-
-      let tags = [];
+      if (inChannel.value && disabled.value){
+        throw new Error('quota 0. Acquista quota per continuare');
+      }
+      let dest = parseDestinations(receiverArr.value);
 
       if (postType.value === 'text') {
-        tags = textSqueal.value.match(/\#\w+/g)
-        if (tags) tags = tags.map(el => el.substring(1));
+        let tags = textSqueal.value.match(/\#\w+/g);
+        if (tags) tags.forEach(tag => {
+          dest.push({
+            name: tag.substring(1),
+            destType: 'keyword',
+          })
+        })
       }
-
-      let [tmpDest, tmpTags] = parseDestinations(receiverArr.value);
-      if (tmpTags?.length > 0) tags = tags.concat(tmpTags);
       //remove duplicates
-      if (tags?.length > 0) tags = tags.filter((tag, index) => tags.indexOf(tag) === index);
-
-      let post = {
-        creator: currentVip.value,
-        contentType: postType.value,
-        dateOfCreation: Date.now(),
-        destinations: tmpDest,
-        timed: timed.value,
-        ...(timed) && {
-          squealNumber: numberOfRepetitions.value,
-          millis: parse2timestamp([numFrequency.value.toString(), typeFrequency.value]),
-        },
-        ...(tags !== []) && {tags: tags}
-      }
-
+      dest = dest.filter((obj, index) => {
+        return index === dest.findIndex(o => obj.name === o.name && o.destType === obj.destType);
+      });
 
       /* content based on squeal type */
       let content = postType.value === 'geolocation' ? JSON.stringify(mapLocationLatLng.value.value) :
@@ -153,7 +148,18 @@
         return {message: 'Squeal vuoto! Dicci qualcosa'};
       }
 
-      post = {...post, content: content};
+      let post = {
+        creator: vip.value.name,
+        contentType: postType.value,
+        dateOfCreation: Date.now(),
+        destinations: dest,
+        timed: timed.value,
+        content: content,
+        ...(timed) && {
+          squealNumber: numberOfRepetitions.value,
+          millis: parse2timestamp([numFrequency.value.toString(), typeFrequency.value]),
+        },
+      }
 
 
       let res = await fetch("/db/post", {
@@ -172,25 +178,25 @@
       })
       if (res.ok) {
         reset();
-        $toast.success('Squal aggiunto con successo!', {position: 'top-right'});
+        $toast.success('Squeal aggiunto con successo!', {position: 'top-right'});
         closeModal(true, await res.json());
 
         if (timed.value) {
-          setupBeep(numberOfRepetitions.value, numFrequency.value, typeFrequency.value);
+          setupBeep(numberOfRepetitions.value - 1, numFrequency.value, typeFrequency.value);
         }
       }
       else{
-        throw res;
+        throw await res.json()
       }
     }
     catch (err){
-      let message = await err.json()
-        $toast.error(message);
+      $toast.error(err.message);
     }
   }
 
   function reset(){
-    postType.value ='Select type'
+    typeSelect.value.reset();
+    postType.value ='text'
     receivers.value = ''
     imgPath.value = ''
     currentImgPath.value= ''
@@ -228,34 +234,45 @@
                       createPost()
                       }">
               <div class="d-flex flex-column">
-                <div class="d-flex flex-row justify-content-between align-items-end">
-                  <div class="d-flex flex-row align-items-end" style="flex:1">
-                    <div class="d-flex flex-column">
+                <div class="d-flex flex-column flex-lg-row justify-content-between align-items-center align-items-lg-end">
+                  <div class="d-flex flex-row align-items-end md-w-100 flex-addpost-dest">
+                    <div class="d-flex flex-column md-w-100">
                       <label for="destPost" class="form-label fw-light">Destinatario/i</label>
-                      <input type="text" class="form-control" id="destPost"  v-model="receivers" required>
+                      <input type="text" class="form-control" placeholder="@pippo, §canalepippo, ..." id="destPost"  v-model="receivers" required>
+                    </div>
+                  </div>
+
+                  <div class="d-flex flex-row align-items-end justify-content-between flex-addpost-typetemp w-100">
+                    <div class="d-flex  justify-content-start justify-content-lg-center w-50 mt-2 mt-lg-0">
+                      <input type="checkbox" class="btn-check" id="btn-check-outlined" v-model="timed" autocomplete="off">
+                      <label class="btn btn-outline-primary" for="btn-check-outlined">Temporizzato</label><br>
+                      <div class="d-flex ms-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16" v-tooltip="infoTimed">
+                          <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                          <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                        </svg>
+                      </div>
                     </div>
 
-                  </div>
-                  <div class="d-flex justify-content-center" style="flex:1 1 0">
-                    <input type="checkbox" class="btn-check" id="btn-check-outlined" v-model="timed" autocomplete="off">
-                    <label class="btn btn-outline-primary" for="btn-check-outlined">Temporizzato</label><br>
-                  </div>
-                  <div class="d-flex flex-row justify-content-end" style="flex: 1 1 0">
-                    <Select
-                        updateRef="updatePostType"
-                        :dropItems="['text','geolocation','image','video']"
-                        :dropItemsName="['testo','geolocazione','immagine','video']"
-                        classButton="btn btn-secondary"
-                        label="tipo squeal"
-                        def="inserisci tipo squeal"
-                        @updatePostType="(el) => postType = el"
-                    />
+                    <div class="d-flex flex-row justify-content-end" >
+                      <Select
+                          ref="typeSelect"
+                          updateRef="updatePostType"
+                          :dropItems="['text','geolocation','image','video']"
+                          :dropItemsName="['testo','geolocazione','immagine','video']"
+                          label="tipo squeal"
+                          def="text"
+                          @updatePostType="(el) => postType = el"
+                      />
+                    </div>
                   </div>
 
-                  </div>
-                <div class="m-1 w-100" style="max-height: 60vh">
 
-                  <textarea v-if=" postType==='text'" rows="6" v-model="textSqueal" maxlength="500"  class="form-control"></textarea>
+
+                  </div>
+                <div class="mt-2 m-lg-1 preview-size" >
+
+                  <textarea v-if=" postType==='text'" rows="6" v-model="textSqueal" :maxlength="maxTextLength" placeholder="cosa pensi?"  class="form-control"></textarea>
                   <div v-if="!!link && activeChoiceLink" class="d-flex flex-row mt-3 mb-2 align-items-center">
                     <h5 class="fw-light m-0">E' stato rilevato un link. Preferisci crearne uno breve? </h5>
                     <button type="button" class="btn btn-outline-success ms-3 btn-sm " style="width: 5%"
@@ -276,15 +293,14 @@
                   <div v-if="postType === 'image'"  class="d-flex flex-column">
                     <div class="d-flex flex-column w-100 mt-3">
                       <div class="d-flex flex-row align-items-center">
-                        <label for="pathImgForm" class="form-label flex-shrink-0 mb-0 me-2">inserisci URL foto</label>
                         <div class="input-group d-flex flex-row">
-                          <input class="form-control" :disabled="Object.keys(fileUploaded).length !== 0"  type="text" placeholder="inserisci URL" id="pathImgForm" v-model="imgPath" >
+                          <input class="form-control" :disabled="Object.keys(fileUploaded).length !== 0"  type="text" placeholder="inserisci URL foto" id="pathImgForm" v-model="imgPath" >
                           <button :disabled="Object.keys(fileUploaded).length !== 0" type="button" class="btn btn-secondary" @click=" currentImgPath = imgPath; showImg = true">
                             Anteprima
                           </button>
                         </div>
                       </div>
-                      <h6 class="m-0 mt-2 text-center">oppure</h6>
+                      <h6 class="m-0 mt-2 mb-2 text-center">oppure</h6>
                       <div class="d-flex flex-row align-items-center">
                         <label for="formFile" class="form-label flex-shrink-0 mb-0 me-2">carica una foto</label>
                         <input :disabled="!canUploadFile" class="form-control" type="file" id="formFile" accept="image/png, image/jpeg"
@@ -312,55 +328,48 @@
                           </button>
                         </div>
                       </div>
-                      <div v-if="showVideo" id="videoAddPost" class=" d-flex flex-row justify-content-center" style="height: 50vh">
-                        <iframe :src="youtubePath"  title="preview video" width="100%" height="100%" allowfullscreen></iframe>
+                      <div v-if="showVideo" id="videoAddPost" class=" d-flex flex-row justify-content-center w-100 mt-2">
+                        <iframe :src="youtubePath"  title="preview video" class="preview-video"  allowfullscreen></iframe>
                       </div>
                     </div>
                   </div>
 
                 </div>
                 <div :class="getLiveDQuota < 0 || getLiveWQuota < 0 ? 'justify-content-evenly':'justify-content-center'" class="d-flex flex-row">
-                  <h6 v-if="getLiveDQuota < 0">extra daily quota: {{-getLiveDQuota}}</h6>
-                  <h6 v-if="getLiveWQuota < 0">extra weekly quota: {{-getLiveWQuota}}</h6>
+                  <h6 v-if="getLiveDQuota < 0">quota extra giornaliera: {{-getLiveDQuota}}</h6>
+                  <h6 v-if="getLiveWQuota < 0">quota extra settimanale: {{-getLiveWQuota}}</h6>
                   <div class="d-flex flex-row">
                     <h6 :class="getLiveDQuota < 0 ? 'text-danger':''">{{getLiveDQuota}}</h6>
                     <h6 :class="getLiveWQuota < 0 ? 'text-danger':''">/{{getLiveWQuota}}</h6>
                     <h6 :class="getLiveMQuota < 0 ? 'text-danger':''">/{{getLiveMQuota}}</h6>
                   </div>
                 </div>
-                <div class="d-flex flex-row justify-content-between">
-                  <div v-if="timed" class="d-flex flex-row flex-fill align-items-end">
-                    <div class="d-flex flex-column">
-                      <label for="numTimed" class="form-label">Numero di Squeal</label>
+                <div class="d-flex flex-row flex-wrap justify-content-between">
+                  <div v-if="timed" class="d-flex flex-row flex-fill align-items-end mb-2 mb-lg-0 ">
+                    <div class="d-flex flex-column align-items-center sameWidth">
+                      <label for="numTimed" class="form-label fw-light">Numero</label>
                       <input type="number" class="form-control" id="numTimed" v-model="numberOfRepetitions" min="1" required>
                     </div>
-                      <div class="d-flex flex-column">
-                        <label for="numFrequency" class=" form-label fw-light">Intervallo</label>
-                        <input type="number" class="form-control" id="numFrequency" v-model="numFrequency" min="1" required>
-                      </div>
-                      <Select
-                          :dropItems="['seconds','minutes', 'hours']"
-                          :dropItemsName="['secondi','minuti', 'ore']"
-                          :required="true"
-                          updateRef="updateTypeF"
-                          classButton="btn-secondary form-select-lg "
-                          @updateTypeF="(el) => typeFrequency=el"
-                          label="frequenza"
-                          def="secondi"
-                          labelClass="form-label fw-light"
-                      />
-
-                    <div class="d-flex ms-3">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16" v-tooltip="infoTimed">
-                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                        <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
-                      </svg>
+                    <div class="d-flex flex-column align-items-center sameWidth ms-2">
+                      <label for="numFrequency" class=" form-label fw-light">Intervallo</label>
+                      <input type="number" class="form-control" id="numFrequency" v-model="numFrequency" min="1" required>
                     </div>
+                    <Select class="sameWidth"
+                        :dropItems="['seconds','minutes', 'hours']"
+                        :dropItemsName="['secondi','minuti', 'ore']"
+                        :required="true"
+                        updateRef="updateTypeF"
+                        classButton="btn-secondary"
+                        @updateTypeF="(el) => typeFrequency=el"
+                        label="frequenza"
+                        def="secondi"
+                        labelClass="form-label fw-light"
+                    />
                   </div>
-                  <div class="d-flex flex-row justify-content-end flex-fill align-items-end">
+                  <div class="d-flex flex-row justify-content-between justify-content-lg-end flex-fill align-items-end">
                     <button type="button" class="btn btn-danger m-1"
                             @click="closeModal(false); reset()">Indietro</button>
-                    <button type="submit" class="btn btn-primary m-1" > Crea Squeal </button>
+                    <button type="submit" class="btn btn-primary m-1" :disabled="getLiveDQuota < - F_QUOTA || getLiveWQuota < - F_QUOTA || getLiveMQuota < - F_QUOTA"> Crea Squeal </button>
                   </div>
                 </div>
 
@@ -393,7 +402,48 @@
   #imgAddPost{
     padding: 2%;
     border: 10px;
-    max-height: 55vh;
+    max-height: 45vh;
   }
+
+  .flex-addpost-dest{
+    flex-basis: calc(100%/3);
+  }
+  .flex-addpost-typetemp{
+    flex-basis: calc((100%/3) * 2);
+  }
+
+  .preview-size{
+    max-height: 60vh;
+  }
+  .preview-video{
+    min-height: 35vh;
+    max-height:40vh;
+    aspect-ratio: 16/9
+  }
+
+  @media screen and (max-width: 768px){
+    .modal-dialog-centered{
+      max-width: 100% !important;
+      min-height: 4rem;
+    }
+    .md-w-100{
+      width: 100%;
+    }
+
+    .preview-size{
+      max-height: 45vh;
+    }
+    .map{
+      min-height: 40vh;
+    }
+    #imgAddPost{
+      max-height: 25vh;
+    }
+    .preview-video{
+      min-height: 20vh;
+      max-height: 30vh;
+    }
+  }
+
 
 </style>

@@ -1,14 +1,23 @@
-import {Button, Modal} from "flowbite-react";
-import {getUsernameFromSessionStore} from "../../../utils/usefulFunctions.js";
+import {Modal} from "flowbite-react";
+import {getUsernameFromSessionStore, handleLogout} from "../../../utils/usefulFunctions.js";
 
 function DeleteAccountModal({isOpen, setIsOpen}) {
     const deleteAccount = async () => {
         console.log("eliminato")
+        try {
+            await fetch(`/db/user/delete/${getUsernameFromSessionStore()}`,{
+                method: 'DELETE',
+            });
+            setIsOpen(false);
+            await handleLogout();
+        } catch (e) {
+            console.log(e);
+        }
     }
 
     return (
-        <Modal  show={isOpen} onClose={()=>setIsOpen(false)}>
-            <Modal.Header>
+        <Modal show={isOpen} onClose={() => setIsOpen(false)}>
+            <Modal.Header aria-label="Eliminazione Account">
                 Eliminazione Account
             </Modal.Header>
             <Modal.Body>
@@ -36,7 +45,6 @@ function DeleteAccountModal({isOpen, setIsOpen}) {
                         <span>
                             sarà possibile ripristinare l'account
                         </span>
-
                     </div>
                 </div>
             </Modal.Body>
@@ -44,6 +52,7 @@ function DeleteAccountModal({isOpen, setIsOpen}) {
                 <button
                     className="button-delete"
                     onClick={deleteAccount}
+                    aria-label="Conferma eliminazione account"
                 >
                     CONFERMO
                 </button>

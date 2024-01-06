@@ -16,7 +16,7 @@ const addReply = async (req,res) => {
         res.status(200).send(response);
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
-            res.status(Error.statusCode).send(Error.message);
+            res.status(Error.statusCode).send({message: Error.message});
         else {
             res.status(500).send(Error);
         }
@@ -34,7 +34,7 @@ const getReplies = async (req,res) => {
 
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
-            res.status(Error.statusCode).send(Error.message);
+            res.status(Error.statusCode).send({message: Error.message});
         else {
             res.status(500).send(Error);
         }

@@ -38,9 +38,10 @@ function getChannels (limit,offset,filter) {
             }
 
             let html = `${$.map(data,(channel,index) => `
-            <div class="mt-3 mx-auto rounded d-flex flex-row bg-back align-items-center text-center channeldiv" onclick="window.location.href = window.location.href + '/${channel.name}'" style="height:7vh; width: 90vw;">
-                <div style="width: 50%;" class="fontcustom"> §${channel.name}</> </div>
-                <div style="width: 50%;" class="fontcustom"> @${channel.creator}</> </div> 
+            <div class="mt-3 mx-auto rounded d-flex flex-row bg-back align-items-center text-center channeldiv"style="height:7vh; width: 90vw;">
+                <div style="width: 50%;" class="fontcustom"> §${channel.name}</div>
+                <div style="width: 50%;" class="fontcustom"> @${channel.creator} </div>
+                <div style="width: 50%;" class="fontcustom"> <button class="btn btn-primary" onclick="window.location.href = window.location.href + '/${channel.name}'" > Gestisci </button> </div> 
             </div>`).join('\n')}`;
 
             if (offset !== 0) {
@@ -74,6 +75,7 @@ $('#channelform').on("submit",(event) => {
         name: $('#name').val(),
         description: $('#description').val(),
         silenceable: $('#silenceable').is(':checked') === true ? $('#silenceable').val() : undefined,
+        profilePicture: $('#picture').val(),
     }
 
     $.ajax({
@@ -84,7 +86,7 @@ $('#channelform').on("submit",(event) => {
             location.reload();
         },
         error: (error) => {
-            $('#toast-content').empty().html(error.responseText);
+            $('#toast-content').empty().html(error.responseJSON.message);
             let toastList = inizializeToast();
             toastList.forEach(toast => toast.show()); // This show them
         }

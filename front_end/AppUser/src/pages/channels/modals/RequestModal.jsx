@@ -1,5 +1,6 @@
 import {Modal} from "flowbite-react";
 import {CheckIcon, DenyIcon} from "../../../components/assets/index.jsx";
+import {Link} from "react-router-dom";
 
 function RequestModal({isOpen, setIsOpen, requests, channelName, hasUpdated, setHasUpdated}) {
 
@@ -21,29 +22,38 @@ function RequestModal({isOpen, setIsOpen, requests, channelName, hasUpdated, set
     }
 
     return (
-        <Modal show={isOpen} onClose={()=>setIsOpen(false)}>
-            <Modal.Header>
-                Richieste pendenti
-            </Modal.Header>
+        <Modal show={isOpen} onClose={() => setIsOpen(false)}>
+            <Modal.Header aria-label="Richieste pendenti">Richieste pendenti</Modal.Header>
             <Modal.Body>
                 {requests === undefined || requests.length === 0 ? (
                     <div>Non ci sono richieste pendenti</div>
-                ):(
+                ) : (
                     <div>
-                        {requests.map((user) => {
+                        {requests.map((follower) => {
                             return (
-                                <div key={user._id}
-                                    className="flex justify-between"
-                                >
-                                    {user.user}
+                                <div key={follower._id} className="flex justify-between">
+                                    <div className="flex gap-2 items-center justify-start">
+                                        <Link to={`/search/${follower.user}`}>
+                                            <img
+                                                src={follower.profilePic}
+                                                alt={`foto profilo di ${follower.user}`}
+                                                className="w-6 h-6 object-cover rounded-full aspect-square"
+                                            />
+                                        </Link>
+                                        <Link to={`/search/${follower.user}`}>
+                                            <span>{follower.user}</span>
+                                        </Link>
+                                    </div>
                                     <div className="flex gap-4">
                                         <button
-                                            onClick={() => handleRequest(user.user, true)}
+                                            onClick={() => handleRequest(follower.user, true)}
+                                            aria-label={`Accetta richiesta di ${follower.user}`}
                                         >
                                             {CheckIcon}
                                         </button>
                                         <button
-                                            onClick={() => handleRequest(user.user, false)}
+                                            onClick={() => handleRequest(follower.user, false)}
+                                            aria-label={`Rifiuta richiesta di ${follower.user}`}
                                         >
                                             {DenyIcon}
                                         </button>

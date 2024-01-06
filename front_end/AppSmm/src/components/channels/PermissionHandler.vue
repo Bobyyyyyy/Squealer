@@ -1,5 +1,5 @@
 <script setup>
-  import {onMounted, onUnmounted, reactive} from "vue";
+  import {reactive} from "vue";
   import {Modal} from "bootstrap";
   import Permission from "./Permission.vue";
 

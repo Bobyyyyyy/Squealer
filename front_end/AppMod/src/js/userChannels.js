@@ -52,6 +52,7 @@ function getChannels (limit,offset,filters) {
                 <div style="width: 50%;"> ${channel.postNumber}</> </div> 
                 <div style="width: 50%;"> ${channel.followerNumber}</> </div> 
                 <div style="width: 50%;"> ${channel.type}</> </div> 
+                <div style="width: 50%;" class="fontcustom"> <button class="btn btn-primary" onclick="window.location.href = window.location.href + '/${channel.name}'" > Gestisci </button> </div> 
             </div>`).join('\n')}`;
 
             if (offset !== 0) {
@@ -165,7 +166,7 @@ $('#addChannelForm').on('submit', (event) => {
             location.reload();
         },
         error: (error) => {
-            $('#toast-content').empty().html(error.responseText);
+            $('#toast-content').empty().html(error.responseJSON.message);
             let toastList = inizializeToast();
             toastList.forEach(toast => toast.show()); // This show them
         }

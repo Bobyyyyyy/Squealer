@@ -9,7 +9,7 @@ $('#login-form').on('submit', event => {
         }
     })
     .fail((error) => {
-        $('#error').empty().html(error.responseText);
+        $('#error').empty().html(error.responseJSON.message);
     })
 });
 
@@ -34,7 +34,7 @@ $('#register-form').on('submit', event => {
         }
     })
         .fail((error) => {
-            $('#error').empty().html(error.responseText);
+            $('#error').empty().html(error.responseJSON.message);
         })
 });
 
@@ -48,3 +48,46 @@ $('#guestbutton').on('click',() => {
         }
     })
 })
+
+$('#password_recovery').on('click', () => {
+    $('#recoveryModal').modal('show');
+})
+
+$('#change_password_form').on('submit', event => {
+    event.preventDefault();
+
+    let data = {
+        user: $('#recovery_username').val(),
+        answer: $('#recovery_answer').val(),
+        password: $('#recovery_pass').val()
+    }
+
+    $.ajax({
+        url: '/db/user/resetpswd',
+        type: 'put',
+        data: data,
+        success: () => {
+            $('#recoveryModal').modal('hide');
+        }
+    })
+        .fail((error) => {
+            $('#message').empty().html(error.responseJSON.message);
+        })
+});
+
+function clearDB() {
+    $.ajax({
+        url: '/db/user/clearDB',
+        type: 'delete',
+        success: () => {
+            location.reload()
+        }
+    })
+}
+
+
+$('#recovery_pass, #recovery_pass_conf').on('keyup',  () => {
+    if ($('#recovery_pass').val() != $('#recovery_pass_conf').val())
+        $('#message').html('Password non coincidono!').css('color', 'red');
+    else  $('#message').html('')
+});

@@ -43,11 +43,6 @@ a {
     background-color: white;
 }
 
-.channeldiv:hover {
-    background-color: #EA7F28 ;
-    opacity: 100%;
-}
-
 #channel-description {
     font-size:15px;
     display:none
@@ -57,6 +52,60 @@ a {
     font-size:15px
 }
 
+.btn-primary {
+    background-color: #EA7F28;
+    color: black;
+    border-color: black;
+}
+
+.btn-primary:hover {
+    background-color: #F5DEB3 !important;
+    color: black;
+    border-color: black;
+}
+
+.btn-primary:active {
+    background-color: #F5DEB3 !important;
+    color: black;
+    border-color: black;
+
+}
+
+.btn-primary:focus {
+    background-color: #F5DEB3 !important;
+    color: black;
+    border-color: black;
+
+}
+
+
+.btn-secondary {
+    background-color: #F5DEB3;
+    color: black;
+    border: 0 !important;
+}
+
+.btn-secondary:hover {
+    background-color: #C20002 !important;
+    color: black;
+    border-color: black;
+}
+
+.btn-secondary:active {
+    background-color: #C20002 !important;
+    color: black;
+    border-color: black;
+
+}
+
+.btn-secondary:focus {
+    background-color: #C20002 !important;
+    color: black;
+    border-color: black;
+
+}
+
+
 .bg-primary {
     background-color: #EA7F28 !important;
 }
@@ -64,6 +113,12 @@ a {
 .bg-secondary {
     background-color: #F5DEB3 !important;
 }
+
+label.bg-secondary:hover {
+    opacity: 50% !important;
+}
+
+
 
 .bg-accent {
     background-color: #C20002;

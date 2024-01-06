@@ -1,6 +1,6 @@
 import { Outlet, NavLink } from "react-router-dom";
 import '../index.css'
-import React, {useState} from "react";
+import React from "react";
 import {
     ChannelIcon,
     HomeIcon,
@@ -11,7 +11,6 @@ import {
 
 function RootLayoutAnonymous() {
 
-    const [notifications, setNotifications] = useState([]);
     const navigationButtons = [
         {
             id: 0,

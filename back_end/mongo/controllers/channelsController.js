@@ -1,12 +1,11 @@
 const channelsModel = require('../models/ChannelMethods');
 const {mongo} = require("mongoose");
-const officialChannel = require("../models/officialChannelsMethods");
 const createChannel = async (req,res) => {
     try {
         res.status(200).send(await channelsModel.addChannel(req.body))
     } catch (Error) {
         if((typeof Error.statusCode) !== 'undefined') {
-            res.status(Error.statusCode).send(Error.message);
+            res.status(Error.statusCode).send({message: Error.message});
         }
         else {
             res.status(500).send(Error);
@@ -19,7 +18,7 @@ const checkUserInChannel = async (req,res) => {
         res.status(200).send(await channelsModel.checkUserChannel(req.query))
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
-            res.status(Error.statusCode).send(Error.message);
+            res.status(Error.statusCode).send({message: Error.message});
         else {
             res.status(500).send(Error);
         }
@@ -31,7 +30,7 @@ const getChannels = async (req,res) => {
         res.status(200).send(await channelsModel.getChannels(req.query))
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
-            res.status(Error.statusCode).send(Error.message);
+            res.status(Error.statusCode).send({message: Error.message});
         else {
             res.status(500).send(Error);
         }
@@ -43,7 +42,7 @@ const getChannelsNumber = async (req,res) => {
         res.status(200).send(await channelsModel.getChannelsNumber(req.query.filters))
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
-            res.status(Error.statusCode).send(Error.message);
+            res.status(Error.statusCode).send({message: Error.message});
         else {
             res.status(500).send(Error);
         }
@@ -55,7 +54,7 @@ const changeChannelName = async (req,res) => {
         res.status(200).send(await channelsModel.changeChannelName(req.body.channelName,req.body.newName,req.session.user));
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
-            res.status(Error.statusCode).send(Error.message);
+            res.status(Error.statusCode).send({message: Error.message});
         else {
             res.status(500).send(Error);
         }
@@ -69,7 +68,7 @@ const getSingleChannel = async (req,res) => {
         res.status(200).send(await channelsModel.getSingleChannel(name,user));
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
-            res.status(Error.statusCode).send(Error.message);
+            res.status(Error.statusCode).send({message: Error.message});
         else {
             res.status(500).send(Error);
         }
@@ -83,7 +82,7 @@ const blockChannel = async (req,res) => {
         res.status(200).send(await channelsModel.blockChannel(user,channel))
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
-            res.status(Error.statusCode).send(Error.message);
+            res.status(Error.statusCode).send({message: Error.message});
         else {
             res.status(500).send(Error);
         }
@@ -97,7 +96,7 @@ const addFollower = async function (req,res){
         res.status(200).send(await channelsModel.addFollower(user,channel))
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
-            res.status(Error.statusCode).send(Error.message);
+            res.status(Error.statusCode).send({message: Error.message});
         else {
             res.status(500).send(Error);
         }
@@ -113,7 +112,7 @@ const handleRequest = async function (req,res) {
         res.status(200).send(await channelsModel.handleRequest(admin,user,channel,accepted))
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
-            res.status(Error.statusCode).send(Error.message);
+            res.status(Error.statusCode).send({message: Error.message});
         else {
             res.status(500).send(Error);
         }
@@ -122,10 +121,10 @@ const handleRequest = async function (req,res) {
 
 const deleteChannel = async (req,res) => {
     try {
-        res.send(await channelsModel.deleteChannel(req.body.name));
+        res.send(await channelsModel.deleteChannel(req.params.name));
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
-            res.status(Error.statusCode).send(Error.message);
+            res.status(Error.statusCode).send({message: Error.message});
         else {
             res.status(500).send(Error);
         }
@@ -140,7 +139,7 @@ const addAdmin = async function (req,res) {
         res.status(200).send(await channelsModel.addAdmin(user,admin,channel));
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
-            res.status(Error.statusCode).send(Error.message);
+            res.status(Error.statusCode).send({message: Error.message});
         else {
             res.status(500).send(Error);
         }
@@ -156,7 +155,7 @@ const handlePermission = async function (req, res) {
         res.status(200).send(await channelsModel.handlePermission(admin,user,channel,canWrite))
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
-            res.status(Error.statusCode).send(Error.message);
+            res.status(Error.statusCode).send({message: Error.message});
         else {
             res.status(500).send(Error);
         }
@@ -168,7 +167,7 @@ const getChannelProfilePicByName = async (req,res) => {
         res.send(await channelsModel.getChannelProfilePicByName(req.query.channelName));
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
-            res.status(Error.statusCode).send(Error.message);
+            res.status(Error.statusCode).send({message: Error.message});
         else {
             res.status(500).send(Error);
         }
@@ -180,7 +179,7 @@ const updateChannelProfilePic = async (req, res) => {
         res.send(await channelsModel.updateChannelProfilePic(req.body.channelName, req.body.newProfilePic));
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
-            res.status(Error.statusCode).send(Error.message);
+            res.status(Error.statusCode).send({message: Error.message});
         else {
             res.status(500).send(Error);
         }

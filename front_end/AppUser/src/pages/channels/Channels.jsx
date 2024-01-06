@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from "react";
-import {ProfilePic} from "../../components/assets/index.jsx"
 import {Link} from "react-router-dom";
 import CreateChannelModal from "./modals/CreateChannelModal.jsx";
 import FiltersModal from "./modals/FiltersModal.jsx";
@@ -14,7 +13,6 @@ function Channels () {
     const [officialChannels, setOfficialChannels] = useState([]);
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [showFilterModal, setShowFilterModal] = useState(false);
-    const [nuovoCanale, setNuovoCanale] = useState(false)
     const [channelName, setChannelName] = useState('');
     const [visibility, setVisibility] = useState('');
     const [owner, setOwner] = useState('');
@@ -80,7 +78,6 @@ function Channels () {
         setIsLoading(true);
         let resChannel = await getChannels();
         setChannels(resChannel);
-        setNuovoCanale(false);
         if (activeOfficialChannel) {
             let resOfficialChannels = await getOfficialChannels();
             setOfficialChannels(resOfficialChannels);
@@ -91,24 +88,29 @@ function Channels () {
     useEffect(() => {
         fetchChannels()
             .catch(console.error)
-    }, [nuovoCanale, queryFilter]);
+    }, [queryFilter]);
 
     return (
         <>
-            <div className="flex flex-col p-4">
+            <div className="flex flex-col p-4 max-h-screen pb-20">
                 <h1 className="text-xl font-semibold uppercase">Lista canali :</h1>
                 <button
                     className="mt-4 button-action"
-                    onClick={()=>setShowFilterModal(true)}
+                    onClick={() => setShowFilterModal(true)}
                 >
                     Filtra canali
                 </button>
                 <FiltersModal
-                    isOpen={showFilterModal} setIsOpen={setShowFilterModal}
-                    channelName={channelName} setChannelName={setChannelName}
-                    owner={owner} setOwner={setOwner}
-                    visibility={visibility} setVisibility={setVisibility}
-                    admin={admin} setAdmin={setAdmin}
+                    isOpen={showFilterModal}
+                    setIsOpen={setShowFilterModal}
+                    channelName={channelName}
+                    setChannelName={setChannelName}
+                    owner={owner}
+                    setOwner={setOwner}
+                    visibility={visibility}
+                    setVisibility={setVisibility}
+                    admin={admin}
+                    setAdmin={setAdmin}
                     handleSearch={handleFilters}
                     activeOfficialChannel={activeOfficialChannel}
                     setActiveOfficialChanel={setActiveOfficialChannel}
@@ -118,14 +120,18 @@ function Channels () {
                         <Spinner aria-label="loading profile spinner" size="xl" color="pink" />
                     </div>
                 ) : (
-                    <div className="flex flex-wrap w-full h-fit max-h-[580px] overflow-y-scroll mt-2 gap-4">
-                        {channels!==null && channels.map((channel) => {
+                    <div className="flex flex-wrap w-full h-fit overflow-y-scroll mt-2 gap-4">
+                        {(channels !== null ? channels : []).map((channel) => {
                             const role = checkRole(channel.admins, channel.followers, channel.creator, channel.requests);
                             return (
-                                <Link className="w-full" to={`/channels/${channel.name}`} key={channel._id} >
-                                    <div className="flex w-full justify-start gap-4">
-                                        <img src={channel.profilePicture} alt="immagine canale" className="w-14 h-14 object-cover rounded-full"/>
-                                        <div className="flex flex-col overflow-x-hidden  mx-2 w-full">
+                                <Link className="w-full" to={`/channels/${channel.name}`} key={channel._id}>
+                                    <div className="flex w-full justify-start items-center gap-3">
+                                        <img
+                                            src={channel.profilePicture}
+                                            alt={`immagine canale ${channel.name}`}
+                                            className="w-14 h-14 aspect-square rounded-full object-cover"
+                                        />
+                                        <div className="flex flex-col overflow-x-hidden w-full mr-2">
                                             <div className="flex justify-between items-center">
                                                 <span className="font-semibold text-lg">{channel.name}</span>
                                                 <span className="font-medium text-base text-red-600">{channel.type}</span>
@@ -137,12 +143,16 @@ function Channels () {
                                 </Link>
                             );
                         })}
-                        {activeOfficialChannel && officialChannels!==null && officialChannels.map((channel) => {
+                        {activeOfficialChannel && (officialChannels !== null ? officialChannels : []).map((channel) => {
                             return (
-                                <Link className="w-full" to={`/channels/${channel.name}`} key={channel._id} >
-                                    <div className="flex w-full justify-start gap-4">
-                                        <img src={channel.profilePicture} alt="immagine canale" className="w-14 h-14 object-cover rounded-full"/>
-                                        <div className="flex flex-col overflow-x-hidden  mx-2 w-full">
+                                <Link className="w-full" to={`/channels/${channel.name}`} key={channel._id}>
+                                    <div className="flex w-full justify-start items-center gap-4">
+                                        <img
+                                            src={channel.profilePicture}
+                                            alt={`immagine canale ${channel.name}`}
+                                            className="w-14 h-14 object-cover rounded-full aspect-square"
+                                        />
+                                        <div className="flex flex-col overflow-x-hidden w-full mr-2">
                                             <div className="flex justify-between">
                                                 <span className="font-semibold text-lg">{channel.name}</span>
                                                 <span className="font-medium text-base text-red-600">ufficiale</span>
@@ -153,17 +163,18 @@ function Channels () {
                                 </Link>
                             );
                         })}
-                        {channels.length === 0 && (officialChannels.length === 0 || !activeOfficialChannel) &&
-                            <div>Non ci sono canali</div>}
+                        {(channels.length === 0 && (!activeOfficialChannel || officialChannels.length === 0)) && (
+                            <div>Non ci sono canali</div>
+                        )}
                     </div>
                 )}
                 <button
                     className="mt-4 button-action"
-                    onClick={()=> setShowCreateModal(true)}
+                    onClick={() => setShowCreateModal(true)}
                 >
                     Crea canale
                 </button>
-                <CreateChannelModal isOpen={showCreateModal} setIsOpen={setShowCreateModal} setNuovoCanale={setNuovoCanale} />
+                <CreateChannelModal isOpen={showCreateModal} setIsOpen={setShowCreateModal} />
             </div>
         </>
     );

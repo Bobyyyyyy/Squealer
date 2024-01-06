@@ -16,6 +16,14 @@ export const store = createStore({
             currentSqueals: [],
             offsetSqueals: 0,
             notifications: [],
+            user_info:{
+                smm: '',
+                vip: {
+                    name: '',
+                    profilePic: '',
+                }
+            },
+            currReplies: [],
         }
     },
     mutations: {
@@ -38,8 +46,8 @@ export const store = createStore({
             state.currentSqueals.push(...squeals);
         },
         clearSqueal(state){
-            state.currentSqueals = [];
             state.offsetSqueals = 0;
+            state.currentSqueals = [];
         },
         pushHeadSqueal(state, squeal){
             state.currentSqueals.unshift(squeal.post);
@@ -55,6 +63,27 @@ export const store = createStore({
         },
         deleteNotifications(state){
             state.notifications = [];
+        },
+        setsmm(state, smmname){
+            state.user_info.smm = smmname
+        },
+        setVip(state,vip){
+            state.user_info.vip.name = vip.name;
+            state.user_info.vip.profilePic = vip.profilePic;
+        },
+        deleteVip(state){
+            state.user_info.vip.name= '';
+            state.user_info.vip.profilePic = '';
+        },
+        setReplies(state, replies){
+            state.currReplies = replies;
+        },
+        pushReply(state, reply){
+            console.log(reply);
+            state.currReplies.unshift(reply);
+        },
+        deleteReplies(state){
+            state.currReplies = []
         }
     },
     getters:{
@@ -72,6 +101,15 @@ export const store = createStore({
         },
         getNotifications(state){
             return state.notifications;
+        },
+        getVip(state){
+            return state.user_info.vip;
+        },
+        getSmm(state){
+            return state.user_info.smm;
+        },
+        getReplies(state){
+            return state.currReplies;
         }
     }
 })

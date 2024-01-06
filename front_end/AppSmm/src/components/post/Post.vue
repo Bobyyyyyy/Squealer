@@ -13,17 +13,19 @@
     viewFooter:{
       type: Boolean,
       default: true,
+    },
+    handle: {
+      type: Boolean,
+      default: false,
     }
   })
 
-  function getIdMap(){
-    return `map${props.numberOfPost}`;
-  }
+  const idMap = `map${props.numberOfPost}${Math.floor(Math.random() * 10000)}`
 
   const onlyUser = computed(() => {
     let tmpArr = props.dest.split(', ');
     for (let i = 0; i < tmpArr.length; i++) {
-      if(tmpArr[i].startsWith('§')) return false;
+      if(tmpArr[i].startsWith('§') || tmpArr[i].startsWith('#') ) return false;
     }
     return true;
   })
@@ -33,19 +35,19 @@
 
 
 <template>
-  <div class="card mb-4 d-flex flex-column justify-content-between mt-1 postDim bg-secondary" :class="post.contentType === 'text' ? 'h-auto' : ''">
+  <div class="card mb-4 d-flex flex-column justify-content-between mt-1 postDim bg-secondary" :class="post.contentType === 'geolocation' ? 'map_dim' : ''">
 
       <HeaderPost
           :name= "post.owner"
           :dest="dest"
           :srcImg="picProfile"
-          :dateCreation="post.dateOfCreation"
+          :dateCreation="new Date(post.dateOfCreation)"
       />
-      <div class="d-flex flex-row justify-content-center text-center align-items-center h-100 text-dark">
+      <div class="d-flex flex-row justify-content-center text-center align-items-center text-dark h-100">
         <img v-if="post.contentType==='image'" :src="post.content"  alt="silly cat" class="img-fluid" />
         <postMap v-if="post.contentType==='geolocation'"
                  :latlng = "post.content"
-                 :mapID = "getIdMap()"
+                 :mapID = "idMap"
         />
         <div v-if="post.contentType === 'text'" class="mb-0 m-2 mb-2 align-self-center w-100" v-html="htmlContent"></div>
         <iframe v-if="post.contentType ==='video'" :src="post.content" width="100%" height="100%" allowfullscreen></iframe>
@@ -54,6 +56,7 @@
       <FooterPost
           :post="post"
           :idx = "numberOfPost"
+          :handle = "handle"
       />
     </div>
   </div>
@@ -62,8 +65,12 @@
 <style>
 
   .postDim{
-    width: 32rem;
-    height: 32rem;
+    width: 40rem;
+    height: auto;
+  }
+
+  .map_dim{
+    height: 30rem !important;
   }
 
   @media screen and (max-width: 768px) {

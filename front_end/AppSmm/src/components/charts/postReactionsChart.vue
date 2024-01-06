@@ -11,7 +11,7 @@
    Tooltip,
    ArcElement,
  } from "chart.js";
- import {onBeforeUpdate, onMounted, onUnmounted, onUpdated, ref, watch} from "vue";
+ import {ref} from "vue";
 
  ChartJS.register(ArcElement,CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
 
@@ -54,7 +54,7 @@
     labels: ['cuori', 'pollici su', 'pollici giù', 'cuori spezzati'],
     datasets: [
         {
-          backgroundColor: ['#FF0000','#0000FF','#00FF00','#000000'],
+          backgroundColor: ['#df1021','#003da5','#78be20','#000000'],
           data: Object.values(dataChart),
           }
           ]

@@ -36,7 +36,13 @@
 
 <style scoped>
 .replyDim{
-  width: 32rem;
+  width: 40rem;
   height: auto;
+}
+
+@media screen and (max-width: 768px){
+  .replyDim{
+    width: 100% !important;
+  }
 }
 </style>

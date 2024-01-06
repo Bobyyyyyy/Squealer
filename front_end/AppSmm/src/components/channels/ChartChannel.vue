@@ -1,14 +1,10 @@
 <script setup>
 
 import {onMounted, reactive, ref, watch} from "vue";
-import {currentVip} from "../../utils/config.js";
-import {parseReactionType} from "../../utils/functions.js";
 import Popularity30days from "../charts/Popularity30days.vue";
 import {Modal} from "bootstrap";
 
-const channelReactions = reactive({});
 const modalStateChart = reactive({chartChannel:null})
-const chart30Channel = ref();
 
 
 const props = defineProps({

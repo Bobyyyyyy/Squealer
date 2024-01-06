@@ -16,6 +16,8 @@ body {
     --activeBtn: rgb(63 131 248);
     --normalBtn: rgba(35, 87, 137, 0.52);
     --text-button: white;
+    --bg-toast-success: green;
+    --bg-toast-failure: red;
     margin: 0;
       /*
       background: var(--sfondo);
@@ -28,7 +30,6 @@ body {
     z-index: 1;
 }
 
-
 .quotaCounter {
     position: relative;
     right: 0;
@@ -39,7 +40,7 @@ body {
     transform: translateX(-10px) rotate(-0.8deg);
 }
 
-.button, .button-warning {
+.button, .button-warning, .button-unselected {
     background: var(--activeBtn);
     border-radius: 0.45rem;
     padding: 0.5rem 1rem 0.5rem 1rem;
@@ -87,10 +88,36 @@ body {
     background-color: rgb(200 30 30);
 }
 
+.button-unselected {
+    background-color: transparent;
+    border: solid var(--normalBtn) 2px;
+    color: var(--normalBtn);
+}
+
+.toast, .toast-success, .toast-failure {
+    position: fixed;
+    top: 10%;
+    left: 50%;
+    transform: translate(-50%, 0);
+    padding: 1.5rem;
+    border-radius: 0.5em;
+    opacity: 0.99;
+    width: 80vw;
+    color: white;
+}
+
+.toast-success {
+    background-color: var(--bg-toast-success);
+}
+
+.toast-failure {
+    background-color: var(--bg-toast-failure);
+}
+
 /* Computer */
 @media (min-width: 768px) {
     .button-action, .button-submit, .button-delete {
-        max-width: 12rem;
+        max-width: fit-content;
         align-self: center;
     }
 }

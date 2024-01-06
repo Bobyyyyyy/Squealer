@@ -1,14 +1,23 @@
 <script setup>
   import Reaction from "./Reaction.vue";
-  import {currentVip, reactionsIcons} from "../../utils/config.js";
-  import {onMounted, reactive, ref, watch} from "vue";
+  import {reactionsIcons} from "../../utils/config.js";
+  import {computed, onMounted, reactive, ref} from "vue";
   import ChartModalPost from "./ChartModalPost.vue";
   import {parseReactionType} from "../../utils/functions.js";
   import ReplyModal from "./reply/ReplyModal.vue";
+  import {useStore} from "vuex";
+
+  const store = useStore();
+
+  const vip = computed(()=>store.getters.getVip);
 
   const props = defineProps({
     post: Object,
     idx: Number,
+    handle: {
+      type:Boolean,
+      default: false,
+    }
   });
 
   const modalActive = ref(false);
@@ -30,7 +39,7 @@
   function updateProps(newReac){
       let newReaction = {
         rtype: newReac,
-        user:currentVip.value,
+        user: vip.value.name,
         date: new Date().toISOString(),
       }
 
@@ -61,8 +70,8 @@
         'Content-Type': 'application/json'
       },
       body:JSON.stringify({
-        postId: props.post.postId,
-        user: currentVip.value,
+        postId: props.post._id,
+        user: vip.value.name,
         reaction: newReac,
       })
     })
@@ -78,7 +87,7 @@
       },
       body:JSON.stringify({
         postId: props.post.postId,
-        user: currentVip.value,
+        user: vip.value.name,
       })
     })
   }
@@ -95,8 +104,7 @@
   }
 
   onMounted(()=>{
-
-    let idx = props.post.reactions.findIndex(el => el.user === currentVip.value);
+    let idx = props.post.reactions.findIndex(el => el.user === vip.value.name);
     if (idx >= 0) currentActive.value = props.post.reactions[idx].rtype
 
     parsedType.value = parseReactionType(props.post.reactions);
@@ -114,7 +122,7 @@
 <template>
   <div class="d-flex flex-row justify-content-around align-items-center text-dark ms-1 me-1 mb-1">
     <div class="d-flex flex-row align-items-center sameWidth justify-content-between">
-      <div class="d-flex flex-row align-items-center">
+      <div v-if="!handle" class="d-flex flex-row align-items-center">
         <Reaction
             v-for="(reaction,index) in reactionsIcons"
             :key="index"
@@ -138,10 +146,10 @@
     </div>
 
     <div class="d-flex align-items-center sameWidth">
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chat" viewBox="0 0 16 16">
+      <svg v-if="!handle" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chat" viewBox="0 0 16 16">
         <path d="M2.678 11.894a1 1 0 0 1 .287.801 10.97 10.97 0 0 1-.398 2c1.395-.323 2.247-.697 2.634-.893a1 1 0 0 1 .71-.074A8.06 8.06 0 0 0 8 14c3.996 0 7-2.807 7-6 0-3.192-3.004-6-7-6S1 4.808 1 8c0 1.468.617 2.83 1.678 3.894m-.493 3.905a21.682 21.682 0 0 1-.713.129c-.2.032-.352-.176-.273-.362a9.68 9.68 0 0 0 .244-.637l.003-.01c.248-.72.45-1.548.524-2.319C.743 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7-3.582 7-8 7a9.06 9.06 0 0 1-2.347-.306c-.52.263-1.639.742-3.468 1.105z"/>
       </svg>
-      <h6 @click="openReplyModal" class="m-0 ms-1 text-dark">
+      <h6 v-if="!handle" @click="openReplyModal" class="m-0 ms-1 text-dark" type="button">
         Risposte
       </h6>
       <div class="d-flex sameWidth justify-content-end">

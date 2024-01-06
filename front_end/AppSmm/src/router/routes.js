@@ -39,7 +39,7 @@ export const routes =[
     },
     {
         path: "/AppSmm/Canali/:nomeCanale" ,
-        name:"listaCanali",
+        name:"canaleSingolo",
         components: {
             sideBar: SideBar,
             SbOn: ChannelProfile

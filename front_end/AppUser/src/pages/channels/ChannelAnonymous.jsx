@@ -1,14 +1,11 @@
 import React, {useEffect, useState} from "react";
-import {ProfilePic} from "../../components/assets/index.jsx"
 import {Link} from "react-router-dom";
-import FiltersModal from "./modals/FiltersModal.jsx";
 import {Spinner} from "flowbite-react";
 import FilterModalAnonymous from "./modals/FilterModalAnonymous.jsx";
 
 function ChannelAnonymous () {
 
     const [isLoading, setIsLoading] = useState(true);
-
     const [officialChannels, setOfficialChannels] = useState([]);
     const [showFilterModal, setShowFilterModal] = useState(false);
     const [channelName, setChannelName] = useState('');
@@ -48,19 +45,20 @@ function ChannelAnonymous () {
     }, [hasUpdated]);
 
     return (
-        <>
             <div className="flex flex-col p-4">
                 <h1 className="text-xl font-semibold uppercase">Lista canali :</h1>
                 <button
                     className="mt-4 button-action"
-                    onClick={()=>setShowFilterModal(true)}
+                    onClick={() => setShowFilterModal(true)}
+                    aria-label="Filtra canali"
                 >
                     Filtra canali
                 </button>
                 <FilterModalAnonymous
-                    isOpen={showFilterModal} setIsOpen={setShowFilterModal}
-                    channelName={channelName} setChannelName={setChannelName}
-
+                    isOpen={showFilterModal}
+                    setIsOpen={setShowFilterModal}
+                    channelName={channelName}
+                    setChannelName={setChannelName}
                     handleSearch={handleFilters}
                 />
                 {isLoading ? (
@@ -69,15 +67,21 @@ function ChannelAnonymous () {
                     </div>
                 ) : (
                     <div className="flex flex-wrap w-full h-fit max-h-[580px] overflow-y-scroll mt-2 gap-4">
-                        {officialChannels!==null && officialChannels.map((channel) => {
+                        {officialChannels !== null && officialChannels.map((channel) => {
                             return (
-                                <Link className="w-full" to={`/channels/${channel.name}`} key={channel._id} >
+                                <Link className="w-full" to={`/channels/${channel.name}`} key={channel._id}>
                                     <div className="flex w-full justify-start gap-4">
-                                        <img src={channel.profilePicture} alt="immagine canale" className="w-14 h-14 object-cover rounded-full"/>
-                                        <div className="flex flex-col overflow-x-hidden  mx-2 w-full">
+                                        <img
+                                            src={channel.profilePicture}
+                                            alt={`immagine canale ${channel.name}`}
+                                            className="w-14 h-14 object-cover rounded-full aspect-square"
+                                        />
+                                        <div className="flex flex-col overflow-x-hidden mx-2 w-full">
                                             <div className="flex justify-between">
                                                 <span className="font-semibold text-lg">{channel.name}</span>
-                                                <span className="font-medium text-base text-red-600">ufficiale</span>
+                                                <span className="font-medium text-base text-red-600" aria-label="ufficiale">
+                                                    ufficiale
+                                                </span>
                                             </div>
                                             <p className="font-thin truncate text-base">{channel.description}</p>
                                         </div>
@@ -86,11 +90,15 @@ function ChannelAnonymous () {
                             );
                         })}
                         {officialChannels.length === 0 &&
-                            <div>Non ci sono canali</div>}
+                            <div className="flex w-full items-center justify-center mt-8 text-2xl text-center">
+                                <p>
+                                    Nessun canale trovato
+                                </p>
+                            </div>
+                        }
                     </div>
                 )}
-             </div>
-        </>
+            </div>
     );
 }
 

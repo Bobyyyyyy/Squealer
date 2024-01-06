@@ -7,7 +7,7 @@ const getNotifications = async(req,res) => {
         else throw createError('insert user', 404);
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
-            res.status(Error.statusCode).send(Error.message);
+            res.status(Error.statusCode).send({message: Error.message});
         else {
             res.status(500).send(Error);
         }
@@ -20,7 +20,7 @@ const deleteNotifications = async(req,res) => {
         else throw createError('insert user', 404);
     } catch (Error) {
         if(typeof Error.statusCode !== 'undefined')
-            res.status(Error.statusCode).send(Error.message);
+            res.status(Error.statusCode).send({message: Error.message});
         else {
             res.status(500).send(Error);
         }

@@ -1,4 +1,5 @@
 import {Modal, ToggleSwitch} from "flowbite-react";
+import {Link} from "react-router-dom";
 
 function FollowersModal({isOpen, setIsOpen, followers, channelName, hasUpdated, setHasUpdated}) {
     const setPermission = (name) => {
@@ -24,34 +25,44 @@ function FollowersModal({isOpen, setIsOpen, followers, channelName, hasUpdated, 
         })
     }
     return (
-        <Modal  show={isOpen} onClose={()=>setIsOpen(false)}>
-            <Modal.Header>
-                Gestione dei followers
-            </Modal.Header>
+        <Modal show={isOpen} onClose={() => setIsOpen(false)}>
+            <Modal.Header aria-label="Gestione dei followers">Gestione dei followers</Modal.Header>
             <Modal.Body>
                 {followers === undefined || followers.length === 0 ? (
-                        <div>Non ci sono followers per questo canale</div>
-                    ) : (
+                    <div>Non ci sono followers per questo canale</div>
+                ) : (
                     followers.map((follower) => {
                         let canWrite = followers.some((fol) => {
                             if (follower.user === fol.user) {
                                 return fol.canWrite;
                             }
-                        })
+                        });
                         return (
                             <div key={follower._id} className="flex justify-between py-2">
-                                {follower.user}
+                                <div className="flex gap-2 items-center justify-start">
+                                    <Link to={`/search/${follower.user}`}>
+                                        <img
+                                            src={follower.profilePic}
+                                            alt={`foto profilo di ${follower.user}`}
+                                            className="w-6 h-6 object-cover rounded-full aspect-square"
+                                        />
+                                    </Link>
+                                    <Link to={`/search/${follower.user}`}>
+                                        <span>{follower.user}</span>
+                                    </Link>
+                                </div>
                                 <div className="flex gap-4">
                                     <span> può scrivere</span>
                                     <ToggleSwitch
-                                        onChange={()=>setPermission(follower.user)}
+                                        onChange={() => setPermission(follower.user)}
                                         checked={canWrite}
+                                        aria-label={`Abilita/Disabilita scrittura per ${follower.user}`}
                                     />
                                 </div>
                             </div>
                         );
-                }))}
-
+                    })
+                )}
             </Modal.Body>
         </Modal>
     );

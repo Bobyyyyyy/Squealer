@@ -1,51 +1,37 @@
 import Post from "../../components/posts/Post.jsx";
 import React, { useEffect, useRef, useState} from "react";
 import {
-    getAllOfficialChannelPost,
-    getAllPost
+    getHomeAnonymousPost,
+    POST_TO_GET,
+    scrollEndDetectorHandler
 } from "../../utils/usefulFunctions.js";
 import {Spinner} from "flowbite-react";
 
-function Home() {
+function HomeAnonymous() {
 
-    const POST_TO_GET = 10;
-
-    const allPosts = useRef([]);
     const [isLoading, setIsLoading] = useState(true);
     const [posts, setPosts] = useState([]);
-    const currentOffset = useRef(POST_TO_GET);
-    const lastRequestLenght = useRef(POST_TO_GET);
+    const currentOffset = useRef(0);
+    const lastRequestLength = useRef(0);
     const lastHeightDiv = useRef(0);
 
-    const fetchFirstPosts = async () => {
-        let newPost = await getAllOfficialChannelPost();
-        allPosts.current =  allPosts.current.concat(newPost);
-        //setPosts(allPosts.current);
-        setIsLoading(false)
-    };
-
-    const updatePost = async () => {
+    const fetchPosts = async () => {
         setIsLoading(true);
-        let newPosts = await getAllPost(currentOffset.current);
+        let newPosts = await getHomeAnonymousPost(currentOffset.current, POST_TO_GET);
         currentOffset.current += newPosts.length;
-        lastRequestLenght.current = newPosts.length;
-        //setPosts((prev) => [...prev, ...newPosts]);
+        lastRequestLength.current = newPosts.length;
+        setPosts((prev) => [...prev, ...newPosts]);
         setIsLoading(false);
     }
 
     const scrollEndDetector = async (event) => {
         event.preventDefault();
-        const postDiv = document.getElementById("postDiv");
-
-        if (postDiv && window.innerHeight + window.scrollY >= postDiv.offsetHeight && lastRequestLenght.current >= POST_TO_GET) {
-            lastHeightDiv.current = window.scrollY;
-            await updatePost();
-        }
+        await scrollEndDetectorHandler(lastRequestLength, lastHeightDiv, fetchPosts);
     };
 
     useEffect(() => {
         document.addEventListener('scroll', scrollEndDetector, true);
-        fetchFirstPosts()
+        fetchPosts()
             .catch(console.error);
         return () => {
             document.removeEventListener('scroll', scrollEndDetector);
@@ -67,17 +53,17 @@ function Home() {
             ) : (
                 <div className="max-h-screen">
                     <div className="flex flex-wrap w-full gap-8 items-center justify-center pb-20 overflow-y-scroll" id="postDiv">
-                        {posts!==null && posts !==undefined && posts.map((post)=> {
-                            return(
-                                <Post
-                                    post={post} key={post._id}
-                                />
-                            )})}
-                        {posts!==null && posts !==undefined && posts.length === 0 &&
-                            <div className="flex w-full items-center justify-center mt-8 text-2xl">
+                        {posts !== null && posts !== undefined && posts.map((post) => (
+                            <Post
+                                post={post}
+                                key={post._id}
+                            />
+                        ))}
+                        {posts !== null && posts !== undefined && posts.length === 0 && (
+                            <div className="flex w-full items-center justify-center mt-8 text-2xl text-center" aria-label="No posts available">
                                 Non ci sono ancora post!
                             </div>
-                        }
+                        )}
                     </div>
                 </div>
             )}
@@ -85,4 +71,4 @@ function Home() {
     );
 }
 
-export default Home;
+export default HomeAnonymous;

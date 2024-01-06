@@ -1,73 +1,46 @@
 import Post from "../../components/posts/Post.jsx";
 import React, { useEffect, useRef, useState} from "react";
 import {
-    getAllPost
+    getHomePosts,
+    POST_TO_GET,
+    scrollEndDetectorHandler
 } from "../../utils/usefulFunctions.js";
 import {Spinner} from "flowbite-react";
 
 function Home() {
 
-    const POST_TO_GET = 10;
-
-    const allPosts = useRef([]);
     const [isLoading, setIsLoading] = useState(true);
     const [posts, setPosts] = useState([]);
-    const currentOffset = useRef(POST_TO_GET);
-    const lastRequestLenght = useRef(POST_TO_GET);
+    const currentOffset = useRef(0);
+    const lastRequestLength = useRef(0);
     const lastHeightDiv = useRef(0);
 
-    const fetchFirstPosts = async () => {
-        try {
-            let res = await fetch(`/db/post/all?offset=0&limit=10`, {
-                method: 'GET'
-            });
-            if (!res.ok) {
-               console.log("errore nel fetching dei post");
-            }
-
-            let newPost = await res.json();
-            allPosts.current =  allPosts.current.concat(newPost);
-            setPosts(allPosts.current);
-            setIsLoading(false)
-
-        } catch (e) {
-            console.log(e);
-        }
-    };
-
-    const updatePost = async () => {
+    const fetchPosts = async () => {
         setIsLoading(true);
-        let newPosts = await getAllPost(currentOffset.current);
+        let newPosts = await getHomePosts(currentOffset.current, POST_TO_GET);
         currentOffset.current += newPosts.length;
-        lastRequestLenght.current = newPosts.length;
+        lastRequestLength.current = newPosts.length;
         setPosts((prev) => [...prev, ...newPosts]);
         setIsLoading(false);
-    }
+    };
 
     const scrollEndDetector = async (event) => {
         event.preventDefault();
-        const postDiv = document.getElementById("postDiv");
-
-        if (postDiv && window.innerHeight + window.scrollY >= postDiv.offsetHeight && lastRequestLenght.current >= POST_TO_GET) {
-            lastHeightDiv.current = window.scrollY;
-            await updatePost();
-        }
+        await scrollEndDetectorHandler(lastRequestLength, lastHeightDiv, fetchPosts);
     };
 
     useEffect(() => {
         document.addEventListener('scroll', scrollEndDetector, true);
-        fetchFirstPosts()
+        fetchPosts()
             .catch(console.error);
         return () => {
             document.removeEventListener('scroll', scrollEndDetector);
         }
     }, []);
 
-
     useEffect(() => {
-        window.scrollTo({ behavior: "instant", top: lastHeightDiv.current, left:0})
+        window.scrollTo({ behavior: "instant", top: lastHeightDiv.current, left: 0})
     }, [posts]);
-
 
 
     return (
@@ -79,21 +52,21 @@ function Home() {
             ) : (
                 <div className="max-h-screen">
                     <div className="flex flex-wrap w-full gap-8 items-center justify-center pb-20 overflow-y-scroll" id="postDiv">
-                        {posts!==null && posts.map((post)=> {
-                            return(
-                                <Post
-                                    post={post} key={post._id}
-                                />
-                        )})}
-                        {posts.length === 0 &&
-                            <div className="flex w-full items-center justify-center mt-8 text-2xl">
+                        {posts !== null && posts.map((post) => (
+                            <Post
+                                post={post}
+                                key={post._id}
+                            />
+                        ))}
+                        {posts.length === 0 && (
+                            <div className="flex w-full items-center justify-center mt-8 text-2xl" aria-label="No posts available">
                                 Non ci sono ancora post!
                             </div>
-                        }
+                        )}
                     </div>
                 </div>
             )}
-         </>
+        </>
     );
 }
 

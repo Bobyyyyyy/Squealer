@@ -1,7 +1,6 @@
 <script setup>
-import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
+import {computed, onMounted, onUnmounted, ref} from "vue";
   import {
-    currentVip,
     filterValues,
     filterValuesITAS,
     postType,
@@ -18,8 +17,6 @@ import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
 
   const readyPosts = ref(false);
 
-  const profilePicturePath ="/img/profilePicture.png";
-
   const keyWordFilter = ref(false);
   const destFilter = ref('Filter');
   const typePostFilter = ref('Type');
@@ -31,6 +28,8 @@ import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
 
   const squeals = computed(()=> store.getters.getSqueal);
   const offset = computed(() => store.getters.getOffset);
+  const vip = computed(() => store.getters.getVip);
+
 
   let query = ''
 
@@ -45,6 +44,7 @@ import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
     typePostFilter.value=newText
 
     store.commit('clearSqueal');
+    lastRequestLength = 12
     store.commit('pushSqueal', await getPosts(query,0) )
     readyPosts.value=true
   }
@@ -56,6 +56,7 @@ import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
 
     sortFilter.value = newText
     store.commit('clearSqueal');
+    lastRequestLength = 12
     store.commit('pushSqueal', await getPosts(query,0) )
     readyPosts.value=true
   }
@@ -68,10 +69,10 @@ import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
       else query = query.replace(`&destType=${destFilter.value}`, `&destType=${newText}`)
       destFilter.value = newText
     }
-      //GESTIRE IL CASO DELLA KEYWORD
 
     destFilter.value = newText;
     store.commit('clearSqueal');
+    lastRequestLength = 12
     store.commit('pushSqueal', await getPosts(query,0) )
     readyPosts.value=true
   }
@@ -85,12 +86,12 @@ import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
 
   async function updateTagPosts(){
     store.commit('clearSqueal');
-    store.commit('pushSqueal', await getPosts(`${query}&keyword=${keyWord.value}`));
+    store.commit('pushSqueal', await getPosts(`${query}&keyword=${keyWord.value}`, offset.value));
   }
 
 
   const scrollEndDetector = async () => {
-    if (window.innerHeight + window.pageYOffset >= document.getElementById("bodyDiv").offsetHeight && lastRequestLength >= 12) {
+    if (window.innerHeight + window.pageYOffset >= document.getElementById("postContainer").offsetHeight && lastRequestLength >= 12) {
       lastRequestLength = await(updatePost());
     }
   }
@@ -101,16 +102,16 @@ import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
 
     store.commit('clearSqueal');
 
-    n_post.value = (await getUserInfo()).nposts;
+    n_post.value = (await getUserInfo(vip.value.name)).nposts;
 
     document.addEventListener('scroll', scrollEndDetector, true);
 
-    let quota = await getUserQuota();
+    let quota = await getUserQuota(vip.value.name);
 
     store.commit('setQuota', quota.characters);
     store.commit('setMaxQuota',quota.maxQuota);
 
-    query = `name=${currentVip.value}&limit=12`
+    query = `name=${vip.value.name}&limit=12`
 
     store.commit('pushSqueal',(await getPosts(query, 0)));
 
@@ -129,18 +130,18 @@ import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
     <div class="marginCD">
       <div class="d-flex flex-row justify-content-center  profileDim">
         <div class="aspect-ratio object-fit-fill profileDim">
-          <img :src= "profilePicturePath" alt="pippo" class="img-fluid rounded-circle" />
+          <img :src= "vip.profilePic" alt="pippo" class="img-fluid rounded-circle" />
         </div>
       </div>
 
-    <h2 class="m-0 text-center text-white fw-bolder">{{'@'+currentVip }}</h2>
+    <h2 class="m-0 text-center text-white fw-bolder">{{'@'+ vip.name }}</h2>
     <h6 class="mt-1 text-center text-white fw-bold mb-0">{{[store.getters.getQuota.daily,store.getters.getQuota.weekly,store.getters.getQuota.monthly].join(' | ')}}</h6>
      <p class="m-0 text-center text-white mt-1 mb-0">{{n_post}} Squeal </p>
 
-      <div class="d-flex flex-column align-items-start">
-        <div class="d-flex flex-row justify-content-around align-items-end">
-
-          <Select class="buttonDropDown"
+      <div class="d-flex flex-column align-items-center">
+        <div class="d-flex flex-row justify-content-around align-items-end flex-wrap w-100">
+          <div class="d-flex flex-row justify-content-center" style="flex: 1 1 0">
+            <Select class="buttonDropDown"
                     :dropItems="filterValues"
                     :dropItemsName="filterValuesITAS"
                     classButton="btn btn-secondary"
@@ -148,9 +149,10 @@ import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
                     label="destinazione"
                     def="all"
                     @updateDestFilter = updateDestFilter
-          />
-
-          <Select class="ms-1 buttonDropDown"
+            />
+          </div>
+          <div class="d-flex flex-row justify-content-center" style="flex: 1 1 0">
+            <Select class="ms-1 buttonDropDown"
                     classButton="btn btn-secondary"
                     :dropItems="postType"
                     :dropItemsName="postTypeITAS"
@@ -158,9 +160,10 @@ import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
                     label= 'contenuto'
                     def = 'all'
                     @updatePostType = updatePostType
-          />
-
-          <Select  class="ms-1 buttonDropDown"
+            />
+          </div>
+          <div class="d-flex flex-row justify-content-center" style="flex: 1 1 0">
+            <Select  class="ms-1 buttonDropDown"
                      classButton="btn btn-secondary"
                      :dropItems="sortPosts"
                      :dropItemsName="sortPosts"
@@ -168,24 +171,25 @@ import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
                      label="ordina per"
                      :def="sortPosts[0]"
                      @updateSort = updateSortFilter
-          />
-          <div v-if="keyWordFilter && !smartPhone" class="input-group ms-3">
-            <input type="text" class="form-control" placeholder="Keyword" aria-label="Keyword's search" v-model="keyWord" aria-describedby="button-addon2">
-            <button class="btn btn-secondary" type="button" id="button-addon2" @click="updateTagPosts">Cerca</button>
+            />
+          </div>
+          <div v-if="keyWordFilter && !smartPhone" class="input-group ms-3 keyword-dim">
+            <input type="text" class="form-control" placeholder="Keyword..." aria-label="Keyword's search" v-model="keyWord" @keyup.enter="updateTagPosts">
+            <button class="btn btn-secondary" type="button" @click="updateTagPosts">Cerca</button>
           </div>
         </div>
-        <div v-if="keyWordFilter && smartPhone" class="input-group ms-3">
-          <input type="text" class="form-control" placeholder="Keyword" aria-label="Keyword's search" aria-describedby="button-addon2">
-          <button class="btn btn-secondary" type="button" id="button-addon2" @click="updateTagPosts">Cerca</button>
+        <div v-if="keyWordFilter && smartPhone" class="input-group">
+          <input type="text" class="form-control" placeholder="Keyword..." aria-label="Keyword's search" >
+          <button class="btn btn-secondary" type="button" @click="updateTagPosts">Cerca</button>
         </div>
       </div>
-      <div id="postContainer" v-if="readyPosts" class="d-flex flex-row flex-wrap justify-content-around mt-3">
-        <Post v-for="(post,i) in squeals" :key="post._id"
+      <div id="postContainer" v-if="readyPosts" class="mt-3 d-flex flex-column align-items-center">
+          <Post v-for="(post,i) in squeals" :key="post._id"
               :post="post"
-              :dest= "parseDestinationsViewPost(post.destinationArray, post.tags)"
+              :dest= "parseDestinationsViewPost(post.destinationArray, post.officialChannelsArray)"
               :numberOfPost="i"
-              picProfile = "/img/defaultUser.jpeg"
-        />
+              :picProfile = "post.profilePicture"
+          />
       </div>
     </div>
   </div>
@@ -196,8 +200,16 @@ import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
   .profileDim{
     max-height: 30vh;
   }
+  .keyword-dim{
+    width: 30rem;
+    max-width: 40rem;
+  }
 
   @media screen and (max-width: 768px) {
+
+    .keyword-dim{
+      width: 100%;
+    }
 
     .profileDim{
       max-height: 15vh;
@@ -206,6 +218,10 @@ import {computed, onMounted, onUnmounted, reactive, ref} from "vue";
     .buttonDropDown{
       align-self: end;
       margin-bottom: 2%;
+      min-width: 8rem;
+    }
+    #postContainer{
+      padding-bottom: 4rem;
     }
   }
 

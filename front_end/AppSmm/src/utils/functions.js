@@ -1,24 +1,26 @@
 
-import {currentVip, QUALITY, MAX_HEIGHT, MAX_WIDTH, URLHTTPREGEX, cast2millis} from './config.js'
+import {QUALITY, MAX_HEIGHT, MAX_WIDTH, URLHTTPREGEX, cast2millis} from './config.js'
 
 function getPage(){
     return window.location.pathname.split('/')[2];
 }
 
-async function getPosts(query,offset){
+async function getPosts(query,offset, limit = 12){
     try{
-        let res = await fetch(`/db/post/all?${query}&offset=${offset}`,{
+        let res = await fetch(`/db/post/all?${query}&offset=${offset}&limit=${limit}`,{
             method:"GET",
         });
-        return (await res.json()).map(post => { return {...post, dateOfCreation: new Date(Date.parse(post.dateOfCreation))} });
+        let posts = await res.json();
+        if (posts.length > 0) return posts.map(post => { return {...post, dateOfCreation: new Date(Date.parse(post.dateOfCreation))} });
+        return [];
     }catch (e) {
         throw e
     }
 }
 
-async function getUserQuota() {
+async function getUserQuota(vip) {
     try{
-        let res = await fetch(`/db/user/quota?user=${currentVip.value}`,{
+        let res = await fetch(`/db/user/quota?user=${vip}`,{
             method:'GET',
         })
         return (await res.json());
@@ -28,9 +30,9 @@ async function getUserQuota() {
     }
 }
 
-async function getUserInfo(){
+async function getUserInfo(vip){
     try{
-        let res = await fetch(`/db/user/info?user=${currentVip.value}`,{
+        let res = await fetch(`/db/user/info?user=${vip}`,{
             method:'GET',
         })
         return (await res.json());
@@ -112,15 +114,16 @@ const compressBlob = (file) => new Promise((resolve) => {
 /**
  *
  * @param {Array<{name:String,destType:String}>} destinations
- * @param {Array<String>} tags - #
+ * @param {Array<String>} officialDestinations - §PIPPO
  * @return {String} - '@francesco, §popi_ma_buoni,'
  */
-const parseDestinationsViewPost = (destinations, tags) => {
+const parseDestinationsViewPost = (destinations,officialDestinations) => {
     let arr = [];
     destinations.forEach(dest => {
-        arr.push(dest.destType === 'channel' ? `§${dest.name}` : `@${dest.name}`)
+        arr.push(dest.destType === 'channel' ? `§${dest.name}` : dest.destType === 'user' ? `@${dest.name}` : `#${dest.name}`)
     })
-    if(tags) arr = arr.concat(tags.map(tag => `#${tag}`))
+    officialDestinations.forEach(dest => arr.push(`§${dest.toUpperCase()}`));
+
     return arr.join(', ');
 }
 

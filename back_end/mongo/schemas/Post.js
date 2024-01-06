@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const {ObjectId} = require("mongodb");
 const contentTypes = ['geolocation','text','image','video']
-const destTypes = ['channel', 'user','official']
+const destTypes = ['channel', 'user','official','keyword']
 const reactionTypes = ['heart','thumbs-up','thumbs-down','heartbreak']
 const categories = ['private','public'];
 const popularities = ['popular','unpopular','controversial','neutral']
@@ -73,20 +73,13 @@ const PostSchema = new mongoose.Schema({
 
     criticalMass: {
         type: Number,
-        default: 5,
+        default: 0,
     },
 
     views: [{
         name: String,
         date: Date,
     }],
-
-
-    tags: [
-        {
-            type: String,
-        }
-    ],
 
 })
 

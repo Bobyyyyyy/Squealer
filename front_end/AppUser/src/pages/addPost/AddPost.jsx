@@ -1,18 +1,9 @@
 import ContentPost from "./ContentPost.jsx";
 import {useEffect, useRef, useState} from "react";
 import {SubmitIcon} from "../../components/assets/index.jsx";
-import {
-    getQuotaByUsername,
-    getUsernameFromSessionStore
-} from "../../utils/usefulFunctions.js";
+import {getQuotaByUsername, getUsernameFromSessionStore, setToastNotification} from "../../utils/usefulFunctions.js";
 
-import {
-    blob2base64,
-    compressBlob,
-    getEmbed
-} from "../../utils/imageFunctions.js";
-
-import {Toast} from "flowbite-react";
+import {blob2base64, compressBlob, getEmbed} from "../../utils/imageFunctions.js";
 import TimedPost from "./TimedPost.jsx";
 import {startSendingPosition} from "../../utils/geoFunctions.js";
 import ModalGeo from "./ModalGeo.jsx";
@@ -24,8 +15,12 @@ function AddPost(){
     const [content, setContent] = useState('');
     const [imgAsFile, setImgAsFile] = useState();
     const [position, setPosition] = useState(null);
-    const [quota,setQuota] = useState();
+
+    const [quota, setQuota] = useState(null);
     const [currentQuota, setCurrentQuota] = useState();
+    // quota that will be passed and can be negative
+    const realQuota = useRef();
+
     const [error, setError] = useState('');
 
     const [isTimed, setIsTimed] = useState(false);
@@ -47,13 +42,17 @@ function AddPost(){
         </div>
     );
 
+    const handleError = (data) => {
+        setError(data);
+    }
+
     function parseDestinations(dests) {
         let finalDest = [];
         let allDest = dests.replaceAll(" ", "").split(",");
         for (let dest of allDest) {
             finalDest.push({
                 name: dest.substring(1),
-                destType: dest.startsWith('§') ? 'channel' : dest.startsWith('@') ? 'user' : 'errore',
+                destType: (dest.startsWith('§') ? 'channel' : (dest.startsWith('@') ? 'user' : (dest.startsWith('#') ? 'keyword' : "error"))),
             })
         }
         return finalDest;
@@ -61,7 +60,9 @@ function AddPost(){
 
     const canSendPost = () => {
         let canSend = true;
-        if (!destinations && !content) {
+        if (!!error) {
+            canSend = false;
+        } else if (!destinations && !content) {
             setError("Inserisci i destinatari e il contenuto")
             canSend = false;
         } else if (!content) {
@@ -70,12 +71,13 @@ function AddPost(){
         } else if (!destinations) {
             setError("Inserisci i destinatari")
             canSend = false;
-        } else if (!(destinations.includes("§") || destinations.includes("@"))) {
-            setError("Inserisci @ o § nei destinatari");
+        } else if (!(destinations.includes("§") || destinations.includes("@") || destinations.includes("#"))) {
+            setError("Inserisci @ o § o # nei destinatari");
             canSend = false;
         } else if (isQuotaNegative()) {
+            setError("Hai finito la quota");
             canSend = false;
-        } else if (destinations.includes(username)) {
+        } else if (isMyUsername(destinations)) {
             setError("Non puoi inviare messaggi a te stesso")
             canSend = false;
         } else if (containsUppercaseChannel(destinations)) {
@@ -89,10 +91,14 @@ function AddPost(){
         return /§[A-Z]/.test(str);
     }
 
-    const isQuotaNegative = () => {
-        return currentQuota?.monthly < 0;
+    function isMyUsername(dest) {
+        let reg = new RegExp(`@${username}$`, "gm");
+        return dest.match(reg);
     }
 
+    const isQuotaNegative = () => {
+        return quota.characters.daily <= 0 || quota.characters.weekly <= 0 || quota.characters.monthly <= 0;
+    }
 
     async function createPost() {
         let content2send;
@@ -144,13 +150,11 @@ function AddPost(){
         try {
             if (canSendPost()) {
                 let post = await createPost();
-                console.log("post creato", post, currentQuota)
-
                 let res = await fetch("/db/post", {
                     method: "POST",
                     body: JSON.stringify({
                         post: post,
-                        quota: currentQuota
+                        quota: realQuota.current
                     }),
                     headers: {
                         "Content-Type": "application/json"
@@ -159,33 +163,28 @@ function AddPost(){
                 if (res.ok) {
                     res = await res.json();
                     if (post.contentType === "geolocation" && post.hasOwnProperty("millis")) {
-                        console.log("start sending");
                         setStartSending(true);
                         setShowModalGeo(true);
                         startSendingPosition(frequencyMs, numberOfPosts, res.post._id);
                         const wait = frequencyMs * numberOfPosts + 500;
-                        console.log("wait", wait)
                         setTimeout(()=> {
                             setShowModalGeo(false);
+                            setToastNotification("Post inviato correttamente", "success");
                             window.location.href = "/user/"
                         }, wait)
                     } else {
+                        setToastNotification("Post inviato correttamente", "success");
                         window.location.href = "/user/"
                     }
                 } else {
-                    let data = await res.json();
-                    if (data.statusCode === 400) {
-                        console.log(data.message);
-                        window.alert("Non hai il prermesso di scrivere");
-                    } else if (data.statusCode === 400) {
-                        window.alert("Canale o utente non esiste");
-                    }
-                    throw res;
+                    setToastNotification("Oh no, qualcosa è andato storto nell'invio del post", "failure");
+                    window.location.href = "/user/"
                 }
             }
         } catch (e) {
             console.log(e)
-            window.alert("canale o utente non esistente")
+            setToastNotification("Oh no, qualcosa è andato storto nell'invio del post", "failure");
+            window.location.href = "/user/"
         }
     }
 
@@ -193,19 +192,11 @@ function AddPost(){
         getQuotaByUsername(username)
             .then((response) => {
                 setQuota(response);
-                setCurrentQuota(response);
+                setCurrentQuota(response.characters);
+                realQuota.current = response.characters;
             })
     }, []);
 
-    useEffect(() => {
-        if (!isQuotaNegative()) {
-            setError('')
-        }
-    }, [content, destinations]);
-
-    useEffect(()=> {
-        console.log("num post:", numberOfPosts)
-    }, [numberOfPosts])
 
     return (
         <main className="flex flex-col items-center justify-center m-4 pb-8">
@@ -215,15 +206,16 @@ function AddPost(){
             <div className="mt-6 w-full mb-4">
                 {/* DESTINATARI */}
                 <div className="flex flex-col justify-between items-start gap-2">
-                    <div className={"flex justify-between w-full"}>
+                    <div className={"flex justify-between items-center w-full"}>
                         <span className="text-xl md:text-2xl">Destinatari</span>
-                        <span className={"text-blue-400"}>(@utente, §canale)</span>
+                        <span className={"text-blue-400 font-normal text-base"}>(@utente, §canale, #keyword)</span>
                     </div>
                     <input
                         type="text"
-                        className="border-2 border-gray-500  rounded-md w-full focus:border-teal-500 focus:ring-teal-500 "
-                        placeholder="@Pippo42, §calcetto"
+                        className="border-2 border-gray-500 rounded-md w-full focus:border-teal-500 focus:ring-teal-500"
+                        placeholder="@Pippo42, §calcetto, #oggi"
                         onChange={e => setDestinations(e.target.value)}
+                        aria-label="Inserisci i destinatari del post"
                     />
                 </div>
                 {/* TIPO DI CONTENUTO DEL POST */}
@@ -235,6 +227,7 @@ function AddPost(){
                             setType(e.target.value)
                             setContent('');
                         }}
+                        aria-label="Seleziona la tipologia del post"
                     >
                         <option value="text">Testo</option>
                         <option value="image">Immagine</option>
@@ -248,20 +241,21 @@ function AddPost(){
                         type={type} content={content} setContent={setContent} destinations={destinations}
                         quota={quota} currentQuota={currentQuota} setCurrentQuota={setCurrentQuota}
                         setImgAsFile={setImgAsFile} position={position} setPosition={setPosition}
-                        setError={setError} isQuotaNegative={isQuotaNegative}
+                        handleError={handleError} isQuotaNegative={isQuotaNegative} realQuota={realQuota}
                     />
                 }
                 <div className="flex items-center gap-4 mt-4">
                     <input
                         type="checkbox" checked={isTimed} onChange={() => setIsTimed((prev) => !prev)}
                         className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                        id="timedCheckbox"
                     />
-                        <label
-                            htmlFor="default-checkbox"
-                            className="text-xl md:text-2xl"
-                        >
-                            Messaggio temporizzato
-                        </label>
+                    <label
+                        htmlFor="timedCheckbox"
+                        className="text-xl md:text-2xl"
+                    >
+                        Messaggio temporizzato
+                    </label>
                 </div>
             </div>
             {isTimed && type === "text" && <>{infoTimedText}</>}
@@ -273,7 +267,7 @@ function AddPost(){
                     </p>
                 </div>
             }
-            {isTimed && <TimedPost frequency={frequencyMs} setFrequencyMs={setFrequencyMs} numberOfPosts={numberOfPosts} setNumberOfPosts={setNumberOfPosts} type={type}/>}
+            {isTimed && <TimedPost setFrequencyMs={setFrequencyMs} numberOfPosts={numberOfPosts} setNumberOfPosts={setNumberOfPosts} type={type} handleError={handleError} />}
             {!!error &&
                 <div className="flex w-full justify-start text-xl text-red-600 mb-4">
                     {error}
@@ -295,15 +289,6 @@ function AddPost(){
             />
         </main>
     );
-    /*
-        <Toast>
-            <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-cyan-100 text-cyan-500 dark:bg-cyan-800 dark:text-cyan-200">
-                {SubmitIcon}
-            </div>
-            <div className="ml-3 text-sm font-normal">Set yourself free.</div>
-            <Toast.Toggle />
-        </Toast>
-     */
 }
 
 export default AddPost;

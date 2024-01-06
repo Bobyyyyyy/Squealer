@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
 
-function TimedPost({frequency, numberOfPosts, setNumberOfPosts, type, setFrequencyMs}) {
+function TimedPost({numberOfPosts, setNumberOfPosts, type, setFrequencyMs, handleError}) {
 
     const [seconds, setSeconds] = useState(0);
     const [minutes, setMinutes] = useState(0);
@@ -16,37 +16,53 @@ function TimedPost({frequency, numberOfPosts, setNumberOfPosts, type, setFrequen
     }
 
     useEffect(() => {
-        setFrequencyMs(parseInMs());
-    }, [seconds, minutes, hours, days]);
+        if (seconds>=0 && minutes>=0 && hours>=0 && days>=0 && numberOfPosts >= 1) {
+            setFrequencyMs(parseInMs());
+        } else {
+            handleError("I valori selezionati devono essere positivi");
+        }
 
+    }, [seconds, minutes, hours, days]);
     return (
         <div className="flex flex-col justify-between w-full gap-2 mb-4">
-            <Interval name={`${type === "geolocation" ? "Aggiornamenti mappa" : "Numero di post"}`} min={1} value={numberOfPosts} setValue={setNumberOfPosts} />
+            <Interval name={`${type === "geolocation" ? "Aggiornamenti mappa" : "Numero di post"}`} min={1} value={numberOfPosts} setValue={setNumberOfPosts} handleError={handleError} />
             <span className="text-xl text-center">Frequenza</span>
-            <div className="flex flex-wrap w-full gap-4 justify-between items-center">
-                <Interval name={"secondi"} min={0} value={seconds} setValue={setSeconds} />
-                <Interval name={"minuti"} min={0} value={minutes} setValue={setMinutes} />
-                <Interval name={"ore"} min={0} value={hours} setValue={setHours} />
-                <Interval name={"giorni"} min={0} value={days} setValue={setDays} />
+            <div className="flex flex-wrap w-full gap-4 justify-between items-center" aria-label="Frequenza di aggiornamento">
+                <Interval name={"secondi"} min={0} value={seconds} setValue={setSeconds} handleError={handleError} />
+                <Interval name={"minuti"} min={0} value={minutes} setValue={setMinutes} handleError={handleError} />
+                <Interval name={"ore"} min={0} value={hours} setValue={setHours} handleError={handleError} />
+                <Interval name={"giorni"} min={0} value={days} setValue={setDays} handleError={handleError} />
             </div>
         </div>
     );
 }
 
-function Interval({name, value, setValue, min}) {
+function Interval({name, value, setValue, min, handleError}) {
+    useEffect(() => {
+        if (value >= min) {
+            handleError("");
+        }
+    }, [value]);
+
     return (
         <div>
-            <label htmlFor="number-input" className="text-lg md:text-2xl mr-2">{name} :</label>
-            <input type="number" id="number-input"
-                   className="appearance-none w-20 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2"
-                   placeholder="0"
-                   value={String(value)}
-                   min={min}
-                   onChange={(e) => {
-                        if (e.target.value >= min) {
-                            setValue(e.target.value)
-                        }
-                   }}
+            <label htmlFor="number-input" className="text-lg md:text-2xl mr-2">
+                {name} :
+            </label>
+            <input
+                type="number"
+                id="number-input"
+                className="appearance-none w-20 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2"
+                placeholder="0"
+                value={String(value)}
+                min={min}
+                aria-label={`${name} input`}
+                onChange={(e) => {
+                    setValue(e.target.value);
+                    if (e.target.value < min) {
+                        handleError(`Selezionare un valore superiore di ${min}`);
+                    }
+                }}
             />
         </div>
     );

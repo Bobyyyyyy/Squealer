@@ -5,7 +5,6 @@ import "leaflet/dist/leaflet.css"
 
 
 function Mappa({position, setPosition}) {
-    //const [position, setPosition] = useState(null);
     const [error, setError] = useState(false);
     const savePosition = (pos) => {
         setPosition([pos.coords.latitude, pos.coords.longitude]);
@@ -25,7 +24,6 @@ function Mappa({position, setPosition}) {
     }, []);
 
     const IconMarker = new Icon({
-        //iconUrl: MarkerPosition,
         iconUrl: "/img/location.png",
         iconSize: [48, 48],
     })
@@ -42,9 +40,6 @@ function Mappa({position, setPosition}) {
                     center={position}
                     zoom={15}
                     scrollWheelZoom={false}
-                    whenReady={(map)=> {
-                        //console.log("mappa pronta", map);
-                    }}
                 >
                     <TileLayer
                         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

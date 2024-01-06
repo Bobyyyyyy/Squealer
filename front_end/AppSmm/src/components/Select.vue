@@ -22,12 +22,18 @@ import {onMounted, ref} from "vue";
   const getID = (label) => `select${label}`;
   onMounted(() => selected.value = props.def);
 
+  function reset(){
+    selected.value=props.def;
+  }
+
+  defineExpose({reset});
+
 </script>
 
 <template>
   <div class="d-flex flex-column align-items-center ms-2">
     <label :for=getID(label) :class="labelClass" class="fw-light" >{{label}}</label>
-    <select :id=getID(label) :class="classButton" v-model="selected" class="select btn" role="button" @change="$emit(updateRef, selected)" aria-expanded="false" :required="required">
+    <select :id=getID(label) v-model="selected" class="form-select text-dark" role="button" @change="$emit(updateRef, selected)" aria-expanded="false" :required="required" style="background-color: var(--bs-secondary);">
       <option v-for="(el,i) in dropItems" :key="i" :value="el">{{dropItemsName[i]}}</option>
     </select>
   </div>

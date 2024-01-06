@@ -8,18 +8,18 @@ function NotFound() {
 
     return (
         <div className="flex flex-col w-full justify-center items-center gap-6 mt-8 text-lg font-normal">
-            <p >
+            <p aria-label={`La pagina ${lastPage} non è stata trovata!`}>
                 La pagina {lastPage} non è stata trovata!
             </p>
-            <p>
+            <p aria-label="Verifica di trovarti nella pagina giusta">
                 Verifica di trovarti nella pagina giusta
             </p>
-
             <Link
                 className="button uppercase"
                 to="/"
+                aria-label="Torna alla Homepage"
             >
-                Back to the Homepage
+                Torna alla Homepage
             </Link>
         </div>
     );

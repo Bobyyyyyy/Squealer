@@ -3,10 +3,12 @@
   import VipCard from "../components/handleVip/VipCard.vue";
   import VipModal from "../components/handleVip/VipModal.vue";
   import {Modal} from 'bootstrap'
-  import {onMounted, reactive, ref} from "vue";
+  import {computed, onMounted, reactive, ref} from "vue";
   import {getLastPost} from "../utils/functions.js";
-  import {smm} from "../utils/config.js";
   import Spinner from "../components/Spinner.vue";
+  import {useStore} from "vuex";
+
+  const store = useStore();
 
   let vips = [];
   let lastVipsPost = [];
@@ -16,6 +18,8 @@
   const name2Use = ref('')
   const requestCompleted = ref(false);
   const readyPage = ref(false);
+
+  const smm = computed(() => store.getters.getSmm);
 
   onMounted(async ()=>{
     modalState.myModal = new Modal('#choiceModal',{});
@@ -31,7 +35,7 @@
     requestCompleted.value=true;
   })
 
-  function openModal(name) {
+  function openModal(name, profilePic) {
     name2Use.value = name;
     modalState.myModal.show()
   }
@@ -46,16 +50,18 @@
 <template>
   <Spinner v-if="!readyPage" />
   <NavBar v-show="readyPage"
-          center-text="Scegli account da gestire"
+          center-text="SQUEALER"
           :welcomingPage="true"
-          @imgLoaded="console.log('ENTRO');readyPage = true"/>
-  <div v-show="readyPage"  class="d-flex flex-row flex-wrap justify-content-evenly" v-if="requestCompleted">
+          @imgLoaded="readyPage = true"/>
+  <h2 class="mt-3 mb-0">Scegli account da gestire:</h2>
+
+  <div v-show="readyPage"  class="d-flex flex-row mb-5 flex-wrap justify-content-evenly" v-if="requestCompleted">
     <VipCard v-for="(vip,index) in vips"
             :key="index"
             :followers="100"
              :username="vip"
              :post="lastVipsPost[index] ? lastVipsPost[index] : {}"
-            @setModal = " (username) => openModal(username)"
+            @setModal = " (username, profilePic) => openModal(username, profilePic)"
     />
 
   </div>

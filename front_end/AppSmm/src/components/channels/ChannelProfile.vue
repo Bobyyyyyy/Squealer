@@ -1,8 +1,8 @@
 <script setup>
-  import {computed, onMounted, onUnmounted, ref, getCurrentInstance} from "vue";
+  import {computed, onMounted, onUnmounted, ref} from "vue";
   import Post from "../post/Post.vue";
   import Select from "../Select.vue";
-  import {currentVip, postType, postTypeITAS, sortPosts} from "../../utils/config.js";
+  import {postType, postTypeITAS, sortPosts} from "../../utils/config.js";
   import {getPosts, parseDestinationsViewPost} from "../../utils/functions.js";
   import {useStore} from "vuex";
   import Spinner from "../Spinner.vue";
@@ -10,6 +10,8 @@
   import AddAdminHandler from "./AddAdminHandler.vue";
   import DeleteAdminHandler from "./DeleteAdminHandler.vue";
   import RequestHandler from "./RequestHandler.vue";
+  import DeleteChannelModal from "./DeleteChannelModal.vue";
+  import ProfilePicModal from "./ProfilePicModal.vue";
 
   const store = useStore();
 
@@ -19,6 +21,7 @@
 
   const squeals = computed(()=> store.getters.getSqueal);
   const offset = computed(() => store.getters.getOffset);
+  const vip = computed(() => store.getters.getVip);
 
   const channel = ref({});
   const readyChannel = ref(false);
@@ -27,22 +30,28 @@
   const addAdminModal = ref();
   const deleteAdminModal = ref();
   const requestModal = ref();
+  const deleteChannelModal = ref();
+  const changeProfilePic = ref();
 
   let query = ''
 
   let lastRequestLength = 12;
 
   const updateAfterInsert = (admin) => {
-    channel.value.admins.push(admin);
-    channel.value.followers.splice(channel.value.followers.map(follower => follower.user).indexOf(admin),1);
+    let adminInfo = channel.value.followers.find(foll => foll.user === admin);
+    channel.value.admins.push({
+      name: adminInfo.user,
+      profilePic: adminInfo.profilePic,
+    });
+    channel.value.followers.splice(channel.value.followers.map(follower => follower.user).indexOf(admin.name),1);
   }
-  const updateAfterDelete = user => {
-    channel.value.followers.push({user:user, canWrite: true});
-    channel.value.admins.splice(channel.value.admins.indexOf(user),1);
+  const updateAfterDelete = admin => {
+    channel.value.followers.push({user: admin.name, canWrite: true, profilePic: admin.profilePic});
+    channel.value.admins.splice(channel.value.admins.map(admin => admin.name).indexOf(admin.name),1);
   }
   const updateRequests = (user,accepted) => {
-    channel.value.requests.splice(channel.value.requests.indexOf(user),1);
-    if(accepted) channel.value.followers.push({user:user, canWrite: true});
+    channel.value.requests.splice(channel.value.requests.map(req => req.user).indexOf(user.user),1);
+    if(accepted) channel.value.followers.push({user:user.user, canWrite: true, profilePic: user.profilePic});
   }
 
   async function updateSortFilter(newText){
@@ -54,6 +63,7 @@
     sortFilter.value = newText
 
     store.commit('clearSqueal');
+    lastRequestLength = 12;
     store.commit('pushSqueal', await getPosts(query,0) )
     readyPosts.value=true
   }
@@ -66,6 +76,7 @@
     typePostFilter.value=newText
 
     store.commit('clearSqueal');
+    lastRequestLength = 12;
     store.commit('pushSqueal', await getPosts(query,0))
     readyPosts.value=true
  }
@@ -78,13 +89,12 @@
   }
 
   const scrollEndDetector = async () => {
-    if (window.innerHeight + window.pageYOffset >= document.getElementById("bodyDivChannel").offsetHeight && lastRequestLength >= 12) {
+    if (window.innerHeight + window.pageYOffset >= document.getElementById("post_channel_container").offsetHeight && lastRequestLength >= 12) {
       lastRequestLength = await(updatePost());
     }
   }
 
   onMounted(async ()=>{
-    document.addEventListener('scroll', scrollEndDetector, true);
     readyPosts.value=false;
     readyChannel.value = false;
     let name = window.location.pathname.split("/").pop();
@@ -93,14 +103,16 @@
       method:'GET'
     });
     channel.value = await res.json();
-    channel.value.requests = channel.value.requests.map(obj => obj.user);
     readyChannel.value = true;
-    query =`name=${currentVip.value}&channel=${name}&smm=${true}&limit=12`;
+
+    query =`name=${vip.value.name}&channel=${name}&smm=${true}&limit=12`;
 
     store.commit('clearSqueal');
     store.commit('pushSqueal',(await getPosts(query, 0)));
 
     readyPosts.value=true
+
+    document.addEventListener('scroll', scrollEndDetector, true);
   })
 
   onUnmounted(() => {
@@ -115,16 +127,16 @@
     <div v-if="readyChannel" class="marginCD">
       <div class="d-flex flex-column">
         <div class="d-flex flex-row justify-content-center w-100">
-          <div class="maxWidth">
-            <img src="https://picsum.photos/id/1/300/300" class="img-fluid rounded-circle" alt="gatto che ormai ha stufato">
+          <div class="profileImgContainer">
+            <img :src="channel.profilePicture" class="img-fluid rounded-circle h-100 object-fit-cover" alt="immagine profilo canale" @click="changeProfilePic.openModal">
           </div>
         </div>
         <h2 class="m-1 text-center">{{ channel.name }}</h2>
         <h5 class="m-1 text-center">{{ channel.description }}</h5>
         <div class="w-50 d-flex flex-row  align-self-center  justify-content-center">
           <div class="text-center bordEl" >
-            <span v-if="channel.creator === currentVip" class="badge rounded-pill text-bg-primary"> creatore </span>
-            <span v-else-if="channel.admins.includes(currentVip)" class="badge rounded-pill text-bg-warning"> admin </span>
+            <span v-if="channel.creator === vip.name" class="badge rounded-pill text-bg-primary"> creatore </span>
+            <span v-else-if="channel.admins.map(admin => admin.name).includes(vip.name)" class="badge rounded-pill text-bg-warning"> admin </span>
           </div>
           <div class="text-center bordEl ">
             <span v-if="channel.type === 'public'" class="badge rounded-pill text-bg-success"> pubblico </span>
@@ -132,12 +144,13 @@
           </div>
         </div>
       </div>
-      <div class="d-flex flex-row justify-content-between align-items-end">
-        <div class="d-flex flex-row">
+      <div class="d-flex flex-column flex-lg-row justify-content-between align-items-center align-items-lg-end">
+        <div class="d-flex flex-row flex-wrap justify-content-around gap-2 mt-2">
           <button type="button" class="btn btn-primary" @click="permissionModal.openModal">Permessi</button>
           <button v-if="channel.type === 'private'" type="button"  class="btn btn-primary ms-2" @click="requestModal.openModal">Richieste</button>
-          <button v-if="channel.creator === currentVip" type="button" class="btn btn-primary ms-2" @click="addAdminModal.openModal">Aggiungi admin</button>
-          <button v-if="channel.creator === currentVip" type="button" class="btn btn-primary ms-2" @click="deleteAdminModal.openModal">Rimuovi admin</button>
+          <button v-if="channel.creator === vip.name" type="button" class="btn btn-primary ms-2" @click="addAdminModal.openModal">Aggiungi admin</button>
+          <button v-if="channel.creator === vip.name" type="button" class="btn btn-primary ms-2" @click="deleteAdminModal.openModal">Rimuovi admin</button>
+          <button v-if="channel.creator === vip.name" type="button" class="btn btn-danger ms-2" @click="deleteChannelModal.openModal">Elimina canale</button>
         </div>
 
         <div class="d-flex flex-row justify-content-end">
@@ -162,25 +175,35 @@
           />
         </div>
       </div>
-      <div v-if="readyPosts" class="d-flex flex-row flex-wrap justify-content-around mt-3">
+      <div id="post_channel_container" v-if="readyPosts" class="d-flex flex-row flex-wrap justify-content-around mt-3" style="padding-bottom: 4rem;">
         <Post v-for="(post,i) in squeals" :key="post._id"
               :post="post"
-              :dest= "parseDestinationsViewPost(post.destinationArray, post.tags)"
+              :dest= "parseDestinationsViewPost(post.destinationArray, post.officialChannelsArray)"
               :numberOfPost="i"
-              picProfile = "/img/defaultUser.jpeg"
+              :picProfile = "post.profilePicture"
         />
       </div>
+
+      <RequestHandler ref="requestModal" :chname="channel.name" :requests="channel.requests" @updateFollowers="(user,accepted) => updateRequests(user,accepted)" />
+      <DeleteAdminHandler ref="deleteAdminModal" :chname="channel.name" :admins="channel.admins" @updateAdmin="admin => updateAfterDelete(admin)"/>
+      <AddAdminHandler ref="addAdminModal" :followers="channel.followers" :chname="channel.name" @updateAdmin="admin => updateAfterInsert(admin)" />
+      <PermissionHandler ref="permissionModal" :followers="channel.followers" :chname="channel.name" />
+      <DeleteChannelModal ref="deleteChannelModal" :channelName="channel.name" />
+      <ProfilePicModal ref="changeProfilePic" :channelName="channel.name" @profilePic="(img) => channel.profilePicture = img"/>
     </div>
     <Spinner v-else />
   </div>
-  <RequestHandler ref="requestModal" :chname="channel.name" :requests="channel.requests" @updateFollowers="(user,accepted) => updateRequests(user,accepted)" />
-  <DeleteAdminHandler ref="deleteAdminModal" :chname="channel.name" :admins="channel.admins" @updateAdmin="admin => updateAfterDelete(admin)"/>
-  <AddAdminHandler ref="addAdminModal" :followers="channel.followers" :chname="channel.name" @updateAdmin="admin => updateAfterInsert(admin)" />
-  <PermissionHandler ref="permissionModal" :followers="channel.followers" :chname="channel.name"/>
+
 </template>
 
-<style>
-  .maxWidth{
-    max-width:  20vh;
+<style scoped>
+  .profileImgContainer{
+    max-height:  17vh;
+    aspect-ratio: 1;
+  }
+  @media screen and (max-width: 768px){
+    .btn{
+      width: 10rem !important;
+    }
   }
 </style>

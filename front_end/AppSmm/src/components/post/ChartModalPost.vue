@@ -1,7 +1,7 @@
 <script setup>
   import postReactionsChart from '../charts/postReactionsChart.vue'
   import {Modal} from "bootstrap";
-  import {computed, onMounted, onUnmounted, reactive, ref, toRaw, watch, watchEffect} from "vue";
+  import {onMounted, reactive, ref, watch} from "vue";
   import Popularity30days from "../charts/Popularity30days.vue";
 
 
@@ -12,9 +12,7 @@
     idx: Number,
   })
 
-  function getId(){
-    return `chartPostModal${props.idx}`
-  }
+  const id = `chartPostModal${props.idx}${Math.floor(Math.random() * 100000000)}`;
 
 
   const DChart = ref();
@@ -46,7 +44,7 @@
   })
 
   onMounted(()=> {
-    modalStateChart.chartPost = new Modal(`#${getId()}`, {})
+    modalStateChart.chartPost = new Modal(`#${id}`, {})
   })
   watch(props.reactions,(data)=>{
     if(Object.keys(data.value).length !== 0){
@@ -59,7 +57,7 @@
 </script>
 
 <template>
-  <div  class="modal modal-xl fade overflow-hidden" :id="getId()" tabindex="-1" aria-hidden="true">
+  <div  class="modal modal-xl fade overflow-hidden" :id="id" tabindex="-1" aria-hidden="true">
     <div class="centralDiv z-1">
       <div class="modal-dialog modal-dialog-centered ">
         <div class="modal-content">
@@ -68,8 +66,8 @@
             <button type="button" class="btn-close" @click="closeModal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <div class="d-flex flex-row align-items-center justify-content-around p-2 ">
-              <postReactionsChart ref="DChart" :reactions="liveReactions" />
+            <div class="d-flex flex-column flex-lg-row align-items-center justify-content-around p-2 ">
+              <postReactionsChart ref="DChart" :reactions="liveReactions" class="mb-5 mb-lg-0" />
               <Popularity30days ref="LChart" :reactions="liveReactions" :post="true" class="h-50" />
             </div>
           </div>

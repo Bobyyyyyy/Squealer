@@ -1,12 +1,19 @@
 import Body from "./Body.jsx";
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import Title from "./Title.jsx";
 
 import {
-    Dislike, Like, Heart, MadIcon, CommentIcon
+    Dislike,
+    Like,
+    Heart,
+    MadIcon,
+    CommentIcon
 } from "../assets/index.jsx"
 
-import {getUsernameFromSessionStore} from "../../utils/usefulFunctions.js";
+import {
+    getUsernameFromSessionStore,
+    isUserAnonymous
+} from "../../utils/usefulFunctions.js";
 import RepliesModal from "./RepliesModal.jsx";
 
 function Post({post}) {
@@ -20,6 +27,7 @@ function Post({post}) {
 
     const lastReaction = post.reactions.find((reaction)=> reaction.user === getUsernameFromSessionStore());
     const [activeButton, setActiveButton] = useState(lastReaction ? lastReaction.rtype : null);
+    const isAnonymous = isUserAnonymous();
 
     const [showRepliesModal, setShowRepliesModal] = useState(false);
 
@@ -29,11 +37,6 @@ function Post({post}) {
         // effettivamente quando il componente viene renderizzato
         const user = getUsernameFromSessionStore();
         if (id !== activeButton) {
-            const newReaction = {
-                rtype: id,
-                user: user,
-                date: new Date().toISOString(),
-            }
             await fetch(`/db/post/updateReaction`,{
                 method:"PUT",
                 headers: {
@@ -61,7 +64,7 @@ function Post({post}) {
 
     return(
     <>
-        <div className="w-full md:w-[32rem] border border-gray-200">
+        <div className="w-full md:w-[32rem] h-fit border border-gray-200">
             <Title post={post} />
             <Body post={post} />
             <div className="flex w-full justify-evenly py-2 px-4" >
@@ -74,11 +77,13 @@ function Post({post}) {
                         { (activeButton === item.id) ? item.icon.active : item.icon.inactive }
                     </button>
                 ))}
-                <button
-                    className="w-8 h-8"
-                    onClick={() => setShowRepliesModal((prev) => !prev)}>
-                    {CommentIcon}
-                </button>
+                {!isAnonymous && (
+                    <button
+                        className="w-8 h-8"
+                        onClick={() => setShowRepliesModal((prev) => !prev)}>
+                        {CommentIcon}
+                    </button>
+                )}
             </div>
             <RepliesModal
                 isOpen={showRepliesModal} setIsOpen={setShowRepliesModal} postID={post._id}

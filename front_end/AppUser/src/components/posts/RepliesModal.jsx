@@ -1,4 +1,4 @@
-import {Button, Modal, Spinner} from "flowbite-react";
+import {Modal, Spinner} from "flowbite-react";
 import React, {useEffect, useState} from "react";
 function RepliesModal({isOpen, setIsOpen, postID}) {
     const [comment, setComment] = useState('');
@@ -68,7 +68,7 @@ function RepliesModal({isOpen, setIsOpen, postID}) {
                                         key={rep._id}
                                     >
                                         <img
-                                            className="w-9 h-9 object-cover rounded-full"
+                                            className="w-9 h-9 object-cover rounded-full aspect-square"
                                             src={rep.profilePicture} alt={`${rep.owner}'s profile picture`}
                                         />
                                         <div className="flex flex-wrap w-full justify-start gap-2 items-center overflow-x-hidden">

@@ -1,9 +1,8 @@
 TODO:
 - SMM
-    - grafica !!!
-    - risposte ai post
-    - canali refactor
-    - CAMBIO TIPO SESSIONE QUANDO si scegle UTENTE
+    risposte immagine profilo
+    scrivere a popi che non funziona l'update delle reazioni se ci sono solo menzioni
+
 - MOD:
     - canali privati
     - cerca dei post ?
