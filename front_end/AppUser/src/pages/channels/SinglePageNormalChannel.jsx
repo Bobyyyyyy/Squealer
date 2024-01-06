@@ -172,7 +172,7 @@ function SinglePageNormalChannel() {
                             )}
                             <h3 className="text-center text-2xl font-extrabold">§{nome}</h3>
                         </div>
-                        <p className="text-center px-2 break-words text-sm">{description}</p>
+                        <p className="text-center px-2 break-words text-base">{description}</p>
                     </div>
                     {role === "Creator" || role === "Admin" ? (
                             <div className="flex flex-wrap justify-around items-center gap-4 px-4 w-full">
