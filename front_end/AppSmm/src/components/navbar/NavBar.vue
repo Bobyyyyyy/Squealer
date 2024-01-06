@@ -24,7 +24,7 @@ const vip = computed(() => store.getters.getVip);
       <div class="justify-content-start align-item sameWidth">
         <div class="img-container d-flex justify-content-start">
           <img v-if="welcomingPage" alt="logo" src="/img/logo.png" class="img-fluid object-fit-contain h-100"  @load=" $emit('imgLoaded')">
-          <router-link v-else to="/SMM/Profile" class="d-flex justify-content-start mb-3 h-100">
+          <router-link v-else to="/AppSmm/Profilo" class="d-flex justify-content-start mb-3 h-100">
             <img alt="logo" src="/img/logo.png" class="img-fluid" @load=" $emit('imgLoaded')">
           </router-link>
         </div>

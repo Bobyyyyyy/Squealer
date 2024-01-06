@@ -52,21 +52,21 @@ function Home() {
             ) : (
                 <div className="max-h-screen">
                     <div className="flex flex-wrap w-full gap-8 items-center justify-center pb-20 overflow-y-scroll" id="postDiv">
-                        {posts!==null && posts.map((post)=> {
-                            return(
-                                <Post
-                                    post={post} key={post._id}
-                                />
-                        )})}
-                        {posts.length === 0 &&
-                            <div className="flex w-full items-center justify-center mt-8 text-2xl">
+                        {posts !== null && posts.map((post) => (
+                            <Post
+                                post={post}
+                                key={post._id}
+                            />
+                        ))}
+                        {posts.length === 0 && (
+                            <div className="flex w-full items-center justify-center mt-8 text-2xl" aria-label="No posts available">
                                 Non ci sono ancora post!
                             </div>
-                        }
+                        )}
                     </div>
                 </div>
             )}
-         </>
+        </>
     );
 }
 

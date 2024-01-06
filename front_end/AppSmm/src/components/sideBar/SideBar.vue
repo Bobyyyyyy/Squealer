@@ -103,7 +103,14 @@
         />
       </ul>
     </div>
-    <div v-if="!smartPhone" class="d-flex flex-column align-items-center">
+    <div v-if="!smartPhone && !expanded">
+      <NotificationBadge :smartphoneNav="true"
+                         :text="''"
+                         :class="'p-0'"
+                         @openNotificationModal="openNotificationModal"
+      />
+    </div>
+    <div v-else-if="!smartPhone " class="d-flex flex-column align-items-center">
       <ul class="nav nav-pills flex-column mb-auto">
         <li class="d-flex flex-row justify-content-center">
           <NotificationBadge :text="vip.name"
@@ -124,16 +131,19 @@
             </p>
           </button>
         </li>
-        <Dropdown class="align-self-center"
-            :filterRef="smm"
-            updateRef="logout"
-            :dropItems = "['logout']"
-            classButton="btn-outline-danger"
-            @logout="async () => await logout()"
-        />
-        <!-- TODO: SISTEMARE VISTA TABLET -->
+        <li class="d-flex flex-row justify-content-center">
+          <Dropdown class="align-self-center"
+                    :filterRef="smm"
+                    updateRef="logout"
+                    :dropItems = "['logout']"
+                    classButton="btn-outline-danger"
+                    @logout="async () => await logout()"
+          />
+        </li>
+
       </ul>
     </div>
+
   </nav>
   <AddPostModal ref="postModal" @restoreSideBar = "restoreSidebar" @addedPost="(post) => updateSqueals(post)" />
   <buyQuotaModal ref="quotaModal" @restoreSideBar="restoreSidebar" />

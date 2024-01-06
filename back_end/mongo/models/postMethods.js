@@ -131,8 +131,11 @@ const addTimedPost = async (postId) => {
         let post = await Post.findById(postId).lean();
         let userQuota = (await User.findOne({username: post.owner})).characters;
 
-        let timedInfo = scheduledPostArr.find(el => el['id']===postId);
+        if (userQuota.daily === 0 || userQuota.weekly === 0 || userQuota.monthly === 0){
+            throw createError('quota 0', 404);
+        }
 
+        let timedInfo = scheduledPostArr.find(el => el['id']===postId);
 
             /* same structure of body passed in addPost */
         let newPost = {
@@ -145,8 +148,12 @@ const addTimedPost = async (postId) => {
         }
         let delQuota = !!newPost.destinations.find(dest => dest.destType !== 'user');
 
-        let quota2del = delQuota ? (post.contentType === 'text' ? newPost.content.length : 125) : 0 ;
-        //GESTIRE CASI IN CUI NON PUO' INSERIRE
+        let quota2del = delQuota ? (post.contentType === 'text' ? newPost.content.length : 125) : 0;
+
+        if (userQuota.daily - quota2del < -50 || userQuota.weekly - quota2del < -50 || userQuota.monthly - quota2del < -50){
+            throw createError('50 caratteri extra ecceduti', 404);
+        }
+
         let id = await addPost(newPost, {
                 daily: userQuota.daily - quota2del,
                 weekly: userQuota.weekly - quota2del,
@@ -742,13 +749,6 @@ const getPostHomeAnonymous = async (limit, offset) => {
                                         ],
                                     },
                                 },
-                            },
-
-                            {
-                                $in: [
-                                    "keyword",
-                                    "$destinationArray.destType",
-                                ],
                             },
                             {
                                 $and: [

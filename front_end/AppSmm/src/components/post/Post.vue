@@ -13,6 +13,10 @@
     viewFooter:{
       type: Boolean,
       default: true,
+    },
+    handle: {
+      type: Boolean,
+      default: false,
     }
   })
 
@@ -52,6 +56,7 @@
       <FooterPost
           :post="post"
           :idx = "numberOfPost"
+          :handle = "handle"
       />
     </div>
   </div>

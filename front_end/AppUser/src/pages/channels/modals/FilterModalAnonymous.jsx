@@ -4,16 +4,17 @@ import React from "react";
 function FilterModalAnonymous({isOpen, setIsOpen, channelName, setChannelName, handleSearch}) {
 
     return (
-        <Modal show={isOpen} onClose={()=>setIsOpen(false)}>
-            <Modal.Header>
+        <Modal show={isOpen} onClose={() => setIsOpen(false)}>
+            <Modal.Header aria-label="Filtra i canali">
                 Filtra i canali
             </Modal.Header>
             <Modal.Body>
                 <div className="flex flex-col gap-4">
                     <div>
-                        <Label className="block mb-1">channelName:</Label>
+                        <Label className="block mb-1">Nome del canale:</Label>
                         <input
                             type="text"
+                            id="channelName"
                             className="border border-gray-300 rounded px-3 py-2 w-full"
                             value={channelName}
                             onChange={(e) => setChannelName(e.target.value)}

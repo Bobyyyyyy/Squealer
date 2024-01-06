@@ -63,8 +63,8 @@ watchEffect(async () => {
 
 <template>
   <div class="centralDiv">
-    <div class="marginCD">
-      <div class="d-flex flex-row flex-wrap justify-content-between align-items-end pt-4 pb-2 mb-2 m-lg-0">
+    <div class="marginCD" id="channelListPage">
+      <div  class="d-flex flex-row flex-wrap justify-content-between align-items-end pt-4 mb-2 m-lg-0">
         <div id="filterCh" class="input-group mb-2 m-lg-0">
           <input  type="text" class="form-control " placeholder="Cerca..." aria-label="channel search" aria-describedby="cerca canale" v-model="searchChannel">
           <button type="submit" class="btn btn-secondary">
@@ -121,6 +121,9 @@ watchEffect(async () => {
   @media screen and (max-width: 768px) {
     #filterCh{
       width: 100%;
+    }
+    #channelListPage{
+      padding-bottom: 4rem;
     }
   }
 

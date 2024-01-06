@@ -3,10 +3,17 @@ import React, {useState} from "react";
 import Title from "./Title.jsx";
 
 import {
-    Dislike, Like, Heart, MadIcon, CommentIcon
+    Dislike,
+    Like,
+    Heart,
+    MadIcon,
+    CommentIcon
 } from "../assets/index.jsx"
 
-import {getUsernameFromSessionStore} from "../../utils/usefulFunctions.js";
+import {
+    getUsernameFromSessionStore,
+    isUserAnonymous
+} from "../../utils/usefulFunctions.js";
 import RepliesModal from "./RepliesModal.jsx";
 
 function Post({post}) {
@@ -20,6 +27,7 @@ function Post({post}) {
 
     const lastReaction = post.reactions.find((reaction)=> reaction.user === getUsernameFromSessionStore());
     const [activeButton, setActiveButton] = useState(lastReaction ? lastReaction.rtype : null);
+    const isAnonymous = isUserAnonymous();
 
     const [showRepliesModal, setShowRepliesModal] = useState(false);
 
@@ -69,11 +77,13 @@ function Post({post}) {
                         { (activeButton === item.id) ? item.icon.active : item.icon.inactive }
                     </button>
                 ))}
-                <button
-                    className="w-8 h-8"
-                    onClick={() => setShowRepliesModal((prev) => !prev)}>
-                    {CommentIcon}
-                </button>
+                {!isAnonymous && (
+                    <button
+                        className="w-8 h-8"
+                        onClick={() => setShowRepliesModal((prev) => !prev)}>
+                        {CommentIcon}
+                    </button>
+                )}
             </div>
             <RepliesModal
                 isOpen={showRepliesModal} setIsOpen={setShowRepliesModal} postID={post._id}

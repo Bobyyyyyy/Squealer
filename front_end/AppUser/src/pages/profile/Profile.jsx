@@ -119,94 +119,127 @@ function Profile () {
 
     return (
         <>
-        {isLoading || user.current === null || posts === undefined ? (
-            <div className="flex h-screen items-center justify-center">
-                <Spinner aria-label="loading profile spinner" size="xl" color="pink" />
-            </div>
-        ) : (
-            <>
-            <div className={"flex flex-col h-fit"}>
-                {/* HEADER */}
-                <div className="flex items-center justify-start p-4 border border-b-black">
-                    <button
-                        onClick={()=>setShowChangePicModal(!showChangePicModal)}
-                    >
-                        <img
-                            src={user.current.profilePicture}
-                            className="w-20 h-20 rounded-full object-cover aspect-square"
-                            alt="profile"
-                        />
-                    </button>
-                    <ChangeProfilePictureModal setIsOpen={setShowChangePicModal} isOpen={showChangePicModal} user={user} />
-                    <div className="flex flex-col h-full justify-between ml-4 gap-2">
-                        <span className={"text-3xl font-bold"}>{name}</span>
-                        <span className={"text-xl"}>Squeals: {posts.length}</span>
-                    </div>
+            {isLoading || user.current === null || posts === undefined ? (
+                <div className="flex h-screen items-center justify-center" aria-busy="true">
+                    <Spinner aria-label="loading profile spinner" size="xl" color="pink" />
                 </div>
-                <div className={"flex flex-col justify-evenly my-2 mx-auto"}>
-                    <p className={"text-xl"}>Quota giornaliera: {quota.characters.daily < 0 ? 0 : quota.characters.daily}/{quota.maxQuota.daily}</p>
-                    <p className={"text-xl"}>Quota settimanale: {quota.characters.weekly < 0 ? 0 : quota.characters.weekly}/{quota.maxQuota.weekly}</p>
-                    <p className={"text-xl"}>Quota mensile: {quota.characters.monthly < 0 ? 0 : quota.characters.monthly}/{quota.maxQuota.monthly}</p>
-                </div>
-            </div>
-            <div className="flex flex-wrap justify-between gap-4 px-4 py-2">
-                <button
-                    className="button"
-                    onClick={handleLogout}
-                >
-                    Disconettiti
-                </button>
-                <button
-                    className="button-warning"
-                    onClick={() => setShowDeleteModal((prev) => !prev)}
-                >
-                    Elimina account
-                </button>
-                <DeleteAccountModal setIsOpen={setShowDeleteModal} isOpen={showDeleteModal} />
-                <button
-                    className="button"
-                    onClick={() => setShowChangePasswordModal((prev) => !prev)}
-                >
-                    Cambia password
-                </button>
-                <ChangePswModal setIsOpen={setShowChangePasswordModal} isOpen={showChangePasswordModal} />
-                {user.current.typeUser === "vip" &&
+            ) : (
                 <>
-                    <button
-                        className="button"
-                        onClick={()=>setShowBuyQuotaModal(true)}
-                    >
-                        Compra quota
-                    </button>
-                    <BuyQuotaModal isOpen={showBuyQuotaModal} setIsOpen={setShowBuyQuotaModal} setHasUpdated={setUpdatedQuota}/>
-                    <button
-                        className="button"
-                        onClick={()=>setShowSmmModal(true)}
-                    >
-                        Gestisci SMM
-                    </button>
-                    <HireSmmModal
-                        isOpen={showSmmModal} setIsOpen={setShowSmmModal}
-                        setHasUpdated={setUpdatedSmm} smm={smm} hasSMM={hasSMM}
-                    />
-                </>}
-            </div>
-            <div className="flex flex-wrap w-full gap-8 items-center justify-center pb-20 overflow-y-scroll mt-4" id="postDiv">
-                {posts.map((post)=> {
-                    return(
-                        <Post
-                            key={post._id}
-                            post={post}
+                    <div className={"flex flex-col h-fit"}>
+                        {/* HEADER */}
+                        <div className="flex items-center justify-start p-4 border border-b-black">
+                            <button
+                                onClick={() => setShowChangePicModal(!showChangePicModal)}
+                                aria-label="Cambia foto profilo"
+                            >
+                                <img
+                                    src={user.current.profilePicture}
+                                    className="w-20 h-20 rounded-full object-cover aspect-square"
+                                    alt="profile"
+                                />
+                            </button>
+                            <ChangeProfilePictureModal
+                                setIsOpen={setShowChangePicModal}
+                                isOpen={showChangePicModal}
+                                user={user}
+                            />
+                            <div className="flex flex-col h-full justify-between ml-4 gap-2">
+                                <span className={"text-3xl font-bold"}>{name}</span>
+                                <span className={"text-xl"}>Squeals: {posts.length}</span>
+                            </div>
+                        </div>
+                        <div className={"flex flex-col justify-evenly my-2 mx-auto"}>
+                            <p className={"text-xl"} aria-label="Quota giornaliera">
+                                Quota giornaliera: {quota.characters.daily < 0 ? 0 : quota.characters.daily}/
+                                {quota.maxQuota.daily}
+                            </p>
+                            <p className={"text-xl"} aria-label="Quota settimanale">
+                                Quota settimanale: {quota.characters.weekly < 0 ? 0 : quota.characters.weekly}/
+                                {quota.maxQuota.weekly}
+                            </p>
+                            <p className={"text-xl"} aria-label="Quota mensile">
+                                Quota mensile: {quota.characters.monthly < 0 ? 0 : quota.characters.monthly}/
+                                {quota.maxQuota.monthly}
+                            </p>
+                        </div>
+                    </div>
+                    <div className="flex flex-wrap justify-between gap-4 px-4 py-2">
+                        <button
+                            className="button"
+                            onClick={handleLogout}
+                            aria-label="Disconnetti"
+                        >
+                            Disconnetti
+                        </button>
+                        <button
+                            className="button-warning"
+                            onClick={() => setShowDeleteModal((prev) => !prev)}
+                            aria-label="Elimina account"
+                        >
+                            Elimina account
+                        </button>
+                        <DeleteAccountModal
+                            setIsOpen={setShowDeleteModal}
+                            isOpen={showDeleteModal}
                         />
-                    )})
-                }
-                {posts.length === 0 &&
-                <p className="text-lg text-center mt-4">
-                    Al momento non ci sono post!
-                </p>}
-            </div>
-            </>
-        )}
+                        <button
+                            className="button"
+                            onClick={() => setShowChangePasswordModal((prev) => !prev)}
+                            aria-label="Cambia password"
+                        >
+                            Cambia password
+                        </button>
+                        <ChangePswModal
+                            setIsOpen={setShowChangePasswordModal}
+                            isOpen={showChangePasswordModal}
+                        />
+                        {user.current.typeUser === "vip" && (
+                            <>
+                                <button
+                                    className="button"
+                                    onClick={() => setShowBuyQuotaModal(true)}
+                                    aria-label="Compra quota"
+                                >
+                                    Compra quota
+                                </button>
+                                <BuyQuotaModal
+                                    isOpen={showBuyQuotaModal}
+                                    setIsOpen={setShowBuyQuotaModal}
+                                    setHasUpdated={setUpdatedQuota}
+                                />
+                                <button
+                                    className="button"
+                                    onClick={() => setShowSmmModal(true)}
+                                    aria-label="Gestisci SMM"
+                                >
+                                    Gestisci SMM
+                                </button>
+                                <HireSmmModal
+                                    isOpen={showSmmModal}
+                                    setIsOpen={setShowSmmModal}
+                                    setHasUpdated={setUpdatedSmm}
+                                    smm={smm}
+                                    hasSMM={hasSMM}
+                                />
+                            </>
+                        )}
+                    </div>
+                    <div
+                        className="flex flex-wrap w-full gap-8 items-center justify-center pb-20 overflow-y-scroll mt-4"
+                        id="postDiv"
+                        aria-live="polite"
+                    >
+                        {posts.map((post) => {
+                            return <Post key={post._id} post={post} />;
+                        })}
+                        {posts.length === 0 && (
+                            <p className="text-lg text-center mt-4" aria-label="Nessun post al momento">
+                                Al momento non ci sono post!
+                            </p>
+                        )}
+                    </div>
+                </>
+            )}
         </>
     );
 }

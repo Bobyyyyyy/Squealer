@@ -57,13 +57,13 @@ defineEmits(['openNotificationModal']);
 <template>
     <Dropdown v-if="smartphoneNav"
               id="notification_badge"
-              :filterRef="vip.name"
+              :filterRef="text === ''? '' : vip.name"
               classButton="btn btn-lg btn-primary position-relative text-center h-100 w-100 p-0 d-flex flex-row align-items-center ps-1 pe-1"
               updateRef="action"
-              classDropDown="dropstart"
+              :classDropDown="text=== '' ? 'dropend' : 'dropstart'"
               :dropItems="['cambia VIP', 'mostra notifiche','logout']"
               @action="async (el) => {
-              if (el === 'cambia VIP')  $router.push('/AppSmm/handlevip');
+              if (el === 'cambia VIP')  $router.push('/AppSmm/sceltavip');
               else if (el === 'mostra notifiche') $emit('openNotificationModal')
               else await logout();
       }"

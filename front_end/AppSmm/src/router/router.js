@@ -10,7 +10,18 @@ const router = createRouter({
 
 router.beforeEach(async (to)=> {
     if(to.name === 'canaleSingolo'){
-        let query = `/db/channel/check?channel=${to.params.nomeCanale}&user=${store.getters.getVip.name}`;
+        let vipName = ''
+        if (store.getters.getVip.name === '') {
+            let response = await fetch("/db/user/sessionVip",{
+                method:"GET",
+            });
+            vipName = (await response.json())?.vip || '';
+        }
+        else {
+            vipName = store.getters.getVip.name
+        }
+
+        let query = `/db/channel/check?channel=${to.params.nomeCanale}&user=${vipName}`;
         let res = await fetch(query,{
             method: "GET"
         })

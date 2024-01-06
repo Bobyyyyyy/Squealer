@@ -16,8 +16,8 @@ function DeleteAccountModal({isOpen, setIsOpen}) {
     }
 
     return (
-        <Modal  show={isOpen} onClose={()=>setIsOpen(false)}>
-            <Modal.Header>
+        <Modal show={isOpen} onClose={() => setIsOpen(false)}>
+            <Modal.Header aria-label="Eliminazione Account">
                 Eliminazione Account
             </Modal.Header>
             <Modal.Body>
@@ -45,7 +45,6 @@ function DeleteAccountModal({isOpen, setIsOpen}) {
                         <span>
                             sarà possibile ripristinare l'account
                         </span>
-
                     </div>
                 </div>
             </Modal.Body>
@@ -53,6 +52,7 @@ function DeleteAccountModal({isOpen, setIsOpen}) {
                 <button
                     className="button-delete"
                     onClick={deleteAccount}
+                    aria-label="Conferma eliminazione account"
                 >
                     CONFERMO
                 </button>

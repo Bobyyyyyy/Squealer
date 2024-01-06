@@ -47,28 +47,27 @@ function MentionPostContainer({mention, has2update}) {
         return (
             <>
                 {isLoading ? (
-                    <div className="flex h-screen items-center justify-center">
-                        <Spinner aria-label="loading profile spinner" size="xl" color="pink" />
+                    <div className="flex h-screen items-center justify-center" aria-live="polite">
+                        <Spinner aria-label="Caricamento in corso" size="xl" color="pink" />
                     </div>
                 ) : (
                     <div className="max-h-screen">
                         <div className="flex flex-wrap w-full gap-8 items-center justify-center pb-20 overflow-y-scroll" id="postDiv">
-                            {posts!==null && posts !==undefined && posts.map((post)=> {
-                                return(
-                                    <Post
-                                        post={post} key={post._id}
-                                    />
-                                )})}
-                            {posts!==null && posts !==undefined && posts.length === 0 &&
-                                <div className="flex w-full items-center justify-center mt-8 text-2xl text-center">
+                            {posts !== null && posts !== undefined && posts.map((post) => (
+                                <Post
+                                    post={post} key={post._id}
+                                />
+                            ))}
+                            {posts !== null && posts !== undefined && posts.length === 0 && (
+                                <div className="flex w-full items-center justify-center mt-8 text-2xl text-center" aria-live="assertive">
                                     <p>
                                         Non ci sono ancora post che contengono
                                         <span className="font-semibold">
-                                        {" "}{mention}!
-                                    </span>
+                                            {" "}{mention}!
+                                        </span>
                                     </p>
                                 </div>
-                            }
+                            )}
                         </div>
                     </div>
                 )}

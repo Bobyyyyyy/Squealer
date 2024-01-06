@@ -63,6 +63,7 @@
     sortFilter.value = newText
 
     store.commit('clearSqueal');
+    lastRequestLength = 12;
     store.commit('pushSqueal', await getPosts(query,0) )
     readyPosts.value=true
   }
@@ -75,6 +76,7 @@
     typePostFilter.value=newText
 
     store.commit('clearSqueal');
+    lastRequestLength = 12;
     store.commit('pushSqueal', await getPosts(query,0))
     readyPosts.value=true
  }
@@ -87,13 +89,12 @@
   }
 
   const scrollEndDetector = async () => {
-    if (window.innerHeight + window.pageYOffset >= document.getElementById("bodyDivChannel").offsetHeight && lastRequestLength >= 12) {
+    if (window.innerHeight + window.pageYOffset >= document.getElementById("post_channel_container").offsetHeight && lastRequestLength >= 12) {
       lastRequestLength = await(updatePost());
     }
   }
 
   onMounted(async ()=>{
-    document.addEventListener('scroll', scrollEndDetector, true);
     readyPosts.value=false;
     readyChannel.value = false;
     let name = window.location.pathname.split("/").pop();
@@ -103,12 +104,15 @@
     });
     channel.value = await res.json();
     readyChannel.value = true;
+
     query =`name=${vip.value.name}&channel=${name}&smm=${true}&limit=12`;
 
     store.commit('clearSqueal');
     store.commit('pushSqueal',(await getPosts(query, 0)));
 
     readyPosts.value=true
+
+    document.addEventListener('scroll', scrollEndDetector, true);
   })
 
   onUnmounted(() => {
@@ -123,7 +127,7 @@
     <div v-if="readyChannel" class="marginCD">
       <div class="d-flex flex-column">
         <div class="d-flex flex-row justify-content-center w-100">
-          <div class="maxWidth">
+          <div class="profileImgContainer">
             <img :src="channel.profilePicture" class="img-fluid rounded-circle h-100 object-fit-cover" alt="immagine profilo canale" @click="changeProfilePic.openModal">
           </div>
         </div>
@@ -171,7 +175,7 @@
           />
         </div>
       </div>
-      <div v-if="readyPosts" class="d-flex flex-row flex-wrap justify-content-around mt-3">
+      <div id="post_channel_container" v-if="readyPosts" class="d-flex flex-row flex-wrap justify-content-around mt-3" style="padding-bottom: 4rem;">
         <Post v-for="(post,i) in squeals" :key="post._id"
               :post="post"
               :dest= "parseDestinationsViewPost(post.destinationArray, post.officialChannelsArray)"
@@ -193,8 +197,8 @@
 </template>
 
 <style scoped>
-  .maxWidth{
-    max-width:  20vh;
+  .profileImgContainer{
+    max-height:  17vh;
     aspect-ratio: 1;
   }
   @media screen and (max-width: 768px){

@@ -44,6 +44,7 @@ import {computed, onMounted, onUnmounted, ref} from "vue";
     typePostFilter.value=newText
 
     store.commit('clearSqueal');
+    lastRequestLength = 12
     store.commit('pushSqueal', await getPosts(query,0) )
     readyPosts.value=true
   }
@@ -55,6 +56,7 @@ import {computed, onMounted, onUnmounted, ref} from "vue";
 
     sortFilter.value = newText
     store.commit('clearSqueal');
+    lastRequestLength = 12
     store.commit('pushSqueal', await getPosts(query,0) )
     readyPosts.value=true
   }
@@ -70,6 +72,7 @@ import {computed, onMounted, onUnmounted, ref} from "vue";
 
     destFilter.value = newText;
     store.commit('clearSqueal');
+    lastRequestLength = 12
     store.commit('pushSqueal', await getPosts(query,0) )
     readyPosts.value=true
   }
@@ -88,7 +91,7 @@ import {computed, onMounted, onUnmounted, ref} from "vue";
 
 
   const scrollEndDetector = async () => {
-    if (window.innerHeight + window.pageYOffset >= document.getElementById("bodyDiv").offsetHeight && lastRequestLength >= 12) {
+    if (window.innerHeight + window.pageYOffset >= document.getElementById("postContainer").offsetHeight && lastRequestLength >= 12) {
       lastRequestLength = await(updatePost());
     }
   }
@@ -136,8 +139,8 @@ import {computed, onMounted, onUnmounted, ref} from "vue";
      <p class="m-0 text-center text-white mt-1 mb-0">{{n_post}} Squeal </p>
 
       <div class="d-flex flex-column align-items-center">
-        <div class="d-flex flex-row justify-content-around align-items-end wrap-md">
-          <div class="d-flex" style="flex: 1 1 0">
+        <div class="d-flex flex-row justify-content-around align-items-end flex-wrap w-100">
+          <div class="d-flex flex-row justify-content-center" style="flex: 1 1 0">
             <Select class="buttonDropDown"
                     :dropItems="filterValues"
                     :dropItemsName="filterValuesITAS"
@@ -148,7 +151,7 @@ import {computed, onMounted, onUnmounted, ref} from "vue";
                     @updateDestFilter = updateDestFilter
             />
           </div>
-          <div class="d-flex" style="flex: 1 1 0">
+          <div class="d-flex flex-row justify-content-center" style="flex: 1 1 0">
             <Select class="ms-1 buttonDropDown"
                     classButton="btn btn-secondary"
                     :dropItems="postType"
@@ -159,7 +162,7 @@ import {computed, onMounted, onUnmounted, ref} from "vue";
                     @updatePostType = updatePostType
             />
           </div>
-          <div class="d-flex" style="flex: 1 1 0">
+          <div class="d-flex flex-row justify-content-center" style="flex: 1 1 0">
             <Select  class="ms-1 buttonDropDown"
                      classButton="btn btn-secondary"
                      :dropItems="sortPosts"
@@ -171,7 +174,7 @@ import {computed, onMounted, onUnmounted, ref} from "vue";
             />
           </div>
           <div v-if="keyWordFilter && !smartPhone" class="input-group ms-3 keyword-dim">
-            <input type="text" class="form-control" placeholder="Keyword..." aria-label="Keyword's search" v-model="keyWord">
+            <input type="text" class="form-control" placeholder="Keyword..." aria-label="Keyword's search" v-model="keyWord" @keyup.enter="updateTagPosts">
             <button class="btn btn-secondary" type="button" @click="updateTagPosts">Cerca</button>
           </div>
         </div>
@@ -208,10 +211,6 @@ import {computed, onMounted, onUnmounted, ref} from "vue";
       width: 100%;
     }
 
-    .wrap-md{
-      flex-wrap: wrap;
-    }
-
     .profileDim{
       max-height: 15vh;
     }
@@ -219,6 +218,10 @@ import {computed, onMounted, onUnmounted, ref} from "vue";
     .buttonDropDown{
       align-self: end;
       margin-bottom: 2%;
+      min-width: 8rem;
+    }
+    #postContainer{
+      padding-bottom: 4rem;
     }
   }
 
