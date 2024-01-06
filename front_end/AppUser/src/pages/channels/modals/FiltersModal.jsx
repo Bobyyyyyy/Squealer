@@ -8,8 +8,8 @@ function FiltersModal({isOpen, setIsOpen, channelName, setChannelName, visibilit
     }) {
 
     return (
-        <Modal show={isOpen} onClose={() => setIsOpen(false)} aria-label="Filtra i canali">
-            <Modal.Header>
+        <Modal show={isOpen} onClose={() => setIsOpen(false)}>
+            <Modal.Header aria-label="Filtra i canali">
                 Filtra i canali
             </Modal.Header>
             <Modal.Body>

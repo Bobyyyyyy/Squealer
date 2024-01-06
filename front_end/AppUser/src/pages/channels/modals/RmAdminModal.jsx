@@ -21,14 +21,12 @@ function RmAdminModal({isOpen, setIsOpen, admins, channelName, hasUpdated, setHa
     }
 
     return (
-        <Modal  show={isOpen} onClose={()=>setIsOpen(false)}>
-            <Modal.Header>
-                Revoca admin
-            </Modal.Header>
+        <Modal show={isOpen} onClose={() => setIsOpen(false)}>
+            <Modal.Header aria-label="Revoca admin">Revoca admin</Modal.Header>
             <Modal.Body>
                 {admins === undefined || admins.length === 0 ? (
                     <div>Non ci sono admin per questo canale</div>
-                ):(
+                ) : (
                     admins.map((admin) => {
                         return (
                             <div key={admin.name} className="flex justify-between py-2">
@@ -40,23 +38,23 @@ function RmAdminModal({isOpen, setIsOpen, admins, channelName, hasUpdated, setHa
                                             className="w-6 h-6 object-cover rounded-full aspect-square"
                                         />
                                     </Link>
-                                    <Link to={`/search/${admin.name}`} >
-                                        <span>
-                                            {admin.name}
-                                        </span>
+                                    <Link to={`/search/${admin.name}`}>
+                                        <span>{admin.name}</span>
                                     </Link>
                                 </div>
                                 <div className="flex gap-4">
                                     <span>rendi follower</span>
                                     <button
                                         onClick={() => promote2admin(admin.name)}
+                                        aria-label={`Rendi follower ${admin.name}`}
                                     >
                                         {DenyIcon}
                                     </button>
                                 </div>
                             </div>
                         );
-                    }))}
+                    })
+                )}
             </Modal.Body>
         </Modal>
     );

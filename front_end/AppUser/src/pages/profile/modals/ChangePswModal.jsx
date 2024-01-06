@@ -61,7 +61,7 @@ function ChangePswModal({isOpen, setIsOpen}) {
 
     return (
         <Modal show={isOpen} onClose={() => setIsOpen(false)}>
-            <Modal.Header>
+            <Modal.Header aria-label="Cambio Password">
                 Cambio Password
             </Modal.Header>
             <Modal.Body>
@@ -69,7 +69,10 @@ function ChangePswModal({isOpen, setIsOpen}) {
                     <PasswordInput setPsw={setCurrentPsw} pswLabel={"Password corrente"} />
                     <PasswordInput setPsw={setNewPsw} pswLabel={"Nuova password"} />
                     <PasswordInput setPsw={setConfirmNewPsw} pswLabel={"Conferma password"} />
-                    <span className="text-red-600 text-lg font-normal">
+                    <span
+                        className="text-red-600 text-lg font-normal"
+                        aria-label={`Errore: ${error}`}
+                    >
                         {error}
                     </span>
                 </div>
@@ -78,6 +81,7 @@ function ChangePswModal({isOpen, setIsOpen}) {
                 <button
                     className="button-action"
                     onClick={changePsw}
+                    aria-label="Conferma cambia password"
                 >
                     conferma
                 </button>
@@ -91,25 +95,27 @@ function PasswordInput({pswLabel, setPsw}) {
 
     return (
         <div className="flex flex-col justify-between items-start gap-2">
-            <span className="text-xl md:text-2xl">{pswLabel}</span>
+            <label htmlFor={`password-input-${pswLabel}`} className="text-xl md:text-2xl">
+                {pswLabel}
+            </label>
             <div className="flex w-full justify-between gap-2">
                 <input
                     type={showPsw ? "text" : "password"}
                     className="border-2 border-gray-500 rounded-md w-full focus:border-teal-500 focus:ring-teal-500 "
+                    id={`password-input-${pswLabel}`}
                     placeholder={pswLabel}
                     onChange={e => setPsw(e.target.value)}
+                    aria-label={pswLabel}
+                    aria-required="true"
                 />
                 <button
-                    onClick={() => setShowPsw((prev)=>!prev)}
+                    onClick={() => setShowPsw((prev) => !prev)}
+                    aria-label={showPsw ? "Nascondi password" : "Mostra password"}
                 >
                     {showPsw ? (
-                        <>
-                            {CloseEyeIcon}
-                        </>
+                        <>{CloseEyeIcon}</>
                     ) : (
-                        <>
-                            {ShowEyeIcon}
-                        </>
+                        <>{ShowEyeIcon}</>
                     )}
                 </button>
             </div>

@@ -12,7 +12,10 @@ import {
 
 function SinglePageOfficialChannel() {
     const channel = useLoaderData();
+
+    const isAnonymous = getUsernameFromSessionStore().match(/guest-\d+/g);
     const [isLoading, setIsLoading] = useState(true);
+
     const [posts, setPosts] = useState([]);
     const currentOffset = useRef(0);
     const lastRequestLength = useRef(0);
@@ -75,13 +78,13 @@ function SinglePageOfficialChannel() {
     return (
         <>
             {isLoading ? (
-            <div className="flex h-screen items-center justify-center">
-                <Spinner aria-label="loading profile spinner" size="xl" color="pink" />
-            </div>
+                <div className="flex h-screen items-center justify-center">
+                    <Spinner aria-label="loading profile spinner" size="xl" color="pink" />
+                </div>
             ) : (
                 <div className="flex flex-col w-full justify-center items-center gap-4 mt-2">
                     <div className="flex flex-col items-center justify-start px-4 gap-2 w-full">
-                        <div className="flex justify-center items-center gap-3 w-full ">
+                        <div className="flex justify-center items-center gap-3 w-full">
                             <img
                                 src={channel.profilePicture}
                                 alt={`foto canale ${channel.name}`}
@@ -91,11 +94,9 @@ function SinglePageOfficialChannel() {
                         </div>
                         <p className="text-center px-2 break-words text-sm">{channel.description}</p>
                     </div>
-                    {channel.silenceable && (
-                        <div className="flex justify-center gap-2">
-                            <span>
-                                Canale silenziato
-                            </span>
+                    {channel.silenceable && !isAnonymous && (
+                        <div className="flex justify-center gap-2" aria-label="Gestione silenziamento canale">
+                            <span>Canale silenziato</span>
                             <ToggleSwitch
                                 checked={isSilenced}
                                 onChange={async () => await handleSilenceChannel()}
@@ -103,17 +104,21 @@ function SinglePageOfficialChannel() {
                             />
                         </div>
                     )}
-                    <div className="flex flex-wrap w-full gap-8 items-center justify-center pb-20 overflow-y-scroll mt-4" id="postDiv">
-                        {posts!==null && posts.map((post)=> {
-                            return(
-                                <Post
-                                    key={post._id}
-                                    post={post}
-                                />
-                            )})}
-                        {posts.length===0 &&
-                            <p className="text-center">Non ci sono ancora post indirizzati al canale {channel.name}</p>
-                        }
+                    <div
+                        className="flex flex-wrap w-full gap-8 items-center justify-center pb-20 overflow-y-scroll mt-4"
+                        id="postDiv"
+                        aria-live="polite"
+                    >
+                        {posts !== null && posts.map((post) => {
+                            return <Post key={post._id} post={post} />;
+                        })}
+                        {posts.length === 0 && (
+                            <div className="flex w-full items-center justify-center mt-8 text-2xl text-center px-4">
+                                <p>
+                                    Non ci sono ancora post indirizzati al canale {channel.name}
+                                </p>
+                            </div>
+                        )}
                     </div>
                 </div>
             )}

@@ -57,11 +57,11 @@ function BuyQuotaModal({isOpen, setIsOpen, setHasUpdated}) {
     }
 
     return (
-        <Modal show={isOpen} onClose={()=>setIsOpen(false)}>
-            <Modal.Header>
-                <span className="text-2xl">
-                    Compra quota
-                </span>
+        <Modal show={isOpen} onClose={() => setIsOpen(false)}>
+            <Modal.Header  aria-label="Compra quota">
+            <span className="text-2xl">
+                Compra quota
+            </span>
             </Modal.Header>
             <Modal.Body>
                 <div className="flex flex-col w-full items-start justify-center gap-6">
@@ -71,7 +71,9 @@ function BuyQuotaModal({isOpen, setIsOpen, setHasUpdated}) {
                     <ResetQuotaType text={"Aumento quota massima"} reset={increasementQuota} setReset={setIncreasementQuota} />
                 </div>
                 <div className="flex w-full justify-center mt-6">
-                    <span className="text-xl text-red-600">Spesa: {cost}</span>
+                  <span className="text-xl text-red-600" aria-label={`Spesa: ${cost}`}>
+                      Spesa: {cost}
+                  </span>
                 </div>
             </Modal.Body>
             <Modal.Footer>
@@ -79,6 +81,7 @@ function BuyQuotaModal({isOpen, setIsOpen, setHasUpdated}) {
                     <button
                         className="button-action"
                         onClick={handleBuyQuota}
+                        aria-label="Acquista"
                     >
                         Acquista {EuroIcon}
                     </button>
@@ -92,8 +95,9 @@ function ResetQuotaType({text, reset, setReset}) {
     return (
         <div className="flex items-center gap-4">
             <label
-                htmlFor="default-checkbox"
+                htmlFor="reset-quota-checkbox"
                 className="text-xl md:text-2xl"
+                aria-label={text}
             >
                 {text}
             </label>
@@ -102,6 +106,8 @@ function ResetQuotaType({text, reset, setReset}) {
                 type="checkbox"
                 checked={reset}
                 className="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                id="reset-quota-checkbox"
+                aria-labelledby="reset-quota-checkbox"
             />
         </div>
     );

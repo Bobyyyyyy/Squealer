@@ -64,22 +64,23 @@ function Search ()  {
         <>
             <div className="flex flex-col p-4 max-h-screen">
                 <Searchbar setName={setName} name={name} />
-                <div className="flex w-full justify-between mt-4 items-center" >
+                <div className="flex w-full justify-between mt-4 items-center">
                     {buttonsFilter.map((item) => (
                         <button
-                            key = {item.id}
+                            key={item.id}
                             onClick={() => setActiveButton(item.id)}
-                            className={`${activeButton === item.id ? "button": "button-unselected"}`}
+                            className={`${activeButton === item.id ? "button" : "button-unselected"}`}
+                            aria-pressed={activeButton === item.id}
                         >
                             {item.name}
                         </button>
                     ))}
                 </div>
-                {activeButton === "user" && !!name && showContent &&
+                {activeButton === "user" && !!name && showContent && (
                     <div className="flex flex-wrap w-full overflow-y-scroll mt-2 gap-4 pb-40">
                         {users.map((user) => {
                             return (
-                                <Link className="w-full" to={`/search/${user.username}`} key={user._id} >
+                                <Link className="w-full" to={`/search/${user.username}`} key={user._id}>
                                     <div className="flex w-full justify-start items-center gap-4">
                                         <img
                                             src={user.profilePicture}
@@ -94,30 +95,24 @@ function Search ()  {
                                 </Link>
                             );
                         })}
-                        {users.length === 0 &&
-                            <div className="flex w-full items-center justify-center mt-8 text-2xl text-center">
-                                <p>
-                                    Nessun utente trovato
-                                </p>
+                        {users.length === 0 && (
+                            <div className="flex w-full items-center justify-center mt-8 text-2xl text-center" aria-live="polite">
+                                <p>Nessun utente trovato</p>
                             </div>
-                        }
+                        )}
                     </div>
-                }
+                )}
             </div>
-            {showContent &&
+            {showContent && (
                 <>
-                {activeButton === "keyword" && !!name &&
-                    <>
-                        <KeywordPostContainer tag={name} has2update={showContent} />
-                    </>
-                }
-                {activeButton === "mention" && !!name &&
-                    <>
-                        <MentionPostContainer mention={name}  has2update={showContent} />
-                    </>
-                }
+                    {activeButton === "keyword" && !!name && (
+                            <KeywordPostContainer tag={name} has2update={showContent} />
+                    )}
+                    {activeButton === "mention" && !!name && (
+                            <MentionPostContainer mention={name} has2update={showContent} />
+                    )}
                 </>
-            }
+            )}
         </>
     );
 }

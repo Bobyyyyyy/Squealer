@@ -270,7 +270,11 @@ function SinglePageNormalChannel() {
                                             />
                                     )})}
                                 {posts.length===0 &&
-                                    <p className="text-center">Non ci sono ancora post indirizzati al canale {nome}</p>
+                                    <div className="flex w-full items-center justify-center mt-8 text-2xl text-center px-4">
+                                        <p>
+                                            Non ci sono ancora post indirizzati al canale {nome}
+                                        </p>
+                                    </div>
                                 }
                             </div>
                     )}

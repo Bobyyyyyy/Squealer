@@ -18,7 +18,6 @@ function HomeAnonymous() {
     const fetchPosts = async () => {
         setIsLoading(true);
         let newPosts = await getHomeAnonymousPost(currentOffset.current, POST_TO_GET);
-        console.log(newPosts)
         currentOffset.current += newPosts.length;
         lastRequestLength.current = newPosts.length;
         setPosts((prev) => [...prev, ...newPosts]);
@@ -54,17 +53,17 @@ function HomeAnonymous() {
             ) : (
                 <div className="max-h-screen">
                     <div className="flex flex-wrap w-full gap-8 items-center justify-center pb-20 overflow-y-scroll" id="postDiv">
-                        {posts!==null && posts !==undefined && posts.map((post)=> {
-                            return(
-                                <Post
-                                    post={post} key={post._id}
-                                />
-                            )})}
-                        {posts!==null && posts !==undefined && posts.length === 0 &&
-                            <div className="flex w-full items-center justify-center mt-8 text-2xl text-center">
+                        {posts !== null && posts !== undefined && posts.map((post) => (
+                            <Post
+                                post={post}
+                                key={post._id}
+                            />
+                        ))}
+                        {posts !== null && posts !== undefined && posts.length === 0 && (
+                            <div className="flex w-full items-center justify-center mt-8 text-2xl text-center" aria-label="No posts available">
                                 Non ci sono ancora post!
                             </div>
-                        }
+                        )}
                     </div>
                 </div>
             )}

@@ -96,16 +96,21 @@ function Channels () {
                 <h1 className="text-xl font-semibold uppercase">Lista canali :</h1>
                 <button
                     className="mt-4 button-action"
-                    onClick={()=>setShowFilterModal(true)}
+                    onClick={() => setShowFilterModal(true)}
                 >
                     Filtra canali
                 </button>
                 <FiltersModal
-                    isOpen={showFilterModal} setIsOpen={setShowFilterModal}
-                    channelName={channelName} setChannelName={setChannelName}
-                    owner={owner} setOwner={setOwner}
-                    visibility={visibility} setVisibility={setVisibility}
-                    admin={admin} setAdmin={setAdmin}
+                    isOpen={showFilterModal}
+                    setIsOpen={setShowFilterModal}
+                    channelName={channelName}
+                    setChannelName={setChannelName}
+                    owner={owner}
+                    setOwner={setOwner}
+                    visibility={visibility}
+                    setVisibility={setVisibility}
+                    admin={admin}
+                    setAdmin={setAdmin}
                     handleSearch={handleFilters}
                     activeOfficialChannel={activeOfficialChannel}
                     setActiveOfficialChanel={setActiveOfficialChannel}
@@ -115,11 +120,11 @@ function Channels () {
                         <Spinner aria-label="loading profile spinner" size="xl" color="pink" />
                     </div>
                 ) : (
-                    <div className="flex flex-wrap w-full h-fit  overflow-y-scroll mt-2 gap-4">
-                        {channels!==null && channels.map((channel) => {
+                    <div className="flex flex-wrap w-full h-fit overflow-y-scroll mt-2 gap-4">
+                        {(channels !== null ? channels : []).map((channel) => {
                             const role = checkRole(channel.admins, channel.followers, channel.creator, channel.requests);
                             return (
-                                <Link className="w-full" to={`/channels/${channel.name}`} key={channel._id} >
+                                <Link className="w-full" to={`/channels/${channel.name}`} key={channel._id}>
                                     <div className="flex w-full justify-start items-center gap-3">
                                         <img
                                             src={channel.profilePicture}
@@ -138,9 +143,9 @@ function Channels () {
                                 </Link>
                             );
                         })}
-                        {activeOfficialChannel && officialChannels!==null && officialChannels.map((channel) => {
+                        {activeOfficialChannel && (officialChannels !== null ? officialChannels : []).map((channel) => {
                             return (
-                                <Link className="w-full" to={`/channels/${channel.name}`} key={channel._id} >
+                                <Link className="w-full" to={`/channels/${channel.name}`} key={channel._id}>
                                     <div className="flex w-full justify-start items-center gap-4">
                                         <img
                                             src={channel.profilePicture}
@@ -158,13 +163,14 @@ function Channels () {
                                 </Link>
                             );
                         })}
-                        {channels.length === 0 && (officialChannels.length === 0 || !activeOfficialChannel) &&
-                            <div>Non ci sono canali</div>}
+                        {(channels.length === 0 && (!activeOfficialChannel || officialChannels.length === 0)) && (
+                            <div>Non ci sono canali</div>
+                        )}
                     </div>
                 )}
                 <button
                     className="mt-4 button-action"
-                    onClick={()=> setShowCreateModal(true)}
+                    onClick={() => setShowCreateModal(true)}
                 >
                     Crea canale
                 </button>
