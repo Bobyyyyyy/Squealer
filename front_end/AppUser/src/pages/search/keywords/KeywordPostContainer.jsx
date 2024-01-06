@@ -13,7 +13,6 @@ function KeywordPostContainer({tag, has2update}) {
     const fetchPosts = async () => {
         setIsLoading(true);
         let newPosts = await getPostByKeyword(tag, currentOffset.current, POST_TO_GET);
-        console.log(newPosts, tag)
         currentOffset.current += newPosts.length;
         lastRequestLength.current = newPosts.length;
         setPosts((prev) => [...prev, ...newPosts]);
