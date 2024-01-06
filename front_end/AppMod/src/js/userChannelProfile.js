@@ -182,7 +182,7 @@ const showPosts = (filter,offset,limit,append = false) => {
             }).join('\n')}`;
 
             if (offset + limit < LastCall.posts) {
-                $('#under_posts').html(`<div class="mx-auto"> <a id="load_posts" class="link-opacity-100 link-opacity-50-hover"> Carica altri post</a></div>`)
+                $('#under_posts').html(`<div class="mx-auto"> <a id="load_posts" class="link-opacity-100 link-opacity-50-hover btn-secondary text-black rounded p-2 fontcustom"> Carica altri post</a></div>`)
             }
             else {
                 $('#under_posts').empty();

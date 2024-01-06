@@ -52,7 +52,7 @@ function getChannels (limit,offset,filters) {
                 <div style="width: 50%;"> ${channel.postNumber}</> </div> 
                 <div style="width: 50%;"> ${channel.followerNumber}</> </div> 
                 <div style="width: 50%;"> ${channel.type}</> </div> 
-                <div style="width: 50%;" class="fontcustom"> <button class="btn btn-primary" onclick="window.location.href = window.location.href + '/${channel.name}'" > Entra nel profilo </button> </div> 
+                <div style="width: 50%;" class="fontcustom"> <button class="btn btn-primary" onclick="window.location.href = window.location.href + '/${channel.name}'" > Gestisci </button> </div> 
             </div>`).join('\n')}`;
 
             if (offset !== 0) {
