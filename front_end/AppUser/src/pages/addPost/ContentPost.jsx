@@ -27,7 +27,7 @@ function ContentPost({type, quota, currentQuota, setCurrentQuota,
     }
 
     const has2removeQuota = () => {
-        return destinations.includes("§");
+        return destinations.includes("§") || destinations.includes("#");
     }
 
     const isCurrentQuotaNegative = () => {
