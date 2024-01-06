@@ -1,5 +1,5 @@
 import ContentPost from "./ContentPost.jsx";
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {SubmitIcon} from "../../components/assets/index.jsx";
 import {getQuotaByUsername, getUsernameFromSessionStore, setToastNotification} from "../../utils/usefulFunctions.js";
 
@@ -18,6 +18,8 @@ function AddPost(){
 
     const [quota, setQuota] = useState(null);
     const [currentQuota, setCurrentQuota] = useState();
+    // quota that will be passed and can be negative
+    const realQuota = useRef();
 
     const [error, setError] = useState('');
 
@@ -148,13 +150,11 @@ function AddPost(){
         try {
             if (canSendPost()) {
                 let post = await createPost();
-                console.log("post creato", post, currentQuota)
-
                 let res = await fetch("/db/post", {
                     method: "POST",
                     body: JSON.stringify({
                         post: post,
-                        quota: currentQuota
+                        quota: realQuota.current
                     }),
                     headers: {
                         "Content-Type": "application/json"
@@ -163,12 +163,10 @@ function AddPost(){
                 if (res.ok) {
                     res = await res.json();
                     if (post.contentType === "geolocation" && post.hasOwnProperty("millis")) {
-                        console.log("start sending");
                         setStartSending(true);
                         setShowModalGeo(true);
                         startSendingPosition(frequencyMs, numberOfPosts, res.post._id);
                         const wait = frequencyMs * numberOfPosts + 500;
-                        console.log("wait", wait)
                         setTimeout(()=> {
                             setShowModalGeo(false);
                             setToastNotification("Post inviato correttamente", "success");
@@ -195,6 +193,7 @@ function AddPost(){
             .then((response) => {
                 setQuota(response);
                 setCurrentQuota(response.characters);
+                realQuota.current = response.characters;
             })
     }, []);
 
@@ -209,7 +208,7 @@ function AddPost(){
                 <div className="flex flex-col justify-between items-start gap-2">
                     <div className={"flex justify-between items-center w-full"}>
                         <span className="text-xl md:text-2xl">Destinatari</span>
-                        <span className={"text-blue-400"}>(@utente, §canale, #keyword)</span>
+                        <span className={"text-blue-400 font-normal text-base"}>(@utente, §canale, #keyword)</span>
                     </div>
                     <input
                         type="text"
@@ -242,7 +241,7 @@ function AddPost(){
                         type={type} content={content} setContent={setContent} destinations={destinations}
                         quota={quota} currentQuota={currentQuota} setCurrentQuota={setCurrentQuota}
                         setImgAsFile={setImgAsFile} position={position} setPosition={setPosition}
-                        handleError={handleError} isQuotaNegative={isQuotaNegative}
+                        handleError={handleError} isQuotaNegative={isQuotaNegative} realQuota={realQuota}
                     />
                 }
                 <div className="flex items-center gap-4 mt-4">
