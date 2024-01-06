@@ -171,7 +171,7 @@
           />
         </div>
       </div>
-      <div v-if="readyPosts" class="d-flex flex-row flex-wrap justify-content-around mt-3">
+      <div v-if="readyPosts" class="d-flex flex-row flex-wrap justify-content-around mt-3" style="padding-bottom: 4rem;">
         <Post v-for="(post,i) in squeals" :key="post._id"
               :post="post"
               :dest= "parseDestinationsViewPost(post.destinationArray, post.officialChannelsArray)"
