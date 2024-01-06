@@ -131,7 +131,6 @@
             classButton="btn-outline-danger"
             @logout="async () => await logout()"
         />
-        <!-- TODO: SISTEMARE VISTA TABLET -->
       </ul>
     </div>
   </nav>
