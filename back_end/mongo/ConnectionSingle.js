@@ -1,8 +1,7 @@
 const mongoose = require('mongoose');
-
-const dbName = "db";
-const mongouri = `mongodb://localhost:27017/${dbName}`;
-//const mongouri = mongodb://${mongoCredentials.user}:${mongoCredentials.pwd}@${mongoCredentials.site}/${dbname}?authSource=admin&writeConcern=majority;
+const {mongoCredentials} = require("./models/utils");
+const dbname = "db";
+const mongouri = `mongodb://${mongoCredentials.user}:${mongoCredentials.pwd}@${mongoCredentials.site}/${dbname}?authSource=admin&writeConcern=majority`;
 const connection = () => {
     let singleConnection;
     return {

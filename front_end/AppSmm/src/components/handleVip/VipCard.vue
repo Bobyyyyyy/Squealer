@@ -71,6 +71,7 @@
   }
   .profilePicContainer{
     height: 15vh;
+    aspect-ratio: 1;
   }
 
   @media screen and (max-width: 768px){
