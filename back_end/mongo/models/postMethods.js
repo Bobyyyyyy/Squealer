@@ -221,7 +221,7 @@ const addPost = async (post,quota) => {
                 officialChannels.push(destination.name);
                 destinations.pop(destination);
             }
-            else if (channel) {
+            else if (destinationType === 'channel') {
                 let permissionToWrite;
                 if(channel.isBlocked) {
                     throw createError('Il canale è bloccato',400);
