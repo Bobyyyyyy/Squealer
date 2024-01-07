@@ -73,7 +73,6 @@ function SinglePageNormalChannel() {
 
     const getChannelInfo = async () => {
         if (currentNome.current !== nome) {
-            console.log("CHANNEL INFO NOME CAMBIATO", currentNome.current, nome)
             return;
         }
         let res = await fetch(`/db/channel/${nome}`);
@@ -100,14 +99,12 @@ function SinglePageNormalChannel() {
 
     const fetchPosts = async () => {
         if (currentNome.current !== nome) {
-            console.log("CHANNEL INFO NOME CAMBIATO", currentNome.current, nome)
             return;
         }
         setIsLoading(true);
         if (canSeePosts) {
-            console.log("nome", nome,"offset", currentOffset.current)
             let newPosts = await getPostByChannelName(nome, currentOffset.current, POST_TO_GET);
-            console.log(newPosts)
+            newPosts = (!newPosts) ? [] : newPosts;
             currentOffset.current += newPosts.length;
             lastRequestLength.current = newPosts.length;
             setPosts((prev) => [...prev, ...newPosts]);

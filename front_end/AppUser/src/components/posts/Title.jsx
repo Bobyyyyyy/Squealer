@@ -8,18 +8,16 @@ function Title({post}) {
 
     return (
         <>
-            <div className="flex justify-between items-center px-4 py-2">
-                <div className="flex w-full items-center" >
-                    <Link to={`/search/${post.owner}`}>
-                        <img className="w-14 h-14 rounded-full object-cover" alt="foto profilo" src={post.profilePicture} />
+            <div className="flex justify-between items-center gap-3 px-4 py-2 ">
+                <div className="flex w-full items-center truncate gap-4">
+                    <Link to={`/search/${post.owner}`} className="w-14 h-14 aspect-square">
+                        <img className="w-full h-full rounded-full object-cover" alt="foto profilo" src={post.profilePicture} />
                     </Link>
-                    <div className="flex flex-col ml-4 gap-2">
-                        <Link to={`/search/${post.owner}`}>
-                            <h3 className="text-primary font-semibold text-lg w-fit h-fit">
-                                {post.owner}
-                            </h3>
+                    <div className="flex flex-col gap-2">
+                        <Link to={`/search/${post.owner}`} className="text-primary font-semibold text-lg w-fit h-fit">
+                            {post.owner}
                         </Link>
-                        <h2 className="flex gap-2 w-fit h-fit">
+                        <p className="flex gap-2 w-fit h-fit">
                             {post.destinationArray.map((dest) => {
                                 const symbol = (dest.destType === "user" ? "@" : (dest.destType === "channel" ? "§" : (dest.destType === "keyword" ? "#" : "error")));
                                 const name = symbol + dest.name;
@@ -37,10 +35,10 @@ function Title({post}) {
                                     </Link>
                                 )})
                             }
-                        </h2>
+                        </p>
                     </div>
                 </div>
-                    <span className="min-w-fit">{tempo}</span>
+                <span className="min-w-fit">{tempo}</span>
             </div>
         </>
     );
