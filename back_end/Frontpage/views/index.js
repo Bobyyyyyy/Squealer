@@ -55,11 +55,17 @@ $('#password_recovery').on('click', () => {
 
 $('#change_password_form').on('submit', event => {
     event.preventDefault();
+    if ($('#recovery_pass').val() != $('#recovery_pass_conf').val()) {
+        return;
+    }
+    let user = $('#recovery_username').val();
+    let answer= $('#recovery_answer').val();
+    let password = $('#recovery_pass').val();
 
     let data = {
-        user: $('#recovery_username').val(),
-        answer: $('#recovery_answer').val(),
-        password: $('#recovery_pass').val()
+        user: user,
+        answer: answer,
+        password: password
     }
 
     $.ajax({
@@ -68,6 +74,14 @@ $('#change_password_form').on('submit', event => {
         data: data,
         success: () => {
             $('#recoveryModal').modal('hide');
+            $.ajax({
+                url: '/login',
+                type: 'post',
+                data: {user: user, password: password},
+                success: () => {
+                    location.reload();
+                }
+            })
         }
     })
         .fail((error) => {

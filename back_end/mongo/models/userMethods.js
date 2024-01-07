@@ -60,11 +60,15 @@ const addUser = async (body) => {
 const checkSecurityAnswer = async function(username,answer,newPassword) {
     try{
         await connection.get();
-        let getAnswer = await User.findOne({'username': username}).lean();
-        if(answer.trim() !== getAnswer.backupAnswer) {
+        let user = await User.findOne({'username': username}).lean();
+        if (!user) {
+            throw createError('Utente non esiste',404);
+        }
+        if(answer.trim() !== user.backupAnswer) {
             throw createError('Risposta errata',400);
         }
-        await changePwsd(username,getAnswer.password,newPassword);
+        let newPasswordCrypt = await bcrypt.hash(newPassword, saltRounds);
+        await User.findOneAndUpdate({'username': user.username},{password: newPasswordCrypt}).lean();
     }
     catch(error){
         throw error;
