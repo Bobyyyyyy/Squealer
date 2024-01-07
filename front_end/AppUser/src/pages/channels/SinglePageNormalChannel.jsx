@@ -143,22 +143,27 @@ function SinglePageNormalChannel() {
                 <div className="flex h-screen items-center justify-center">
                     <Spinner aria-label="loading profile spinner" size="xl" color="pink" />
                 </div>
-                ) : (
+            ) : (
                 <div className="flex flex-col w-full justify-center items-center gap-4 mt-2">
                     <div className="flex flex-col items-center justify-start px-4 gap-2 w-full">
                         <div className="flex justify-center gap-3 w-full items-center">
                             {role === "Creator" ? (
                                 <>
                                     <button
-                                            onClick={()=>setShowChangePicModal(true)}
+                                        aria-label="Cambia foto profilo canale"
+                                        onClick={() => setShowChangePicModal(true)}
                                     >
                                         <img
                                             src={channelPic}
                                             alt={`foto canale ${nome}`}
-                                            className={"w-20 h-20 rounded-full object-cover aspect-square"}
+                                            className="w-20 h-20 rounded-full object-cover aspect-square"
                                         />
                                     </button>
-                                    <ChangeChannelPictureModal isOpen={showChangePicModal} setIsOpen={setShowChangePicModal} channelName={nome} />
+                                    <ChangeChannelPictureModal
+                                        isOpen={showChangePicModal}
+                                        setIsOpen={setShowChangePicModal}
+                                        channelName={nome}
+                                    />
                                 </>
                             ) : (
                                 <img
@@ -169,111 +174,124 @@ function SinglePageNormalChannel() {
                             )}
                             <h3 className="text-center text-2xl font-extrabold">§{nome}</h3>
                         </div>
-                        <p className="text-center px-2 break-words text-base">{description}</p>
+                        <p className="text-center px-2 break-words text-lg">{description}</p>
                     </div>
                     {role === "Creator" || role === "Admin" ? (
-                            <div className="flex flex-wrap justify-around items-center gap-4 px-4 w-full">
-                               <button className="button"
-                                    onClick={()=>setShowFollowerModal(true)}
-                                >
-                                    Followers
-                                </button>
-                                <FollowersModal
-                                        channelName={nome} followers={followers} isOpen={showFollowerModal} setIsOpen={setShowFollowerModal}
-                                        hasUpdated={hasUpdatedFol} setHasUpdated={setHasUpdatedFol}
-                                />
-                                {type === "private" &&
-                                    <>
-                                       <button className="button"
-                                            onClick={()=>setShowRequestModal(true)}
-                                        >
-                                             Richieste
-                                        </button>
-                                        <RequestModal
-                                            channelName={nome} requests={requests} isOpen={showRequestModal} setIsOpen={setShowRequestModal}
-                                            hasUpdated={hasUpdatedReq} setHasUpdated={setHasUpdatedReq}
-                                        />
-                                    </>
-                                }
-                                {role === "Creator" &&
-                                    <>
-                                       <button className="button"
-                                            onClick={()=>setShowAddAdminModal(true)}
-                                        >
-                                            Aggiungi admin
-                                        </button>
-                                        <AddAdminModal
-                                            channelName={nome} followers={followers} isOpen={showAddAdminModal} setIsOpen={setShowAddAdminModal}
-                                            hasUpdated={hasUpdatedAddAdm} setHasUpdated={setHasUpdatedAddAdm}
-                                        />
+                        <div className="flex flex-wrap justify-around items-center gap-4 px-4 w-full">
+                            <button className="button"
+                                    onClick={()=> setShowFollowerModal(true)}
+                                    aria-label="Gestisci followers"
+                            >
+                                Followers
+                            </button>
+                            <FollowersModal
+                                channelName={nome} followers={followers} isOpen={showFollowerModal} setIsOpen={setShowFollowerModal}
+                                hasUpdated={hasUpdatedFol} setHasUpdated={setHasUpdatedFol}
+                            />
+                            {type === "private" &&
+                                <>
+                                    <button className="button"
+                                            onClick={()=> setShowRequestModal(true)}
+                                            aria-label="Gestisci richieste"
+                                    >
+                                        Richieste
+                                    </button>
+                                    <RequestModal
+                                        channelName={nome} requests={requests} isOpen={showRequestModal} setIsOpen={setShowRequestModal}
+                                        hasUpdated={hasUpdatedReq} setHasUpdated={setHasUpdatedReq}
+                                    />
+                                </>
+                            }
+                            {role === "Creator" &&
+                                <>
+                                    <button className="button"
+                                            onClick={()=> setShowAddAdminModal(true)}
+                                            aria-label="Aggiungi admin"
+                                    >
+                                        Aggiungi admin
+                                    </button>
+                                    <AddAdminModal
+                                        channelName={nome} followers={followers} isOpen={showAddAdminModal} setIsOpen={setShowAddAdminModal}
+                                        hasUpdated={hasUpdatedAddAdm} setHasUpdated={setHasUpdatedAddAdm}
+                                    />
 
-                                       <button className="button-warning"
-                                            onClick={()=>setShowRmAdminModal(true)}
-                                        >
-                                            Rimuovi admin
-                                        </button>
-                                        <RmAdminModal
-                                            channelName={nome} admins={admins} isOpen={showRmAdminModal} setIsOpen={setShowRmAdminModal}
-                                            hasUpdated={hasUpdatedRmAdm} setHasUpdated={setHasUpdatedRmAdm}
-                                        />
-                                        <button
-                                            className="button-warning"
-                                            onClick={() => setShowDeleteModal((prev) => !prev)}
-                                        >
-                                            Elimina canale
-                                        </button>
-                                        <DeleteChannelModal setIsOpen={setShowDeleteModal} isOpen={showDeleteModal} channelName={nome}/>
-                                    </>
-                                }
-                            </div>
-                        ) :
+                                    <button className="button-warning"
+                                            onClick={()=> setShowRmAdminModal(true)}
+                                            aria-label="Rimuovi admin"
+                                    >
+                                        Rimuovi admin
+                                    </button>
+                                    <RmAdminModal
+                                        channelName={nome} admins={admins} isOpen={showRmAdminModal} setIsOpen={setShowRmAdminModal}
+                                        hasUpdated={hasUpdatedRmAdm} setHasUpdated={setHasUpdatedRmAdm}
+                                    />
+                                    <button
+                                        className="button-warning"
+                                        aria-label="Gestisci elimina canale"
+                                        onClick={() => setShowDeleteModal((prev) => !prev)}
+                                    >
+                                        Elimina canale
+                                    </button>
+                                    <DeleteChannelModal setIsOpen={setShowDeleteModal} isOpen={showDeleteModal} channelName={nome}/>
+                                </>
+                            }
+                        </div>
+                    ) : (
                         <div className="mx-auto">
-                        {role === "Follower" || role === "Writer" ? (
-                           <button className="button-delete"  onClick={handleFollow}>
-                                <span className="pl-2">
-                                    Disicriviti
-                                </span>
-                                {DontFollow}
-                            </button>
-                        ): (role === "Not Follower" ? (
-                           <button className="button-action"  onClick={handleFollow}>
-                                <span className="pl-2">
-                                    Segui
-                                </span>
-                                {FollowIcon}
-                            </button>
-                        ) : (
-                           <button className="button-delete"  onClick={handleFollow}>
-                                <span className="pl-2">
-                                    Annulla
-                                </span>
-                                {DontFollow}
-                            </button>
-                        ))
-                        }
+                            {role === "Follower" || role === "Writer" ? (
+                                <button
+                                    aria-label="Disiscriviti"
+                                    className="button-delete"
+                                    onClick={handleFollow}
+                                >
+                                    <span className="pl-2">Disiscriviti</span>
+                                    {DontFollow}
+                                </button>
+                            ) : (role === "Not Follower" ? (
+                                <button
+                                    aria-label="Segui"
+                                    className="button-action"
+                                    onClick={handleFollow}
+                                >
+                                    <span className="pl-2">Segui</span>
+                                    {FollowIcon}
+                                </button>
+                            ) : (
+                                <button
+                                    aria-label="Annulla richiesta"
+                                    className="button-delete"
+                                    onClick={handleFollow}
+                                >
+                                    <span className="pl-2">Annulla</span>
+                                    {DontFollow}
+                                </button>
+                            ))}
                         </div>
-                    }
-                    {type === "private" && (role === "Not Follower" || role === "Pending")? (
-                        <div>
-                            Non puoi ancora vedere i post
+                    )}
+
+                    {type === "private" && (role === "Not Follower" || role === "Pending") ? (
+                        <div className="flex w-full items-center justify-center mt-8 text-2xl text-center px-4">
+                            <p>
+                                Non puoi ancora vedere i post
+                            </p>
                         </div>
-                        ) : (
-                            <div className="flex flex-wrap w-full gap-8 items-center justify-center pb-20 overflow-y-scroll mt-4" id="postDiv">
-                                {posts!==null && posts.map((post)=> {
-                                    return(
-                                            <Post
-                                                key={post._id}
-                                                post={post}
-                                            />
-                                    )})}
-                                {posts.length===0 &&
-                                    <div className="flex w-full items-center justify-center mt-8 text-2xl text-center px-4">
-                                        <p>
-                                            Non ci sono ancora post indirizzati al canale {nome}
-                                        </p>
-                                    </div>
-                                }
-                            </div>
+                    ) : (
+                        <div className="flex flex-wrap w-full gap-8 items-center justify-center pb-20 overflow-y-scroll mt-4" id="postDiv">
+                            {posts!==null && posts.map((post)=> {
+                                return(
+                                    <Post
+                                        key={post._id}
+                                        post={post}
+                                    />
+                                )})}
+                            {posts.length===0 &&
+                                <div className="flex w-full items-center justify-center mt-8 text-2xl text-center px-4">
+                                    <p>
+                                        Non ci sono ancora post indirizzati al canale {nome}
+                                    </p>
+                                </div>
+                            }
+                        </div>
                     )}
                 </div>
             )}
