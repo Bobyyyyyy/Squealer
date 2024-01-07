@@ -51,6 +51,7 @@ function SinglePageOfficialChannel() {
     const fetchPosts = async () => {
         setIsLoading(true);
         let newPosts = await getPostByOfficialChannelName(channel.name, currentOffset.current, POST_TO_GET);
+        newPosts = (!newPosts) ? [] : newPosts;
         currentOffset.current += newPosts.length;
         lastRequestLength.current = newPosts.length;
         setPosts((prev) => [...prev, ...newPosts]);
@@ -70,7 +71,7 @@ function SinglePageOfficialChannel() {
         return () => {
             document.removeEventListener('scroll', scrollEndDetector);
         }
-    }, [channel.username]);
+    }, [channel]);
 
     useEffect(() => {
         window.scrollTo({ behavior: "instant", top: lastHeightDiv.current, left:0})

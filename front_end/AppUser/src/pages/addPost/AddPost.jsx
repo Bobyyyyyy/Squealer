@@ -111,7 +111,6 @@ function AddPost(){
                     content2send = await blob2base64(await compressBlob(imgAsFile));
                 } else {
                     content2send = content;
-                    console.log("imgObj",content);
                 }
                 break;
             case "geolocation":
@@ -119,7 +118,6 @@ function AddPost(){
                     lat : position[0],
                     lng: position[1]
                 });
-                console.log("pos", content);
                 break
             case "video":
                 const youtubepath = `//www.youtube.com/embed/${getEmbed(content)}`
@@ -139,7 +137,6 @@ function AddPost(){
 
         if (isTimed) {
             post.timed = true;
-            console.log(frequencyMs, typeof frequencyMs);
             post.millis = frequencyMs;
             post.squealNumber = parseInt(numberOfPosts);
         }
