@@ -93,11 +93,11 @@ function SinglePageOfficialChannel() {
                             />
                             <h3 className="text-center text-2xl font-extrabold">§{channel.name}</h3>
                         </div>
-                        <p className="text-center px-2 break-words text-sm">{channel.description}</p>
+                        <p className="text-center px-2 break-words text-lg">{channel.description}</p>
                     </div>
                     {channel.silenceable && !isAnonymous && (
                         <div className="flex justify-center gap-2" aria-label="Gestione silenziamento canale">
-                            <span>Canale silenziato</span>
+                            <span className="text-base">Canale silenziato</span>
                             <ToggleSwitch
                                 checked={isSilenced}
                                 onChange={async () => await handleSilenceChannel()}

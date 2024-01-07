@@ -77,6 +77,7 @@ function Channels () {
     const fetchChannels = async () => {
         setIsLoading(true);
         let resChannel = await getChannels();
+        resChannel = resChannel.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0));
         setChannels(resChannel);
         if (activeOfficialChannel) {
             let resOfficialChannels = await getOfficialChannels();

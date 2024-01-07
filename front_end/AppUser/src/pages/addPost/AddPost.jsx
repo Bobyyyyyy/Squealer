@@ -34,11 +34,11 @@ function AddPost(){
     const infoTime = "{TIME}";
     const infoDate = "{DATE}";
     const infoTimedText = (
-        <div className="flex flex-col flex-wrap w-full mb-4 text-md font-normal justify-center items-center">
-            <span className="text-lg">Sintassi Squeal:</span>
-            <span> <span className="font-semibold">{infoNum}</span> numero corrente dello squeal</span>
-            <span> <span className="font-semibold">{infoTime}</span> tempo di pubblicazione dello squeal</span>
-            <span> <span className="font-semibold">{infoDate}</span> data di pubblicazione dello squeal</span>
+        <div className="flex flex-col flex-wrap w-full mb-4 text-md font-normal justify-center items-start">
+            <p className="text-lg">Elementi dinamici nello Squeal:</p>
+            <p> <span className="font-semibold">{infoNum}</span> numero corrente dello squeal</p>
+            <p> <span className="font-semibold">{infoTime}</span> tempo di pubblicazione dello squeal</p>
+            <p> <span className="font-semibold">{infoDate}</span> data di pubblicazione dello squeal</p>
         </div>
     );
 
