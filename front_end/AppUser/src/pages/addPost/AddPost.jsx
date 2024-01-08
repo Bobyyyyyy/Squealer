@@ -35,10 +35,10 @@ function AddPost(){
     const infoDate = "{DATE}";
     const infoTimedText = (
         <div className="flex flex-col flex-wrap w-full mb-4 text-md font-normal justify-center items-start">
-            <p className="text-lg">Elementi dinamici nello Squeal:</p>
-            <p> <span className="font-semibold">{infoNum}</span> numero corrente dello squeal</p>
-            <p> <span className="font-semibold">{infoTime}</span> tempo di pubblicazione dello squeal</p>
-            <p> <span className="font-semibold">{infoDate}</span> data di pubblicazione dello squeal</p>
+            <p className="text-lg w-full">Elementi dinamici nello Squeal:</p>
+            <p className="w-full"><span className="font-semibold">{infoNum}</span>{" "}numero corrente dello squeal</p>
+            <p className="w-full"><span className="font-semibold">{infoTime}</span>{" "}tempo di pubblicazione dello squeal</p>
+            <p className="w-full"><span className="font-semibold">{infoDate}</span>{" "}data di pubblicazione dello squeal</p>
         </div>
     );
 
