@@ -54,7 +54,9 @@ function Body({post}) {
     return (
         <div className={"flex justify-center md:max-h-[28rem]"}>
             {post.contentType === "text" &&
-                <div className = "px-4 py-2 overflow-hidden break-words">
+                <div className = "px-4 py-2 overflow-hidden break-words"
+                     aria-label={`post testuale di ${post.owner}`}
+                >
                     {parseContentText(post.content, URLHTTPREGEX,ACCOUNTREGEX)}
                 </div>
             }
@@ -62,16 +64,20 @@ function Body({post}) {
                 <img className="aspect-auto w-full object-cover overflow-hidden"
                      src={post.content}
                      alt="image"
+                     aria-label={`immagine di ${post.owner}`}
                 />
             }
             {post.contentType === "geolocation" &&
-                <div className="w-full h-96">
+                <div className="w-full h-96"
+                     aria-label={`posizione condivisa da ${post.owner}`}
+                >
                     <MappaPost stringCoor={post.content} />
                 </div>
             }
             {post.contentType === "video" &&
                 <iframe
-                    className="w-full h-full"
+                    className="w-full aspect-video"
+                    aria-label={`video inviato da ${post.owner}`}
                     src={post.content}
                 >
                 </iframe>

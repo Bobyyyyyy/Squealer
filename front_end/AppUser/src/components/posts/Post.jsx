@@ -73,6 +73,7 @@ function Post({post}) {
                         key = {item.id}
                         onClick={ () => changeActiveButton({id: item.id})}
                         className="w-8 h-8"
+                        aria-label={`seleziona ${item.id}`}
                     >
                         { (activeButton === item.id) ? item.icon.active : item.icon.inactive }
                     </button>
