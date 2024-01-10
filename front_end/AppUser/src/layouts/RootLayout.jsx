@@ -97,6 +97,7 @@ export default function RootLayout() {
                             <NavLink
                                 to={item.route}
                                 className={({isActive}) => `w-8 h-8 ${isActive && ' '}`}
+                                aria-label={`vai alla pagina ${item.name}`}
                                 key={item.name}
                             >
                                 {({isActive}) => {

@@ -54,9 +54,11 @@ function NotificationModal({isOpen, setIsOpen, notifications, setNotifications})
                             let users = notifications.filter((not) => not.channel === notification.channel);
                             return (
                                     <div key={index} className="flex flex-col w-full my-2">
-                                        <div className="flex gap-1.5">
+                                        <div className="flex gap-1.5"
+                                             aria-label={`nel canale ${notification.channel} ci sono ${notification.names.length} nuovi post`}
+                                        >
                                             In
-                                            <Link to={`/channels/${notification.channel}`} className="font-semibold text-blue-500">
+                                            <Link to={`/channels/${notification.channel}`} className="font-semibold text-blue-500" aria-label={`vai al canale ${notification.channel}`}>
                                                 §{notification.channel}
                                             </Link>
                                             ci sono

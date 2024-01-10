@@ -40,6 +40,7 @@ function RootLayoutAnonymous() {
                     <div className={"flex w-full flex-wrap items-center justify-around px-3 content-around"}>
                         {navigationButtons.map( (item) => (
                             <NavLink
+                                aria-label={`vai alla pagina ${item.name}`}
                                 to={item.route}
                                 className={({isActive}) => `w-8 h-8 ${isActive && ' '}`}
                                 key={item.name}

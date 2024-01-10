@@ -10,6 +10,7 @@ function NotificationButton({notifications, setNotifications}) {
             <button
                 className="fixed bottom-14 right-8 z-10 bg-red-700 rounded-full p-3 flex w-fit h-fit m-0"
                 onClick={()=> setShowNotifications((prev) => !prev)}
+                aria-label="mostra/nascondi notifiche"
             >
                 <div className="w-10 h-10">
                     {NotificationIcon}
