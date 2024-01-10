@@ -50,6 +50,8 @@ function modifyUser(parameters) {
         monthly: $('#max-monthly').html(),
     }
 
+    let newProfilePicture = $('#profile-picture').val()
+
     if(parseInt(parameters.daily)  > parseInt(maxQuota.daily) || parseInt(parameters.weekly) > parseInt(maxQuota.weekly) || parseInt(parameters.monthly)  > parseInt(maxQuota.monthly)) {
         alert('Max Quota Exceeded');
         return 0;
@@ -58,7 +60,7 @@ function modifyUser(parameters) {
     $.ajax({
         url: '/db/user',
         type: 'put',
-        data: {filter: parameters.user, characters: {daily: parameters.daily,weekly: parameters.weekly,monthly: parameters.monthly}},
+        data: {filter: parameters.user, characters: {daily: parameters.daily,weekly: parameters.weekly,monthly: parameters.monthly}, profilePicture: newProfilePicture},
         success: () => {
             location.reload();
         }

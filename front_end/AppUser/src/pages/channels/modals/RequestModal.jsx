@@ -31,7 +31,7 @@ function RequestModal({isOpen, setIsOpen, requests, channelName, hasUpdated, set
                     <div>
                         {requests.map((follower) => {
                             return (
-                                <div key={follower._id} className="flex justify-between">
+                                <div key={follower._id} className="flex justify-between py-2">
                                     <div className="flex gap-2 items-center justify-start">
                                         <Link to={`/search/${follower.user}`}>
                                             <img

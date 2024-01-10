@@ -43,6 +43,6 @@ onMounted(()=> {
 
 <style scoped>
   .map{
-    min-height:30vh ;
+    min-height:28vh;
   }
 </style>

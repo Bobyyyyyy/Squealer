@@ -33,8 +33,6 @@ function Post({post}) {
 
     async function changeActiveButton({id}) {
         setActiveButton((id === activeButton) ? undefined : id);
-        // si può fare perché lo stato activeButton cambia
-        // effettivamente quando il componente viene renderizzato
         const user = getUsernameFromSessionStore();
         if (id !== activeButton) {
             await fetch(`/db/post/updateReaction`,{
@@ -73,12 +71,14 @@ function Post({post}) {
                         key = {item.id}
                         onClick={ () => changeActiveButton({id: item.id})}
                         className="w-8 h-8"
+			aria-label={`seleziona ${item.id}`}
                     >
                         { (activeButton === item.id) ? item.icon.active : item.icon.inactive }
                     </button>
                 ))}
                 {!isAnonymous && (
                     <button
+			aria-label="mostra risposte"
                         className="w-8 h-8"
                         onClick={() => setShowRepliesModal((prev) => !prev)}>
                         {CommentIcon}

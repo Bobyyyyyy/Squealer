@@ -26,21 +26,22 @@ const resetQuota = async (type) => {
  * @returns {Promise<void>}
  */
 const createScheduledPost = async (postId, millis, squealNumber, content, typeC) =>{
-
-
-    let newTimedPost = {
-        allTimes: squealNumber,
-        done:1,             //first insert done before.
-        id : postId,
-        ...(typeC === 'text') && {content: content},
-        timestamp2next: millis,
-        job :  nodeCron.schedule(getNextTick(millis), async () => await PMM.addTimedPost(postId),{
-            scheduled: true,
-            timezone: 'Europe/Rome',
-        })
-    }
-    scheduledPostArr.push(newTimedPost)
-    return {inserted: true};
+	try{
+		const callbackJob = async () => {await PMM.addTimedPost(postId)};
+		let job = nodeCron.schedule(getNextTick(millis), callbackJob);
+    		let newTimedPost = {
+        		allTimes: squealNumber,
+        		done:1,             //first insert done before.
+        		id : postId,
+        		...(typeC === 'text') && {content: content},
+        		timestamp2next: millis,
+        		job :  job,
+    		}
+		scheduledPostArr.push(newTimedPost)
+    		return {inserted: true};
+	}catch(err){
+		console.log(err)
+	}
 }
 
 const createOfficialScheduledPost = async(canale, endpoint) => {

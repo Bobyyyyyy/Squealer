@@ -268,7 +268,7 @@ const scrollEndDetectorHandler = async (lastRequestLength, lastHeightDiv, update
     const postDiv = document.getElementById("postDiv");
     // se l'ultima richiesta ha ricevuto meno post del massimo allora sono finiti,
     // quindi non serve fare una nuova richiesta
-    if (postDiv && window.innerHeight + window.scrollY >= postDiv.offsetHeight && lastRequestLength.current >= POST_TO_GET) {
+    if (postDiv && window.innerHeight + window.scrollY >= (postDiv.offsetHeight-100) && lastRequestLength.current >= POST_TO_GET) {
         lastHeightDiv.current = window.scrollY;
         await updatePost();
     }

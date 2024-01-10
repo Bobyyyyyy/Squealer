@@ -127,7 +127,7 @@ function parseText(squealText, squealNumber){
 const addTimedPost = async (postId) => {
     try {
         await connection.get()
-
+	console.log("ENTRO TEMPORIZZATO");
         let post = await Post.findById(postId).lean();
         let userQuota = (await User.findOne({username: post.owner})).characters;
 
@@ -221,7 +221,10 @@ const addPost = async (post,quota) => {
                 officialChannels.push(destination.name);
                 destinations.pop(destination);
             }
-            else if (channel) {
+	    else if (destinationType === 'keyword') {
+		postCategory = 'public';
+	    }
+            else if (destinationType === 'channel') {
                 let permissionToWrite;
                 if(channel.isBlocked) {
                     throw createError('Il canale è bloccato',400);
@@ -420,14 +423,14 @@ const getAllPost = async (query,sessionUser) =>{
                 let filteredArray = post.views.filter(user => {return user.name === sessionUser.username})
                 if(filteredArray.length === 0) {
                     let NumberofViews = ++post.views.length;
-                    let CriticalMass = post.criticalMass + (NumberofViews * CRITICAL_MASS_MULTIPLIER)
+                    let CriticalMass = NumberofViews * CRITICAL_MASS_MULTIPLIER
                     let view = {
                         name: sessionUser.username,
                         date: new Date(),
                     }
                     let postToUpdate = await Post.findByIdAndUpdate(post._id,{$push: {'views': view} , 'criticalMass': parseInt(CriticalMass)});
 
-                    let creator = User.find({username: post.owner}).lean();
+                    let creator = await User.findOne({username: post.owner}).lean();
                     await UpdateCategory(postToUpdate,creator._id);
                 }
             }
@@ -577,13 +580,34 @@ const getPostHome = async (userInSession , limit, offset) => {
                     content: '$content',
                     reactions: '$reactions',
                     dateOfCreation: '$dateOfCreation',
+		    views: '$views',
+		    criticalMass: '$criticalMass',
                     views_count: {$size: '$views'},
                     profilePicture: '$user_info.profilePicture',
                 }
             },
             {$skip: parseInt(offset)},
             {$limit: parseInt(limit)},
-        ])
+        ]);
+
+	  // Update delle views e della categoria se necessario
+            for (const post of posts) {
+                let filteredArray = post.views.filter(user => {return user.name === userInSession})
+                if(filteredArray.length === 0) {
+                    let NumberofViews = ++post.views.length;
+                    let CriticalMass = NumberofViews * CRITICAL_MASS_MULTIPLIER
+                    let view = {
+                        name: userInSession,
+                        date: new Date(),
+                    }
+                    let postToUpdate = await Post.findByIdAndUpdate(post._id,{$push: {'views': view} , 'criticalMass': parseInt(CriticalMass)});
+
+                    let creator = await User.findOne({username: post.owner}).lean();
+                    await UpdateCategory(postToUpdate,creator._id);
+                }
+            }
+
+
 
         return posts;
 
@@ -689,13 +713,34 @@ const getPostFromMention = async (userInSession, mention, limit, offset) => {
                     content: '$content',
                     reactions: '$reactions',
                     dateOfCreation: '$dateOfCreation',
+ 		    views: '$views',
+		    criticalMass: '$criticalMass',
                     views_count: {$size: '$views'},
                     profilePicture: '$user_info.profilePicture',
                 }
             },
             {$skip: parseInt(offset)},
             {$limit: parseInt(limit)},
-        ])
+        ]);
+
+
+	 // Update delle views e della categoria se necessario
+            for (const post of posts) {
+                let filteredArray = post.views.filter(user => {return user.name === userInSession})
+                if(filteredArray.length === 0) {
+                    let NumberofViews = ++post.views.length;
+                    let CriticalMass = NumberofViews * CRITICAL_MASS_MULTIPLIER
+                    let view = {
+                        name: userInSession,
+                        date: new Date(),
+                    }
+                    let postToUpdate = await Post.findByIdAndUpdate(post._id,{$push: {'views': view} , 'criticalMass': parseInt(CriticalMass)});
+
+                    let creator = await User.findOne({username: post.owner}).lean();
+                    await UpdateCategory(postToUpdate,creator._id);
+                }
+            }
+
 
         return posts;
 
@@ -705,7 +750,7 @@ const getPostFromMention = async (userInSession, mention, limit, offset) => {
 }
 
 
-const getPostHomeAnonymous = async (limit, offset) => {
+const getPostHomeAnonymous = async (userInSession,limit, offset) => {
     try{
         await connection.get();
 
@@ -786,13 +831,33 @@ const getPostHomeAnonymous = async (limit, offset) => {
                     content: '$content',
                     reactions: '$reactions',
                     dateOfCreation: '$dateOfCreation',
+		    views: '$views',
+		    criticalMass: '$criticalMass',
                     views_count: {$size: '$views'},
                     profilePicture: '$user_info.profilePicture',
                 }
             },
             {$skip: parseInt(offset)},
             {$limit: parseInt(limit)},
-        ])
+        ]);
+
+	 // Update delle views e della categoria se necessario
+            for (const post of posts) {
+                let filteredArray = post.views.filter(user => {return user.name === userInSession})
+                if(filteredArray.length === 0) {
+                    let NumberofViews = ++post.views.length;
+                    let CriticalMass = NumberofViews * CRITICAL_MASS_MULTIPLIER
+                    let view = {
+                        name: userInSession,
+                        date: new Date(),
+                    }
+                    let postToUpdate = await Post.findByIdAndUpdate(post._id,{$push: {'views': view} , 'criticalMass': parseInt(CriticalMass)});
+
+                    let creator = await User.findOne({username: post.owner}).lean();
+                    await UpdateCategory(postToUpdate,creator._id);
+                }
+            }
+
 
         return posts;
 
@@ -910,7 +975,9 @@ const getPostByUsername2watch = async (userInSession , limit, offset, user2watch
                     category: '$category',
                     contentType: '$contentType',
                     content: '$content',
+		    views: '$views',
                     reactions: '$reactions',
+		    criticalMass: '$criticalMass',
                     dateOfCreation: '$dateOfCreation',
                     views_count: {$size: '$views'},
                     profilePicture: '$user_info.profilePicture',
@@ -919,6 +986,25 @@ const getPostByUsername2watch = async (userInSession , limit, offset, user2watch
             {$skip: parseInt(offset)},
             {$limit: parseInt(limit)},
         ])
+
+
+	   // Update delle views e della categoria se necessario
+            for (const post of posts) {
+                let filteredArray = post.views.filter(user => {return user.name === userInSession})
+                if(filteredArray.length === 0) {
+                    let NumberofViews = ++post.views.length;
+                    let CriticalMass = NumberofViews * CRITICAL_MASS_MULTIPLIER
+                    let view = {
+                        name: userInSession,
+                        date: new Date(),
+                    }
+                    let postToUpdate = await Post.findByIdAndUpdate(post._id,{$push: {'views': view} , 'criticalMass': parseInt(CriticalMass)});
+
+                    let creator = await User.findOne({username: post.owner}).lean();
+                    await UpdateCategory(postToUpdate,creator._id);
+                }
+            }
+
 
         return posts;
 
@@ -973,6 +1059,8 @@ const getPostByProfile = async (username, limit, offset) => {
                     category: '$category',
                     contentType: '$contentType',
                     content: '$content',
+		    views: '$views',
+		    criticalMass: '$criticalMass',
                     reactions: '$reactions',
                     dateOfCreation: '$dateOfCreation',
                     views_count: {$size: '$views'},
@@ -982,6 +1070,24 @@ const getPostByProfile = async (username, limit, offset) => {
             {$skip: parseInt(offset)},
             {$limit: parseInt(limit)},
         ])
+
+	// Update delle views e della categoria se necessario
+            for (const post of posts) {
+                let filteredArray = post.views.filter(user => {return user.name === username})
+                if(filteredArray.length === 0) {
+                    let NumberofViews = ++post.views.length;
+                    let CriticalMass = NumberofViews * CRITICAL_MASS_MULTIPLIER
+                    let view = {
+                        name: username,
+                        date: new Date(),
+                    }
+                    let postToUpdate = await Post.findByIdAndUpdate(post._id,{$push: {'views': view} , 'criticalMass': parseInt(CriticalMass)});
+
+                    let creator = await User.findOne({username: post.owner}).lean();
+                    await UpdateCategory(postToUpdate,creator._id);
+                }
+            }
+
         return posts;
 
     } catch (err) {
@@ -1195,15 +1301,14 @@ const UpdateCategory = async (post, userID) => {
 
     if (positiveReactionsCount > criticalMass) {
         if (negativeReactionsCount > criticalMass) {
-
-            if(post.popularity !== 'controversial') {
+            if(post.popularity !== 'controversial' && post.category === 'public') {
                 await Post.findByIdAndUpdate(post._id, {popularity: 'controversial'});
                 await addDestination({name: 'CONTROVERSIAL', destType: 'official'},post._id);
             }
 
         }
         else {
-            if(post.popularity !== 'popular') {
+            if(post.popularity !== 'popular' && post.category === 'public') {
                 await Post.findByIdAndUpdate(post._id, {popularity: 'popular'});
                 await changePopularity(userID, 'popularity',true);
             }
@@ -1213,13 +1318,13 @@ const UpdateCategory = async (post, userID) => {
 
     if (negativeReactionsCount > criticalMass) {
         if (positiveReactionsCount > criticalMass) {
-            if(post.popularity !== 'controversial') {
+            if(post.popularity !== 'controversial' && post.category === 'public') {
                 await Post.findByIdAndUpdate(post._id, {popularity: 'controversial'});
                 await addDestination({name: 'CONTROVERSIAL', destType: 'official'},post._id);
             }
         }
         else {
-            if(post.popularity !== 'unpopular') {
+            if(post.popularity !== 'unpopular' && post.category === 'public') {
                 await Post.findByIdAndUpdate(post._id, {popularity: 'unpopular'});
                 await changePopularity(userID,'unpopularity',true);
             }
@@ -1229,10 +1334,10 @@ const UpdateCategory = async (post, userID) => {
 
     if (post.popularity !== 'neutral') {
         await Post.findByIdAndUpdate(post._id, {popularity: 'neutral'});
-        if (post.popularity === 'popular') {
+        if (post.popularity === 'popular' && post.category === 'public') {
             await changePopularity(userID, 'popularity' ,false);
         }
-        else if (post.popularity === 'unpopular'){
+        else if (post.popularity === 'unpopular' && post.category === 'public'){
             await changePopularity(userID, 'unpopularity',true);
         }
         return true;

@@ -139,6 +139,7 @@ const modifyUser = async(req,res) => {
     try{
         res.send(await userModel.altUser(req.body));
     } catch (Error) {
+	console.log(Error);
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send({message: Error.message});
         else {

@@ -237,7 +237,7 @@ const altUser = async (body) => {
             'characters.weekly':  parseInt(body.characters.weekly),
             'characters.monthly':  parseInt(body.characters.monthly)},
             {new: true}).lean();
-
+	
         return user;
     }
     catch (Error){

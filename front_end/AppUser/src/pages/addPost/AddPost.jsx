@@ -35,10 +35,10 @@ function AddPost(){
     const infoDate = "{DATE}";
     const infoTimedText = (
         <div className="flex flex-col flex-wrap w-full mb-4 text-md font-normal justify-center items-start">
-            <p className="text-lg">Elementi dinamici nello Squeal:</p>
-            <p> <span className="font-semibold">{infoNum}</span> numero corrente dello squeal</p>
-            <p> <span className="font-semibold">{infoTime}</span> tempo di pubblicazione dello squeal</p>
-            <p> <span className="font-semibold">{infoDate}</span> data di pubblicazione dello squeal</p>
+            <p className="text-lg w-full">Elementi dinamici:</p>
+            <p className="w-full"><span className="font-semibold">{infoNum}</span>{" "}numero corrente dello squeal</p>
+            <p className="w-full"><span className="font-semibold">{infoTime}</span>{" "}tempo di pubblicazione dello squeal</p>
+            <p className="w-full"><span className="font-semibold">{infoDate}</span>{" "}data di pubblicazione dello squeal</p>
         </div>
     );
 
@@ -111,7 +111,6 @@ function AddPost(){
                     content2send = await blob2base64(await compressBlob(imgAsFile));
                 } else {
                     content2send = content;
-                    console.log("imgObj",content);
                 }
                 break;
             case "geolocation":
@@ -119,7 +118,6 @@ function AddPost(){
                     lat : position[0],
                     lng: position[1]
                 });
-                console.log("pos", content);
                 break
             case "video":
                 const youtubepath = `//www.youtube.com/embed/${getEmbed(content)}`
@@ -139,7 +137,6 @@ function AddPost(){
 
         if (isTimed) {
             post.timed = true;
-            console.log(frequencyMs, typeof frequencyMs);
             post.millis = frequencyMs;
             post.squealNumber = parseInt(numberOfPosts);
         }

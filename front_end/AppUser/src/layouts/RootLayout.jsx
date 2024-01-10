@@ -96,6 +96,7 @@ export default function RootLayout() {
                         {navigationButtons.map( (item) => (
                             <NavLink
                                 to={item.route}
+				aria-label={`vai alla pagina ${item.name}`}
                                 className={({isActive}) => `w-8 h-8 ${isActive && ' '}`}
                                 key={item.name}
                             >

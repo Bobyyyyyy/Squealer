@@ -148,6 +148,7 @@ const getHomePosts = async (req, res) => {
         res.send(await postModel.getPostHome(user, limit, offset))
     }
     catch(Error){
+	console.log(Error)
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send({message: Error.message});
         else {
@@ -203,10 +204,11 @@ const getPostHomeAnonymous = async (req, res) => {
         let offset = req.query.offset;
         if (isNaN(limit) || isNaN(offset))
             throw createError('bad request', 400);
-
-        res.send(await postModel.getPostHomeAnonymous(limit, offset));
+	let user = req.session.user;
+        res.send(await postModel.getPostHomeAnonymous(user,limit, offset));
     }
     catch(Error){
+	console.log(Error)
         if(typeof Error.statusCode !== 'undefined')
             res.status(Error.statusCode).send({message: Error.message});
         else {

@@ -76,9 +76,9 @@ const cronTabs = require("./back_end/mongo/controllers/utils");
 const {logout} = require("./back_end/Frontpage/controllers/FrontPageController");
 
 // quota reset
-nodeCron.schedule(cronTabs.midnight, async () => {await CC.resetQuota('D')}).start()
-nodeCron.schedule(cronTabs.startWeek, async () => {await CC.resetQuota('W')}).start()
-nodeCron.schedule(cronTabs.startMonth, async () => {await CC.resetQuota('M')}).start()
+nodeCron.schedule(cronTabs.midnight, async () => {await CC.resetQuota('D')}, {timezone: 'Europe/Rome'}).start()
+nodeCron.schedule(cronTabs.startWeek, async () => {await CC.resetQuota('W')}, {timezone: 'Europe/Rome'}).start()
+nodeCron.schedule(cronTabs.startMonth, async () => {await CC.resetQuota('M')}, {timezone: 'Europe/Rome'}).start()
 
 //Post Automatici canali ufficiali
 const yesterday = () => {
@@ -98,10 +98,10 @@ const API_NASA = 'https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY'
 const API_CATS = 'https://api.thecatapi.com/v1/images/search'
 const API_WIKI = `https://api.wikimedia.org/feed/v1/wikipedia/it/onthisday/events/${today()}`
 
-nodeCron.schedule(cronTabs.evening, async () => {await CC.createOfficialScheduledPost('TOP_NEWS', API_TOP_NEWS)}).start();
-nodeCron.schedule(cronTabs.evening, async () => {await CC.createOfficialScheduledPost('NASA_APOD',API_NASA)}).start()
-nodeCron.schedule(cronTabs.evening, async () => {await CC.createOfficialScheduledPost('RANDOM_CATS',API_CATS)}).start()
-nodeCron.schedule(cronTabs.evening, async () => {await CC.createOfficialScheduledPost('TODAY_FACTS',API_WIKI)}).start()
+nodeCron.schedule(cronTabs.evening, async () => {await CC.createOfficialScheduledPost('TOP_NEWS', API_TOP_NEWS)}, {timezone: 'Europe/Rome'}).start();
+nodeCron.schedule(cronTabs.evening, async () => {await CC.createOfficialScheduledPost('NASA_APOD',API_NASA)}, {timezone: 'Europe/Rome'}).start()
+nodeCron.schedule(cronTabs.evening, async () => {await CC.createOfficialScheduledPost('RANDOM_CATS',API_CATS)}, {timezone: 'Europe/Rome'}).start()
+nodeCron.schedule(cronTabs.evening, async () => {await CC.createOfficialScheduledPost('TODAY_FACTS',API_WIKI)}, {timezone: 'Europe/Rome'}).start()
 
 
 
